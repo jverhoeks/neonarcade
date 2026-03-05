@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CHROMASELF — Discover Your Palette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+}
+
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== LAYOUT ===== */
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 24px 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  overflow-y: auto;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ===== START SCREEN ===== */
+#start-screen {
+  text-align: center;
+  gap: 20px;
+}
+
+.start-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, #00f0ff 0%, #b44dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  filter: drop-shadow(0 0 20px rgba(0,240,255,0.25)) drop-shadow(0 0 50px rgba(180,77,255,0.15));
+}
+
+.start-hook {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(12px, 2.5vw, 16px);
+  letter-spacing: 4px;
+  color: #00f0ff;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.start-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(15px, 2.5vw, 18px);
+  color: #8888aa;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.color-preview {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 280px;
+}
+
+.preview-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  animation: swatchPulse 3s ease-in-out infinite;
+}
+
+@keyframes swatchPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover, .btn:active {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+
+.btn.purple {
+  border-color: #b44dff;
+  color: #b44dff;
+  background: rgba(180,77,255,0.06);
+}
+
+.btn.purple:hover, .btn.purple:active {
+  background: rgba(180,77,255,0.15);
+  box-shadow: 0 0 20px rgba(180,77,255,0.2);
+}
+
+.time-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+}
+
+/* ===== QUESTION SCREEN ===== */
+#question-screen {
+  gap: 0;
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+.progress-container {
+  width: 100%;
+  max-width: 520px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progress-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+}
+
+.progress-count {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: #00f0ff;
+  letter-spacing: 2px;
+}
+
+.progress-bar-bg {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #b44dff);
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+
+.question-wrap {
+  width: 100%;
+  max-width: 520px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.question-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(14px, 3vw, 20px);
+  letter-spacing: 1px;
+  color: #fff;
+  text-align: center;
+  line-height: 1.4;
+  padding: 0 8px;
+  flex-shrink: 0;
+  transition: opacity 0.3s ease;
+}
+
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  max-height: 380px;
+}
+
+.answer-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 16px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.answer-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--card-color, #00f0ff);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: 7px;
+}
+
+.answer-card:hover::before {
+  opacity: 0.04;
+}
+
+.answer-card.selected {
+  border-color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0,240,255,0.2), inset 0 0 20px rgba(0,240,255,0.04);
+  transform: scale(1.04);
+}
+
+.answer-card.selected::before {
+  opacity: 0.06;
+}
+
+.answer-swatch {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.answer-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: clamp(12px, 2.5vw, 15px);
+  color: #cccce0;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== TRANSITION ===== */
+.q-transition {
+  animation: qSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes qSlideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== RESULTS SCREEN ===== */
+#results-screen {
+  gap: 0;
+  justify-content: flex-start;
+  padding-top: 20px;
+  overflow-y: auto;
+}
+
+.results-inner {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.result-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(24px, 6vw, 44px);
+  letter-spacing: 4px;
+  text-align: center;
+  line-height: 1.1;
+  animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes resultReveal {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.result-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: #8888aa;
+  text-transform: uppercase;
+  text-align: center;
+  animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+}
+
+.result-rarity {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+  animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
+}
+
+/* ===== COLOR GRID ===== */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 320px;
+  animation: gridReveal 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.25s both;
+}
+
+@keyframes gridReveal {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.grid-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  position: relative;
+  animation: cellPop 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.grid-cell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 10px var(--cell-glow, rgba(0,240,255,0.3));
+  opacity: 0.5;
+}
+
+@keyframes cellPop {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ===== ARCHETYPE BAR ===== */
+.archetype-bars {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+}
+
+.arch-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.arch-bar-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #8888aa;
+  width: 62px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.arch-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.arch-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arch-bar-pct {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: #4a4a6a;
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ===== PREVIOUS READINGS ===== */
+.prev-readings {
+  width: 100%;
+  max-width: 320px;
+  animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
+}
+
+.prev-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.prev-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prev-item {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  color: #4a4a6a;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.prev-item-when {
+  color: #8888aa;
+}
+
+/* ===== BUTTONS ROW ===== */
+.results-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.55s both;
+}
+
+/* ===== SHARE TOAST ===== */
+.share-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(0,240,255,0.12);
+  border: 1px solid rgba(0,240,255,0.3);
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.share-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== LOADING OVERLAY ===== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0a0a12;
+  z-index: 8888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  transition: opacity 0.6s ease;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  width: 120px;
+}
+
+.loading-cell {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.05);
+  animation: loadFlicker 1.5s ease-in-out infinite;
+}
+
+@keyframes loadFlicker {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+.loading-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #4a4a6a;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-grid" id="loading-grid"></div>
+  <div class="loading-text">CHROMASELF</div>
+</div>
+
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div class="screen" id="start-screen">
+    <div class="start-title">CHROMASELF</div>
+    <div class="start-hook">12 questions. Your true color.</div>
+    <div class="color-preview" id="preview-swatches"></div>
+    <div class="start-desc">Discover the palette that lives inside you. Share it. Find your match.</div>
+    <button class="btn" id="begin-btn">BEGIN</button>
+    <div class="time-hint">~ 2 minutes</div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="screen" id="question-screen">
+    <div class="progress-container">
+      <div class="progress-meta">
+        <span class="progress-label">Calibrating</span>
+        <span class="progress-count" id="q-count">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+    </div>
+    <div class="question-wrap" id="question-wrap">
+      <div class="question-text" id="q-text"></div>
+      <div class="answers-grid" id="answers-grid"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen" id="results-screen">
+    <div class="results-inner" id="results-inner"></div>
+  </div>
+
+</div>
+
+<div class="share-toast" id="share-toast">PALETTE COPIED</div>
+
+<script>
+(() => {
+  // ===== AUDIO =====
+  const AudioCtxCtor = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function getAudio() {
+    if (!audioCtx) audioCtx = new AudioCtxCtor();
+    return audioCtx;
+  }
+
+  function playTone(freq, type, duration, vol, delay) {
+    delay = delay || 0;
+    try {
+      const ctx = getAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration + 0.05);
+    } catch(e) {}
+  }
+
+  function soundChime() {
+    playTone(880, 'sine', 0.4, 0.06, 0);
+    playTone(1100, 'sine', 0.3, 0.04, 0.1);
+  }
+
+  function soundSelect(archetype) {
+    const freqs = { EMBER: 420, CIRCUIT: 1200, VERDANT: 280, VOID: 140 };
+    const types = { EMBER: 'triangle', CIRCUIT: 'sawtooth', VERDANT: 'sine', VOID: 'sine' };
+    playTone(freqs[archetype] || 600, types[archetype] || 'sine', 0.25, 0.07, 0);
+  }
+
+  function soundReveal() {
+    var notes = [261, 329, 392, 523];
+    notes.forEach(function(f, i) {
+      playTone(f, 'sine', 0.6, 0.05, i * 0.12);
+    });
+    playTone(659, 'sine', 1.0, 0.07, 0.6);
+  }
+
+  function soundShare() {
+    playTone(880, 'sine', 0.1, 0.08, 0);
+    playTone(1320, 'sine', 0.15, 0.06, 0.08);
+    playTone(1760, 'sine', 0.2, 0.05, 0.14);
+  }
+
+  // ===== ARCHETYPE DATA =====
+  var EMBER_COLORS   = ['#ff6b35','#e84855','#ffd700','#c4722a','#ff9a3c','#d4561a','#f7b731','#e55039'];
+  var CIRCUIT_COLORS = ['#00f0ff','#b44dff','#4fc3f7','#7c4dff','#00e5ff','#536dfe','#18ffff','#651fff'];
+  var VERDANT_COLORS = ['#39ff14','#a8d8a8','#52b788','#2d6a4f','#95d5b2','#74c69d','#40916c','#1b4332'];
+  var VOID_COLORS    = ['#2d1b69','#1a0533','#0d0d2b','#160040','#1c1c3a','#0a0a2e','#120024','#06061a'];
+
+  var ARCH_COLOR_POOLS = { EMBER: EMBER_COLORS, CIRCUIT: CIRCUIT_COLORS, VERDANT: VERDANT_COLORS, VOID: VOID_COLORS };
+
+  var ARCH_ACCENT = { EMBER: '#ff9a3c', CIRCUIT: '#00f0ff', VERDANT: '#39ff14', VOID: '#b44dff' };
+  var ARCH_GLOW   = { EMBER: 'rgba(255,154,60,0.4)', CIRCUIT: 'rgba(0,240,255,0.4)', VERDANT: 'rgba(57,255,20,0.4)', VOID: 'rgba(180,77,255,0.4)' };
+  var ARCH_EMOJI  = { EMBER: '🟧', CIRCUIT: '🟦', VERDANT: '🟩', VOID: '⬛' };
+
+  var RARITY = {
+    EMBER:   '32% of players',
+    CIRCUIT: '28% of players',
+    VERDANT: '24% of players',
+    VOID:    '16% of players'
+  };
+
+  var TITLES = {
+    'EMBER+CIRCUIT':   ['Burning Signal',   'Voltage at Dusk'],
+    'EMBER+VERDANT':   ['Root Flame',       'Amber Forest'],
+    'EMBER+VOID':      ['Ash and Dark',     'Embers in Nothing'],
+    'CIRCUIT+EMBER':   ['Neon Warmth',      'Digital Sunset'],
+    'CIRCUIT+VERDANT': ['Electric Garden',  'Silicon Moss'],
+    'CIRCUIT+VOID':    ['Cold Archive',     'Signal Silence'],
+    'VERDANT+EMBER':   ['Forest Fire',      'Living Amber'],
+    'VERDANT+CIRCUIT': ['Green Signal',     'Organic Code'],
+    'VERDANT+VOID':    ['Deep Canopy',      'Roots in Dark'],
+    'VOID+EMBER':      ['Dark Lantern',     'Void With Warmth'],
+    'VOID+CIRCUIT':    ['Null Frequency',   'Dark Circuit'],
+    'VOID+VERDANT':    ['Shadow Garden',    'Night Roots']
+  };
+
+  // Questions — each choice has: label, color swatch, arch
+  var QUESTIONS = [
+    {
+      q: 'You enter a room. The lighting is...',
+      choices: [
+        { label: 'Candlelight warm',            color: '#c4722a', arch: 'EMBER'   },
+        { label: 'Cool blue neon',              color: '#00f0ff', arch: 'CIRCUIT' },
+        { label: 'Natural daylight',            color: '#95d5b2', arch: 'VERDANT' },
+        { label: 'Pitch dark — one spotlight',  color: '#1a0533', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'Your ideal soundtrack is...',
+      choices: [
+        { label: 'Lo-fi rain beats',    color: '#f7b731', arch: 'EMBER'   },
+        { label: 'Glitchy synthwave',   color: '#7c4dff', arch: 'CIRCUIT' },
+        { label: 'Classical piano',     color: '#74c69d', arch: 'VERDANT' },
+        { label: 'Silence with echoes', color: '#0d0d2b', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'Pick a time of day:',
+      choices: [
+        { label: 'Golden hour dusk',      color: '#ff9a3c', arch: 'EMBER'   },
+        { label: '3AM city glow',         color: '#536dfe', arch: 'CIRCUIT' },
+        { label: 'High noon sharp',       color: '#52b788', arch: 'VERDANT' },
+        { label: 'Blue hour before dawn', color: '#2d1b69', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'The texture that draws you:',
+      choices: [
+        { label: 'Rough concrete',  color: '#e55039', arch: 'EMBER'   },
+        { label: 'Polished chrome', color: '#4fc3f7', arch: 'CIRCUIT' },
+        { label: 'Aged paper',      color: '#a8d8a8', arch: 'VERDANT' },
+        { label: 'Liquid glass',    color: '#160040', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'A color you would wear every day:',
+      choices: [
+        { label: 'Burnt orange',    color: '#ff6b35', arch: 'EMBER'   },
+        { label: 'Electric purple', color: '#b44dff', arch: 'CIRCUIT' },
+        { label: 'Forest green',    color: '#2d6a4f', arch: 'VERDANT' },
+        { label: 'Pure white',      color: '#1c1c3a', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'Your emotional signature is:',
+      choices: [
+        { label: 'Melancholy longing', color: '#d4561a', arch: 'EMBER'   },
+        { label: 'Restless energy',    color: '#00e5ff', arch: 'CIRCUIT' },
+        { label: 'Quiet warmth',       color: '#40916c', arch: 'VERDANT' },
+        { label: 'Cold detachment',    color: '#120024', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'The landscape that calls you:',
+      choices: [
+        { label: 'Desert at sunset', color: '#ffd700', arch: 'EMBER'   },
+        { label: 'Neon city rain',   color: '#18ffff', arch: 'CIRCUIT' },
+        { label: 'Mountain fog',     color: '#95d5b2', arch: 'VERDANT' },
+        { label: 'Deep ocean floor', color: '#06061a', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'Words on your wall would be:',
+      choices: [
+        { label: 'A smudged poem',  color: '#c4722a', arch: 'EMBER'   },
+        { label: 'A neon sign',     color: '#651fff', arch: 'CIRCUIT' },
+        { label: 'Nothing — bare',  color: '#1b4332', arch: 'VERDANT' },
+        { label: 'A single number', color: '#0a0a2e', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'You trust...',
+      choices: [
+        { label: 'Instinct', color: '#e84855', arch: 'EMBER'   },
+        { label: 'Data',     color: '#00f0ff', arch: 'CIRCUIT' },
+        { label: 'Memory',   color: '#74c69d', arch: 'VERDANT' },
+        { label: 'Silence',  color: '#2d1b69', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'Your ideal object is:',
+      choices: [
+        { label: 'A worn journal',  color: '#ff9a3c', arch: 'EMBER'   },
+        { label: 'A circuit board', color: '#4fc3f7', arch: 'CIRCUIT' },
+        { label: 'A smooth stone',  color: '#52b788', arch: 'VERDANT' },
+        { label: 'An empty mirror', color: '#160040', arch: 'VOID'    }
+      ]
+    },
+    {
+      q: 'If you had to disappear, you\'d go to:',
+      choices: [
+        { label: 'A lighthouse',            color: '#f7b731', arch: 'EMBER'   },
+        { label: 'A server room',           color: '#7c4dff', arch: 'CIRCUIT' },
+        { label: 'A forest',                color: '#40916c', arch: 'VERDANT' },
+        { label: 'The space between floors', color: '#0d0d2b', arch: 'VOID'   }
+      ]
+    },
+    {
+      q: 'The thing you protect most is:',
+      choices: [
+        { label: 'Your imagination', color: '#d4561a', arch: 'EMBER'   },
+        { label: 'Your time',        color: '#536dfe', arch: 'CIRCUIT' },
+        { label: 'Your peace',       color: '#a8d8a8', arch: 'VERDANT' },
+        { label: 'Your secrets',     color: '#120024', arch: 'VOID'    }
+      ]
+    }
+  ];
+
+  // ===== STATE =====
+  var currentQ  = 0;
+  var scores    = { EMBER: 0, CIRCUIT: 0, VERDANT: 0, VOID: 0 };
+  var resultData = null;
+
+  // ===== DOM REFS =====
+  var startScreen    = document.getElementById('start-screen');
+  var questionScreen = document.getElementById('question-screen');
+  var resultsScreen  = document.getElementById('results-screen');
+  var beginBtn       = document.getElementById('begin-btn');
+  var qText          = document.getElementById('q-text');
+  var answersGrid    = document.getElementById('answers-grid');
+  var qCount         = document.getElementById('q-count');
+  var progressFill   = document.getElementById('progress-fill');
+  var resultsInner   = document.getElementById('results-inner');
+  var shareToast     = document.getElementById('share-toast');
+  var questionWrap   = document.getElementById('question-wrap');
+  var loadingOverlay = document.getElementById('loading-overlay');
+  var loadGrid       = document.getElementById('loading-grid');
+
+  // ===== LOADING GRID ANIMATION =====
+  var allSwatches = EMBER_COLORS.concat(CIRCUIT_COLORS, VERDANT_COLORS, VOID_COLORS);
+  for (var li = 0; li < 16; li++) {
+    var lc = document.createElement('div');
+    lc.className = 'loading-cell';
+    lc.style.background = allSwatches[Math.floor(Math.random() * allSwatches.length)];
+    lc.style.animationDelay = (Math.random() * 1.5) + 's';
+    loadGrid.appendChild(lc);
+  }
+
+  // Hide loading after fonts ready
+  document.fonts.ready.then(function() {
+    setTimeout(function() {
+      loadingOverlay.classList.add('hidden');
+      startScreen.classList.add('active');
+    }, 500);
+  });
+  // Fallback
+  setTimeout(function() {
+    loadingOverlay.classList.add('hidden');
+    startScreen.classList.add('active');
+  }, 2000);
+
+  // ===== PREVIEW SWATCHES =====
+  var previewColors = [
+    '#ff6b35','#00f0ff','#39ff14','#2d1b69',
+    '#f7b731','#b44dff','#52b788','#160040',
+    '#e84855','#4fc3f7','#95d5b2','#0d0d2b',
+    '#c4722a','#18ffff','#74c69d','#1a0533'
+  ];
+  var previewContainer = document.getElementById('preview-swatches');
+  previewColors.forEach(function(c, i) {
+    var s = document.createElement('div');
+    s.className = 'preview-swatch';
+    s.style.background = c;
+    s.style.animationDelay = (i * 0.12) + 's';
+    previewContainer.appendChild(s);
+  });
+
+  // ===== SCREEN NAV =====
+  function showScreen(id) {
+    var screens = document.querySelectorAll('.screen');
+    screens.forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ===== BEGIN =====
+  beginBtn.addEventListener('click', function() {
+    soundChime();
+    currentQ = 0;
+    scores = { EMBER: 0, CIRCUIT: 0, VERDANT: 0, VOID: 0 };
+    resultData = null;
+    showScreen('question-screen');
+    setTimeout(renderQuestion, 50);
+  });
+
+  // ===== RENDER QUESTION =====
+  function renderQuestion() {
+    var data = QUESTIONS[currentQ];
+    qCount.textContent = (currentQ + 1) + ' / 12';
+    progressFill.style.width = (currentQ / 12 * 100) + '%';
+
+    // Slide-in animation
+    questionWrap.classList.remove('q-transition');
+    void questionWrap.offsetWidth; // reflow
+    questionWrap.classList.add('q-transition');
+
+    qText.textContent = data.q;
+
+    // Clear answers grid using safe DOM removal
+    while (answersGrid.firstChild) {
+      answersGrid.removeChild(answersGrid.firstChild);
+    }
+
+    data.choices.forEach(function(choice) {
+      var card = document.createElement('div');
+      card.className = 'answer-card';
+      card.style.setProperty('--card-color', choice.color);
+
+      var swatch = document.createElement('div');
+      swatch.className = 'answer-swatch';
+      swatch.style.background = choice.color;
+      swatch.style.boxShadow = '0 0 12px ' + choice.color + '99';
+
+      var label = document.createElement('div');
+      label.className = 'answer-label';
+      label.textContent = choice.label;
+
+      card.appendChild(swatch);
+      card.appendChild(label);
+
+      card.addEventListener('click', function() { selectAnswer(card, choice); });
+      card.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        selectAnswer(card, choice);
+      }, { passive: false });
+
+      answersGrid.appendChild(card);
+    });
+
+    soundChime();
+  }
+
+  // ===== SELECT ANSWER =====
+  var selecting = false;
+
+  function selectAnswer(card, choice) {
+    if (selecting) return;
+    selecting = true;
+
+    var cards = document.querySelectorAll('.answer-card');
+    cards.forEach(function(c) { c.classList.remove('selected'); });
+    card.classList.add('selected');
+    card.style.borderColor = choice.color;
+    card.style.boxShadow = '0 0 20px ' + choice.color + '66, inset 0 0 20px ' + choice.color + '22';
+
+    soundSelect(choice.arch);
+    scores[choice.arch]++;
+
+    setTimeout(function() {
+      selecting = false;
+      currentQ++;
+      if (currentQ >= QUESTIONS.length) {
+        computeResults();
+      } else {
+        renderQuestion();
+      }
+    }, 320);
+  }
+
+  // ===== COMPUTE RESULTS =====
+  function computeResults() {
+    progressFill.style.width = '100%';
+
+    var archetypes = ['EMBER', 'CIRCUIT', 'VERDANT', 'VOID'];
+    var sorted = archetypes.slice().sort(function(a, b) { return scores[b] - scores[a]; });
+    var dominant  = sorted[0];
+    var secondary = sorted[1];
+    var tertiary  = sorted[2];
+    var trace     = sorted[3];
+
+    // Distribute 16 cells proportionally
+    var dist = calcDist(scores, dominant, secondary, tertiary, trace);
+
+    var cells = [];
+    function addCells(arch, count) {
+      var pool = ARCH_COLOR_POOLS[arch].slice();
+      shuffleArr(pool);
+      for (var i = 0; i < count; i++) {
+        cells.push({ color: pool[i % pool.length], arch: arch });
+      }
+    }
+    addCells(dominant,  dist[0]);
+    addCells(secondary, dist[1]);
+    addCells(tertiary,  dist[2]);
+    addCells(trace,     dist[3]);
+    shuffleArr(cells);
+
+    // Poetic title
+    var key = dominant + '+' + secondary;
+    var titleOptions = TITLES[key] || ['True Spectrum', 'Inner Light'];
+    var poeticTitle = titleOptions[Math.floor(Math.random() * titleOptions.length)];
+
+    // Archetype percentages (capped at 100 for display robustness)
+    var pcts = {};
+    archetypes.forEach(function(a) {
+      pcts[a] = Math.min(100, Math.round(scores[a] / 12 * 100));
+    });
+
+    resultData = {
+      cells: cells,
+      poeticTitle: poeticTitle,
+      dominant: dominant,
+      secondary: secondary,
+      tertiary: tertiary,
+      trace: trace,
+      pcts: pcts,
+      rarity: RARITY[dominant],
+      sorted: sorted
+    };
+
+    savePlay();
+
+    setTimeout(function() {
+      renderResults();
+      showScreen('results-screen');
+      soundReveal();
+    }, 400);
+  }
+
+  function calcDist(scores, a, b, c, d) {
+    var rawSum = scores[a] + scores[b] + scores[c] + scores[d];
+    if (rawSum === 0) return [7, 5, 3, 1];
+
+    // Dominant gets boosted share, trace always gets at least 1
+    var n_a = Math.round(scores[a] / rawSum * 13) + 2;
+    var n_d = 1;
+    var remaining = 16 - n_a - n_d;
+    var bcSum = scores[b] + scores[c];
+    var n_b = bcSum > 0 ? Math.round(scores[b] / bcSum * remaining * 0.65) : Math.floor(remaining / 2);
+    var n_c = remaining - n_b;
+
+    n_a = Math.max(5, Math.min(10, n_a));
+    n_b = Math.max(1, Math.min(7,  n_b));
+    n_c = Math.max(1, Math.min(5,  n_c));
+    n_d = Math.max(1, Math.min(3,  n_d));
+
+    var tot = n_a + n_b + n_c + n_d;
+    while (tot < 16) { n_a++; tot++; }
+    while (tot > 16) {
+      if (n_c > 1)      { n_c--; }
+      else if (n_b > 1) { n_b--; }
+      else              { n_a--; }
+      tot--;
+    }
+    return [n_a, n_b, n_c, n_d];
+  }
+
+  function shuffleArr(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  // ===== RENDER RESULTS =====
+  function renderResults() {
+    var data = resultData;
+    var accentColor = ARCH_ACCENT[data.dominant];
+    var glowColor   = ARCH_GLOW[data.dominant];
+
+    // Previous plays (before this one)
+    var plays = JSON.parse(localStorage.getItem('neonarcade_chromaself_plays') || '[]');
+    var prevPlays = plays.slice(-4, -1);
+
+    // Clear
+    while (resultsInner.firstChild) {
+      resultsInner.removeChild(resultsInner.firstChild);
+    }
+
+    // Poetic title
+    var titleEl = document.createElement('div');
+    titleEl.className = 'result-title';
+    titleEl.textContent = data.poeticTitle.toUpperCase();
+    titleEl.style.color = accentColor;
+    titleEl.style.textShadow = '0 0 20px ' + glowColor + ', 0 0 60px ' + ARCH_GLOW[data.dominant].replace('0.4', '0.12');
+    resultsInner.appendChild(titleEl);
+
+    // Subtitle
+    var subEl = document.createElement('div');
+    subEl.className = 'result-subtitle';
+    subEl.textContent = data.dominant + ' DOMINANT';
+    resultsInner.appendChild(subEl);
+
+    // Rarity
+    var rarEl = document.createElement('div');
+    rarEl.className = 'result-rarity';
+    rarEl.style.color = accentColor;
+    rarEl.textContent = data.rarity;
+    resultsInner.appendChild(rarEl);
+
+    // 4x4 Color Grid
+    var grid = document.createElement('div');
+    grid.className = 'color-grid';
+    data.cells.forEach(function(cell, idx) {
+      var c = document.createElement('div');
+      c.className = 'grid-cell';
+      c.style.background = cell.color;
+      c.style.setProperty('--cell-glow', ARCH_GLOW[cell.arch]);
+      c.style.animationDelay = (idx * 0.04) + 's';
+      grid.appendChild(c);
+    });
+    resultsInner.appendChild(grid);
+
+    // Archetype breakdown bars
+    var barsWrap = document.createElement('div');
+    barsWrap.className = 'archetype-bars';
+    data.sorted.forEach(function(arch) {
+      var pct = data.pcts[arch];
+
+      var row = document.createElement('div');
+      row.className = 'arch-bar-row';
+
+      var lbl = document.createElement('div');
+      lbl.className = 'arch-bar-label';
+      lbl.textContent = arch;
+      lbl.style.color = ARCH_ACCENT[arch];
+
+      var track = document.createElement('div');
+      track.className = 'arch-bar-track';
+
+      var fill = document.createElement('div');
+      fill.className = 'arch-bar-fill';
+      fill.style.background = ARCH_ACCENT[arch];
+      fill.style.boxShadow = '0 0 6px ' + ARCH_GLOW[arch];
+      fill.style.width = '0%';
+      track.appendChild(fill);
+
+      var pctEl = document.createElement('div');
+      pctEl.className = 'arch-bar-pct';
+      pctEl.textContent = pct + '%';
+
+      row.appendChild(lbl);
+      row.appendChild(track);
+      row.appendChild(pctEl);
+      barsWrap.appendChild(row);
+
+      // Animate bar fill after short delay
+      setTimeout(function() {
+        fill.style.width = pct + '%';
+      }, 700);
+    });
+    resultsInner.appendChild(barsWrap);
+
+    // Previous readings section
+    if (prevPlays.length > 0) {
+      var prevWrap = document.createElement('div');
+      prevWrap.className = 'prev-readings';
+
+      var prevLbl = document.createElement('div');
+      prevLbl.className = 'prev-label';
+      prevLbl.textContent = 'Previous readings';
+      prevWrap.appendChild(prevLbl);
+
+      var prevList = document.createElement('div');
+      prevList.className = 'prev-list';
+
+      var recentPlays = prevPlays.slice().reverse();
+      recentPlays.forEach(function(p) {
+        var item = document.createElement('div');
+        item.className = 'prev-item';
+
+        var textNode = document.createTextNode('You explored your palette ');
+        var whenSpan = document.createElement('span');
+        whenSpan.className = 'prev-item-when';
+        whenSpan.textContent = timeAgo(p.ts);
+
+        item.appendChild(textNode);
+        item.appendChild(whenSpan);
+        prevList.appendChild(item);
+      });
+      prevWrap.appendChild(prevList);
+      resultsInner.appendChild(prevWrap);
+    }
+
+    // Action buttons
+    var btnsRow = document.createElement('div');
+    btnsRow.className = 'results-btns';
+
+    var shareBtn = document.createElement('button');
+    shareBtn.className = 'btn';
+    shareBtn.textContent = 'SHARE PALETTE';
+    shareBtn.addEventListener('click', doShare);
+
+    var againBtn = document.createElement('button');
+    againBtn.className = 'btn purple';
+    againBtn.textContent = 'READ AGAIN';
+    againBtn.addEventListener('click', function() {
+      soundChime();
+      showScreen('start-screen');
+    });
+
+    btnsRow.appendChild(shareBtn);
+    btnsRow.appendChild(againBtn);
+    resultsInner.appendChild(btnsRow);
+  }
+
+  // ===== SHARE =====
+  function buildShareText() {
+    var d = resultData;
+    var emojiRows = [];
+    for (var row = 0; row < 4; row++) {
+      var rowStr = '';
+      for (var col = 0; col < 4; col++) {
+        rowStr += ARCH_EMOJI[d.cells[row * 4 + col].arch];
+      }
+      emojiRows.push(rowStr);
+    }
+
+    return [
+      'CHROMASELF',
+      d.poeticTitle.toUpperCase(),
+      d.dominant + ' DOMINANT — ' + d.rarity,
+      '',
+      emojiRows.join('\n'),
+      '',
+      "What's yours? neonarcade.net/chromaself.html"
+    ].join('\n');
+  }
+
+  function doShare() {
+    soundShare();
+    var text = buildShareText();
+    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+      navigator.share({ text: text }).catch(function() { copyFallback(text); });
+    } else {
+      copyFallback(text);
+    }
+  }
+
+  function copyFallback(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(showToast).catch(function() { legacyCopy(text); });
+    } else {
+      legacyCopy(text);
+    }
+  }
+
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    showToast();
+  }
+
+  function showToast() {
+    shareToast.classList.add('show');
+    setTimeout(function() { shareToast.classList.remove('show'); }, 2200);
+  }
+
+  // ===== PERSISTENCE =====
+  function savePlay() {
+    var key = 'neonarcade_chromaself_plays';
+    var plays = JSON.parse(localStorage.getItem(key) || '[]');
+    plays.push({ ts: Date.now() });
+    plays = plays.slice(-5);
+    localStorage.setItem(key, JSON.stringify(plays));
+  }
+
+  function timeAgo(ts) {
+    var diff  = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'   : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago'  : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'   : ' mins ago');
+    return 'just now';
+  }
+
+})();
+</script>
+</body>
+</html>
