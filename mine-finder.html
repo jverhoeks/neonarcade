@@ -502,6 +502,13 @@ body::before {
   height: 10px;
   border-radius: 2px;
 }
+
+.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
 </style>
 </head>
 <body>
@@ -553,6 +560,7 @@ body::before {
         <div class="stat-label">TOTAL SCORE</div>
       </div>
       <div class="best-score" id="best-score-result"></div>
+      <div class="score-table"></div>
     </div>
     <div class="result-buttons">
       <button class="share-btn" id="share-btn">SHARE</button>
@@ -565,6 +573,51 @@ body::before {
 
 <script>
 (() => {
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function renderScoreTable(scores) {
+    var el = document.querySelector('.score-table');
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var title = document.createElement('div');
+    title.className = 'score-table-title';
+    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    el.appendChild(title);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = String(s.score);
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      el.appendChild(row);
+    });
+  }
+
   const GRID = 10;
   const TOTAL_MINES = 15;
   const AI_DELAY = 300;
@@ -746,8 +799,8 @@ body::before {
   }
 
   function updateBestDisplay() {
-    const best = localStorage.getItem(LS_KEY);
-    const text = best ? 'BEST: ' + best : '';
+    var scores = JSON.parse(localStorage.getItem('neonarcade_scores_minefinder') || '[]');
+    var text = scores.length > 0 ? 'BEST: ' + scores[0].score : '';
     bestScoreStart.textContent = text;
     bestScoreResult.textContent = text;
   }
@@ -922,7 +975,7 @@ body::before {
 
         if (unrevealed.length > 0 && flagCount === num) {
           for (const ui of unrevealed) {
-            if (!tempFlagged[ui]) {
+            if (!tempFlagged[ui] && !toReveal.has(ui)) {
               toReveal.add(ui);
               changed = true;
             }
@@ -1223,11 +1276,9 @@ body::before {
     statMines.textContent = minesHit;
     statScore.textContent = score;
 
-    const best = parseInt(localStorage.getItem(LS_KEY)) || 0;
-    if (score > best) {
-      localStorage.setItem(LS_KEY, score);
-    }
+    var topScores = saveScore('neonarcade_scores_minefinder', score);
     updateBestDisplay();
+    renderScoreTable(topScores);
   }
 
   // Share

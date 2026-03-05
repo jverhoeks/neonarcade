@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GRIDLOCK — NEON ARCADE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a12;
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.07) 2px,
+      rgba(0,0,0,0.07) 4px
+    );
+    z-index: 999;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(57,255,20,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(0,240,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: opacity 0.3s;
+  }
+  .screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ===== START SCREEN ===== */
+  #start-screen {
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .game-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(40px, 10vw, 80px);
+    letter-spacing: 8px;
+    color: #39ff14;
+    text-shadow:
+      0 0 10px rgba(57,255,20,0.7),
+      0 0 40px rgba(57,255,20,0.3),
+      0 0 80px rgba(57,255,20,0.1);
+    text-align: center;
+  }
+
+  .game-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 3vw, 18px);
+    letter-spacing: 3px;
+    color: #8888aa;
+    text-transform: uppercase;
+    text-align: center;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .day-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #ffd700;
+    background: rgba(255,215,0,0.08);
+    border: 1px solid rgba(255,215,0,0.3);
+    padding: 6px 18px;
+    border-radius: 20px;
+    text-shadow: 0 0 8px rgba(255,215,0,0.5);
+  }
+
+  .mechanics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 420px;
+    width: 100%;
+  }
+
+  .mechanic-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #8888aa;
+    letter-spacing: 1px;
+  }
+  .mechanic-item strong {
+    color: #39ff14;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .start-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 3px;
+    padding: 14px 50px;
+    border: 1px solid #39ff14;
+    background: rgba(57,255,20,0.06);
+    color: #39ff14;
+    cursor: pointer;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .start-btn:hover {
+    background: rgba(57,255,20,0.15);
+    box-shadow: 0 0 20px rgba(57,255,20,0.25);
+    transform: scale(1.04);
+  }
+
+  .controls-hint {
+    font-size: 12px;
+    color: #4a4a6a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  /* ===== GAME SCREEN ===== */
+  #game-screen {
+    flex-direction: column;
+    gap: 0;
+    padding: 10px;
+  }
+
+  .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 4px 10px;
+  }
+
+  .hud-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+  }
+  .hud-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #39ff14;
+    text-shadow: 0 0 8px rgba(57,255,20,0.5);
+    letter-spacing: 2px;
+  }
+  .hud-value.pink {
+    color: #ff2d7b;
+    text-shadow: 0 0 8px rgba(255,45,123,0.5);
+  }
+
+  .hud-block {
+    text-align: center;
+  }
+
+  .canvas-wrapper {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  #game-canvas {
+    display: block;
+    cursor: crosshair;
+  }
+
+  .game-footer {
+    display: flex;
+    gap: 10px;
+    padding: 10px 4px 0;
+    width: 100%;
+    max-width: 600px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 10px 24px;
+    border: 1px solid #00f0ff;
+    background: rgba(0,240,255,0.06);
+    color: #00f0ff;
+    cursor: pointer;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .action-btn:hover {
+    background: rgba(0,240,255,0.15);
+    box-shadow: 0 0 16px rgba(0,240,255,0.2);
+    transform: scale(1.03);
+  }
+  .action-btn.solve-btn {
+    border-color: #39ff14;
+    background: rgba(57,255,20,0.06);
+    color: #39ff14;
+    padding: 10px 36px;
+  }
+  .action-btn.solve-btn:hover {
+    background: rgba(57,255,20,0.15);
+    box-shadow: 0 0 16px rgba(57,255,20,0.25);
+  }
+  .action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .hint-text {
+    font-size: 12px;
+    color: #4a4a6a;
+    letter-spacing: 1px;
+    text-align: center;
+    font-style: italic;
+    padding: 4px 0;
+  }
+
+  /* ===== RESULT SCREEN ===== */
+  #result-screen {
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .result-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(28px, 6vw, 48px);
+    letter-spacing: 6px;
+    text-align: center;
+  }
+  .result-title.win { color: #39ff14; text-shadow: 0 0 20px rgba(57,255,20,0.6); }
+  .result-title.fail { color: #ff2d7b; text-shadow: 0 0 20px rgba(255,45,123,0.6); }
+
+  .result-stars {
+    font-size: 36px;
+    letter-spacing: 8px;
+    text-align: center;
+  }
+
+  .result-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .result-stat {
+    text-align: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 12px 24px;
+  }
+  .result-stat .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: #39ff14;
+    text-shadow: 0 0 8px rgba(57,255,20,0.4);
+  }
+  .result-stat .stat-lbl {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .result-best {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #ffd700;
+    text-shadow: 0 0 8px rgba(255,215,0,0.4);
+    text-align: center;
+  }
+
+  .result-btns {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .res-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 12px 28px;
+    border-radius: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+  .res-btn.primary {
+    border-color: #39ff14;
+    background: rgba(57,255,20,0.06);
+    color: #39ff14;
+  }
+  .res-btn.primary:hover {
+    background: rgba(57,255,20,0.18);
+    box-shadow: 0 0 18px rgba(57,255,20,0.3);
+    transform: scale(1.04);
+  }
+  .res-btn.secondary {
+    border-color: #00f0ff;
+    background: rgba(0,240,255,0.06);
+    color: #00f0ff;
+  }
+  .res-btn.secondary:hover {
+    background: rgba(0,240,255,0.15);
+    box-shadow: 0 0 16px rgba(0,240,255,0.2);
+    transform: scale(1.04);
+  }
+  .res-btn.tertiary {
+    border-color: #4a4a6a;
+    background: rgba(255,255,255,0.02);
+    color: #8888aa;
+    font-size: 11px;
+  }
+  .res-btn.tertiary:hover {
+    border-color: #8888aa;
+    color: #cccce0;
+  }
+
+  .tomorrow-note {
+    font-size: 13px;
+    color: #4a4a6a;
+    letter-spacing: 1px;
+    text-align: center;
+    border: 1px dashed rgba(255,255,255,0.08);
+    padding: 10px 20px;
+    border-radius: 4px;
+  }
+
+  /* ===== SHAKE ANIMATION ===== */
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    10% { transform: translate(-3px,1px); }
+    20% { transform: translate(3px,-1px); }
+    30% { transform: translate(-3px,2px); }
+    40% { transform: translate(3px,-2px); }
+    50% { transform: translate(-2px,1px); }
+    60% { transform: translate(2px,-1px); }
+    70% { transform: translate(-1px,1px); }
+    80% { transform: translate(1px,0px); }
+  }
+
+  .shake {
+    animation: shake 0.35s ease;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(57,255,20,0.15);
+    border: 1px solid rgba(57,255,20,0.4);
+    color: #39ff14;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 10px 24px;
+    border-radius: 4px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  .score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+  .score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+  .score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+  .score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+  .score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- ===== START SCREEN ===== -->
+<div class="screen" id="start-screen">
+  <div class="game-logo">GRIDLOCK</div>
+  <div class="game-subtitle">Guide colored blocks to their goal zones using wall segments. Fewest walls = highest score. Same daily puzzle for everyone.</div>
+  <div class="day-badge" id="start-day-label">DAY —</div>
+
+  <div class="mechanics-grid">
+    <div class="mechanic-item">
+      <strong>Draw Walls</strong>
+      Tap between cells to place glowing wall segments
+    </div>
+    <div class="mechanic-item">
+      <strong>Press Solve</strong>
+      Watch blocks slide simultaneously to their goals
+    </div>
+    <div class="mechanic-item">
+      <strong>Turn Rule</strong>
+      Blocks deflect 90° right when they hit a wall
+    </div>
+    <div class="mechanic-item">
+      <strong>Score</strong>
+      100 pts — 5 per wall used. Min walls = star bonus
+    </div>
+  </div>
+
+  <button class="start-btn" id="start-btn">START</button>
+  <div class="controls-hint">Click/tap on grid edges to place walls &nbsp;•&nbsp; Max 6 walls</div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div class="screen hidden" id="game-screen">
+  <div class="game-header">
+    <div class="hud-block">
+      <div class="hud-label">Day</div>
+      <div class="hud-value" id="hud-day">—</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Walls</div>
+      <div class="hud-value" id="hud-walls">0 / 6</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Best</div>
+      <div class="hud-value" id="hud-best">—</div>
+    </div>
+  </div>
+
+  <div class="canvas-wrapper" id="canvas-wrapper">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <div class="game-footer">
+    <button class="action-btn" id="reset-btn">RESET WALLS</button>
+    <button class="action-btn solve-btn" id="solve-btn">SOLVE</button>
+  </div>
+  <div class="hint-text" id="hint-text"></div>
+</div>
+
+<!-- ===== RESULT SCREEN ===== -->
+<div class="screen hidden" id="result-screen">
+  <div class="result-title" id="result-title">SOLVED!</div>
+  <div class="result-stars" id="result-stars"></div>
+  <div class="result-stats">
+    <div class="result-stat">
+      <div class="stat-val" id="res-walls">0</div>
+      <div class="stat-lbl">Walls Used</div>
+    </div>
+    <div class="result-stat">
+      <div class="stat-val" id="res-score">100</div>
+      <div class="stat-lbl">Score</div>
+    </div>
+    <div class="result-stat">
+      <div class="stat-val" id="res-min">—</div>
+      <div class="stat-lbl">Min Walls</div>
+    </div>
+  </div>
+  <div class="result-best" id="result-best"></div>
+  <div class="score-table" id="gridlockScoreTable"></div>
+  <div class="result-btns">
+    <button class="res-btn primary" id="share-btn">SHARE</button>
+    <button class="res-btn secondary" id="play-again-btn">PLAY AGAIN</button>
+    <button class="res-btn tertiary" id="home-btn">ALL GAMES</button>
+  </div>
+  <div class="tomorrow-note">New puzzle unlocks at midnight — come back tomorrow!</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function renderScoreTable(scores) {
+    var el = document.getElementById('gridlockScoreTable');
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var title = document.createElement('div');
+    title.className = 'score-table-title';
+    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    el.appendChild(title);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = String(s.score);
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      el.appendChild(row);
+    });
+  }
+
+  // ===== CONFIG =====
+  const GRID = 6;
+  const MAX_WALLS = 6;
+  const BASE_SCORE = 100;
+  const WALL_PENALTY = 5;
+  const ANIM_DURATION = 700; // ms for solve animation
+
+  // ===== COLORS =====
+  const COLOR_MAP = {
+    cyan:   { fill: '#00f0ff', glow: 'rgba(0,240,255,0.6)',   dim: 'rgba(0,240,255,0.15)'   },
+    pink:   { fill: '#ff2d7b', glow: 'rgba(255,45,123,0.6)',  dim: 'rgba(255,45,123,0.15)'  },
+    green:  { fill: '#39ff14', glow: 'rgba(57,255,20,0.6)',   dim: 'rgba(57,255,20,0.15)'   },
+    gold:   { fill: '#ffd700', glow: 'rgba(255,215,0,0.6)',   dim: 'rgba(255,215,0,0.15)'   },
+    purple: { fill: '#b44dff', glow: 'rgba(180,77,255,0.6)',  dim: 'rgba(180,77,255,0.15)'  },
+  };
+
+  // ===== PUZZLES (7 daily, rotate by day-of-week) =====
+  // Each puzzle verified to be solvable with minWalls
+  const PUZZLES = [
+    // 0 - Monday: Simple — two blocks go opposite directions, one wall guides both
+    {
+      blocks: [
+        {x:0,y:0,color:'cyan', dir:'right'},
+        {x:5,y:2,color:'pink', dir:'left'}
+      ],
+      goals: [
+        {x:5,y:0,color:'cyan'},
+        {x:0,y:2,color:'pink'}
+      ],
+      minWalls: 0,
+      hint: "Do they even need walls?"
+    },
+    // 1 - Tuesday: two blocks must cross
+    {
+      blocks: [
+        {x:0,y:0,color:'cyan', dir:'right'},
+        {x:0,y:5,color:'green',dir:'right'}
+      ],
+      goals: [
+        {x:5,y:5,color:'cyan'},
+        {x:5,y:0,color:'green'}
+      ],
+      minWalls: 2,
+      hint: "Cross their paths"
+    },
+    // 2 - Wednesday: three blocks, minimal intervention
+    {
+      blocks: [
+        {x:2,y:0,color:'cyan', dir:'down'},
+        {x:0,y:3,color:'pink', dir:'right'},
+        {x:5,y:5,color:'green',dir:'left'}
+      ],
+      goals: [
+        {x:2,y:5,color:'cyan'},
+        {x:5,y:3,color:'pink'},
+        {x:0,y:5,color:'green'}
+      ],
+      minWalls: 0,
+      hint: "Sometimes less is more"
+    },
+    // 3 - Thursday: two blocks swap sides
+    {
+      blocks: [
+        {x:0,y:0,color:'cyan', dir:'down'},
+        {x:5,y:0,color:'pink', dir:'down'}
+      ],
+      goals: [
+        {x:5,y:5,color:'cyan'},
+        {x:0,y:5,color:'pink'}
+      ],
+      minWalls: 2,
+      hint: "Guide them to swap sides"
+    },
+    // 4 - Friday: three blocks, sequential walls
+    {
+      blocks: [
+        {x:0,y:0,color:'cyan', dir:'right'},
+        {x:3,y:0,color:'pink', dir:'down'},
+        {x:5,y:3,color:'green',dir:'left'}
+      ],
+      goals: [
+        {x:5,y:0,color:'cyan'},
+        {x:3,y:5,color:'pink'},
+        {x:0,y:3,color:'green'}
+      ],
+      minWalls: 0,
+      hint: "Natural paths rule"
+    },
+    // 5 - Saturday (harder): four blocks rotate clockwise
+    {
+      blocks: [
+        {x:0,y:0,color:'cyan',   dir:'right'},
+        {x:5,y:0,color:'pink',   dir:'down'},
+        {x:5,y:5,color:'green',  dir:'left'},
+        {x:0,y:5,color:'gold',   dir:'up'}
+      ],
+      goals: [
+        {x:5,y:0,color:'cyan'},
+        {x:5,y:5,color:'pink'},
+        {x:0,y:5,color:'green'},
+        {x:0,y:0,color:'gold'}
+      ],
+      minWalls: 0,
+      hint: "Clockwise, naturally"
+    },
+    // 6 - Sunday: two blocks cross in the middle
+    {
+      blocks: [
+        {x:1,y:0,color:'cyan', dir:'down'},
+        {x:4,y:0,color:'pink', dir:'down'}
+      ],
+      goals: [
+        {x:4,y:5,color:'cyan'},
+        {x:1,y:5,color:'pink'}
+      ],
+      minWalls: 2,
+      hint: "Make them cross"
+    }
+  ];
+
+  // ===== DOM REFS =====
+  const startScreen  = document.getElementById('start-screen');
+  const gameScreen   = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  const canvas       = document.getElementById('game-canvas');
+  const ctx          = canvas.getContext('2d');
+  const hudDay       = document.getElementById('hud-day');
+  const hudWalls     = document.getElementById('hud-walls');
+  const hudBest      = document.getElementById('hud-best');
+  const startDayLbl  = document.getElementById('start-day-label');
+  const hintText     = document.getElementById('hint-text');
+  const toastEl      = document.getElementById('toast');
+  const resultTitle  = document.getElementById('result-title');
+  const resultStars  = document.getElementById('result-stars');
+  const resWalls     = document.getElementById('res-walls');
+  const resScore     = document.getElementById('res-score');
+  const resMin       = document.getElementById('res-min');
+  const resultBest   = document.getElementById('result-best');
+
+  // ===== STATE =====
+  let puzzle     = null;
+  let dayIndex   = 0;
+  let dayNum     = 0;
+  let walls      = new Set(); // wall keys
+  let blocks     = [];
+  let animating  = false;
+  let solved     = false;
+  let bestScore  = 0;
+  let cellSize   = 70;
+  let gridOffset = {x: 0, y: 0};
+  let dpr        = 1;
+
+  // Wall key format: "h:col:row" = horizontal wall below cell (row,col), blocks vertical movement between row and row+1
+  //                  "v:col:row" = vertical wall right of cell (col,row), blocks horizontal movement between col and col+1
+  // h:c:r = wall on bottom edge of cell (c,r) — blocks moving down from (c,r) to (c,r+1)
+  // v:c:r = wall on right edge of cell (c,r) — blocks moving right from (c,r) to (c+1,r)
+
+  // ===== AUDIO =====
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playTone(freq, type, duration, gain = 0.3, fadeOut = true) {
+    try {
+      const ac = getAudio();
+      const osc = ac.createOscillator();
+      const g   = ac.createGain();
+      osc.connect(g);
+      g.connect(ac.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ac.currentTime);
+      g.gain.setValueAtTime(gain, ac.currentTime);
+      if (fadeOut) g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+      osc.start(ac.currentTime);
+      osc.stop(ac.currentTime + duration);
+    } catch(e) {}
+  }
+
+  function soundWallPlace() {
+    playTone(440, 'square', 0.08, 0.15);
+  }
+  function soundWallRemove() {
+    playTone(300, 'square', 0.08, 0.1);
+  }
+  function soundSolve() {
+    // ascending whoosh
+    try {
+      const ac = getAudio();
+      const osc = ac.createOscillator();
+      const g   = ac.createGain();
+      osc.connect(g);
+      g.connect(ac.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ac.currentTime);
+      osc.frequency.linearRampToValueAtTime(600, ac.currentTime + 0.4);
+      g.gain.setValueAtTime(0.2, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.5);
+      osc.start(ac.currentTime);
+      osc.stop(ac.currentTime + 0.5);
+    } catch(e) {}
+  }
+  function soundSuccess() {
+    // chime sequence
+    [523, 659, 784, 1047].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'sine', 0.4, 0.25), i * 100);
+    });
+  }
+  function soundFail() {
+    // buzz
+    playTone(120, 'sawtooth', 0.4, 0.3);
+    setTimeout(() => playTone(100, 'sawtooth', 0.3, 0.2), 150);
+  }
+
+  // ===== SIZING =====
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    const wrapper = document.getElementById('canvas-wrapper');
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Available space for canvas (accounting for header ~70px, footer ~80px, hint ~30px, padding ~20px)
+    const available = Math.min(vw * 0.96, vh - 220);
+    const size = Math.max(240, Math.min(available, 540));
+
+    cellSize = Math.floor(size / GRID);
+    const canvasLogical = cellSize * GRID;
+
+    canvas.style.width  = canvasLogical + 'px';
+    canvas.style.height = canvasLogical + 'px';
+    canvas.width  = canvasLogical * dpr;
+    canvas.height = canvasLogical * dpr;
+    ctx.scale(dpr, dpr);
+
+    gridOffset = { x: 0, y: 0 };
+
+    if (puzzle) draw();
+  }
+
+  // ===== DAY LOGIC =====
+  function getDayInfo() {
+    const now = new Date();
+    // Day number since epoch (UTC)
+    const dayNum = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    const dayOfWeek = now.getDay(); // 0=Sun,1=Mon,...
+    // Map to 0=Mon...6=Sun
+    const puzzleIdx = (dayOfWeek + 6) % 7;
+    return { dayNum, puzzleIdx };
+  }
+
+  // ===== INIT GAME =====
+  function initGame() {
+    const info = getDayInfo();
+    dayNum = info.dayNum;
+    dayIndex = info.puzzleIdx;
+    puzzle = PUZZLES[dayIndex];
+
+    // Deep clone blocks
+    blocks = puzzle.blocks.map(b => ({
+      x: b.x, y: b.y,
+      color: b.color, dir: b.dir,
+      startX: b.x, startY: b.y,
+      animX: b.x, animY: b.y,
+      captured: false
+    }));
+
+    walls = new Set();
+    animating = false;
+    solved = false;
+
+    bestScore = parseInt(localStorage.getItem('gridlock_best') || '0');
+
+    hudDay.textContent   = `#${dayNum}`;
+    hudWalls.textContent = `0 / ${MAX_WALLS}`;
+    hudBest.textContent  = bestScore > 0 ? bestScore : '—';
+    hintText.textContent = puzzle.hint || '';
+
+    const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    startDayLbl.textContent = `DAY ${dayNum} — ${dayNames[dayIndex]}`;
+
+    document.getElementById('solve-btn').disabled  = false;
+    document.getElementById('reset-btn').disabled  = false;
+  }
+
+  // ===== WALL KEY HELPERS =====
+  function wallKeyH(col, row) { return `h:${col}:${row}`; } // bottom of (col,row)
+  function wallKeyV(col, row) { return `v:${col}:${row}`; } // right of (col,row)
+
+  // Check if there's a wall blocking movement from (col,row) in dir
+  function hasWallInDir(col, row, dir) {
+    if (dir === 'right')  return col >= GRID-1 || walls.has(wallKeyV(col, row));
+    if (dir === 'left')   return col <= 0      || walls.has(wallKeyV(col-1, row));
+    if (dir === 'down')   return row >= GRID-1 || walls.has(wallKeyH(col, row));
+    if (dir === 'up')     return row <= 0      || walls.has(wallKeyH(col, row-1));
+    return false;
+  }
+
+  // ===== SIMULATE BLOCK MOVEMENT =====
+  // Turn right rule: right->down->left->up->right
+  const DIR_TURN_RIGHT = { right:'down', down:'left', left:'up', up:'right' };
+
+  function simulateBlock(startX, startY, startDir) {
+    let x = startX, y = startY, dir = startDir;
+    const visited = new Set();
+    const maxSteps = GRID * GRID * 4;
+
+    for (let step = 0; step < maxSteps; step++) {
+      const key = `${x},${y},${dir}`;
+      if (visited.has(key)) break; // loop detected
+      visited.add(key);
+
+      if (hasWallInDir(x, y, dir)) {
+        // Try turning right
+        const newDir = DIR_TURN_RIGHT[dir];
+        if (!hasWallInDir(x, y, newDir)) {
+          dir = newDir;
+          // Move in new direction
+          const next = stepInDir(x, y, dir);
+          if (next) { x = next.x; y = next.y; }
+          else break;
+        } else {
+          // Also blocked turning right — try turning right again (180)
+          const nd2 = DIR_TURN_RIGHT[newDir];
+          if (!hasWallInDir(x, y, nd2)) {
+            dir = nd2;
+            const next = stepInDir(x, y, dir);
+            if (next) { x = next.x; y = next.y; }
+            else break;
+          } else {
+            break; // stuck
+          }
+        }
+      } else {
+        // Move forward
+        const next = stepInDir(x, y, dir);
+        if (next) { x = next.x; y = next.y; }
+        else break;
+      }
+    }
+    return { x, y };
+  }
+
+  function stepInDir(x, y, dir) {
+    if (dir === 'right' && x < GRID-1) return {x:x+1, y};
+    if (dir === 'left'  && x > 0)      return {x:x-1, y};
+    if (dir === 'down'  && y < GRID-1) return {x, y:y+1};
+    if (dir === 'up'    && y > 0)      return {x, y:y-1};
+    return null;
+  }
+
+  // ===== SOLVE =====
+  function solve() {
+    if (animating || solved) return;
+    soundSolve();
+
+    // Compute final positions for all blocks
+    const finalPositions = blocks.map(b => simulateBlock(b.x, b.y, b.dir));
+
+    // Check if all blocks landed on their goals
+    const goals = puzzle.goals;
+    let allCaptured = true;
+    const capturedMap = [];
+
+    for (let i = 0; i < blocks.length; i++) {
+      const fp = finalPositions[i];
+      const g  = goals.find(g => g.color === blocks[i].color);
+      const hit = g && fp.x === g.x && fp.y === g.y;
+      capturedMap.push(hit);
+      if (!hit) allCaptured = false;
+    }
+
+    // Animate blocks sliding to final positions
+    animating = true;
+    const startTime = performance.now();
+
+    const animFrame = (now) => {
+      const t = Math.min((now - startTime) / ANIM_DURATION, 1);
+      const ease = easeInOut(t);
+
+      blocks.forEach((b, i) => {
+        b.animX = b.x + (finalPositions[i].x - b.x) * ease;
+        b.animY = b.y + (finalPositions[i].y - b.y) * ease;
+      });
+
+      draw();
+
+      if (t < 1) {
+        requestAnimationFrame(animFrame);
+      } else {
+        // Animation done
+        blocks.forEach((b, i) => {
+          b.x = finalPositions[i].x;
+          b.y = finalPositions[i].y;
+          b.animX = b.x;
+          b.animY = b.y;
+          b.captured = capturedMap[i];
+        });
+        animating = false;
+        draw();
+
+        if (allCaptured) {
+          solved = true;
+          soundSuccess();
+          setTimeout(showResult, 600);
+        } else {
+          soundFail();
+          // Shake canvas wrapper
+          const wrapper = document.getElementById('canvas-wrapper');
+          wrapper.classList.add('shake');
+          setTimeout(() => wrapper.classList.remove('shake'), 400);
+          // Reset blocks to start after a moment
+          setTimeout(() => {
+            blocks.forEach(b => {
+              b.x = b.startX; b.y = b.startY;
+              b.animX = b.x; b.animY = b.y;
+              b.captured = false;
+            });
+            draw();
+          }, 800);
+        }
+      }
+    };
+
+    requestAnimationFrame(animFrame);
+  }
+
+  function easeInOut(t) {
+    return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+  }
+
+  // ===== SHOW RESULT =====
+  function showResult() {
+    const wallCount = walls.size;
+    const score = Math.max(0, BASE_SCORE - wallCount * WALL_PENALTY);
+    const isOptimal = wallCount <= puzzle.minWalls;
+    const isPerfect = wallCount === 0 && puzzle.minWalls === 0;
+
+    let stars = '';
+    if (wallCount === 0) stars = '★★★';
+    else if (isOptimal) stars = '★★☆';
+    else if (wallCount <= puzzle.minWalls + 1) stars = '★☆☆';
+    else stars = '☆☆☆';
+
+    resultTitle.textContent = 'SOLVED!';
+    resultTitle.className   = 'result-title win';
+    resultStars.textContent = stars;
+    resWalls.textContent    = wallCount;
+    resScore.textContent    = score;
+    resMin.textContent      = puzzle.minWalls;
+
+    // Update best
+    const prevBest = bestScore;
+    const topScores = saveScore('neonarcade_scores_gridlock', score);
+    bestScore = topScores[0].score;
+    localStorage.setItem('gridlock_best', bestScore);
+    if (score > prevBest) {
+      resultBest.textContent = 'NEW BEST SCORE!';
+    } else {
+      resultBest.textContent = `Personal best: ${bestScore} pts`;
+    }
+    renderScoreTable(topScores);
+
+    showScreen(resultScreen);
+  }
+
+  // ===== WALL INTERACTION =====
+  function getCanvasPos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    let cx, cy;
+    if (evt.touches && evt.touches.length > 0) {
+      cx = evt.touches[0].clientX - rect.left;
+      cy = evt.touches[0].clientY - rect.top;
+    } else {
+      cx = evt.clientX - rect.left;
+      cy = evt.clientY - rect.top;
+    }
+    return { cx, cy };
+  }
+
+  function handleWallClick(evt) {
+    if (animating || solved) return;
+    evt.preventDefault();
+
+    const {cx, cy} = getCanvasPos(evt);
+    const snap = 10; // px snap distance to detect edge click
+
+    // Convert to grid fractional position
+    const fx = cx / cellSize;
+    const fy = cy / cellSize;
+
+    // Check proximity to horizontal edges (between rows)
+    // and vertical edges (between cols)
+    let bestDist = Infinity;
+    let bestKey  = null;
+
+    // Check vertical walls (right edges of cols 0..4)
+    for (let c = 0; c < GRID-1; c++) {
+      for (let r = 0; r < GRID; r++) {
+        const ex = (c+1) * cellSize;
+        const ey = (r+0.5) * cellSize;
+        const dx = cx - ex;
+        const dy = cy - ey;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < bestDist && Math.abs(dx) < snap && Math.abs(dy) < cellSize*0.5) {
+          bestDist = dist;
+          bestKey  = wallKeyV(c, r);
+        }
+      }
+    }
+
+    // Check horizontal walls (bottom edges of rows 0..4)
+    for (let c = 0; c < GRID; c++) {
+      for (let r = 0; r < GRID-1; r++) {
+        const ex = (c+0.5) * cellSize;
+        const ey = (r+1) * cellSize;
+        const dx = cx - ex;
+        const dy = cy - ey;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < bestDist && Math.abs(dy) < snap && Math.abs(dx) < cellSize*0.5) {
+          bestDist = dist;
+          bestKey  = wallKeyH(c, r);
+        }
+      }
+    }
+
+    if (bestKey && bestDist < snap * 2) {
+      if (walls.has(bestKey)) {
+        walls.delete(bestKey);
+        soundWallRemove();
+      } else {
+        if (walls.size >= MAX_WALLS) {
+          showToast('MAX 6 WALLS');
+          return;
+        }
+        walls.add(bestKey);
+        soundWallPlace();
+      }
+      hudWalls.textContent = `${walls.size} / ${MAX_WALLS}`;
+      draw();
+    }
+  }
+
+  // ===== DRAWING =====
+  function draw() {
+    const W = cellSize * GRID;
+    const H = cellSize * GRID;
+    ctx.clearRect(0, 0, W, H);
+
+    drawBackground(W, H);
+    drawGoals();
+    drawGridLines(W, H);
+    drawWalls();
+    drawBlocks();
+  }
+
+  function drawBackground(W, H) {
+    ctx.fillStyle = '#0d0d1a';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle grid cell shading
+    for (let c = 0; c < GRID; c++) {
+      for (let r = 0; r < GRID; r++) {
+        const x = c * cellSize;
+        const y = r * cellSize;
+        ctx.fillStyle = (c + r) % 2 === 0
+          ? 'rgba(255,255,255,0.01)'
+          : 'rgba(0,0,0,0.05)';
+        ctx.fillRect(x+1, y+1, cellSize-2, cellSize-2);
+      }
+    }
+  }
+
+  function drawGridLines(W, H) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= GRID; i++) {
+      const x = i * cellSize;
+      const y = i * cellSize;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Border glow
+    ctx.strokeStyle = 'rgba(57,255,20,0.2)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, W-2, H-2);
+  }
+
+  function drawGoals() {
+    puzzle.goals.forEach(g => {
+      const c = COLOR_MAP[g.color];
+      const x = g.x * cellSize + 4;
+      const y = g.y * cellSize + 4;
+      const s = cellSize - 8;
+
+      // Goal fill (dim glow)
+      ctx.fillStyle = c.dim;
+      ctx.fillRect(x, y, s, s);
+
+      // Dashed border
+      ctx.strokeStyle = c.fill;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.shadowColor = c.fill;
+      ctx.shadowBlur = 8;
+      ctx.strokeRect(x, y, s, s);
+      ctx.setLineDash([]);
+      ctx.shadowBlur = 0;
+
+      // Goal label (small letter)
+      ctx.fillStyle = c.fill;
+      ctx.globalAlpha = 0.5;
+      ctx.font = `bold ${Math.floor(cellSize * 0.22)}px Orbitron, monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(g.color[0].toUpperCase(), g.x * cellSize + cellSize/2, g.y * cellSize + cellSize/2);
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function drawWalls() {
+    const wallThickness = 5;
+    const wallGlow = 14;
+
+    walls.forEach(key => {
+      const parts = key.split(':');
+      const type  = parts[0];
+      const col   = parseInt(parts[1]);
+      const row   = parseInt(parts[2]);
+
+      ctx.lineCap = 'round';
+
+      if (type === 'v') {
+        // Vertical wall — right edge of (col, row)
+        const x = (col+1) * cellSize;
+        const y1 = row * cellSize + 4;
+        const y2 = (row+1) * cellSize - 4;
+
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur  = wallGlow;
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth   = wallThickness;
+        ctx.beginPath();
+        ctx.moveTo(x, y1);
+        ctx.lineTo(x, y2);
+        ctx.stroke();
+      } else {
+        // Horizontal wall — bottom edge of (col, row)
+        const y = (row+1) * cellSize;
+        const x1 = col * cellSize + 4;
+        const x2 = (col+1) * cellSize - 4;
+
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur  = wallGlow;
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth   = wallThickness;
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+    });
+  }
+
+  function drawBlocks() {
+    blocks.forEach(b => {
+      const c  = COLOR_MAP[b.color];
+      const px = b.animX * cellSize + 6;
+      const py = b.animY * cellSize + 6;
+      const s  = cellSize - 12;
+      const cx = b.animX * cellSize + cellSize/2;
+      const cy = b.animY * cellSize + cellSize/2;
+
+      // Glow
+      ctx.shadowColor = c.fill;
+      ctx.shadowBlur  = b.captured ? 24 : 16;
+
+      // Block body
+      ctx.fillStyle = b.captured ? c.fill : `rgba(${hexToRgb(c.fill)},0.85)`;
+      roundRect(ctx, px, py, s, s, 6);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+
+      // Inner border
+      ctx.strokeStyle = b.captured ? '#fff' : c.fill;
+      ctx.lineWidth   = 1.5;
+      roundRect(ctx, px, py, s, s, 6);
+      ctx.stroke();
+
+      // Direction arrow
+      if (!b.captured) {
+        drawArrow(ctx, cx, cy, b.dir, c.fill, cellSize);
+      } else {
+        // Checkmark
+        ctx.strokeStyle = '#0a0a12';
+        ctx.lineWidth   = 2.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx - s*0.2, cy);
+        ctx.lineTo(cx - s*0.05, cy + s*0.18);
+        ctx.lineTo(cx + s*0.22, cy - s*0.15);
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawArrow(ctx, cx, cy, dir, color, size) {
+    const as = size * 0.18;
+    ctx.strokeStyle = '#0a0a12';
+    ctx.fillStyle   = '#0a0a12';
+    ctx.lineWidth   = 2;
+    ctx.lineCap = 'round';
+
+    let dx = 0, dy = 0;
+    if (dir === 'right') dx =  1;
+    if (dir === 'left')  dx = -1;
+    if (dir === 'down')  dy =  1;
+    if (dir === 'up')    dy = -1;
+
+    const tx = cx + dx * as * 0.7;
+    const ty = cy + dy * as * 0.7;
+    const bx = cx - dx * as * 0.5;
+    const by = cy - dy * as * 0.5;
+
+    // Arrow shaft
+    ctx.beginPath();
+    ctx.moveTo(bx, by);
+    ctx.lineTo(tx, ty);
+    ctx.stroke();
+
+    // Arrowhead
+    const hw = as * 0.45;
+    const perp = { x: -dy, y: dx };
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx - dx * hw + perp.x * hw * 0.5, ty - dy * hw + perp.y * hw * 0.5);
+    ctx.lineTo(tx - dx * hw - perp.x * hw * 0.5, ty - dy * hw - perp.y * hw * 0.5);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.arcTo(x+w, y, x+w, y+r, r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+    ctx.lineTo(x+r, y+h);
+    ctx.arcTo(x, y+h, x, y+h-r, r);
+    ctx.lineTo(x, y+r);
+    ctx.arcTo(x, y, x+r, y, r);
+    ctx.closePath();
+  }
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return `${r},${g},${b}`;
+  }
+
+  // ===== SHARE =====
+  function buildShareText() {
+    const wallCount = walls.size;
+    const score     = Math.max(0, BASE_SCORE - wallCount * WALL_PENALTY);
+    const isOptimal = wallCount <= puzzle.minWalls;
+    const stars     = wallCount === 0 ? '★★★' : isOptimal ? '★★☆' : wallCount <= puzzle.minWalls+1 ? '★☆☆' : '☆☆☆';
+
+    // Build grid emoji representation
+    const BLOCK_EMOJI = { cyan:'🟦', pink:'🟥', green:'🟩', gold:'🟨', purple:'🟪' };
+    const goalMap = {};
+    puzzle.goals.forEach(g => { goalMap[`${g.x},${g.y}`] = g.color; });
+    const blockMap = {};
+    blocks.forEach(b => { blockMap[`${b.startX},${b.startY}`] = b.color; });
+
+    let gridLines = '';
+    for (let r = 0; r < GRID; r++) {
+      let line = '';
+      for (let c = 0; c < GRID; c++) {
+        const bk = `${c},${r}`;
+        if (blockMap[bk]) line += BLOCK_EMOJI[blockMap[bk]];
+        else if (goalMap[bk]) line += '🔲';
+        else line += '⬛';
+      }
+      gridLines += line + '\n';
+    }
+
+    return `🔒 GRIDLOCK — Day #${dayNum}\nSolved with ${wallCount} walls ${stars}\nScore: ${score}/100\n\n${gridLines}\nneonarcade.app/gridlock`;
+  }
+
+  async function share() {
+    const text = buildShareText();
+    try {
+      if (navigator.share) {
+        await navigator.share({ text });
+      } else {
+        await navigator.clipboard.writeText(text);
+        showToast('COPIED TO CLIPBOARD');
+      }
+    } catch(e) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('COPIED TO CLIPBOARD');
+      } catch(e2) {
+        showToast('COPY FAILED');
+      }
+    }
+  }
+
+  // ===== TOAST =====
+  let toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2000);
+  }
+
+  // ===== SCREEN TRANSITIONS =====
+  function showScreen(screen) {
+    [startScreen, gameScreen, resultScreen].forEach(s => {
+      s.classList.toggle('hidden', s !== screen);
+    });
+  }
+
+  // ===== EVENT LISTENERS =====
+  document.getElementById('start-btn').addEventListener('click', () => {
+    initGame();
+    resize();
+    showScreen(gameScreen);
+    draw();
+  });
+
+  document.getElementById('solve-btn').addEventListener('click', () => {
+    solve();
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (animating) return;
+    walls.clear();
+    blocks.forEach(b => {
+      b.x = b.startX; b.y = b.startY;
+      b.animX = b.x; b.animY = b.y;
+      b.captured = false;
+    });
+    solved = false;
+    hudWalls.textContent = `0 / ${MAX_WALLS}`;
+    draw();
+  });
+
+  document.getElementById('share-btn').addEventListener('click', share);
+
+  document.getElementById('play-again-btn').addEventListener('click', () => {
+    initGame();
+    resize();
+    showScreen(gameScreen);
+    draw();
+  });
+
+  document.getElementById('home-btn').addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+
+  canvas.addEventListener('click', handleWallClick);
+  canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    // Convert touchend to a click-like event using changedTouches
+    const touch = e.changedTouches[0];
+    const fakeEvt = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: () => {}
+    };
+    handleWallClick(fakeEvt);
+  }, { passive: false });
+
+  window.addEventListener('resize', resize);
+
+  // Keyboard shortcuts
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (!gameScreen.classList.contains('hidden') && !animating && !solved) {
+        e.preventDefault();
+        solve();
+      }
+    }
+    if (e.key === 'r' || e.key === 'R') {
+      if (!gameScreen.classList.contains('hidden') && !animating) {
+        document.getElementById('reset-btn').click();
+      }
+    }
+  });
+
+  // ===== IDLE ANIMATION on start screen =====
+  // (just run draw on game screen when visible, nothing special needed for start)
+  initGame(); // to set day label
+
+})();
+</script>
+</body>
+</html>

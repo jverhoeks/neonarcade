@@ -79,7 +79,37 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 1. **Start screen** — Game title (Orbitron 900), subtitle explaining the hook, START button, controls hint
 2. **Game over screen** — Stats, high score comparison, SHARE button, PLAY AGAIN button
 3. **Share button** — Copies emoji-based result to clipboard via `navigator.clipboard.writeText()`. Use `navigator.share()` as primary on mobile with clipboard fallback
-4. **High score** — Persisted via `localStorage.setItem('gamename_best', score)`
+4. **High scores (Top 5 with timestamps)** — Use this exact pattern in every game:
+   ```javascript
+   // Storage key: 'neonarcade_scores_GAMENAME' (e.g. 'neonarcade_scores_snake')
+   function saveScore(key, score) {
+     var scores = JSON.parse(localStorage.getItem(key) || '[]');
+     scores.push({ score: score, ts: Date.now() });
+     scores.sort(function(a, b) { return b.score - a.score; });
+     scores = scores.slice(0, 5);
+     localStorage.setItem(key, JSON.stringify(scores));
+     return scores;
+   }
+   function timeAgo(ts) {
+     var diff = Date.now() - ts;
+     var mins  = Math.floor(diff / 60000);
+     var hours = Math.floor(diff / 3600000);
+     var days  = Math.floor(diff / 86400000);
+     if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+     if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+     if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+     return 'just now';
+   }
+   ```
+   Call `saveScore('neonarcade_scores_GAMENAME', finalScore)` on game over.
+   On the result screen, render the top-5 list:
+   ```
+   🏆 YOUR BESTS
+    1   1240 pts   just now
+    2    980 pts   2 hours ago
+    3    740 pts   1 day ago
+   ```
+   Style: Rajdhani font, rank in dim text, score in neon cyan, timestamp in `#4a4a6a`.
 5. **Sound effects** — Web Audio API (oscillator-based, no external audio files). At minimum: action sound, success sound, fail/death sound
 6. **Mobile support** — Touch controls, `touch-action: none`, responsive canvas sizing, `user-scalable=no` in viewport meta
 7. **Desktop support** — Keyboard controls (arrows/WASD/space as appropriate)
