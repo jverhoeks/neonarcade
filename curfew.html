@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CURFEW — NEON ARCADE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none; user-select: none;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+}
+canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+#ui {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 100;
+}
+
+/* HUD */
+#hud {
+  display: none;
+  position: absolute; top: 0; left: 0; width: 100%;
+  padding: 14px 20px;
+  justify-content: space-between; align-items: flex-start;
+  pointer-events: none;
+}
+#hud-score {
+  font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 700;
+  color: #ffd700; letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(255,215,0,0.5);
+}
+#hud-right { text-align: right; }
+#hud-time-label {
+  font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 400;
+  color: #00f0ff; letter-spacing: 3px; display: block;
+  text-shadow: 0 0 8px rgba(0,240,255,0.5);
+}
+#hud-clock {
+  font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700;
+  color: rgba(255,255,255,0.6); letter-spacing: 2px;
+}
+#hud-zone {
+  font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 300;
+  color: #4a4a6a; letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* Screens */
+.screen {
+  display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  flex-direction: column; justify-content: center; align-items: center;
+  pointer-events: auto; z-index: 50;
+}
+.screen.active { display: flex; }
+
+/* Start screen */
+#start-screen {
+  background: radial-gradient(ellipse at 30% 20%, rgba(0,100,120,0.12) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(80,0,80,0.1) 0%, transparent 50%),
+              rgba(0,0,0,0.82);
+}
+#start-screen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(48px, 11vw, 90px);
+  letter-spacing: 12px; color: #00f0ff;
+  text-shadow: 0 0 15px rgba(0,240,255,0.7), 0 0 50px rgba(0,240,255,0.25);
+  margin-bottom: 10px;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 0 0 15px rgba(0,240,255,0.7), 0 0 50px rgba(0,240,255,0.25); }
+  50%      { text-shadow: 0 0 25px rgba(0,240,255,0.9), 0 0 80px rgba(0,240,255,0.4); }
+}
+#start-time-display {
+  font-family: 'Orbitron', monospace; font-size: clamp(14px, 3vw, 20px);
+  color: #ffd700; letter-spacing: 4px; margin-bottom: 6px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+#start-zone-label {
+  font-family: 'Rajdhani', sans-serif; font-size: clamp(12px, 2.5vw, 16px);
+  font-weight: 300; color: rgba(255,255,255,0.4);
+  letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px;
+}
+.start-desc {
+  font-family: 'Rajdhani', sans-serif; font-size: clamp(13px, 2.5vw, 16px);
+  color: rgba(255,255,255,0.35); letter-spacing: 1px;
+  max-width: 400px; text-align: center; line-height: 1.5; margin-bottom: 40px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid #00f0ff; background: rgba(0,240,255,0.06);
+  color: #00f0ff; cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+  pointer-events: auto;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.play-btn:active { transform: scale(0.97); }
+.controls-hint {
+  margin-top: 24px; font-size: clamp(11px, 2vw, 13px);
+  color: rgba(255,255,255,0.2); letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* Game over screen */
+#gameover-screen {
+  background: radial-gradient(ellipse at center, rgba(40,0,20,0.6) 0%, rgba(0,0,0,0.9) 70%);
+}
+#gameover-screen h2 {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(36px, 9vw, 70px);
+  letter-spacing: 10px; color: #ff2d7b;
+  text-shadow: 0 0 20px rgba(255,45,123,0.7), 0 0 60px rgba(255,45,123,0.25);
+  margin-bottom: 6px;
+  animation: caughtPulse 0.5s ease-in-out 3;
+}
+@keyframes caughtPulse {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+#taunt-msg {
+  font-family: 'Rajdhani', sans-serif; font-size: clamp(13px, 2.5vw, 17px);
+  color: rgba(255,100,130,0.65); letter-spacing: 2px;
+  max-width: 360px; text-align: center; margin-bottom: 28px; font-style: italic;
+}
+.stats-row {
+  display: flex; gap: 32px; margin-bottom: 24px; text-align: center;
+}
+.stat-item .stat-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(24px, 5vw, 38px); font-weight: 700;
+  color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.4);
+}
+.stat-item .stat-label {
+  font-size: 12px; color: rgba(255,255,255,0.3);
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 3px;
+}
+#new-best {
+  font-family: 'Orbitron', monospace; font-size: 13px;
+  color: #39ff14; letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(57,255,20,0.6);
+  margin-bottom: 12px; display: none;
+  animation: bestPulse 1s ease-in-out infinite;
+}
+@keyframes bestPulse {
+  0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+}
+.score-table { margin: 10px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+.score-val  { color: #00f0ff; font-size: 15px; font-weight: 700; flex: 1; text-align: center; }
+.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+
+.btn-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+.btn-secondary {
+  font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 3px; color: rgba(255,255,255,0.5);
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  padding: 11px 28px; cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+  pointer-events: auto;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
+
+/* Screen shake */
+@keyframes shake {
+  0%,100% { transform: translate(0,0); }
+  15%      { transform: translate(-4px,2px); }
+  30%      { transform: translate(4px,-2px); }
+  45%      { transform: translate(-3px,3px); }
+  60%      { transform: translate(3px,-1px); }
+  75%      { transform: translate(-2px,2px); }
+}
+.shake { animation: shake 0.3s ease-in-out; }
+
+/* Deep night flicker */
+@keyframes flicker {
+  0%,100% { opacity: 1; }
+  10%      { opacity: 0.92; }
+  20%      { opacity: 0.98; }
+  50%      { opacity: 0.88; }
+  70%      { opacity: 0.95; }
+}
+.flicker { animation: flicker 2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="ui">
+  <!-- HUD -->
+  <div id="hud">
+    <div id="hud-score">0</div>
+    <div id="hud-right">
+      <span id="hud-time-label">MORNING MODE</span>
+      <div id="hud-clock">06:00</div>
+    </div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start-screen" class="screen active">
+    <h1>CURFEW</h1>
+    <div id="start-time-display">06:00</div>
+    <div id="start-zone-label">MORNING MODE</div>
+    <div class="start-desc" id="start-desc">The game reads your clock. The later it is, the harder it gets. Collect night passes. Avoid the officers. Don't get caught.</div>
+    <button class="play-btn" id="btn-start">START</button>
+    <div class="controls-hint">ARROWS / WASD / SWIPE</div>
+  </div>
+
+  <!-- Game over screen -->
+  <div id="gameover-screen" class="screen">
+    <h2>CAUGHT</h2>
+    <div id="taunt-msg">The city doesn't want you here.</div>
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-value" id="final-score">0</div>
+        <div class="stat-label">Passes</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="final-best">0</div>
+        <div class="stat-label">Best</div>
+      </div>
+    </div>
+    <div id="new-best">NEW HIGH SCORE</div>
+    <div class="score-table" id="score-table"></div>
+    <div class="btn-row">
+      <button class="play-btn" id="btn-replay">PLAY AGAIN</button>
+      <button class="btn-secondary" id="btn-share">SHARE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+// =================== LEADERBOARD ===================
+function saveScore(key, score) {
+  var scores = JSON.parse(localStorage.getItem(key) || '[]');
+  scores.push({ score: score, ts: Date.now() });
+  scores.sort(function(a, b) { return b.score - a.score; });
+  scores = scores.slice(0, 5);
+  localStorage.setItem(key, JSON.stringify(scores));
+  return scores;
+}
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  var mins  = Math.floor(diff / 60000);
+  var hours = Math.floor(diff / 3600000);
+  var days  = Math.floor(diff / 86400000);
+  if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+  if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+  return 'just now';
+}
+function renderScoreTable(scores) {
+  var el = document.getElementById('score-table');
+  if (!el) return;
+  el.textContent = '';
+  var title = document.createElement('div');
+  title.className = 'score-table-title';
+  title.textContent = '\u{1F3C6} YOUR BESTS';
+  el.appendChild(title);
+  scores.forEach(function(s, i) {
+    var row = document.createElement('div'); row.className = 'score-row';
+    var rank = document.createElement('span'); rank.className = 'score-rank'; rank.textContent = i + 1;
+    var val = document.createElement('span'); val.className = 'score-val'; val.textContent = s.score;
+    var time = document.createElement('span'); time.className = 'score-time'; time.textContent = timeAgo(s.ts);
+    row.appendChild(rank); row.appendChild(val); row.appendChild(time);
+    el.appendChild(row);
+  });
+}
+
+// =================== TIME ZONES ===================
+function getTimeConfig() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+
+  // 6–11 MORNING
+  if (h >= 6 && h < 12) {
+    return {
+      label: 'MORNING MODE',
+      officers: 2,
+      speed: 320,       // ms per step (higher = slower)
+      bgAlpha: 0.85,
+      bgTint: [0, 20, 30],
+      accentColor: '#00f0ff',
+      taunt: 'Early bird caught by the law. Sleep more.',
+      shareZone: 'MORNING',
+      timeStr,
+      flicker: false,
+    };
+  }
+  // 12–17 AFTERNOON
+  if (h >= 12 && h < 18) {
+    return {
+      label: 'AFTERNOON MODE',
+      officers: 3,
+      speed: 260,
+      bgAlpha: 0.85,
+      bgTint: [10, 10, 20],
+      accentColor: '#00f0ff',
+      taunt: 'Normal person, normal failure.',
+      shareZone: 'AFTERNOON',
+      timeStr,
+      flicker: false,
+    };
+  }
+  // 18–21 EVENING
+  if (h >= 18 && h < 22) {
+    return {
+      label: 'EVENING MODE',
+      officers: 4,
+      speed: 210,
+      bgAlpha: 0.88,
+      bgTint: [15, 5, 25],
+      accentColor: '#b44dff',
+      taunt: 'The night is just beginning...',
+      shareZone: 'EVENING',
+      timeStr,
+      flicker: false,
+    };
+  }
+  // 22–23 NIGHT
+  if (h >= 22) {
+    return {
+      label: 'NIGHT MODE',
+      officers: 5,
+      speed: 170,
+      bgAlpha: 0.92,
+      bgTint: [20, 0, 30],
+      accentColor: '#ff2d7b',
+      taunt: 'You really should be in bed.',
+      shareZone: 'NIGHT',
+      timeStr,
+      flicker: false,
+    };
+  }
+  // 0–2 MIDNIGHT
+  if (h >= 0 && h < 3) {
+    return {
+      label: 'MIDNIGHT MODE',
+      officers: 6,
+      speed: 135,
+      bgAlpha: 0.95,
+      bgTint: [25, 0, 15],
+      accentColor: '#ff2d7b',
+      taunt: "This city doesn't want you here.",
+      shareZone: 'MIDNIGHT',
+      timeStr,
+      flicker: false,
+    };
+  }
+  // 3–5 DEEP NIGHT
+  return {
+    label: 'DEEP NIGHT',
+    officers: 7,
+    speed: 100,
+    bgAlpha: 0.97,
+    bgTint: [10, 0, 8],
+    accentColor: '#ff2d7b',
+    taunt: h === 3 ? 'At 3AM even the shadows are watching.'
+         : h === 4 ? 'Are you okay?'
+         : 'Sunrise incoming. You made it through the worst.',
+    shareZone: 'DEEP NIGHT (3AM)',
+    timeStr,
+    flicker: true,
+  };
+}
+
+// =================== CANVAS ===================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+// =================== CONFIG ===================
+const COLS = 15;
+const ROWS = 20;
+const PASS_COUNT = 12; // night passes on grid at once
+
+// =================== STATE ===================
+let cfg = getTimeConfig();
+let state = 'start'; // 'start' | 'playing' | 'dead'
+let tileW = 0, tileH = 0, offsetX = 0, offsetY = 0;
+let player = { col: 7, row: 10 };
+let officers = [];
+let passes = [];
+let score = 0;
+let highScore = 0;
+let particles = [];
+let lastOfficerMove = 0;
+let animFrame = 0;
+let deathTime = 0;
+let deadOfficerIdx = -1; // which officer caught us
+let gameStartTime = 0; // grace period tracking
+
+// Background stars
+let stars = [];
+for (let i = 0; i < 80; i++) {
+  stars.push({ x: Math.random(), y: Math.random(), r: 0.3 + Math.random() * 1.2, phase: Math.random() * Math.PI * 2, speed: 0.0005 + Math.random() * 0.001 });
+}
+
+// =================== AUDIO ===================
+let audioCtx = null;
+let masterGain = null;
+let droneOsc = null;
+let droneGain = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.18;
+    masterGain.connect(audioCtx.destination);
+  } catch(e) { audioCtx = null; }
+}
+
+function startDrone() {
+  if (!audioCtx || droneOsc) return;
+  // pitch based on time zone: 40–90 Hz (later = lower/more unsettling)
+  const speedFactor = (320 - cfg.speed) / (320 - 100); // 0=morning, 1=deep night
+  const pitch = 90 - speedFactor * 55; // 90Hz morning → 35Hz deep night
+  droneOsc = audioCtx.createOscillator();
+  droneGain = audioCtx.createGain();
+  droneOsc.type = 'sine';
+  droneOsc.frequency.value = pitch;
+  droneGain.gain.value = 0.0;
+  droneOsc.connect(droneGain);
+  droneGain.connect(masterGain);
+  droneOsc.start();
+  droneGain.gain.setTargetAtTime(0.28 + speedFactor * 0.22, audioCtx.currentTime, 1.5);
+}
+
+function stopDrone() {
+  if (!droneGain || !droneOsc) return;
+  droneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.6);
+  const osc = droneOsc;
+  const g = droneGain;
+  droneOsc = null; droneGain = null;
+  setTimeout(() => { try { osc.stop(); g.disconnect(); } catch(e){} }, 2000);
+}
+
+function playMoveSound() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 220;
+  g.gain.setValueAtTime(0.04, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  osc.connect(g); g.connect(masterGain);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.06);
+}
+
+function playCollectSound() {
+  if (!audioCtx) return;
+  const notes = [440, 550, 660, 880];
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const t0 = audioCtx.currentTime + i * 0.06;
+    g.gain.setValueAtTime(0.12, t0);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.12);
+    osc.connect(g); g.connect(masterGain);
+    osc.start(t0); osc.stop(t0 + 0.14);
+  });
+}
+
+function playCaughtSound() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.7);
+  g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+  osc.connect(g); g.connect(masterGain);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.75);
+}
+
+// =================== LEADERBOARD UTIL ===================
+function getBestScore() {
+  const scores = JSON.parse(localStorage.getItem('neonarcade_scores_curfew') || '[]');
+  return scores.length ? scores[0].score : 0;
+}
+
+// =================== RESIZE ===================
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  const W = window.innerWidth, H = window.innerHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const availW = W * 0.9, availH = H * 0.82;
+  tileW = Math.floor(availW / COLS);
+  tileH = Math.floor(availH / ROWS);
+  const tSize = Math.min(tileW, tileH, 40);
+  tileW = tSize; tileH = tSize;
+  offsetX = Math.floor((W - COLS * tileW) / 2);
+  offsetY = Math.floor((H - ROWS * tileH) / 2) + Math.floor(H * 0.04);
+}
+window.addEventListener('resize', () => { resize(); });
+
+// =================== GAME INIT ===================
+function initGame() {
+  cfg = getTimeConfig();
+  score = 0;
+  highScore = getBestScore();
+  officers = [];
+  passes = [];
+  particles = [];
+  deathTime = 0;
+  deadOfficerIdx = -1;
+  gameStartTime = performance.now();
+  lastOfficerMove = performance.now();
+
+  // Player starts at center
+  player = { col: Math.floor(COLS / 2), row: Math.floor(ROWS / 2) };
+
+  // Spawn officers at edges/corners, avoid player start
+  const edgeCells = [];
+  for (let c = 0; c < COLS; c++) { edgeCells.push({col: c, row: 0}); edgeCells.push({col: c, row: ROWS-1}); }
+  for (let r = 1; r < ROWS-1; r++) { edgeCells.push({col: 0, row: r}); edgeCells.push({col: COLS-1, row: r}); }
+  shuffle(edgeCells);
+
+  for (let i = 0; i < cfg.officers; i++) {
+    const pos = edgeCells[i % edgeCells.length];
+    // Direct officer inward from the edge they spawned on
+    let dc = 0, dr = 0;
+    if (pos.col === 0) dc = 1;
+    else if (pos.col === COLS - 1) dc = -1;
+    else if (pos.row === 0) dr = 1;
+    else dr = -1;
+    officers.push({
+      col: pos.col, row: pos.row,
+      dc, dr,
+      // stagger their initial move timers so they don't all move at once
+      lastMove: performance.now() - Math.random() * (cfg.speed * 0.5),
+    });
+  }
+
+  // Spawn night passes
+  spawnPasses();
+
+  // Update HUD labels
+  document.getElementById('hud-time-label').textContent = cfg.label;
+  updateClock();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function spawnPasses() {
+  while (passes.length < PASS_COUNT) {
+    const col = Math.floor(Math.random() * COLS);
+    const row = Math.floor(Math.random() * ROWS);
+    // Don't spawn on player or existing pass
+    if (col === player.col && row === player.row) continue;
+    if (passes.some(p => p.col === col && p.row === row)) continue;
+    passes.push({ col, row, phase: Math.random() * Math.PI * 2 });
+  }
+}
+
+// =================== CLOCK ===================
+function formatClock(d) {
+  const h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+let clockInterval = null;
+function updateClock() {
+  const now = new Date();
+  document.getElementById('hud-clock').textContent = formatClock(now);
+  document.getElementById('start-time-display').textContent =
+    String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+}
+
+// =================== SCREENS ===================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(name + '-screen');
+  if (el) el.classList.add('active');
+  document.getElementById('hud').style.display = 'none';
+}
+
+function showHUD() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('hud').style.display = 'flex';
+}
+
+// =================== INPUT ===================
+let queuedMove = null;
+
+function handleDir(dc, dr) {
+  if (state !== 'playing') return;
+  queuedMove = {dc, dr};
+}
+
+window.addEventListener('keydown', e => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D'].includes(e.key)) {
+    e.preventDefault();
+  }
+  if (e.key === 'ArrowUp'    || e.key === 'w' || e.key === 'W') handleDir(0,-1);
+  else if (e.key === 'ArrowDown'  || e.key === 's' || e.key === 'S') handleDir(0,1);
+  else if (e.key === 'ArrowLeft'  || e.key === 'a' || e.key === 'A') handleDir(-1,0);
+  else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') handleDir(1,0);
+});
+
+let touchSX = 0, touchSY = 0;
+canvas.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  touchSX = t.clientX; touchSY = t.clientY;
+}, { passive: true });
+canvas.addEventListener('touchend', e => {
+  if (state !== 'playing') return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchSX, dy = t.clientY - touchSY;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist > 18) {
+    if (Math.abs(dx) > Math.abs(dy)) handleDir(dx > 0 ? 1 : -1, 0);
+    else handleDir(0, dy > 0 ? 1 : -1);
+  }
+}, { passive: true });
+
+// =================== MOVE PLAYER ===================
+function movePlayer(dc, dr) {
+  const nc = player.col + dc, nr = player.row + dr;
+  if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) return;
+  player.col = nc; player.row = nr;
+  playMoveSound();
+
+  // Check pass collection
+  const pi = passes.findIndex(p => p.col === nc && p.row === nr);
+  if (pi !== -1) {
+    passes.splice(pi, 1);
+    score++;
+    document.getElementById('hud-score').textContent = score;
+    spawnParticles(tileX(nc), tileY(nr), '#39ff14', 12);
+    playCollectSound();
+    spawnPasses();
+  }
+
+  // Check officer collision after move
+  for (let i = 0; i < officers.length; i++) {
+    if (officers[i].col === nc && officers[i].row === nr) {
+      triggerDeath(i);
+      return;
+    }
+  }
+}
+
+// =================== MOVE OFFICERS ===================
+function moveOfficers(now) {
+  for (let i = 0; i < officers.length; i++) {
+    const o = officers[i];
+    if (now - o.lastMove < cfg.speed) continue;
+    o.lastMove = now;
+
+    // Bounce movement: move straight, bounce off walls
+    const nc = o.col + o.dc, nr = o.row + o.dr;
+    if (nc < 0 || nc >= COLS) {
+      o.dc = -o.dc;
+    } else if (nr < 0 || nr >= ROWS) {
+      o.dr = -o.dr;
+    } else {
+      // Occasionally (15% chance) turn toward player for AI pressure
+      if (Math.random() < 0.15) {
+        const pdx = player.col - o.col, pdy = player.row - o.row;
+        if (Math.abs(pdx) > Math.abs(pdy)) {
+          o.dc = pdx > 0 ? 1 : -1; o.dr = 0;
+        } else {
+          o.dc = 0; o.dr = pdy > 0 ? 1 : -1;
+        }
+      }
+      o.col = o.col + o.dc;
+      o.row = o.row + o.dr;
+    }
+
+    // Check if caught player
+    if (o.col === player.col && o.row === player.row) {
+      triggerDeath(i);
+      return;
+    }
+  }
+}
+
+// =================== DEATH ===================
+function triggerDeath(officerIdx) {
+  if (state === 'dead') return;
+  // 1 second grace period at game start
+  if (performance.now() - gameStartTime < 1000) return;
+  state = 'dead';
+  deathTime = performance.now();
+  deadOfficerIdx = officerIdx;
+
+  // Screen shake
+  document.getElementById('ui').classList.add('shake');
+  setTimeout(() => document.getElementById('ui').classList.remove('shake'), 350);
+
+  playCaughtSound();
+  stopDrone();
+
+  // Spawn death particles
+  spawnParticles(tileX(player.col), tileY(player.row), '#ff2d7b', 24);
+
+  // Update stats
+  document.getElementById('final-score').textContent = score;
+  const best = getBestScore();
+  const topScores = saveScore('neonarcade_scores_curfew', score);
+  const newBestScore = topScores[0].score;
+  document.getElementById('final-best').textContent = newBestScore;
+
+  const nbEl = document.getElementById('new-best');
+  if (score > 0 && score >= newBestScore && topScores.filter(s => s.score === score).length === 1) {
+    nbEl.style.display = 'block';
+  } else {
+    nbEl.style.display = 'none';
+  }
+
+  document.getElementById('taunt-msg').textContent = cfg.taunt;
+
+  setTimeout(() => {
+    showScreen('gameover');
+    renderScoreTable(topScores);
+  }, 900);
+}
+
+// =================== PARTICLES ===================
+function spawnParticles(x, y, color, count) {
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+    const speed = 1.5 + Math.random() * 3;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1.0,
+      decay: 0.02 + Math.random() * 0.03,
+      color,
+      r: 2 + Math.random() * 3,
+    });
+  }
+}
+
+function updateParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.94; p.vy *= 0.94;
+    p.life -= p.decay;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+// =================== TILE HELPERS ===================
+function tileX(col) { return offsetX + col * tileW + tileW * 0.5; }
+function tileY(row) { return offsetY + row * tileH + tileH * 0.5; }
+
+// =================== RENDER ===================
+function render(now) {
+  const W = window.innerWidth, H = window.innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // Background
+  const [tr, tg, tb] = cfg.bgTint;
+  ctx.fillStyle = `rgb(${tr},${tg},${tb})`;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle radial BG glow (changes by zone)
+  const bgGrad = ctx.createRadialGradient(W*0.3, H*0.2, 0, W*0.5, H*0.5, Math.max(W,H)*0.7);
+  bgGrad.addColorStop(0, 'rgba(0,30,50,0.18)');
+  bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars (visible in evening+)
+  const starAlpha = Math.max(0, (18 - new Date().getHours()) * -0.1 + 0.3);
+  if (starAlpha > 0) {
+    stars.forEach(s => {
+      const sx = s.x * W, sy = s.y * H;
+      const a = starAlpha * (0.4 + 0.6 * Math.sin(now * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+    });
+  }
+
+  // Grid — city blocks
+  const gridAlpha = 0.06 + (state === 'playing' ? 0.02 : 0);
+  ctx.strokeStyle = `rgba(0,240,255,${gridAlpha})`;
+  ctx.lineWidth = 0.5;
+  for (let c = 0; c <= COLS; c++) {
+    const x = offsetX + c * tileW;
+    ctx.beginPath(); ctx.moveTo(x, offsetY); ctx.lineTo(x, offsetY + ROWS * tileH); ctx.stroke();
+  }
+  for (let r = 0; r <= ROWS; r++) {
+    const y = offsetY + r * tileH;
+    ctx.beginPath(); ctx.moveTo(offsetX, y); ctx.lineTo(offsetX + COLS * tileW, y); ctx.stroke();
+  }
+
+  if (state === 'start') {
+    // Idle animation: gently pulse grid
+    const pulse = 0.5 + 0.5 * Math.sin(now * 0.0008);
+    ctx.fillStyle = `rgba(0,240,255,${0.015 * pulse})`;
+    ctx.fillRect(offsetX, offsetY, COLS * tileW, ROWS * tileH);
+  }
+
+  if (state === 'playing' || state === 'dead') {
+    // Draw night passes
+    passes.forEach(p => {
+      const px = tileX(p.col), py = tileY(p.row);
+      const pulse = 0.7 + 0.3 * Math.sin(now * 0.003 + p.phase);
+      const glow = ctx.createRadialGradient(px, py, 0, px, py, tileW * 0.9 * pulse);
+      glow.addColorStop(0, 'rgba(57,255,20,0.5)');
+      glow.addColorStop(0.4, 'rgba(57,255,20,0.15)');
+      glow.addColorStop(1, 'rgba(57,255,20,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(px, py, tileW * 0.9 * pulse, 0, Math.PI * 2); ctx.fill();
+
+      // Core
+      ctx.beginPath(); ctx.arc(px, py, tileW * 0.18 * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = '#39ff14'; ctx.fill();
+
+      // Star sparkle lines
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(now * 0.001 + p.phase);
+      ctx.strokeStyle = `rgba(57,255,20,${0.4 * pulse})`;
+      ctx.lineWidth = 1;
+      for (let s = 0; s < 4; s++) {
+        const ang = (s / 4) * Math.PI * 2;
+        const len = tileW * 0.32 * pulse;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ang)*len, Math.sin(ang)*len); ctx.stroke();
+      }
+      ctx.restore();
+    });
+
+    // Draw officers (pink/red)
+    officers.forEach((o, idx) => {
+      const ox = tileX(o.col), oy = tileY(o.row);
+      const isCatcher = state === 'dead' && idx === deadOfficerIdx;
+      const color = isCatcher ? '#ffffff' : '#ff2d7b';
+      const glowColor = isCatcher ? 'rgba(255,255,255,' : 'rgba(255,45,123,';
+
+      // Officer glow
+      const og = ctx.createRadialGradient(ox, oy, 0, ox, oy, tileW * 1.1);
+      og.addColorStop(0, glowColor + '0.6)');
+      og.addColorStop(0.5, glowColor + '0.15)');
+      og.addColorStop(1, glowColor + '0)');
+      ctx.fillStyle = og;
+      ctx.beginPath(); ctx.arc(ox, oy, tileW * 1.1, 0, Math.PI * 2); ctx.fill();
+
+      // Officer core (diamond shape)
+      ctx.save();
+      ctx.translate(ox, oy);
+      ctx.rotate(now * 0.002 * (idx % 2 === 0 ? 1 : -1));
+      const s = tileW * 0.3;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(0, -s); ctx.lineTo(s, 0); ctx.lineTo(0, s); ctx.lineTo(-s, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+    });
+
+    // Draw player (if alive or recently dead)
+    const showPlayer = state === 'playing' || (state === 'dead' && now - deathTime < 700);
+    if (showPlayer) {
+      const px = tileX(player.col), py = tileY(player.row);
+      const alpha = state === 'dead' ? Math.max(0, 1 - (now - deathTime) / 700) : 1;
+
+      // Player glow
+      const pg = ctx.createRadialGradient(px, py, 0, px, py, tileW * 1.5);
+      pg.addColorStop(0, `rgba(0,240,255,${0.7 * alpha})`);
+      pg.addColorStop(0.4, `rgba(0,240,255,${0.15 * alpha})`);
+      pg.addColorStop(1, `rgba(0,240,255,0)`);
+      ctx.fillStyle = pg;
+      ctx.beginPath(); ctx.arc(px, py, tileW * 1.5, 0, Math.PI * 2); ctx.fill();
+
+      // Player core circle
+      ctx.beginPath(); ctx.arc(px, py, tileW * 0.28, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,240,255,${alpha})`; ctx.fill();
+
+      // Inner bright core
+      ctx.beginPath(); ctx.arc(px, py, tileW * 0.14, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
+    }
+
+    // Particles
+    updateParticles();
+    particles.forEach(p => {
+      ctx.globalAlpha = p.life;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color; ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  // Deep night: occasional full-screen flicker overlay
+  if (cfg.flicker && state === 'playing') {
+    const ft = Math.sin(now * 0.0023) * Math.cos(now * 0.0037);
+    if (ft > 0.85) {
+      ctx.fillStyle = `rgba(255,0,60,${(ft - 0.85) * 0.08})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+}
+
+// =================== GAME LOOP ===================
+function loop(now) {
+  animFrame++;
+
+  if (state === 'playing') {
+    // Process queued input
+    if (queuedMove) {
+      movePlayer(queuedMove.dc, queuedMove.dr);
+      queuedMove = null;
+    }
+    moveOfficers(now);
+    updateClock();
+  }
+
+  render(now);
+  requestAnimationFrame(loop);
+}
+
+// =================== START / RESTART ===================
+function startGame() {
+  initAudio();
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  initGame();
+  resize();
+  state = 'playing';
+  queuedMove = null;
+  showHUD();
+  startDrone();
+}
+
+// =================== SHARE ===================
+function shareResult() {
+  const now = new Date();
+  const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  const text = `\u{1F319} CURFEW\nSurvived: ${score} passes | ${cfg.shareZone}\nTime: ${timeStr}\nneonarcade.net/curfew.html`;
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => copyText(text));
+  } else {
+    copyText(text);
+  }
+}
+
+function copyText(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('btn-share');
+      const orig = btn.textContent;
+      btn.textContent = 'COPIED!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }).catch(() => {});
+  }
+}
+
+// =================== STARTUP ===================
+
+// Init start screen with time info
+(function initStartScreen() {
+  const c = getTimeConfig();
+  document.getElementById('start-time-display').textContent = c.timeStr;
+  document.getElementById('start-zone-label').textContent = c.label;
+  document.getElementById('hud-time-label').textContent = c.label;
+
+  const descs = {
+    'MORNING MODE': 'A calm morning in the city. 2 officers patrol. Collect night passes. Get caught and it\u2019s game over.',
+    'AFTERNOON MODE': 'Midday tension. 3 officers, standard pace. The city watches.',
+    'EVENING MODE': 'The city shifts at dusk. 4 officers now. Things move a little faster.',
+    'NIGHT MODE': 'Night mode. 5 officers. Fast. You really shouldn\u2019t be out here.',
+    'MIDNIGHT MODE': 'Six officers. Near-black. You\u2019re still awake. The city knows.',
+    'DEEP NIGHT': 'Seven officers. Nightmare speed. Something is wrong with you.',
+  };
+  document.getElementById('start-desc').textContent = descs[c.label] || descs['AFTERNOON MODE'];
+
+  // Apply flicker class to body in deep night
+  if (c.flicker) document.getElementById('start-screen').classList.add('flicker');
+
+  // Live clock on start screen
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('start-time-display').textContent =
+      String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  }, 30000);
+})();
+
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-replay').addEventListener('click', startGame);
+document.getElementById('btn-share').addEventListener('click', shareResult);
+
+resize();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
