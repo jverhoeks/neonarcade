@@ -1,0 +1,3 @@
+[    7703ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.transip.nl/:0
+[    8472ms] [ERROR] TypeError: network error @ /js/minified/modules/one-showroom/one-showroom-products.js:45
+[    9016ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.transip.nl/bestel-domein/check/:0

@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PONG: BOTH SIDES</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #0a0a12;
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Scanline overlay */
+  #scanlines {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.06) 2px,
+      rgba(0, 0, 0, 0.06) 4px
+    );
+  }
+
+  /* UI Overlay */
+  #ui-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #rally-counter {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    z-index: 25;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  #rally-counter.visible { opacity: 1; }
+
+  #power-up-text {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 5vw, 40px);
+    font-weight: 700;
+    text-align: center;
+    z-index: 25;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  /* Screens */
+  .screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    background: rgba(10, 10, 18, 0.95);
+    transition: opacity 0.4s;
+    padding: 20px;
+  }
+
+  .screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .game-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 7vw, 56px);
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    background: linear-gradient(180deg, #00ffff, #0088ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.4));
+  }
+
+  .subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(14px, 3vw, 20px);
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 360px;
+  }
+
+  .btn {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(16px, 3.5vw, 22px);
+    font-weight: 700;
+    padding: 14px 48px;
+    border: 2px solid #00ffff;
+    background: transparent;
+    color: #00ffff;
+    cursor: pointer;
+    pointer-events: auto;
+    letter-spacing: 3px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn:hover, .btn:active {
+    background: rgba(0, 255, 255, 0.15);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 30px rgba(0, 255, 255, 0.1);
+  }
+
+  .controls-hint {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(11px, 2.5vw, 14px);
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.6;
+  }
+
+  /* Game Over Screen */
+  #game-over-screen .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(13px, 2.8vw, 17px);
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 16px;
+  }
+
+  #game-over-screen .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(32px, 8vw, 56px);
+    font-weight: 900;
+    color: #00ffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  }
+
+  #game-over-screen .stat-value.small {
+    font-size: clamp(18px, 4vw, 28px);
+  }
+
+  .high-score-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(12px, 2.5vw, 16px);
+    color: #ffcc00;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .high-score-badge.visible { opacity: 1; }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn.small {
+    font-size: clamp(12px, 2.5vw, 16px);
+    padding: 10px 28px;
+    letter-spacing: 2px;
+  }
+
+  .btn.share-btn {
+    border-color: #ff66ff;
+    color: #ff66ff;
+  }
+
+  .btn.share-btn:hover, .btn.share-btn:active {
+    background: rgba(255, 102, 255, 0.15);
+    box-shadow: 0 0 30px rgba(255, 102, 255, 0.3);
+  }
+
+  /* Mobile zone indicators */
+  .zone-indicator {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .zone-indicator.visible {
+    opacity: 1;
+  }
+
+  .zone-left {
+    left: 0;
+    width: 50%;
+    border-right: 1px solid rgba(0, 255, 255, 0.08);
+  }
+
+  .zone-right {
+    right: 0;
+    width: 50%;
+  }
+
+  .zone-label {
+    position: absolute;
+    bottom: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    color: rgba(0, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .zone-left .zone-label { left: 50%; transform: translateX(-50%); }
+  .zone-right .zone-label { left: 50%; transform: translateX(-50%); }
+
+  /* Copied toast */
+  #copied-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 8px 20px;
+    border-radius: 4px;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  #copied-toast.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+<div id="scanlines"></div>
+
+<div id="rally-counter">0</div>
+<div id="power-up-text"></div>
+
+<!-- Start Screen -->
+<div id="start-screen" class="screen">
+  <div class="game-title">PONG:<br>BOTH SIDES</div>
+  <div class="subtitle">Control both paddles. Don't drop the ball.</div>
+  <button class="btn" id="start-btn">START</button>
+  <div class="controls-hint" id="controls-hint"></div>
+</div>
+
+<!-- Game Over Screen -->
+<div id="game-over-screen" class="screen hidden">
+  <div class="game-title" style="font-size: clamp(22px, 5vw, 38px); margin-bottom: 4px;">GAME OVER</div>
+  <div class="stat-label">Rally</div>
+  <div class="stat-value" id="final-rally">0</div>
+  <div class="high-score-badge" id="new-high-score">NEW HIGH SCORE!</div>
+  <div class="stat-label">Best Streak (no power-ups)</div>
+  <div class="stat-value small" id="final-streak">0</div>
+  <div class="stat-label">High Score</div>
+  <div class="stat-value small" id="final-highscore">0</div>
+  <div class="btn-row">
+    <button class="btn small share-btn" id="share-btn">SHARE</button>
+    <button class="btn small" id="replay-btn">REPLAY</button>
+  </div>
+</div>
+
+<!-- Mobile Zone Indicators -->
+<div class="zone-indicator zone-left" id="zone-left">
+  <span class="zone-label">LEFT PADDLE</span>
+</div>
+<div class="zone-indicator zone-right" id="zone-right">
+  <span class="zone-label">RIGHT PADDLE</span>
+</div>
+
+<div id="copied-toast">Copied to clipboard!</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ========== CONSTANTS ==========
+  var BG_COLOR = '#0a0a12';
+  var NEON_CYAN = '#00ffff';
+  var NEON_CYAN_RGB = [0, 255, 255];
+  var PADDLE_WIDTH_RATIO = 0.018;
+  var PADDLE_HEIGHT_RATIO = 0.15;
+  var PADDLE_MIN_HEIGHT_RATIO = 0.07;
+  var PADDLE_MARGIN_RATIO = 0.03;
+  var BALL_RADIUS_RATIO = 0.012;
+  var BALL_SPEED_RATIO = 0.006;
+  var SPEED_INCREASE = 1.02;
+  var MAX_TRAIL_LENGTH = 12;
+  var POWER_UP_INTERVAL = 10;
+  var POWER_UP_TYPES = ['SPLIT', 'SHRINK', 'CURVE', 'INVISIBLE'];
+  var POWER_UP_COLORS = {
+    SPLIT: '#ff6600',
+    SHRINK: '#ff0066',
+    CURVE: '#66ff00',
+    INVISIBLE: '#aa66ff'
+  };
+
+  // ========== DOM ==========
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  var rallyCounter = document.getElementById('rally-counter');
+  var powerUpText = document.getElementById('power-up-text');
+  var startScreen = document.getElementById('start-screen');
+  var gameOverScreen = document.getElementById('game-over-screen');
+  var startBtn = document.getElementById('start-btn');
+  var replayBtn = document.getElementById('replay-btn');
+  var shareBtn = document.getElementById('share-btn');
+  var controlsHint = document.getElementById('controls-hint');
+  var finalRally = document.getElementById('final-rally');
+  var finalStreak = document.getElementById('final-streak');
+  var finalHighscore = document.getElementById('final-highscore');
+  var newHighScoreBadge = document.getElementById('new-high-score');
+  var zoneLeft = document.getElementById('zone-left');
+  var zoneRight = document.getElementById('zone-right');
+  var copiedToast = document.getElementById('copied-toast');
+
+  // ========== STATE ==========
+  var W, H;
+  var gameState = 'start'; // start, playing, gameover
+  var rally = 0;
+  var highScore = parseInt(localStorage.getItem('pongBothSides_highScore')) || 0;
+  var longestStreak = 0;
+  var currentStreak = 0;
+  var lastPowerUpRally = 0;
+
+  // Paddles
+  var paddleW, paddleH, paddleMargin;
+  var leftPaddleY, rightPaddleY;
+  var leftPaddleTargetY, rightPaddleTargetY;
+  var leftPaddleCurrentH, rightPaddleCurrentH;
+  var leftShrinkBounces = 0, rightShrinkBounces = 0;
+
+  // Balls
+  var balls = [];
+  var ballRadius;
+  var baseSpeed;
+
+  // Power-ups
+  var activePowerUp = null;
+  var powerUpSpawnPending = false;
+
+  // Screen shake
+  var shakeTimer = 0;
+  var shakeIntensity = 0;
+
+  // Audio
+  var audioCtx = null;
+
+  // Touch
+  var leftTouchId = null, rightTouchId = null;
+  var leftTouchStartY = 0, rightTouchStartY = 0;
+  var leftPaddleStartY = 0, rightPaddleStartY = 0;
+
+  // Keys
+  var keysDown = {};
+
+  // isMobile
+  var isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+
+  // ========== RESIZE ==========
+  function resize() {
+    var dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    paddleW = Math.max(8, W * PADDLE_WIDTH_RATIO);
+    paddleH = Math.max(50, H * PADDLE_HEIGHT_RATIO);
+    paddleMargin = Math.max(12, W * PADDLE_MARGIN_RATIO);
+    ballRadius = Math.max(5, Math.min(W, H) * BALL_RADIUS_RATIO);
+    baseSpeed = Math.max(3, Math.min(W, H) * BALL_SPEED_RATIO);
+  }
+
+  // ========== AUDIO ==========
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function playBounceSound(pitchMultiplier) {
+    if (!audioCtx) return;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    var baseFreq = 220 + (pitchMultiplier || 0) * 8;
+    osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, audioCtx.currentTime + 0.03);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, audioCtx.currentTime + 0.1);
+    osc.type = 'square';
+
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.12);
+  }
+
+  function playMissSound() {
+    if (!audioCtx) return;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.4);
+    osc.type = 'sawtooth';
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.4);
+  }
+
+  function playPowerUpSound() {
+    if (!audioCtx) return;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.2);
+  }
+
+  // ========== BALL ==========
+  function createBall(vx, vy, speed) {
+    var s = speed || baseSpeed;
+    var angle, finalAngle;
+    if (vx !== undefined) {
+      angle = Math.atan2(vy, vx);
+      finalAngle = angle;
+    } else {
+      angle = Math.random() > 0.5 ? 0 : Math.PI;
+      finalAngle = angle + (Math.random() - 0.5) * 0.5;
+    }
+    return {
+      x: W / 2,
+      y: H / 2,
+      vx: vx !== undefined ? vx : Math.cos(finalAngle) * s,
+      vy: vy !== undefined ? vy : Math.sin(finalAngle) * s,
+      speed: s,
+      trail: [],
+      curveAmount: 0,
+      invisibleTimer: 0,
+      alive: true
+    };
+  }
+
+  // ========== POWER-UPS ==========
+  function spawnPowerUp() {
+    var type = POWER_UP_TYPES[Math.floor(Math.random() * POWER_UP_TYPES.length)];
+    activePowerUp = {
+      type: type,
+      x: W / 2,
+      y: H * 0.2 + Math.random() * H * 0.6,
+      radius: Math.max(14, Math.min(W, H) * 0.025),
+      pulseTimer: 0,
+      collected: false
+    };
+  }
+
+  function collectPowerUp(ball) {
+    if (!activePowerUp || activePowerUp.collected) return;
+    var dx = ball.x - activePowerUp.x;
+    var dy = ball.y - activePowerUp.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < activePowerUp.radius + ballRadius + 5) {
+      activePowerUp.collected = true;
+      applyPowerUp(activePowerUp.type, ball);
+      playPowerUpSound();
+      showPowerUpText(activePowerUp.type);
+      currentStreak = 0;
+      setTimeout(function() { activePowerUp = null; }, 100);
+    }
+  }
+
+  function applyPowerUp(type, ball) {
+    switch (type) {
+      case 'SPLIT':
+        var angle = Math.atan2(ball.vy, ball.vx);
+        var spread = 0.4;
+        var newBall = {
+          x: ball.x,
+          y: ball.y,
+          vx: Math.cos(angle + spread) * ball.speed,
+          vy: Math.sin(angle + spread) * ball.speed,
+          speed: ball.speed,
+          trail: [],
+          curveAmount: 0,
+          invisibleTimer: 0,
+          alive: true
+        };
+        ball.vx = Math.cos(angle - spread) * ball.speed;
+        ball.vy = Math.sin(angle - spread) * ball.speed;
+        balls.push(newBall);
+        break;
+
+      case 'SHRINK':
+        if (Math.random() > 0.5) {
+          leftShrinkBounces = 5;
+        } else {
+          rightShrinkBounces = 5;
+        }
+        break;
+
+      case 'CURVE':
+        ball.curveAmount = (Math.random() > 0.5 ? 1 : -1) * 0.06;
+        break;
+
+      case 'INVISIBLE':
+        ball.invisibleTimer = 1.0;
+        break;
+    }
+  }
+
+  function showPowerUpText(type) {
+    var labels = {
+      SPLIT: 'SPLIT BALL!',
+      SHRINK: 'PADDLE SHRINK!',
+      CURVE: 'CURVE BALL!',
+      INVISIBLE: 'INVISIBLE!'
+    };
+    powerUpText.textContent = labels[type] || type;
+    powerUpText.style.color = POWER_UP_COLORS[type] || '#fff';
+    powerUpText.style.textShadow = '0 0 20px ' + (POWER_UP_COLORS[type] || '#fff');
+    powerUpText.style.opacity = '1';
+    setTimeout(function() { powerUpText.style.opacity = '0'; }, 1200);
+  }
+
+  // ========== GAME INIT ==========
+  function initGame() {
+    rally = 0;
+    longestStreak = 0;
+    currentStreak = 0;
+    lastPowerUpRally = 0;
+    leftShrinkBounces = 0;
+    rightShrinkBounces = 0;
+    leftPaddleCurrentH = paddleH;
+    rightPaddleCurrentH = paddleH;
+    leftPaddleY = H / 2 - paddleH / 2;
+    rightPaddleY = H / 2 - paddleH / 2;
+    leftPaddleTargetY = leftPaddleY;
+    rightPaddleTargetY = rightPaddleY;
+    activePowerUp = null;
+    shakeTimer = 0;
+    balls = [createBall()];
+    updateRallyDisplay();
+  }
+
+  function updateRallyDisplay() {
+    rallyCounter.textContent = rally;
+  }
+
+  // ========== UPDATE ==========
+  function update(dt) {
+    if (gameState !== 'playing') return;
+
+    // Clamp dt
+    if (dt > 0.05) dt = 0.05;
+
+    // Update paddle heights (shrink effect)
+    var targetLeftH = leftShrinkBounces > 0 ? H * PADDLE_MIN_HEIGHT_RATIO : paddleH;
+    var targetRightH = rightShrinkBounces > 0 ? H * PADDLE_MIN_HEIGHT_RATIO : paddleH;
+    leftPaddleCurrentH += (targetLeftH - leftPaddleCurrentH) * 0.15;
+    rightPaddleCurrentH += (targetRightH - rightPaddleCurrentH) * 0.15;
+
+    // Move paddles with keyboard
+    var paddleSpeed = H * 0.9 * dt;
+    if (keysDown['w'] || keysDown['W']) leftPaddleTargetY -= paddleSpeed;
+    if (keysDown['s'] || keysDown['S']) leftPaddleTargetY += paddleSpeed;
+    if (keysDown['ArrowUp']) rightPaddleTargetY -= paddleSpeed;
+    if (keysDown['ArrowDown']) rightPaddleTargetY += paddleSpeed;
+
+    // Smooth paddle movement
+    leftPaddleY += (leftPaddleTargetY - leftPaddleY) * 0.35;
+    rightPaddleY += (rightPaddleTargetY - rightPaddleY) * 0.35;
+
+    // Clamp paddles
+    leftPaddleY = Math.max(0, Math.min(H - leftPaddleCurrentH, leftPaddleY));
+    rightPaddleY = Math.max(0, Math.min(H - rightPaddleCurrentH, rightPaddleY));
+    leftPaddleTargetY = Math.max(0, Math.min(H - leftPaddleCurrentH, leftPaddleTargetY));
+    rightPaddleTargetY = Math.max(0, Math.min(H - rightPaddleCurrentH, rightPaddleTargetY));
+
+    // Update power-up
+    if (activePowerUp && !activePowerUp.collected) {
+      activePowerUp.pulseTimer += dt;
+    }
+
+    // Update shake
+    if (shakeTimer > 0) shakeTimer -= dt;
+
+    // Update balls
+    var anyAlive = false;
+    for (var i = balls.length - 1; i >= 0; i--) {
+      var ball = balls[i];
+      if (!ball.alive) continue;
+
+      // Invisible timer
+      if (ball.invisibleTimer > 0) ball.invisibleTimer -= dt;
+
+      // Apply curve
+      if (ball.curveAmount !== 0) {
+        ball.vy += ball.curveAmount * ball.speed * dt * 60;
+      }
+
+      // Move
+      ball.x += ball.vx * dt * 60;
+      ball.y += ball.vy * dt * 60;
+
+      // Trail
+      ball.trail.unshift({ x: ball.x, y: ball.y });
+      if (ball.trail.length > MAX_TRAIL_LENGTH) ball.trail.pop();
+
+      // Top/bottom bounce
+      if (ball.y - ballRadius < 0) {
+        ball.y = ballRadius;
+        ball.vy = Math.abs(ball.vy);
+        playBounceSound(rally * 0.5);
+      } else if (ball.y + ballRadius > H) {
+        ball.y = H - ballRadius;
+        ball.vy = -Math.abs(ball.vy);
+        playBounceSound(rally * 0.5);
+      }
+
+      // Left paddle collision
+      var lpx = paddleMargin + paddleW;
+      if (ball.vx < 0 && ball.x - ballRadius <= lpx && ball.x - ballRadius >= paddleMargin - ballRadius) {
+        if (ball.y >= leftPaddleY - 2 && ball.y <= leftPaddleY + leftPaddleCurrentH + 2) {
+          ball.x = lpx + ballRadius;
+          var hitPos = (ball.y - leftPaddleY) / leftPaddleCurrentH;
+          var hitAngle = (hitPos - 0.5) * Math.PI * 0.7;
+          ball.speed *= SPEED_INCREASE;
+          ball.vx = Math.cos(hitAngle) * ball.speed;
+          ball.vy = Math.sin(hitAngle) * ball.speed;
+          ball.curveAmount = 0;
+          rally++;
+          currentStreak++;
+          if (currentStreak > longestStreak) longestStreak = currentStreak;
+          if (leftShrinkBounces > 0) leftShrinkBounces--;
+          updateRallyDisplay();
+          playBounceSound(rally);
+          checkPowerUpSpawn();
+        }
+      }
+
+      // Right paddle collision
+      var rpx = W - paddleMargin - paddleW;
+      if (ball.vx > 0 && ball.x + ballRadius >= rpx && ball.x + ballRadius <= W - paddleMargin + ballRadius) {
+        if (ball.y >= rightPaddleY - 2 && ball.y <= rightPaddleY + rightPaddleCurrentH + 2) {
+          ball.x = rpx - ballRadius;
+          var hitPos2 = (ball.y - rightPaddleY) / rightPaddleCurrentH;
+          var hitAngle2 = Math.PI - (hitPos2 - 0.5) * Math.PI * 0.7;
+          ball.speed *= SPEED_INCREASE;
+          ball.vx = Math.cos(hitAngle2) * ball.speed;
+          ball.vy = Math.sin(hitAngle2) * ball.speed;
+          ball.curveAmount = 0;
+          rally++;
+          currentStreak++;
+          if (currentStreak > longestStreak) longestStreak = currentStreak;
+          if (rightShrinkBounces > 0) rightShrinkBounces--;
+          updateRallyDisplay();
+          playBounceSound(rally);
+          checkPowerUpSpawn();
+        }
+      }
+
+      // Check power-up collection
+      collectPowerUp(ball);
+
+      // Check if ball is out
+      if (ball.x < -ballRadius * 2 || ball.x > W + ballRadius * 2) {
+        ball.alive = false;
+        var remaining = balls.filter(function(b) { return b.alive; });
+        if (remaining.length === 0) {
+          gameOver();
+          return;
+        }
+      } else {
+        anyAlive = true;
+      }
+    }
+
+    if (!anyAlive && gameState === 'playing') {
+      gameOver();
+    }
+  }
+
+  function checkPowerUpSpawn() {
+    if (rally > 0 && rally % POWER_UP_INTERVAL === 0 && rally !== lastPowerUpRally) {
+      lastPowerUpRally = rally;
+      if (!activePowerUp) {
+        spawnPowerUp();
+      }
+    }
+  }
+
+  function gameOver() {
+    gameState = 'gameover';
+    playMissSound();
+    shakeTimer = 0.4;
+    shakeIntensity = 12;
+
+    var isNewHigh = rally > highScore;
+    if (isNewHigh) {
+      highScore = rally;
+      localStorage.setItem('pongBothSides_highScore', highScore);
+    }
+
+    setTimeout(function() {
+      finalRally.textContent = rally;
+      finalStreak.textContent = longestStreak;
+      finalHighscore.textContent = highScore;
+      newHighScoreBadge.classList.toggle('visible', isNewHigh);
+      rallyCounter.classList.remove('visible');
+      gameOverScreen.classList.remove('hidden');
+    }, 600);
+  }
+
+  // ========== DRAW ==========
+  function draw() {
+    ctx.save();
+
+    // Screen shake
+    if (shakeTimer > 0) {
+      var sx = (Math.random() - 0.5) * shakeIntensity * (shakeTimer / 0.4);
+      var sy = (Math.random() - 0.5) * shakeIntensity * (shakeTimer / 0.4);
+      ctx.translate(sx, sy);
+    }
+
+    // Background
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(-20, -20, W + 40, H + 40);
+
+    // Center line
+    ctx.setLineDash([8, 12]);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 0);
+    ctx.lineTo(W / 2, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw paddles
+    drawPaddle(paddleMargin, leftPaddleY, paddleW, leftPaddleCurrentH, leftShrinkBounces > 0);
+    drawPaddle(W - paddleMargin - paddleW, rightPaddleY, paddleW, rightPaddleCurrentH, rightShrinkBounces > 0);
+
+    // Draw power-up
+    if (activePowerUp && !activePowerUp.collected) {
+      drawPowerUp(activePowerUp);
+    }
+
+    // Draw balls
+    for (var bi = 0; bi < balls.length; bi++) {
+      var b = balls[bi];
+      if (!b.alive) continue;
+      drawBall(b);
+    }
+
+    ctx.restore();
+  }
+
+  function drawPaddle(x, y, w, h, isShrunk) {
+    var color = isShrunk ? '#ff0066' : NEON_CYAN;
+    var rgb = isShrunk ? [255, 0, 102] : NEON_CYAN_RGB;
+
+    // Glow
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = color;
+
+    // Rounded rectangle
+    var r = Math.min(w / 2, 4);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fill();
+
+    // Inner glow line
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 0.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Brighter center line
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(x + w * 0.3, y + 2, w * 0.4, h - 4);
+  }
+
+  function drawBall(ball) {
+    var isInvisible = ball.invisibleTimer > 0;
+
+    // Draw trail
+    for (var ti = 0; ti < ball.trail.length; ti++) {
+      var t = ball.trail[ti];
+      var alpha = isInvisible ? 0 : (1 - ti / ball.trail.length) * 0.3;
+      var size = ballRadius * (1 - ti / ball.trail.length * 0.5);
+      ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')';
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (isInvisible) return;
+
+    // Ball glow
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Inner highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.beginPath();
+    ctx.arc(ball.x - ballRadius * 0.2, ball.y - ballRadius * 0.2, ballRadius * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawPowerUp(pu) {
+    var pulse = Math.sin(pu.pulseTimer * 4) * 0.3 + 0.7;
+    var r = pu.radius * pulse;
+    var color = POWER_UP_COLORS[pu.type];
+
+    // Outer glow
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 25;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(pu.x, pu.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Inner fill
+    ctx.fillStyle = color + '33';
+    ctx.beginPath();
+    ctx.arc(pu.x, pu.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Icon/letter
+    ctx.fillStyle = color;
+    ctx.font = 'bold ' + Math.round(r * 0.8) + 'px "Orbitron", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var icons = { SPLIT: 'S', SHRINK: '-', CURVE: '~', INVISIBLE: '?' };
+    ctx.fillText(icons[pu.type] || '?', pu.x, pu.y);
+  }
+
+  // ========== GAME LOOP ==========
+  var lastTime = 0;
+
+  function gameLoop(timestamp) {
+    var dt = lastTime ? (timestamp - lastTime) / 1000 : 1 / 60;
+    lastTime = timestamp;
+
+    update(dt);
+    draw();
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  // ========== INPUT: KEYBOARD ==========
+  window.addEventListener('keydown', function(e) {
+    keysDown[e.key] = true;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') e.preventDefault();
+  });
+
+  window.addEventListener('keyup', function(e) {
+    keysDown[e.key] = false;
+  });
+
+  // ========== INPUT: TOUCH ==========
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    for (var ci = 0; ci < e.changedTouches.length; ci++) {
+      var touch = e.changedTouches[ci];
+      var x = touch.clientX;
+      var y = touch.clientY;
+      if (x < W / 2) {
+        leftTouchId = touch.identifier;
+        leftTouchStartY = y;
+        leftPaddleStartY = leftPaddleTargetY;
+      } else {
+        rightTouchId = touch.identifier;
+        rightTouchStartY = y;
+        rightPaddleStartY = rightPaddleTargetY;
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    for (var ci = 0; ci < e.changedTouches.length; ci++) {
+      var touch = e.changedTouches[ci];
+      if (touch.identifier === leftTouchId) {
+        var dy = touch.clientY - leftTouchStartY;
+        leftPaddleTargetY = leftPaddleStartY + dy;
+      }
+      if (touch.identifier === rightTouchId) {
+        var dy2 = touch.clientY - rightTouchStartY;
+        rightPaddleTargetY = rightPaddleStartY + dy2;
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', function(e) {
+    for (var ci = 0; ci < e.changedTouches.length; ci++) {
+      var touch = e.changedTouches[ci];
+      if (touch.identifier === leftTouchId) leftTouchId = null;
+      if (touch.identifier === rightTouchId) rightTouchId = null;
+    }
+  });
+
+  canvas.addEventListener('touchcancel', function(e) {
+    for (var ci = 0; ci < e.changedTouches.length; ci++) {
+      var touch = e.changedTouches[ci];
+      if (touch.identifier === leftTouchId) leftTouchId = null;
+      if (touch.identifier === rightTouchId) rightTouchId = null;
+    }
+  });
+
+  // ========== BUTTONS ==========
+  startBtn.addEventListener('click', function() {
+    initAudio();
+    startScreen.classList.add('hidden');
+    rallyCounter.classList.add('visible');
+    if (isMobile) {
+      zoneLeft.classList.add('visible');
+      zoneRight.classList.add('visible');
+      setTimeout(function() {
+        zoneLeft.classList.remove('visible');
+        zoneRight.classList.remove('visible');
+      }, 2000);
+    }
+    gameState = 'playing';
+    initGame();
+  });
+
+  replayBtn.addEventListener('click', function() {
+    initAudio();
+    gameOverScreen.classList.add('hidden');
+    rallyCounter.classList.add('visible');
+    if (isMobile) {
+      zoneLeft.classList.add('visible');
+      zoneRight.classList.add('visible');
+      setTimeout(function() {
+        zoneLeft.classList.remove('visible');
+        zoneRight.classList.remove('visible');
+      }, 2000);
+    }
+    gameState = 'playing';
+    initGame();
+  });
+
+  shareBtn.addEventListener('click', function() {
+    var text = '\uD83C\uDFD3 PONG: BOTH SIDES\n' +
+      'Rally: ' + rally + ' \uD83D\uDD25\n' +
+      '\uD83C\uDFD3 \u00B7\u00B7\u00B7\u00B7\uD83C\uDFD0\u00B7\u00B7\u00B7\u00B7\uD83C\uDFD3\n' +
+      'How long can YOU rally with yourself?';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        copiedToast.classList.add('visible');
+        setTimeout(function() { copiedToast.classList.remove('visible'); }, 1500);
+      }).catch(function() {});
+    }
+  });
+
+  // ========== SETUP ==========
+  function setup() {
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Set controls hint text safely
+    if (isMobile) {
+      controlsHint.textContent = '';
+      var line1 = document.createTextNode('Drag left half for left paddle');
+      var br = document.createElement('br');
+      var line2 = document.createTextNode('Drag right half for right paddle');
+      controlsHint.appendChild(line1);
+      controlsHint.appendChild(br);
+      controlsHint.appendChild(line2);
+    } else {
+      controlsHint.textContent = 'W/S = Left Paddle    \u2191/\u2193 = Right Paddle';
+    }
+
+    // Init paddle positions
+    leftPaddleY = H / 2 - paddleH / 2;
+    rightPaddleY = H / 2 - paddleH / 2;
+    leftPaddleTargetY = leftPaddleY;
+    rightPaddleTargetY = rightPaddleY;
+    leftPaddleCurrentH = paddleH;
+    rightPaddleCurrentH = paddleH;
+
+    // Start render loop
+    balls = [createBall()];
+    requestAnimationFrame(gameLoop);
+  }
+
+  setup();
+})();
+</script>
+</body>
+</html>

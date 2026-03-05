@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PALETTE - Color Matching Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a12;
+  --surface: #12121e;
+  --border: #1e1e30;
+  --cyan: #00e5ff;
+  --cyan-dim: #00e5ff44;
+  --magenta: #ff00e5;
+  --text: #e0e0f0;
+  --text-dim: #6a6a80;
+  --success: #00ff88;
+  --warning: #ffaa00;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100dvh;
+}
+
+.game-container {
+  width: 100%;
+  max-width: 520px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+/* TITLE */
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 12px;
+  text-align: center;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ROUND DOTS */
+.round-dots {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan-dim);
+  transition: all 0.3s;
+}
+
+.dot.completed {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan-dim);
+}
+
+.dot.active {
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan-dim);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 4px var(--cyan-dim); }
+  50% { box-shadow: 0 0 12px var(--cyan); }
+}
+
+/* TIMER BAR */
+.timer-container {
+  width: 100%;
+  height: 6px;
+  background: var(--surface);
+  border-radius: 3px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.timer-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  border-radius: 3px;
+  transition: width 0.1s linear;
+  width: 100%;
+}
+
+.timer-bar.urgent {
+  background: linear-gradient(90deg, var(--warning), #ff4444);
+}
+
+/* ROUND LABEL */
+.round-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* SWATCHES */
+.swatches-container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.swatch-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  transition: background-color 0.05s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.swatch.target {
+  border-color: #ffffff18;
+}
+
+.swatch.player {
+  border-color: var(--cyan-dim);
+}
+
+/* SLIDERS */
+.sliders-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cyan);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.slider-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  width: 42px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.slider-track {
+  flex: 1;
+  position: relative;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.slider-track-bg {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  position: absolute;
+}
+
+.slider-track-bg.hue-track {
+  background: linear-gradient(to right,
+    hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%),
+    hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%)
+  );
+}
+
+.slider-track-bg.sat-track {
+  background: linear-gradient(to right, hsl(0,0%,50%), hsl(0,100%,50%));
+}
+
+.slider-track-bg.lit-track {
+  background: linear-gradient(to right, #000, hsl(0,100%,50%), #fff);
+}
+
+.slider-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--cyan);
+  box-shadow: 0 0 10px var(--cyan-dim), 0 2px 8px rgba(0,0,0,0.5);
+  position: absolute;
+  left: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: box-shadow 0.15s;
+}
+
+.slider-track:active .slider-thumb,
+.slider-thumb.dragging {
+  box-shadow: 0 0 16px var(--cyan), 0 2px 8px rgba(0,0,0,0.5);
+  transform: translateX(-50%) scale(1.15);
+}
+
+/* LOCK IN BUTTON */
+.lock-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  padding: 14px 48px;
+  border: 2px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.lock-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cyan);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.lock-btn:hover::before, .lock-btn:active::before {
+  opacity: 0.12;
+}
+
+.lock-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---- SCREENS ---- */
+.screen { display: none; width: 100%; flex: 1; flex-direction: column; align-items: center; }
+.screen.active { display: flex; }
+
+/* START SCREEN */
+.start-screen {
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.start-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 16px;
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.start-subtitle {
+  font-size: 18px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  line-height: 1.6;
+}
+
+.start-best {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.mode-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.play-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  padding: 16px 56px;
+  border: 2px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.play-btn:hover { background: var(--cyan); color: var(--bg); }
+
+.play-btn.daily {
+  border-color: var(--magenta);
+  color: var(--magenta);
+}
+
+.play-btn.daily:hover { background: var(--magenta); color: var(--bg); }
+
+.daily-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+/* RESULT SCREEN */
+.result-screen {
+  padding-top: 20px;
+  gap: 16px;
+}
+
+.result-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  letter-spacing: 6px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.result-score {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 72px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.result-rank {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.result-rounds {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.result-round-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.result-round-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  color: var(--text-dim);
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.result-swatch {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.result-accuracy {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  width: 48px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.result-pair {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.result-btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.result-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  padding: 12px 28px;
+  border: 2px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.result-btn:hover { background: var(--cyan); color: var(--bg); }
+
+.result-btn.share {
+  border-color: var(--magenta);
+  color: var(--magenta);
+}
+
+.result-btn.share:hover { background: var(--magenta); color: var(--bg); }
+
+.new-best {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--success);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 4px var(--success); }
+  to { text-shadow: 0 0 16px var(--success); }
+}
+
+.share-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--surface);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.share-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Canvas for sharing */
+#share-canvas { display: none; }
+
+/* Responsive */
+@media (max-height: 700px) {
+  .swatch { border-radius: 12px; }
+  .swatches-container { margin-bottom: 16px; }
+  .sliders-container { gap: 10px; margin-bottom: 16px; }
+}
+
+@media (max-width: 380px) {
+  .game-container { padding: 12px 14px; }
+  .title { font-size: 22px; letter-spacing: 8px; }
+  .start-title { font-size: 36px; letter-spacing: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="game-container">
+
+  <!-- START SCREEN -->
+  <div class="screen start-screen active" id="start-screen">
+    <div class="start-title">PALETTE</div>
+    <div class="start-subtitle">Match colors. Prove your eye.<br>5 rounds. 15 seconds each.</div>
+    <div class="mode-btns">
+      <button class="play-btn" id="btn-random">PLAY</button>
+      <button class="play-btn daily" id="btn-daily">DAILY</button>
+      <div class="daily-hint">Same colors for everyone today</div>
+    </div>
+    <div class="start-best" id="start-best"></div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="game-screen">
+    <div class="title">PALETTE</div>
+    <div class="round-dots" id="round-dots"></div>
+    <div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
+    <div class="round-label" id="round-label">ROUND 1</div>
+    <div class="swatches-container">
+      <div class="swatch-wrapper">
+        <div class="swatch-label">TARGET</div>
+        <div class="swatch target" id="target-swatch"></div>
+      </div>
+      <div class="swatch-wrapper">
+        <div class="swatch-label">YOURS</div>
+        <div class="swatch player" id="player-swatch"></div>
+      </div>
+    </div>
+    <div class="sliders-container" id="sliders-container">
+      <div class="slider-row">
+        <div class="slider-label">H</div>
+        <div class="slider-track" id="slider-h" data-param="h" data-min="0" data-max="360">
+          <div class="slider-track-bg hue-track"></div>
+          <div class="slider-thumb" id="thumb-h"></div>
+        </div>
+        <div class="slider-value" id="val-h">180</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">S</div>
+        <div class="slider-track" id="slider-s" data-param="s" data-min="0" data-max="100">
+          <div class="slider-track-bg sat-track"></div>
+          <div class="slider-thumb" id="thumb-s"></div>
+        </div>
+        <div class="slider-value" id="val-s">50%</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label">L</div>
+        <div class="slider-track" id="slider-l" data-param="l" data-min="0" data-max="100">
+          <div class="slider-track-bg lit-track"></div>
+          <div class="slider-thumb" id="thumb-l"></div>
+        </div>
+        <div class="slider-value" id="val-l">50%</div>
+      </div>
+    </div>
+    <button class="lock-btn" id="lock-btn">LOCK IN</button>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="screen result-screen" id="result-screen">
+    <div class="title">PALETTE</div>
+    <div class="result-title">COLOR IQ</div>
+    <div class="result-score" id="result-score">0</div>
+    <div class="result-rank" id="result-rank"></div>
+    <div id="new-best-label" class="new-best" style="display:none">NEW PERSONAL BEST</div>
+    <div class="result-rounds" id="result-rounds"></div>
+    <div class="result-btns">
+      <button class="result-btn share" id="btn-share">SHARE</button>
+      <button class="result-btn" id="btn-share-img">IMAGE</button>
+      <button class="result-btn" id="btn-again">PLAY AGAIN</button>
+    </div>
+  </div>
+
+</div>
+
+<canvas id="share-canvas"></canvas>
+<div class="share-toast" id="share-toast">COPIED TO CLIPBOARD</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===================== SEEDED RNG =====================
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function dateSeed() {
+    var d = new Date();
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  }
+
+  // ===================== AUDIO =====================
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+
+  function ensureAudio() {
+    if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTick() {
+    ensureAudio();
+    if (!audioCtx) return;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(2400, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.04);
+  }
+
+  function playDing() {
+    ensureAudio();
+    if (!audioCtx) return;
+    var t = audioCtx.currentTime;
+    [880, 1108.73, 1318.51].forEach(function(freq, i) {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0, t + i * 0.06);
+      gain.gain.linearRampToValueAtTime(0.1, t + i * 0.06 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.35);
+      osc.start(t + i * 0.06);
+      osc.stop(t + i * 0.06 + 0.35);
+    });
+  }
+
+  function playTimerEnd() {
+    ensureAudio();
+    if (!audioCtx) return;
+    var t = audioCtx.currentTime;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, t);
+    osc.frequency.linearRampToValueAtTime(220, t + 0.3);
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc.start(t);
+    osc.stop(t + 0.3);
+  }
+
+  // ===================== COLOR UTILS =====================
+  function hslToStr(h, s, l) {
+    return 'hsl(' + h + ', ' + s + '%, ' + l + '%)';
+  }
+
+  function generateColors(rng, count) {
+    var colors = [];
+    var hueStep = 360 / count;
+    var baseHue = rng() * 360;
+    for (var i = 0; i < count; i++) {
+      var h = (baseHue + hueStep * i + (rng() - 0.5) * hueStep * 0.6) % 360;
+      if (h < 0) h += 360;
+      h = Math.round(h);
+      var s = Math.round(40 + rng() * 50); // 40-90
+      var l = Math.round(30 + rng() * 40); // 30-70
+      colors.push({ h: h, s: s, l: l });
+    }
+    // Shuffle for unpredictability
+    for (var i = colors.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = colors[i];
+      colors[i] = colors[j];
+      colors[j] = tmp;
+    }
+    return colors;
+  }
+
+  function colorDistance(a, b) {
+    var dh = Math.abs(a.h - b.h);
+    if (dh > 180) dh = 360 - dh;
+    var ds = Math.abs(a.s - b.s);
+    var dl = Math.abs(a.l - b.l);
+    var normH = dh / 180;
+    var normS = ds / 100;
+    var normL = dl / 100;
+    var dist = Math.sqrt(normH * normH * 1.2 + normS * normS * 0.8 + normL * normL * 1.0);
+    var maxDist = Math.sqrt(1.2 + 0.8 + 1.0);
+    var score = Math.max(0, Math.round((1 - dist / maxDist) * 100));
+    return score;
+  }
+
+  function getRank(score) {
+    if (score >= 95) return 'Chromatic Genius';
+    if (score >= 85) return 'Eagle Eye';
+    if (score >= 70) return 'Sharp';
+    if (score >= 50) return 'Getting There';
+    return 'Needs Calibration';
+  }
+
+  function hslToEmoji(h, s, l) {
+    if (l < 20 || s < 15) return '\u2B1B';
+    if (l > 85) return '\u2B1C';
+    if (s < 25) return '\uD83D\uDFEB';
+    if (h < 15 || h >= 345) return '\uD83D\uDFE5';
+    if (h < 45) return '\uD83D\uDFE7';
+    if (h < 70) return '\uD83D\uDFE8';
+    if (h < 160) return '\uD83D\uDFE9';
+    if (h < 250) return '\uD83D\uDFE6';
+    if (h < 300) return '\uD83D\uDFEA';
+    return '\uD83D\uDFE5';
+  }
+
+  // ===================== GAME STATE =====================
+  var ROUNDS = 5;
+  var ROUND_TIME = 15000;
+
+  var state = {
+    mode: 'random',
+    round: 0,
+    targets: [],
+    guesses: [],
+    scores: [],
+    playerH: 180,
+    playerS: 50,
+    playerL: 50,
+    timerStart: 0,
+    timerRaf: null,
+    running: false
+  };
+
+  // ===================== DOM =====================
+  var $startScreen = document.getElementById('start-screen');
+  var $gameScreen = document.getElementById('game-screen');
+  var $resultScreen = document.getElementById('result-screen');
+  var $roundDots = document.getElementById('round-dots');
+  var $timerBar = document.getElementById('timer-bar');
+  var $roundLabel = document.getElementById('round-label');
+  var $targetSwatch = document.getElementById('target-swatch');
+  var $playerSwatch = document.getElementById('player-swatch');
+  var $lockBtn = document.getElementById('lock-btn');
+  var $resultScore = document.getElementById('result-score');
+  var $resultRank = document.getElementById('result-rank');
+  var $resultRounds = document.getElementById('result-rounds');
+  var $btnShare = document.getElementById('btn-share');
+  var $btnShareImg = document.getElementById('btn-share-img');
+  var $btnAgain = document.getElementById('btn-again');
+  var $btnRandom = document.getElementById('btn-random');
+  var $btnDaily = document.getElementById('btn-daily');
+  var $startBest = document.getElementById('start-best');
+  var $newBest = document.getElementById('new-best-label');
+  var $shareToast = document.getElementById('share-toast');
+  var $valH = document.getElementById('val-h');
+  var $valS = document.getElementById('val-s');
+  var $valL = document.getElementById('val-l');
+  var $thumbH = document.getElementById('thumb-h');
+  var $thumbS = document.getElementById('thumb-s');
+  var $thumbL = document.getElementById('thumb-l');
+  var $sliderH = document.getElementById('slider-h');
+  var $sliderS = document.getElementById('slider-s');
+  var $sliderL = document.getElementById('slider-l');
+
+  function showScreen(id) {
+    $startScreen.classList.remove('active');
+    $gameScreen.classList.remove('active');
+    $resultScreen.classList.remove('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function updateBestDisplay() {
+    var best = localStorage.getItem('palette-best');
+    if (best) {
+      $startBest.textContent = 'BEST: ' + best + ' - ' + getRank(parseInt(best));
+    } else {
+      $startBest.textContent = '';
+    }
+  }
+
+  // ===================== SLIDERS =====================
+  var tickThrottle = 0;
+
+  function updateSatLitGradients() {
+    var satTrack = $sliderS.querySelector('.sat-track');
+    var litTrack = $sliderL.querySelector('.lit-track');
+    satTrack.style.background = 'linear-gradient(to right, hsl(' + state.playerH + ',0%,' + state.playerL + '%), hsl(' + state.playerH + ',100%,' + state.playerL + '%))';
+    litTrack.style.background = 'linear-gradient(to right, #000, hsl(' + state.playerH + ',100%,50%), #fff)';
+  }
+
+  function updatePlayerSwatch() {
+    $playerSwatch.style.backgroundColor = hslToStr(state.playerH, state.playerS, state.playerL);
+  }
+
+  function setSliderValue(param, value) {
+    var now = Date.now();
+    var oldVal;
+
+    if (param === 'h') {
+      oldVal = state.playerH;
+      state.playerH = Math.round(value);
+      $valH.textContent = state.playerH;
+      $thumbH.style.left = (state.playerH / 360 * 100) + '%';
+    } else if (param === 's') {
+      oldVal = state.playerS;
+      state.playerS = Math.round(value);
+      $valS.textContent = state.playerS + '%';
+      $thumbS.style.left = state.playerS + '%';
+    } else {
+      oldVal = state.playerL;
+      state.playerL = Math.round(value);
+      $valL.textContent = state.playerL + '%';
+      $thumbL.style.left = state.playerL + '%';
+    }
+
+    updateSatLitGradients();
+    updatePlayerSwatch();
+
+    if (Math.round(oldVal) !== Math.round(value) && now - tickThrottle > 60) {
+      tickThrottle = now;
+      playTick();
+    }
+  }
+
+  function initSliderInteraction(track, param, min, max) {
+    function getVal(e) {
+      var rect = track.getBoundingClientRect();
+      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      var pct = (clientX - rect.left) / rect.width;
+      pct = Math.max(0, Math.min(1, pct));
+      return min + pct * (max - min);
+    }
+
+    function onMove(e) {
+      e.preventDefault();
+      setSliderValue(param, getVal(e));
+    }
+
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+      track.querySelector('.slider-thumb').classList.remove('dragging');
+    }
+
+    function onDown(e) {
+      e.preventDefault();
+      ensureAudio();
+      track.querySelector('.slider-thumb').classList.add('dragging');
+      setSliderValue(param, getVal(e));
+      document.addEventListener('mousemove', onMove, { passive: false });
+      document.addEventListener('mouseup', onUp);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onUp);
+    }
+
+    track.addEventListener('mousedown', onDown);
+    track.addEventListener('touchstart', onDown, { passive: false });
+  }
+
+  initSliderInteraction($sliderH, 'h', 0, 360);
+  initSliderInteraction($sliderS, 's', 0, 100);
+  initSliderInteraction($sliderL, 'l', 0, 100);
+
+  // ===================== GAME LOGIC =====================
+  function buildRoundDots() {
+    while ($roundDots.firstChild) {
+      $roundDots.removeChild($roundDots.firstChild);
+    }
+    for (var i = 0; i < ROUNDS; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'dot';
+      $roundDots.appendChild(dot);
+    }
+  }
+
+  function startGame(mode) {
+    ensureAudio();
+    state.mode = mode;
+    state.round = 0;
+    state.guesses = [];
+    state.scores = [];
+
+    var rng;
+    if (mode === 'daily') {
+      rng = mulberry32(dateSeed());
+    } else {
+      rng = mulberry32(Date.now() ^ (Math.random() * 0xFFFFFF | 0));
+    }
+
+    state.targets = generateColors(rng, ROUNDS);
+    buildRoundDots();
+    showScreen('game-screen');
+    startRound();
+  }
+
+  function startRound() {
+    var target = state.targets[state.round];
+
+    state.playerH = 180;
+    state.playerS = 50;
+    state.playerL = 50;
+
+    $targetSwatch.style.backgroundColor = hslToStr(target.h, target.s, target.l);
+    updatePlayerSwatch();
+
+    setSliderValue('h', 180);
+    setSliderValue('s', 50);
+    setSliderValue('l', 50);
+
+    $roundLabel.textContent = 'ROUND ' + (state.round + 1);
+
+    var dots = $roundDots.children;
+    for (var i = 0; i < ROUNDS; i++) {
+      dots[i].className = 'dot';
+      if (i < state.round) dots[i].className = 'dot completed';
+      if (i === state.round) dots[i].className = 'dot active';
+    }
+
+    $timerBar.style.width = '100%';
+    $timerBar.classList.remove('urgent');
+    state.timerStart = Date.now();
+    state.running = true;
+
+    if (state.timerRaf) cancelAnimationFrame(state.timerRaf);
+    tickTimer();
+  }
+
+  function tickTimer() {
+    if (!state.running) return;
+    var elapsed = Date.now() - state.timerStart;
+    var remaining = Math.max(0, 1 - elapsed / ROUND_TIME);
+    $timerBar.style.width = (remaining * 100) + '%';
+
+    if (remaining < 0.25) {
+      $timerBar.classList.add('urgent');
+    }
+
+    if (elapsed >= ROUND_TIME) {
+      playTimerEnd();
+      lockIn();
+      return;
+    }
+    state.timerRaf = requestAnimationFrame(tickTimer);
+  }
+
+  function lockIn() {
+    if (!state.running) return;
+    state.running = false;
+    if (state.timerRaf) cancelAnimationFrame(state.timerRaf);
+
+    var target = state.targets[state.round];
+    var guess = { h: state.playerH, s: state.playerS, l: state.playerL };
+    var score = colorDistance(target, guess);
+
+    state.guesses.push(guess);
+    state.scores.push(score);
+
+    $roundDots.children[state.round].className = 'dot completed';
+
+    playDing();
+
+    state.round++;
+
+    if (state.round >= ROUNDS) {
+      setTimeout(showResults, 600);
+    } else {
+      setTimeout(startRound, 600);
+    }
+  }
+
+  function buildResultRows() {
+    while ($resultRounds.firstChild) {
+      $resultRounds.removeChild($resultRounds.firstChild);
+    }
+    for (var i = 0; i < ROUNDS; i++) {
+      var row = document.createElement('div');
+      row.className = 'result-round-row';
+
+      var num = document.createElement('div');
+      num.className = 'result-round-num';
+      num.textContent = (i + 1).toString();
+
+      var pair = document.createElement('div');
+      pair.className = 'result-pair';
+
+      var targetSw = document.createElement('div');
+      targetSw.className = 'result-swatch';
+      targetSw.style.backgroundColor = hslToStr(state.targets[i].h, state.targets[i].s, state.targets[i].l);
+      targetSw.style.borderRadius = '8px 0 0 8px';
+
+      var guessSw = document.createElement('div');
+      guessSw.className = 'result-swatch';
+      guessSw.style.backgroundColor = hslToStr(state.guesses[i].h, state.guesses[i].s, state.guesses[i].l);
+      guessSw.style.borderRadius = '0 8px 8px 0';
+
+      pair.appendChild(targetSw);
+      pair.appendChild(guessSw);
+
+      var acc = document.createElement('div');
+      acc.className = 'result-accuracy';
+      var s = state.scores[i];
+      acc.textContent = s + '%';
+      acc.style.color = s >= 90 ? 'var(--success)' : s >= 70 ? 'var(--cyan)' : s >= 50 ? 'var(--warning)' : '#ff4444';
+
+      row.appendChild(num);
+      row.appendChild(pair);
+      row.appendChild(acc);
+      $resultRounds.appendChild(row);
+    }
+  }
+
+  function showResults() {
+    var total = Math.round(state.scores.reduce(function(a, b) { return a + b; }, 0) / ROUNDS);
+    var rank = getRank(total);
+
+    $resultScore.textContent = '0';
+    $resultRank.textContent = rank;
+
+    var prev = parseInt(localStorage.getItem('palette-best') || '0');
+    if (total > prev) {
+      localStorage.setItem('palette-best', total.toString());
+      $newBest.style.display = 'block';
+    } else {
+      $newBest.style.display = 'none';
+    }
+
+    buildResultRows();
+    showScreen('result-screen');
+    animateScore(total);
+  }
+
+  function animateScore(target) {
+    var current = 0;
+    var step = Math.max(1, Math.floor(target / 30));
+    var interval = setInterval(function() {
+      current += step;
+      if (current >= target) {
+        current = target;
+        clearInterval(interval);
+      }
+      $resultScore.textContent = current.toString();
+    }, 30);
+  }
+
+  // ===================== SHARE TEXT =====================
+  function getShareText() {
+    var total = Math.round(state.scores.reduce(function(a, b) { return a + b; }, 0) / ROUNDS);
+    var rank = getRank(total);
+    var mode = state.mode === 'daily' ? ' (Daily)' : '';
+
+    var scoreStr = state.scores.map(function(s) { return s + '%'; }).join(' ');
+    var emojiStr = state.targets.map(function(t, i) {
+      return hslToEmoji(t.h, t.s, t.l) + hslToEmoji(state.guesses[i].h, state.guesses[i].s, state.guesses[i].l);
+    }).join(' ');
+
+    return '\uD83C\uDFA8 PALETTE' + mode + '\nRound scores: ' + scoreStr + '\n' + emojiStr + '\nColor IQ: ' + total + ' \u2014 ' + rank + '\nTest your eyes \uD83D\uDC41\uFE0F';
+  }
+
+  function showToast(msg) {
+    $shareToast.textContent = msg || 'COPIED TO CLIPBOARD';
+    $shareToast.classList.add('show');
+    setTimeout(function() { $shareToast.classList.remove('show'); }, 2000);
+  }
+
+  $btnShare.addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('COPIED TO CLIPBOARD');
+      }).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('COPIED TO CLIPBOARD');
+  }
+
+  // ===================== SHARE IMAGE =====================
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function generateShareImage() {
+    var canvas = document.getElementById('share-canvas');
+    var ctx = canvas.getContext('2d');
+    var W = 600;
+    var H = 700;
+    var dpr = 2;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.scale(dpr, dpr);
+
+    var total = Math.round(state.scores.reduce(function(a, b) { return a + b; }, 0) / ROUNDS);
+    var rank = getRank(total);
+
+    // Background
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+
+    // Title
+    ctx.fillStyle = '#00e5ff';
+    ctx.font = '900 36px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PALETTE', W / 2, 50);
+
+    // Score
+    var grad = ctx.createLinearGradient(W / 2 - 80, 0, W / 2 + 80, 0);
+    grad.addColorStop(0, '#00e5ff');
+    grad.addColorStop(1, '#ff00e5');
+    ctx.fillStyle = grad;
+    ctx.font = '900 80px Orbitron, sans-serif';
+    ctx.fillText(total.toString(), W / 2, 140);
+
+    // Rank
+    ctx.fillStyle = '#00e5ff';
+    ctx.font = '700 20px Orbitron, sans-serif';
+    ctx.fillText(rank.toUpperCase(), W / 2, 175);
+
+    // Rounds
+    var swatchW = 220;
+    var swatchH = 70;
+    var gap = 8;
+    var startY = 210;
+
+    for (var i = 0; i < ROUNDS; i++) {
+      var y = startY + i * (swatchH + 16);
+
+      ctx.fillStyle = '#6a6a80';
+      ctx.font = '600 14px Orbitron, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText((i + 1).toString(), 30, y + swatchH / 2 + 5);
+
+      var t = state.targets[i];
+      ctx.fillStyle = hslToStr(t.h, t.s, t.l);
+      roundRect(ctx, 60, y, swatchW, swatchH, 10);
+      ctx.fill();
+
+      var g = state.guesses[i];
+      ctx.fillStyle = hslToStr(g.h, g.s, g.l);
+      roundRect(ctx, 60 + swatchW + gap, y, swatchW, swatchH, 10);
+      ctx.fill();
+
+      var s = state.scores[i];
+      ctx.fillStyle = s >= 90 ? '#00ff88' : s >= 70 ? '#00e5ff' : s >= 50 ? '#ffaa00' : '#ff4444';
+      ctx.font = '700 18px Orbitron, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(s + '%', W - 30, y + swatchH / 2 + 6);
+    }
+
+    // Footer
+    ctx.fillStyle = '#6a6a80';
+    ctx.font = '500 14px Rajdhani, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Test your eyes \uD83D\uDC41\uFE0F', W / 2, H - 30);
+
+    return canvas;
+  }
+
+  $btnShareImg.addEventListener('click', function() {
+    var canvas = generateShareImage();
+    canvas.toBlob(function(blob) {
+      if (!blob) {
+        showToast('COULD NOT GENERATE IMAGE');
+        return;
+      }
+
+      // Try native share first
+      if (navigator.canShare) {
+        var file = new File([blob], 'palette.png', { type: 'image/png' });
+        var shareData = { files: [file], title: 'PALETTE - Color IQ' };
+        try {
+          if (navigator.canShare(shareData)) {
+            navigator.share(shareData).catch(function() {
+              downloadImage(canvas);
+            });
+            return;
+          }
+        } catch(e) { /* fallthrough */ }
+      }
+
+      // Try clipboard
+      if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+        navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]).then(function() {
+          showToast('IMAGE COPIED');
+        }).catch(function() {
+          downloadImage(canvas);
+        });
+        return;
+      }
+
+      // Fallback: download
+      downloadImage(canvas);
+    }, 'image/png');
+  });
+
+  function downloadImage(canvas) {
+    var url = canvas.toDataURL('image/png');
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'palette-score.png';
+    a.click();
+    showToast('IMAGE DOWNLOADED');
+  }
+
+  // ===================== EVENT LISTENERS =====================
+  $lockBtn.addEventListener('click', function() {
+    if (state.running) lockIn();
+  });
+
+  $btnRandom.addEventListener('click', function() { startGame('random'); });
+  $btnDaily.addEventListener('click', function() { startGame('daily'); });
+  $btnAgain.addEventListener('click', function() {
+    updateBestDisplay();
+    showScreen('start-screen');
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.code === 'Space' || e.code === 'Enter') && state.running) {
+      e.preventDefault();
+      lockIn();
+    }
+  });
+
+  // ===================== INIT =====================
+  updateBestDisplay();
+
+})();
+</script>
+</body>
+</html>

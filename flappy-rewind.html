@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FLAPPY REWIND</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
+#ui-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:flex;flex-direction:column;align-items:center;z-index:5}
+#score-display{font-family:'Orbitron',monospace;font-size:clamp(36px,8vw,72px);font-weight:900;color:#fff;text-shadow:0 0 20px rgba(0,255,255,.8),0 0 40px rgba(0,255,255,.4);margin-top:40px;opacity:0;transition:opacity .3s}
+#score-display.visible{opacity:1}
+#phase-indicator{font-family:'Orbitron',monospace;font-size:clamp(14px,3vw,24px);font-weight:700;margin-top:8px;opacity:0;transition:opacity .3s,color .3s;letter-spacing:3px}
+#phase-indicator.visible{opacity:1}
+#phase-indicator.forward{color:#00ffcc;text-shadow:0 0 10px rgba(0,255,204,.6)}
+#phase-indicator.rewind{color:#ff6622;text-shadow:0 0 10px rgba(255,102,34,.6)}
+#rewind-btn{position:absolute;bottom:80px;right:20px;pointer-events:auto;font-family:'Orbitron',monospace;font-size:clamp(12px,2.5vw,18px);font-weight:700;color:#ff6622;background:rgba(255,102,34,.12);border:2px solid #ff6622;border-radius:12px;padding:10px 18px;cursor:pointer;opacity:0;transition:opacity .3s;animation:pulse-btn 1.5s ease-in-out infinite;text-transform:uppercase;letter-spacing:2px;z-index:6}
+#rewind-btn.visible{opacity:1;pointer-events:auto}
+#rewind-btn.hidden{opacity:0;pointer-events:none}
+#rewind-btn:active{background:rgba(255,102,34,.3)}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 8px rgba(255,102,34,.3);transform:scale(1)}50%{box-shadow:0 0 20px rgba(255,102,34,.6);transform:scale(1.05)}}
+.overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;opacity:0;transition:opacity .4s;z-index:10}
+.overlay.visible{opacity:1}
+.overlay.hidden{opacity:0;pointer-events:none}
+#start-screen{background:radial-gradient(ellipse at center,rgba(0,255,255,.06) 0%,rgba(10,10,18,.98) 70%)}
+#start-screen h1{font-family:'Orbitron',monospace;font-size:clamp(28px,7vw,64px);font-weight:900;color:#00ffdd;text-shadow:0 0 30px rgba(0,255,221,.6),0 0 60px rgba(0,255,221,.3);text-align:center;margin-bottom:12px;line-height:1.15}
+#start-screen .subtitle{font-family:'Rajdhani',sans-serif;font-size:clamp(16px,3.5vw,28px);color:rgba(255,255,255,.5);margin-bottom:40px;font-weight:600;letter-spacing:2px}
+#start-screen .highscore-line{font-family:'Rajdhani',sans-serif;font-size:clamp(14px,2.5vw,20px);color:rgba(255,200,50,.7);margin-bottom:30px;font-weight:600}
+.btn-main{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,24px);font-weight:700;color:#0a0a12;background:#00ffdd;border:none;border-radius:50px;padding:14px 48px;cursor:pointer;text-transform:uppercase;letter-spacing:3px;box-shadow:0 0 30px rgba(0,255,221,.4);transition:transform .15s,box-shadow .15s}
+.btn-main:active{transform:scale(.95);box-shadow:0 0 15px rgba(0,255,221,.3)}
+#rewind-transition{background:rgba(10,10,18,.85);z-index:20}
+#rewind-transition h2{font-family:'Orbitron',monospace;font-size:clamp(40px,10vw,90px);font-weight:900;color:#ff6622;text-shadow:0 0 40px rgba(255,102,34,.8),0 0 80px rgba(255,102,34,.4);animation:rewind-text .8s ease-out}
+@keyframes rewind-text{0%{transform:scaleX(3) scaleY(.3);opacity:0}50%{transform:scaleX(1.2) scaleY(1.1);opacity:1}100%{transform:scaleX(1) scaleY(1);opacity:1}}
+#gameover-screen{background:radial-gradient(ellipse at center,rgba(255,50,50,.06) 0%,rgba(10,10,18,.97) 70%)}
+#gameover-screen h2{font-family:'Orbitron',monospace;font-size:clamp(24px,6vw,48px);font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.3);margin-bottom:24px}
+.result-line{font-family:'Rajdhani',sans-serif;font-size:clamp(16px,3.5vw,26px);color:rgba(255,255,255,.7);margin:4px 0;font-weight:600}
+.result-line.forward-result{color:#00ffcc}
+.result-line.rewind-result{color:#ff6622}
+.result-line.final-score{font-family:'Orbitron',monospace;font-size:clamp(30px,7vw,56px);font-weight:900;color:#fff;margin:16px 0 8px;text-shadow:0 0 20px rgba(255,255,255,.4)}
+.result-line.new-best{font-size:clamp(14px,2.5vw,20px);color:rgba(255,200,50,.9)}
+.go-buttons{display:flex;gap:16px;margin-top:28px;flex-wrap:wrap;justify-content:center}
+.btn-secondary{font-family:'Orbitron',monospace;font-size:clamp(12px,2.5vw,16px);font-weight:700;color:#00ffdd;background:transparent;border:2px solid #00ffdd;border-radius:50px;padding:10px 28px;cursor:pointer;text-transform:uppercase;letter-spacing:2px;transition:background .15s}
+.btn-secondary:active{background:rgba(0,255,221,.15)}
+#vhs-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:15;opacity:0;transition:opacity .15s;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px);mix-blend-mode:multiply}
+#vhs-overlay.active{opacity:1}
+#vhs-static{z-index:16;opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+<canvas id="vhs-static"></canvas>
+<div id="vhs-overlay"></div>
+
+<div id="ui-layer">
+  <div id="score-display">0</div>
+  <div id="phase-indicator"></div>
+</div>
+<button id="rewind-btn" class="hidden">REWIND?</button>
+
+<div id="start-screen" class="overlay visible">
+  <h1>FLAPPY<br>REWIND</h1>
+  <div class="subtitle">How far do you dare?</div>
+  <div class="highscore-line" id="start-highscore"></div>
+  <button class="btn-main" id="start-btn">START</button>
+</div>
+
+<div id="rewind-transition" class="overlay hidden">
+  <h2>REWIND!</h2>
+</div>
+
+<div id="gameover-screen" class="overlay hidden">
+  <h2>GAME OVER</h2>
+  <div class="result-line forward-result" id="go-forward"></div>
+  <div class="result-line rewind-result" id="go-rewind"></div>
+  <div class="result-line final-score" id="go-score"></div>
+  <div class="result-line new-best" id="go-best"></div>
+  <div class="go-buttons">
+    <button class="btn-main" id="replay-btn">REPLAY</button>
+    <button class="btn-secondary" id="share-btn">SHARE</button>
+  </div>
+</div>
+
+<script>
+// ======================== AUDIO ========================
+const SFX = (() => {
+  let ac = null;
+  const init = () => {
+    if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  };
+
+  const flap = () => {
+    const c = init(), t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(500, t);
+    o.frequency.exponentialRampToValueAtTime(800, t + 0.07);
+    o.frequency.exponentialRampToValueAtTime(400, t + 0.14);
+    g.gain.setValueAtTime(0.13, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    o.connect(g).connect(c.destination);
+    o.start(t); o.stop(t + 0.14);
+  };
+
+  const crash = () => {
+    const c = init(), t = c.currentTime;
+    const n = c.sampleRate * 0.35 | 0;
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = c.createBufferSource(); src.buffer = buf;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.25, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(2000, t);
+    f.frequency.exponentialRampToValueAtTime(150, t + 0.35);
+    src.connect(f).connect(g).connect(c.destination);
+    src.start(t);
+  };
+
+  const rewind = () => {
+    const c = init(), t = c.currentTime;
+    // Descending sweep
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(1200, t);
+    o.frequency.exponentialRampToValueAtTime(80, t + 0.8);
+    g.gain.setValueAtTime(0.1, t);
+    g.gain.linearRampToValueAtTime(0.07, t + 0.4);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+    o.connect(g).connect(c.destination);
+    o.start(t); o.stop(t + 0.9);
+    // Noise burst
+    const n = c.sampleRate * 0.6 | 0;
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const ns = c.createBufferSource(); ns.buffer = buf;
+    const ng = c.createGain();
+    ng.gain.setValueAtTime(0.12, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+    const bp = c.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 800; bp.Q.value = 2;
+    ns.connect(bp).connect(ng).connect(c.destination);
+    ns.start(t);
+    // VHS clicks
+    for (let i = 0; i < 8; i++) {
+      const ct = t + i * 0.1;
+      const co = c.createOscillator(), cg = c.createGain();
+      co.type = 'square'; co.frequency.value = 80 + i * 15;
+      cg.gain.setValueAtTime(0.06, ct);
+      cg.gain.exponentialRampToValueAtTime(0.001, ct + 0.025);
+      co.connect(cg).connect(c.destination);
+      co.start(ct); co.stop(ct + 0.025);
+    }
+  };
+
+  const score = () => {
+    const c = init(), t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(660, t);
+    o.frequency.setValueAtTime(880, t + 0.05);
+    g.gain.setValueAtTime(0.08, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o.connect(g).connect(c.destination);
+    o.start(t); o.stop(t + 0.12);
+  };
+
+  return { init, flap, crash, rewind, score };
+})();
+
+// ======================== CANVAS SETUP ========================
+const canvas = document.getElementById('game-canvas');
+const C = canvas.getContext('2d');
+const staticCanvas = document.getElementById('vhs-static');
+const SC = staticCanvas.getContext('2d');
+
+const $ = id => document.getElementById(id);
+
+let W, H, DPR;
+let pipeW, pipeGap, pipeSpacing, birdR, pipeSpd;
+
+function resize() {
+  DPR = window.devicePixelRatio || 1;
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  C.setTransform(DPR, 0, 0, DPR, 0, 0);
+  staticCanvas.width = W * DPR;
+  staticCanvas.height = H * DPR;
+  SC.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  pipeW = Math.max(W * 0.1, 40);
+  pipeGap = Math.max(H * 0.24, 110);
+  pipeSpacing = Math.max(W * 0.42, 180);
+  birdR = Math.max(H * 0.022, 12);
+  pipeSpd = Math.max(W * 0.0035, 2);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ======================== GAME STATE ========================
+const GRAV = 0.42;
+const FLAP = -7.2;
+
+let state = 'start'; // start | forward | transition | rewind | gameover
+let bird = { x: 0, y: 0, vy: 0, rot: 0 };
+let pipes = [];             // forward phase active pipes
+let pipeHistory = [];       // ordered gapY values for ALL pipes ever generated this round
+let fwdScore = 0;           // pipes passed in forward
+let scoredIdx = 0;          // index into pipes[] for scoring
+let rwPipes = [];            // rewind phase pipe objects
+let rwTotal = 0;             // how many rewind pipes
+let rwDone = 0;              // how many cleared in rewind
+let rwDied = false;
+let trail = [];
+let frame = 0;
+let transTimer = 0;
+let rwWave = 0;
+let highScore = parseInt(localStorage.getItem('flappyRewindHigh') || '0');
+
+// ======================== HELPERS ========================
+function randGapY() {
+  const margin = pipeGap * 0.7 + 20;
+  return margin + Math.random() * (H - 2 * margin);
+}
+
+function resetBird(rightSide) {
+  bird.x = rightSide ? W * 0.78 : W * 0.22;
+  bird.y = H * 0.45;
+  bird.vy = 0;
+  bird.rot = 0;
+  trail = [];
+}
+
+// ======================== GAME FLOW ========================
+function startGame() {
+  state = 'forward';
+  pipes = [];
+  pipeHistory = [];
+  fwdScore = 0;
+  scoredIdx = 0;
+  rwPipes = [];
+  rwTotal = 0;
+  rwDone = 0;
+  rwDied = false;
+  frame = 0;
+  resetBird(false);
+
+  // Seed initial pipes
+  const startX = W * 0.7;
+  for (let i = 0; i < 6; i++) {
+    const gy = randGapY();
+    pipes.push({ x: startX + i * pipeSpacing, gapY: gy });
+    pipeHistory.push(gy);
+  }
+
+  $('score-display').textContent = '0';
+  $('score-display').classList.add('visible');
+  $('phase-indicator').textContent = '\u25B6 FORWARD';
+  $('phase-indicator').className = 'visible forward';
+  $('rewind-btn').className = 'visible';
+  $('start-screen').className = 'overlay hidden';
+  $('gameover-screen').className = 'overlay hidden';
+  $('rewind-transition').className = 'overlay hidden';
+}
+
+function triggerRewind(fromCrash) {
+  if (state !== 'forward') return;
+  if (fromCrash) SFX.crash();
+  state = 'transition';
+  transTimer = 0;
+  $('rewind-btn').className = 'hidden';
+  SFX.rewind();
+  $('vhs-overlay').classList.add('active');
+  $('rewind-transition').className = 'overlay visible';
+  drawStatic(0.6);
+}
+
+function startRewindPhase() {
+  state = 'rewind';
+  $('rewind-transition').className = 'overlay hidden';
+  $('vhs-overlay').classList.remove('active');
+  staticCanvas.style.opacity = '0';
+
+  rwTotal = fwdScore;
+  rwDone = 0;
+  rwDied = false;
+  rwWave = 0;
+
+  // Build rewind pipes: reversed order, starting off-screen LEFT, scrolling RIGHT
+  rwPipes = [];
+  for (let i = 0; i < rwTotal; i++) {
+    const histIdx = fwdScore - 1 - i; // reverse order
+    rwPipes.push({
+      x: -(i + 1) * pipeSpacing - pipeW,
+      gapY: pipeHistory[histIdx],
+      scored: false
+    });
+  }
+
+  resetBird(true);
+
+  $('phase-indicator').textContent = '\u25C0 REWIND';
+  $('phase-indicator').className = 'visible rewind';
+  $('score-display').textContent = fwdScore;
+
+  // If no pipes to rewind through, instant win
+  if (rwTotal === 0) {
+    rwDied = false;
+    setTimeout(() => showGameOver(), 300);
+  }
+}
+
+function showGameOver() {
+  state = 'gameover';
+  $('score-display').classList.remove('visible');
+  $('phase-indicator').className = '';
+  $('rewind-btn').className = 'hidden';
+
+  const survived = !rwDied && rwDone >= rwTotal;
+  const finalScore = survived ? fwdScore : 0;
+  const isNew = finalScore > highScore;
+  if (isNew) {
+    highScore = finalScore;
+    localStorage.setItem('flappyRewindHigh', String(highScore));
+  }
+
+  $('go-forward').textContent = '\u25B6 Forward: ' + fwdScore + ' pipes';
+  const rwEl = $('go-rewind');
+  if (survived) {
+    rwEl.textContent = '\u25C0 Rewind: SURVIVED';
+    rwEl.style.color = '#00ff88';
+  } else {
+    rwEl.textContent = '\u25C0 Rewind: died at pipe ' + rwDone;
+    rwEl.style.color = '#ff4444';
+  }
+  $('go-score').textContent = finalScore;
+  $('go-best').textContent = isNew ? 'NEW BEST!' : ('Best: ' + highScore);
+  $('go-best').style.color = isNew ? 'rgba(255,200,50,.9)' : 'rgba(255,255,255,.4)';
+
+  $('gameover-screen').className = 'overlay visible';
+
+  window._lastResult = { fwdScore, survived, rwDone, finalScore };
+}
+
+// ======================== INPUT ========================
+function doFlap() {
+  if (state === 'forward') {
+    bird.vy = FLAP;
+    SFX.flap();
+  } else if (state === 'rewind') {
+    bird.vy = -FLAP; // push DOWN (positive vy = down)
+    SFX.flap();
+  }
+}
+
+function handleInput(e) {
+  if (e) e.preventDefault();
+  if (state === 'forward' || state === 'rewind') doFlap();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); handleInput(); }
+});
+
+// Tap anywhere on the page (not just canvas) for mobile friendliness
+document.addEventListener('pointerdown', e => {
+  // Don't intercept button clicks
+  if (e.target.tagName === 'BUTTON') return;
+  if (state === 'forward' || state === 'rewind') handleInput(e);
+});
+
+$('rewind-btn').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  triggerRewind(false);
+});
+
+$('start-btn').addEventListener('click', () => { SFX.init(); startGame(); });
+$('replay-btn').addEventListener('click', () => startGame());
+
+$('share-btn').addEventListener('click', () => {
+  const r = window._lastResult;
+  const text = r.survived
+    ? `\u{1F424} FLAPPY REWIND\n\u25B6 Forward: ${r.fwdScore} pipes\n\u25C0 Rewind: SURVIVED \u2705\nScore: ${r.fwdScore} \u{1F525}\nHow far do you dare?`
+    : `\u{1F424} FLAPPY REWIND\n\u25B6 Forward: ${r.fwdScore} pipes\n\u25C0 Rewind: \u{1F480} at pipe ${r.rwDone}\nScore: 0\nGreed kills \u{1F62D}`;
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $('share-btn');
+      btn.textContent = 'COPIED!';
+      setTimeout(() => { btn.textContent = 'SHARE'; }, 1500);
+    });
+  }
+});
+
+// ======================== UPDATE ========================
+function update() {
+  frame++;
+  if (state === 'forward') updateForward();
+  else if (state === 'transition') updateTransition();
+  else if (state === 'rewind') updateRewind();
+}
+
+function updateForward() {
+  // Physics
+  bird.vy += GRAV;
+  bird.y += bird.vy;
+  bird.rot = Math.min(Math.max(bird.vy * 3, -30), 70);
+
+  // Trail
+  trail.unshift({ x: bird.x, y: bird.y });
+  if (trail.length > 14) trail.pop();
+
+  // Move pipes left
+  for (const p of pipes) p.x -= pipeSpd;
+
+  // Score: pipe right edge passes bird's x
+  while (scoredIdx < pipes.length && pipes[scoredIdx].x + pipeW < bird.x) {
+    fwdScore++;
+    scoredIdx++;
+    $('score-display').textContent = fwdScore;
+    SFX.score();
+  }
+
+  // Generate new pipes as needed
+  const last = pipes[pipes.length - 1];
+  if (last && last.x < W - pipeSpacing + pipeW) {
+    const gy = randGapY();
+    pipes.push({ x: last.x + pipeSpacing, gapY: gy });
+    pipeHistory.push(gy);
+  }
+
+  // Collision: boundaries
+  const br = birdR * 0.85;
+  if (bird.y + br > H || bird.y - br < 0) {
+    triggerRewind(true);
+    return;
+  }
+
+  // Collision: pipes
+  for (const p of pipes) {
+    if (p.x > bird.x + br + pipeW) break; // pipes are sorted by x; skip far-right ones
+    if (p.x + pipeW < bird.x - br) continue; // already passed
+    if (bird.x + br > p.x && bird.x - br < p.x + pipeW) {
+      const halfGap = pipeGap / 2;
+      if (bird.y - br < p.gapY - halfGap || bird.y + br > p.gapY + halfGap) {
+        triggerRewind(true);
+        return;
+      }
+    }
+  }
+}
+
+function updateTransition() {
+  transTimer++;
+  if (transTimer < 15) {
+    drawStatic(transTimer / 15 * 0.7);
+  } else if (transTimer < 45) {
+    // hold - slight flicker
+    if (transTimer % 8 === 0) drawStatic(0.4 + Math.random() * 0.3);
+  } else if (transTimer < 60) {
+    drawStatic((1 - (transTimer - 45) / 15) * 0.5);
+  }
+  if (transTimer >= 60) startRewindPhase();
+}
+
+function updateRewind() {
+  // Inverted gravity: bird falls UP, tap pushes DOWN
+  bird.vy -= GRAV;
+  bird.y += bird.vy;
+  bird.rot = Math.min(Math.max(-bird.vy * 3, -70), 30);
+
+  rwWave += 0.03;
+
+  trail.unshift({ x: bird.x, y: bird.y });
+  if (trail.length > 14) trail.pop();
+
+  // Move pipes RIGHT
+  for (const p of rwPipes) p.x += pipeSpd;
+
+  // Score: pipe has fully passed bird (pipe's LEFT edge > bird's x)
+  // Since pipes move right and bird is on the right side,
+  // a pipe is "cleared" when its left edge passes bird's right extent
+  for (const p of rwPipes) {
+    if (!p.scored && p.x > bird.x + birdR) {
+      p.scored = true;
+      rwDone++;
+      SFX.score();
+    }
+  }
+
+  // Survived check
+  if (rwDone >= rwTotal && rwTotal > 0) {
+    rwDied = false;
+    showGameOver();
+    return;
+  }
+
+  // Collision: boundaries
+  const br = birdR * 0.85;
+  if (bird.y + br > H || bird.y - br < 0) {
+    rwDied = true;
+    SFX.crash();
+    showGameOver();
+    return;
+  }
+
+  // Collision: pipes
+  for (const p of rwPipes) {
+    if (bird.x + br > p.x && bird.x - br < p.x + pipeW) {
+      const halfGap = pipeGap / 2;
+      if (bird.y - br < p.gapY - halfGap || bird.y + br > p.gapY + halfGap) {
+        rwDied = true;
+        SFX.crash();
+        showGameOver();
+        return;
+      }
+    }
+  }
+}
+
+// ======================== RENDERING ========================
+function render() {
+  C.clearRect(0, 0, W, H);
+  drawBg();
+
+  if (state === 'forward') {
+    drawFwdPipes();
+    drawTrail();
+    drawBird();
+  } else if (state === 'transition') {
+    drawFwdPipes();
+    drawBird();
+  } else if (state === 'rewind') {
+    drawRwPipes();
+    drawTrail();
+    drawBird();
+    drawScanlines();
+  } else {
+    drawIdleBird();
+  }
+}
+
+function drawBg() {
+  C.fillStyle = '#0a0a12';
+  C.fillRect(0, 0, W, H);
+
+  // Grid
+  const isRw = state === 'rewind';
+  C.strokeStyle = isRw ? 'rgba(255,102,34,.025)' : 'rgba(0,255,255,.025)';
+  C.lineWidth = 1;
+  const gs = 50;
+  const offset = isRw ? (frame * 0.5) % gs : (-frame * 0.5) % gs;
+  C.beginPath();
+  for (let x = offset; x < W; x += gs) { C.moveTo(x, 0); C.lineTo(x, H); }
+  for (let y = 0; y < H; y += gs) { C.moveTo(0, y); C.lineTo(W, y); }
+  C.stroke();
+
+  // Horizon lines
+  const lineColor = isRw ? 'rgba(255,102,34,.25)' : 'rgba(0,255,204,.25)';
+  C.strokeStyle = lineColor;
+  C.lineWidth = 2;
+  C.beginPath();
+  C.moveTo(0, H - 1); C.lineTo(W, H - 1);
+  C.moveTo(0, 1); C.lineTo(W, 1);
+  C.stroke();
+}
+
+function drawFwdPipes() {
+  for (const p of pipes) {
+    if (p.x + pipeW < -20 || p.x > W + 20) continue;
+    drawPipe(p.x, p.gapY, '#00ff88', 'rgba(0,255,136,.12)');
+  }
+}
+
+function drawRwPipes() {
+  for (const p of rwPipes) {
+    if (p.x + pipeW < -20 || p.x > W + 20) continue;
+    const wave = Math.sin(rwWave + p.x * 0.008) * 4;
+    drawPipe(p.x, p.gapY + wave, '#ff6622', 'rgba(255,102,34,.1)');
+  }
+}
+
+function drawPipe(x, gapY, col, glow) {
+  const hg = pipeGap / 2;
+  const topH = gapY - hg;
+  const botY = gapY + hg;
+  const botH = H - botY;
+
+  C.shadowColor = col;
+  C.shadowBlur = 18;
+
+  // Top pipe
+  C.fillStyle = glow;
+  C.fillRect(x - 4, -2, pipeW + 8, topH + 4);
+  C.fillStyle = col;
+  C.fillRect(x, 0, pipeW, topH);
+  C.fillStyle = 'rgba(10,10,18,.55)';
+  C.fillRect(x + 4, 0, pipeW - 8, topH - 3);
+  C.fillStyle = col;
+  C.fillRect(x - 4, topH - 6, pipeW + 8, 6); // lip
+
+  // Bottom pipe
+  C.fillStyle = glow;
+  C.fillRect(x - 4, botY - 2, pipeW + 8, botH + 4);
+  C.fillStyle = col;
+  C.fillRect(x, botY, pipeW, botH);
+  C.fillStyle = 'rgba(10,10,18,.55)';
+  C.fillRect(x + 4, botY + 3, pipeW - 8, botH - 3);
+  C.fillStyle = col;
+  C.fillRect(x - 4, botY, pipeW + 8, 6); // lip
+
+  C.shadowBlur = 0;
+}
+
+function drawBird() {
+  const isRw = state === 'rewind';
+  C.save();
+  C.translate(bird.x, bird.y);
+  C.rotate(bird.rot * Math.PI / 180);
+
+  const s = birdR * 2.2;
+  const bodyCol = isRw ? '#ff8844' : '#00ffee';
+  const innerCol = isRw ? '#ffaa66' : '#88ffff';
+  const glowCol = isRw ? '#ff8844' : '#00ffff';
+
+  // Glow
+  C.shadowColor = glowCol;
+  C.shadowBlur = 22;
+
+  // Body
+  C.fillStyle = bodyCol;
+  C.beginPath();
+  C.ellipse(0, 0, s * 0.52, s * 0.4, 0, 0, Math.PI * 2);
+  C.fill();
+
+  // Inner highlight
+  C.fillStyle = innerCol;
+  C.beginPath();
+  C.ellipse(-s * 0.04, -s * 0.07, s * 0.3, s * 0.22, 0, 0, Math.PI * 2);
+  C.fill();
+
+  C.shadowBlur = 0;
+
+  // Eye
+  C.fillStyle = '#fff';
+  C.beginPath();
+  C.arc(s * 0.18, -s * 0.08, s * 0.11, 0, Math.PI * 2);
+  C.fill();
+  C.fillStyle = '#0a0a12';
+  C.beginPath();
+  C.arc(s * 0.21, -s * 0.08, s * 0.055, 0, Math.PI * 2);
+  C.fill();
+
+  // Beak
+  C.fillStyle = isRw ? '#ffcc00' : '#ffdd44';
+  C.beginPath();
+  C.moveTo(s * 0.4, -s * 0.04);
+  C.lineTo(s * 0.62, s * 0.04);
+  C.lineTo(s * 0.4, s * 0.1);
+  C.closePath();
+  C.fill();
+
+  // Wing
+  const wf = Math.sin(frame * 0.35) * s * 0.1;
+  C.fillStyle = bodyCol;
+  C.globalAlpha = 0.85;
+  C.beginPath();
+  C.ellipse(-s * 0.12, s * 0.04 + wf, s * 0.22, s * 0.13, -0.3, 0, Math.PI * 2);
+  C.fill();
+  C.globalAlpha = 1;
+
+  C.restore();
+}
+
+function drawTrail() {
+  if (trail.length < 2) return;
+  const isRw = state === 'rewind';
+  const rgb = isRw ? '255,102,34' : '0,255,238';
+
+  for (let i = 1; i < trail.length; i++) {
+    const t = 1 - i / trail.length;
+    C.fillStyle = `rgba(${rgb},${t * 0.35})`;
+    C.beginPath();
+    C.arc(trail[i].x, trail[i].y, birdR * 0.5 * t, 0, Math.PI * 2);
+    C.fill();
+  }
+}
+
+function drawScanlines() {
+  C.fillStyle = 'rgba(0,0,0,.035)';
+  for (let y = 0; y < H; y += 4) C.fillRect(0, y, W, 2);
+
+  // Random glitch
+  if (Math.random() < 0.04) {
+    const gy = Math.random() * H;
+    C.fillStyle = `rgba(255,102,34,${0.05 + Math.random() * 0.08})`;
+    C.fillRect(0, gy, W, 2 + Math.random() * 5);
+  }
+  // Color aberration line
+  if (Math.random() < 0.015) {
+    const gy = Math.random() * H;
+    C.fillStyle = 'rgba(0,255,255,.06)';
+    C.fillRect(Math.random() * W * 0.3, gy, W * 0.7, 1);
+  }
+}
+
+function drawIdleBird() {
+  const t = Date.now() * 0.002;
+  C.save();
+  C.translate(W * 0.5, H * 0.3 + Math.sin(t) * 18);
+
+  const s = birdR * 3;
+  C.shadowColor = '#00ffff';
+  C.shadowBlur = 30;
+  C.fillStyle = '#00ffee';
+  C.beginPath();
+  C.ellipse(0, 0, s * 0.52, s * 0.4, 0, 0, Math.PI * 2);
+  C.fill();
+  C.fillStyle = '#88ffff';
+  C.beginPath();
+  C.ellipse(-s * 0.04, -s * 0.07, s * 0.3, s * 0.22, 0, 0, Math.PI * 2);
+  C.fill();
+  C.shadowBlur = 0;
+  C.fillStyle = '#fff';
+  C.beginPath();
+  C.arc(s * 0.18, -s * 0.08, s * 0.11, 0, Math.PI * 2);
+  C.fill();
+  C.fillStyle = '#0a0a12';
+  C.beginPath();
+  C.arc(s * 0.21, -s * 0.08, s * 0.055, 0, Math.PI * 2);
+  C.fill();
+  C.fillStyle = '#ffdd44';
+  C.beginPath();
+  C.moveTo(s * 0.4, -s * 0.04);
+  C.lineTo(s * 0.62, s * 0.04);
+  C.lineTo(s * 0.4, s * 0.1);
+  C.closePath();
+  C.fill();
+  C.fillStyle = '#00ffee';
+  C.beginPath();
+  C.ellipse(-s * 0.12, s * 0.04 + Math.sin(t * 3) * s * 0.1, s * 0.22, s * 0.13, -0.3, 0, Math.PI * 2);
+  C.fill();
+
+  C.restore();
+}
+
+function drawStatic(alpha) {
+  // Reset transform so we work in raw pixel coords
+  SC.setTransform(1, 0, 0, 1, 0, 0);
+  SC.clearRect(0, 0, staticCanvas.width, staticCanvas.height);
+  // Small noise texture for perf, then scale up
+  const sw = 200, sh = 350;
+  const img = SC.createImageData(sw, sh);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random() * 255;
+    d[i] = v; d[i+1] = v; d[i+2] = v;
+    d[i+3] = Math.random() * alpha * 255;
+  }
+  SC.putImageData(img, 0, 0);
+  // Scale the small noise to fill the canvas
+  SC.imageSmoothingEnabled = false;
+  SC.drawImage(staticCanvas, 0, 0, sw, sh, 0, 0, staticCanvas.width, staticCanvas.height);
+  // Restore DPR transform
+  SC.setTransform(DPR, 0, 0, DPR, 0, 0);
+  staticCanvas.style.opacity = '1';
+}
+
+// ======================== MAIN LOOP ========================
+let lastT = 0, acc = 0;
+const DT = 1000 / 60;
+
+function loop(ts) {
+  if (!lastT) lastT = ts;
+  let dt = ts - lastT;
+  lastT = ts;
+  if (dt > 100) dt = 100;
+  acc += dt;
+  while (acc >= DT) { update(); acc -= DT; }
+  render();
+  requestAnimationFrame(loop);
+}
+
+// Init
+const hsEl = $('start-highscore');
+if (highScore > 0) hsEl.textContent = 'Best: ' + highScore;
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
