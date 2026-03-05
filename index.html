@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>NEON SNAKE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON ARCADE — Viral Web Games</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
@@ -11,38 +11,33 @@
 
   :root {
     --bg-deep: #0a0a12;
-    --bg-surface: #12121f;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
     --neon-cyan: #00f0ff;
     --neon-green: #39ff14;
     --neon-gold: #ffd700;
     --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
     --text-dim: #4a4a6a;
     --text-mid: #8888aa;
+    --text-bright: #cccce0;
+    --border: rgba(0,240,255,0.1);
   }
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    background: var(--bg-deep);
-    font-family: 'Rajdhani', sans-serif;
-    color: #fff;
-    touch-action: none;
-    -webkit-user-select: none;
-    user-select: none;
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background:
-      radial-gradient(ellipse at 50% 0%, rgba(0,240,255,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.04) 0%, transparent 50%),
-      var(--bg-deep);
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
   }
 
-  /* --- SCANLINE OVERLAY --- */
+  /* --- SCANLINES --- */
   body::after {
     content: '';
     position: fixed;
@@ -51,774 +46,473 @@
       0deg,
       transparent,
       transparent 2px,
-      rgba(0,0,0,0.08) 2px,
-      rgba(0,0,0,0.08) 4px
+      rgba(0,0,0,0.06) 2px,
+      rgba(0,0,0,0.06) 4px
     );
     pointer-events: none;
-    z-index: 100;
+    z-index: 1000;
   }
 
-  #game-wrapper {
+  /* --- ANIMATED BG --- */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- HEADER --- */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 40px;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 72px);
+    letter-spacing: 8px;
+    color: var(--neon-cyan);
+    text-shadow:
+      0 0 10px rgba(0,240,255,0.6),
+      0 0 40px rgba(0,240,255,0.2),
+      0 0 80px rgba(0,240,255,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-pink);
+    text-shadow:
+      0 0 10px rgba(255,45,123,0.6),
+      0 0 40px rgba(255,45,123,0.2);
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    margin: 30px auto 0;
+  }
+
+  /* --- GAME GRID --- */
+  .games-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  /* --- GAME CARD --- */
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
     display: flex;
     flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(0,240,255,0.25);
+    transform: translateY(-4px);
+    box-shadow:
+      0 8px 32px rgba(0,240,255,0.08),
+      0 0 0 1px rgba(0,240,255,0.1);
+  }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
+    overflow: hidden;
     position: relative;
   }
 
-  /* --- HEADER / HUD --- */
-  #hud {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: min(90vw, 500px);
-    padding: 0 4px;
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
   }
 
-  .hud-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .game-card:hover .card-screenshot img {
+    transform: scale(1.03);
   }
 
-  .hud-label {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 300;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .hud-value {
+  .card-screenshot .placeholder {
     font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 28px;
-    line-height: 1;
-    color: var(--neon-cyan);
-    text-shadow: 0 0 12px rgba(0,240,255,0.5);
-    transition: transform 0.1s, color 0.15s;
+    font-size: 48px;
+    opacity: 0.15;
   }
 
-  .hud-value.pop {
-    transform: scale(1.25);
-    color: #fff;
-  }
-
-  #high-score .hud-value {
-    color: var(--neon-gold);
-    text-shadow: 0 0 12px rgba(255,215,0,0.4);
-    font-size: 22px;
-  }
-
-  #title {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 18px;
-    letter-spacing: 6px;
-    color: var(--neon-cyan);
-    text-shadow:
-      0 0 8px rgba(0,240,255,0.6),
-      0 0 30px rgba(0,240,255,0.2);
-  }
-
-  /* --- CANVAS --- */
-  #game-canvas {
-    border: 1px solid rgba(0,240,255,0.15);
-    border-radius: 4px;
-    box-shadow:
-      0 0 30px rgba(0,240,255,0.07),
-      inset 0 0 60px rgba(0,0,0,0.4);
-    image-rendering: pixelated;
-    display: block;
-  }
-
-  /* --- LEGEND --- */
-  #legend {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--text-mid);
-    letter-spacing: 1px;
-  }
-
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-
-  .legend-dot.easy {
-    background: var(--neon-green);
-    box-shadow: 0 0 8px rgba(57,255,20,0.6);
-  }
-
-  .legend-dot.hard {
-    background: var(--neon-gold);
-    box-shadow: 0 0 8px rgba(255,215,0,0.6);
-  }
-
-  /* --- OVERLAYS --- */
-  .overlay {
+  .card-badge {
     position: absolute;
-    inset: 0;
+    top: 12px;
+    right: 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-new {
+    background: rgba(57,255,20,0.15);
+    color: var(--neon-green);
+    border: 1px solid rgba(57,255,20,0.3);
+  }
+
+  .badge-hot {
+    background: rgba(255,45,123,0.15);
+    color: var(--neon-pink);
+    border: 1px solid rgba(255,45,123,0.3);
+  }
+
+  .badge-classic {
+    background: rgba(255,215,0,0.15);
+    color: var(--neon-gold);
+    border: 1px solid rgba(255,215,0,0.3);
+  }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(6,6,14,0.88);
-    backdrop-filter: blur(6px);
-    border-radius: 4px;
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
   }
 
-  .overlay.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .overlay h2 {
+  .card-number {
     font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: 32px;
-    letter-spacing: 4px;
-    margin-bottom: 8px;
-  }
-
-  #start-overlay h2 {
-    color: var(--neon-cyan);
-    text-shadow: 0 0 20px rgba(0,240,255,0.5);
-  }
-
-  #gameover-overlay h2 {
-    color: var(--neon-pink);
-    text-shadow: 0 0 20px rgba(255,45,123,0.5);
-  }
-
-  .overlay .sub {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 300;
-    font-size: 15px;
-    color: var(--text-mid);
-    letter-spacing: 2px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 3px;
     margin-bottom: 4px;
   }
 
-  #final-score {
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    font-size: 48px;
-    color: var(--neon-cyan);
-    text-shadow: 0 0 20px rgba(0,240,255,0.4);
-    margin: 12px 0 4px;
-  }
-
-  #new-best {
-    font-family: 'Orbitron', monospace;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--neon-gold);
-    text-shadow: 0 0 12px rgba(255,215,0,0.5);
-    height: 20px;
-    margin-bottom: 16px;
-  }
-
-  .play-btn {
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 3px;
-    padding: 14px 40px;
-    border: 1px solid var(--neon-cyan);
-    background: rgba(0,240,255,0.06);
-    color: var(--neon-cyan);
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    margin-top: 8px;
-  }
-
-  .play-btn:hover {
-    background: rgba(0,240,255,0.15);
-    box-shadow: 0 0 20px rgba(0,240,255,0.2);
-    transform: scale(1.04);
-  }
-
-  .play-btn:active {
-    transform: scale(0.97);
-  }
-
-  .controls-hint {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 300;
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 2px;
-    margin-top: 20px;
-  }
-
-  /* score pop particles */
-  .score-pop {
-    position: absolute;
+  .card-title {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
     font-size: 20px;
-    pointer-events: none;
-    z-index: 20;
-    animation: scoreFly 0.7s ease-out forwards;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    transition: color 0.2s;
   }
 
-  .score-pop.easy-pop {
-    color: var(--neon-green);
-    text-shadow: 0 0 10px rgba(57,255,20,0.7);
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-mid);
+    flex: 1;
   }
 
-  .score-pop.hard-pop {
-    color: var(--neon-gold);
-    text-shadow: 0 0 10px rgba(255,215,0,0.7);
-    font-size: 26px;
+  .card-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
   }
 
-  @keyframes scoreFly {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
+  .tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border: 1px solid rgba(255,255,255,0.06);
   }
 
-  /* screen shake */
-  @keyframes shake {
-    0%, 100% { transform: translate(0); }
-    20% { transform: translate(-3px, 2px); }
-    40% { transform: translate(2px, -3px); }
-    60% { transform: translate(-2px, 1px); }
-    80% { transform: translate(1px, -2px); }
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--neon-cyan);
+    transition: all 0.2s;
   }
 
-  .shake {
-    animation: shake 0.25s ease;
+  .game-card:hover .card-play {
+    letter-spacing: 4px;
+  }
+
+  .play-arrow {
+    font-size: 16px;
+    transition: transform 0.2s;
+  }
+
+  .game-card:hover .play-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Per-game accent colors */
+  .game-card[data-accent="cyan"] .card-title { color: var(--neon-cyan); }
+  .game-card[data-accent="cyan"]:hover { border-color: rgba(0,240,255,0.3); }
+
+  .game-card[data-accent="pink"] .card-title { color: var(--neon-pink); }
+  .game-card[data-accent="pink"]:hover { border-color: rgba(255,45,123,0.3); box-shadow: 0 8px 32px rgba(255,45,123,0.08); }
+
+  .game-card[data-accent="green"] .card-title { color: var(--neon-green); }
+  .game-card[data-accent="green"]:hover { border-color: rgba(57,255,20,0.3); box-shadow: 0 8px 32px rgba(57,255,20,0.08); }
+
+  .game-card[data-accent="gold"] .card-title { color: var(--neon-gold); }
+  .game-card[data-accent="gold"]:hover { border-color: rgba(255,215,0,0.3); box-shadow: 0 8px 32px rgba(255,215,0,0.08); }
+
+  .game-card[data-accent="purple"] .card-title { color: var(--neon-purple); }
+  .game-card[data-accent="purple"]:hover { border-color: rgba(180,77,255,0.3); box-shadow: 0 8px 32px rgba(180,77,255,0.08); }
+
+  .game-card[data-accent="orange"] .card-title { color: var(--neon-orange); }
+  .game-card[data-accent="orange"]:hover { border-color: rgba(255,140,0,0.3); box-shadow: 0 8px 32px rgba(255,140,0,0.08); }
+
+  .game-card[data-accent="white"] .card-title { color: #e0e0f0; }
+  .game-card[data-accent="white"]:hover { border-color: rgba(224,224,240,0.3); box-shadow: 0 8px 32px rgba(224,224,240,0.06); }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 700px) {
+    .games-grid {
+      grid-template-columns: 1fr;
+      padding: 12px 16px 60px;
+      gap: 16px;
+    }
+    header {
+      padding: 40px 16px 28px;
+    }
   }
 </style>
 </head>
 <body>
 
-<div id="game-wrapper">
-  <div id="hud">
-    <div id="cur-score" class="hud-block">
-      <span class="hud-label">Score</span>
-      <span class="hud-value" id="score-val">0</span>
-    </div>
-    <span id="title">NEON SNAKE</span>
-    <div id="high-score" class="hud-block">
-      <span class="hud-label">Best</span>
-      <span class="hud-value" id="best-val">0</span>
-    </div>
-  </div>
+<div class="bg-glow"></div>
 
-  <div style="position:relative; display:inline-block;">
-    <canvas id="game-canvas"></canvas>
+<header>
+  <div class="logo">NEON<span>ARCADE</span></div>
+  <p class="tagline">Viral web games — zero install, pure chaos</p>
+  <div class="header-line"></div>
+</header>
 
-    <div id="start-overlay" class="overlay visible">
-      <h2>NEON SNAKE</h2>
-      <p class="sub">RISK VS REWARD</p>
-      <button class="play-btn" id="start-btn">START</button>
-      <p class="controls-hint">ARROWS / WASD / SWIPE</p>
+<div class="games-grid">
+
+  <!-- 1. NEON SNAKE (existing) -->
+  <a href="neon-snake.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/neon-snake.png" alt="Neon Snake" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🐍</div>
+      <span class="card-badge badge-classic">OG</span>
     </div>
-
-    <div id="gameover-overlay" class="overlay">
-      <h2>GAME OVER</h2>
-      <p class="sub">YOUR SCORE</p>
-      <div id="final-score">0</div>
-      <div id="new-best"></div>
-      <button class="play-btn" id="retry-btn">PLAY AGAIN</button>
-      <p class="controls-hint">PRESS SPACE OR TAP</p>
+    <div class="card-body">
+      <span class="card-number">GAME 01</span>
+      <h2 class="card-title">NEON SNAKE</h2>
+      <p class="card-desc">The classic snake with a risk vs reward twist. Easy food is safe in the center. Gold food near the walls is worth 5x — but one wrong move and you're dead.</p>
+      <div class="card-tags">
+        <span class="tag">Arcade</span>
+        <span class="tag">Risk / Reward</span>
+        <span class="tag">Mobile</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
     </div>
-  </div>
+  </a>
 
-  <div id="legend">
-    <div class="legend-item"><span class="legend-dot easy"></span>EASY +10 (+1)</div>
-    <div class="legend-item"><span class="legend-dot hard"></span>HARD +50 (+3)</div>
-  </div>
+  <!-- 2. IMPOSTOR PIXEL -->
+  <a href="impostor-pixel.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img src="screenshots/impostor-pixel.png" alt="Impostor Pixel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">👁️</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 02</span>
+      <h2 class="card-title">IMPOSTOR PIXEL</h2>
+      <p class="card-desc">A grid of identical tiles. One is slightly different. Can you spot it? Each round the difference shrinks. How sharp are your eyes really?</p>
+      <div class="card-tags">
+        <span class="tag">Perception</span>
+        <span class="tag">Daily Challenge</span>
+        <span class="tag">Shareable</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 3. CATALYST -->
+  <a href="catalyst.html" class="game-card" data-accent="orange">
+    <div class="card-screenshot">
+      <img src="screenshots/catalyst.png" alt="Catalyst" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">⚡</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 03</span>
+      <h2 class="card-title">CATALYST</h2>
+      <p class="card-desc">One touch. Infinite chaos. Flick a spark into a field of hidden particles and watch the chain reaction unfold. Exploders, multipliers, attractors — every reaction is unique.</p>
+      <div class="card-tags">
+        <span class="tag">Chain Reaction</span>
+        <span class="tag">One Touch</span>
+        <span class="tag">Satisfying</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 4. PONG: BOTH SIDES -->
+  <a href="pong-both-sides.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img src="screenshots/pong-both-sides.png" alt="Pong Both Sides" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🏓</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 04</span>
+      <h2 class="card-title">PONG: BOTH SIDES</h2>
+      <p class="card-desc">You control BOTH paddles. Left thumb, right thumb. The ball speeds up. How long can you rally with yourself before your brain short-circuits?</p>
+      <div class="card-tags">
+        <span class="tag">Dexterity</span>
+        <span class="tag">Split Brain</span>
+        <span class="tag">Two Thumbs</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 5. AFTERGLOW -->
+  <a href="afterglow.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img src="screenshots/afterglow.png" alt="Afterglow" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">✨</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 05</span>
+      <h2 class="card-title">AFTERGLOW</h2>
+      <p class="card-desc">Navigate a dark maze. Your trail glows behind you — but touch it and you die. Your light is your only guide and your greatest enemy. Every run is a light painting.</p>
+      <div class="card-tags">
+        <span class="tag">Maze</span>
+        <span class="tag">Light Painting</span>
+        <span class="tag">Atmospheric</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 6. FLAPPY REWIND -->
+  <a href="flappy-rewind.html" class="game-card" data-accent="pink">
+    <div class="card-screenshot">
+      <img src="screenshots/flappy-rewind.png" alt="Flappy Rewind" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🐤</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 06</span>
+      <h2 class="card-title">FLAPPY REWIND</h2>
+      <p class="card-desc">Fly forward through pipes. Then the game REWINDS and you fly backward with inverted gravity. Score only counts if you survive both ways. How far do you dare?</p>
+      <div class="card-tags">
+        <span class="tag">Risk / Reward</span>
+        <span class="tag">Rewind</span>
+        <span class="tag">Greed Kills</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 7. PALETTE -->
+  <a href="palette.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/palette.png" alt="Palette" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🎨</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 07</span>
+      <h2 class="card-title">PALETTE</h2>
+      <p class="card-desc">Match the target color using three sliders. Sounds easy? Five rounds. Same colors for everyone today. Discover your Color IQ and find out if your eyes betray you.</p>
+      <div class="card-tags">
+        <span class="tag">Daily</span>
+        <span class="tag">Color IQ</span>
+        <span class="tag">Self-Discovery</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 8. PAC-MAN AMNESIA -->
+  <a href="pacman-amnesia.html" class="game-card" data-accent="white">
+    <div class="card-screenshot">
+      <img src="screenshots/pacman-amnesia.png" alt="Pac-Man Amnesia" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">👻</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 08</span>
+      <h2 class="card-title">PAC-MAN AMNESIA</h2>
+      <p class="card-desc">Pac-Man, but the maze is invisible. You see only a tiny radius around you. The ghosts can see everything. Every 50 dots the maze flashes for 2 seconds — memorize fast.</p>
+      <div class="card-tags">
+        <span class="tag">Horror</span>
+        <span class="tag">Fog of War</span>
+        <span class="tag">Memory</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
 </div>
 
-<script>
-(() => {
-  // --- CONFIG ---
-  const GRID = 20;
-  const BASE_SPEED = 120;        // ms per tick at start
-  const MIN_SPEED = 55;          // fastest possible
-  const SPEED_DECAY = 0.997;     // multiplier each tick
-  const EASY_PTS = 10;
-  const HARD_PTS = 50;
-  const EASY_GROW = 1;
-  const HARD_GROW = 3;
+<footer>
+  <p>ALL GAMES RUN IN YOUR BROWSER — NO INSTALL — NO SIGNUP — JUST PLAY</p>
+</footer>
 
-  // --- ELEMENTS ---
-  const canvas = document.getElementById('game-canvas');
-  const ctx = canvas.getContext('2d');
-  const scoreEl = document.getElementById('score-val');
-  const bestEl = document.getElementById('best-val');
-  const startOverlay = document.getElementById('start-overlay');
-  const gameoverOverlay = document.getElementById('gameover-overlay');
-  const finalScoreEl = document.getElementById('final-score');
-  const newBestEl = document.getElementById('new-best');
-  const wrapper = document.getElementById('game-wrapper');
-
-  // --- SIZING ---
-  let cols, rows, cellSize;
-
-  function resize() {
-    const maxW = Math.min(window.innerWidth * 0.92, 500);
-    const maxH = Math.min(window.innerHeight * 0.65, 500);
-    const maxCell = Math.floor(Math.min(maxW, maxH) / GRID);
-    cellSize = Math.max(maxCell, 12);
-    cols = GRID;
-    rows = GRID;
-    canvas.width = cols * cellSize;
-    canvas.height = rows * cellSize;
-  }
-
-  resize();
-  window.addEventListener('resize', () => { resize(); draw(); });
-
-  // --- STATE ---
-  let snake, dir, nextDir, score, highScore, growQueue;
-  let easyFood, hardFood;
-  let gameRunning, gameOver, speed, tickTimer;
-  let particles = [];
-  let trail = [];
-
-  highScore = parseInt(localStorage.getItem('neonsnake_best') || '0', 10);
-  bestEl.textContent = highScore;
-
-  function init() {
-    const mid = Math.floor(GRID / 2);
-    snake = [
-      { x: mid, y: mid },
-      { x: mid - 1, y: mid },
-      { x: mid - 2, y: mid },
-    ];
-    dir = { x: 1, y: 0 };
-    nextDir = { x: 1, y: 0 };
-    score = 0;
-    growQueue = 0;
-    speed = BASE_SPEED;
-    particles = [];
-    trail = [];
-    scoreEl.textContent = '0';
-    placeFood('easy');
-    placeFood('hard');
-    gameRunning = true;
-    gameOver = false;
-  }
-
-  function isCellOccupied(x, y) {
-    if (snake.some(s => s.x === x && s.y === y)) return true;
-    if (easyFood && easyFood.x === x && easyFood.y === y) return true;
-    if (hardFood && hardFood.x === x && hardFood.y === y) return true;
-    return false;
-  }
-
-  function placeFood(type) {
-    let x, y, attempts = 0;
-    const WALL_ZONE = 2; // cells from edge considered "wall zone"
-    do {
-      if (type === 'hard') {
-        // spawn within 2 cells of any wall
-        const side = Math.floor(Math.random() * 4);
-        if (side === 0)      { x = Math.floor(Math.random() * WALL_ZONE); y = Math.floor(Math.random() * rows); }
-        else if (side === 1) { x = cols - 1 - Math.floor(Math.random() * WALL_ZONE); y = Math.floor(Math.random() * rows); }
-        else if (side === 2) { y = Math.floor(Math.random() * WALL_ZONE); x = Math.floor(Math.random() * cols); }
-        else                 { y = rows - 1 - Math.floor(Math.random() * WALL_ZONE); x = Math.floor(Math.random() * cols); }
-      } else {
-        // easy: spawn in the inner area, away from walls
-        x = WALL_ZONE + Math.floor(Math.random() * (cols - WALL_ZONE * 2));
-        y = WALL_ZONE + Math.floor(Math.random() * (rows - WALL_ZONE * 2));
-      }
-      attempts++;
-    } while (isCellOccupied(x, y) && attempts < 500);
-    if (type === 'easy') easyFood = { x, y };
-    else hardFood = { x, y };
-  }
-
-  // --- PARTICLES ---
-  function spawnParticles(x, y, color, count) {
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const vel = 1 + Math.random() * 3;
-      particles.push({
-        x: x * cellSize + cellSize / 2,
-        y: y * cellSize + cellSize / 2,
-        vx: Math.cos(angle) * vel,
-        vy: Math.sin(angle) * vel,
-        life: 1,
-        decay: 0.02 + Math.random() * 0.03,
-        color,
-        size: 2 + Math.random() * 3,
-      });
-    }
-  }
-
-  function updateParticles() {
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= p.decay;
-      if (p.life <= 0) particles.splice(i, 1);
-    }
-  }
-
-  // --- SCORE POP ---
-  function showScorePop(gridX, gridY, pts, type) {
-    const canvasRect = canvas.getBoundingClientRect();
-    const wrapperRect = canvas.parentElement.getBoundingClientRect();
-    const px = gridX * cellSize + cellSize / 2 + (canvasRect.left - wrapperRect.left);
-    const py = gridY * cellSize + (canvasRect.top - wrapperRect.top);
-    const el = document.createElement('div');
-    el.className = `score-pop ${type === 'easy' ? 'easy-pop' : 'hard-pop'}`;
-    el.textContent = `+${pts}`;
-    el.style.left = px + 'px';
-    el.style.top = py + 'px';
-    canvas.parentElement.appendChild(el);
-    setTimeout(() => el.remove(), 700);
-  }
-
-  // --- GAME LOOP ---
-  function tick() {
-    if (!gameRunning) return;
-
-    dir = { ...nextDir };
-
-    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-
-    // wall collision
-    if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
-      die();
-      return;
-    }
-
-    // self collision
-    if (snake.some(s => s.x === head.x && s.y === head.y)) {
-      die();
-      return;
-    }
-
-    snake.unshift(head);
-
-    // trail ghost
-    trail.push({ x: head.x, y: head.y, life: 1 });
-
-    // check food
-    let ate = null;
-    if (easyFood && head.x === easyFood.x && head.y === easyFood.y) {
-      ate = 'easy';
-      score += EASY_PTS;
-      growQueue += EASY_GROW;
-      spawnParticles(head.x, head.y, 'rgba(57,255,20,', 8);
-      showScorePop(head.x, head.y, EASY_PTS, 'easy');
-      easyFood = null;
-      hardFood = null;
-      placeFood('easy');
-      placeFood('hard');
-    } else if (hardFood && head.x === hardFood.x && head.y === hardFood.y) {
-      ate = 'hard';
-      score += HARD_PTS;
-      growQueue += HARD_GROW;
-      spawnParticles(head.x, head.y, 'rgba(255,215,0,', 14);
-      showScorePop(head.x, head.y, HARD_PTS, 'hard');
-      easyFood = null;
-      hardFood = null;
-      placeFood('easy');
-      placeFood('hard');
-    }
-
-    if (ate) {
-      scoreEl.textContent = score;
-      scoreEl.classList.add('pop');
-      setTimeout(() => scoreEl.classList.remove('pop'), 120);
-    }
-
-    if (growQueue > 0) {
-      growQueue--;
-    } else {
-      snake.pop();
-    }
-
-    // speed up: hard food gives a bigger speed boost
-    if (ate === 'hard') {
-      speed = Math.max(MIN_SPEED, speed * 0.92);
-    } else if (ate === 'easy') {
-      speed = Math.max(MIN_SPEED, speed * 0.97);
-    }
-    speed = Math.max(MIN_SPEED, speed * SPEED_DECAY);
-
-    updateParticles();
-    for (let i = trail.length - 1; i >= 0; i--) {
-      trail[i].life -= 0.06;
-      if (trail[i].life <= 0) trail.splice(i, 1);
-    }
-
-    draw();
-    tickTimer = setTimeout(tick, speed);
-  }
-
-  function die() {
-    gameRunning = false;
-    gameOver = true;
-    canvas.classList.add('shake');
-    setTimeout(() => canvas.classList.remove('shake'), 250);
-
-    // head explosion
-    spawnParticles(snake[0].x, snake[0].y, 'rgba(255,45,123,', 20);
-
-    const isNewBest = score > highScore;
-    if (isNewBest) {
-      highScore = score;
-      localStorage.setItem('neonsnake_best', highScore);
-      bestEl.textContent = highScore;
-    }
-
-    finalScoreEl.textContent = score;
-    newBestEl.textContent = isNewBest ? 'NEW BEST!' : '';
-
-    // small delay before showing overlay
-    setTimeout(() => {
-      draw(); // final draw with particles
-      gameoverOverlay.classList.add('visible');
-    }, 400);
-  }
-
-  // --- DRAW ---
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-    ctx.lineWidth = 0.5;
-    for (let x = 0; x <= cols; x++) {
-      ctx.beginPath();
-      ctx.moveTo(x * cellSize, 0);
-      ctx.lineTo(x * cellSize, rows * cellSize);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= rows; y++) {
-      ctx.beginPath();
-      ctx.moveTo(0, y * cellSize);
-      ctx.lineTo(cols * cellSize, y * cellSize);
-      ctx.stroke();
-    }
-
-    // trail
-    for (const t of trail) {
-      ctx.fillStyle = `rgba(0,240,255,${t.life * 0.06})`;
-      ctx.fillRect(t.x * cellSize, t.y * cellSize, cellSize, cellSize);
-    }
-
-    // snake body
-    for (let i = snake.length - 1; i >= 0; i--) {
-      const s = snake[i];
-      const t = i / snake.length;
-      const pad = 1;
-
-      if (i === 0) {
-        // head - brighter
-        ctx.fillStyle = '#00f0ff';
-        ctx.shadowColor = 'rgba(0,240,255,0.8)';
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.roundRect(
-          s.x * cellSize + pad,
-          s.y * cellSize + pad,
-          cellSize - pad * 2,
-          cellSize - pad * 2,
-          3
-        );
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      } else {
-        const fade = 0.4 + 0.6 * (1 - t);
-        ctx.fillStyle = `rgba(0,200,220,${fade})`;
-        ctx.fillRect(
-          s.x * cellSize + pad,
-          s.y * cellSize + pad,
-          cellSize - pad * 2,
-          cellSize - pad * 2
-        );
-      }
-    }
-
-    // easy food
-    if (easyFood) {
-      const pulse = 0.7 + 0.3 * Math.sin(Date.now() * 0.005);
-      const ex = easyFood.x * cellSize + cellSize / 2;
-      const ey = easyFood.y * cellSize + cellSize / 2;
-      const r = (cellSize / 2 - 2) * pulse;
-
-      ctx.shadowColor = 'rgba(57,255,20,0.7)';
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = '#39ff14';
-      ctx.beginPath();
-      ctx.arc(ex, ey, r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
-
-    // hard food
-    if (hardFood) {
-      const pulse = 0.75 + 0.25 * Math.sin(Date.now() * 0.008);
-      const hx = hardFood.x * cellSize + cellSize / 2;
-      const hy = hardFood.y * cellSize + cellSize / 2;
-      const r = (cellSize / 2 - 1) * pulse;
-
-      // outer glow
-      ctx.shadowColor = 'rgba(255,215,0,0.9)';
-      ctx.shadowBlur = 20;
-      ctx.fillStyle = '#ffd700';
-      ctx.beginPath();
-      ctx.arc(hx, hy, r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // inner diamond
-      ctx.fillStyle = 'rgba(255,255,255,0.8)';
-      const ir = r * 0.35;
-      ctx.beginPath();
-      ctx.moveTo(hx, hy - ir);
-      ctx.lineTo(hx + ir, hy);
-      ctx.lineTo(hx, hy + ir);
-      ctx.lineTo(hx - ir, hy);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    // particles
-    for (const p of particles) {
-      ctx.fillStyle = p.color + p.life + ')';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  // draw initial state
-  function drawIdle() {
-    init();
-    gameRunning = false;
-    draw();
-  }
-
-  drawIdle();
-
-  // --- INPUT ---
-  function setDirection(dx, dy) {
-    // prevent 180 turn
-    if (dir.x === -dx && dir.y === -dy) return;
-    // prevent queuing same direction
-    if (nextDir.x === dx && nextDir.y === dy) return;
-    nextDir = { x: dx, y: dy };
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.repeat) return;
-
-    // start/restart with space
-    if (e.code === 'Space') {
-      e.preventDefault();
-      if (!gameRunning && !gameOver) {
-        startGame();
-      } else if (gameOver) {
-        restartGame();
-      }
-      return;
-    }
-
-    const key = e.key.toLowerCase();
-    switch (key) {
-      case 'arrowup': case 'w': e.preventDefault(); setDirection(0, -1); break;
-      case 'arrowdown': case 's': e.preventDefault(); setDirection(0, 1); break;
-      case 'arrowleft': case 'a': e.preventDefault(); setDirection(-1, 0); break;
-      case 'arrowright': case 'd': e.preventDefault(); setDirection(1, 0); break;
-    }
-  });
-
-  // touch / swipe
-  let touchStartX, touchStartY;
-
-  canvas.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
-  }, { passive: true });
-
-  canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-  }, { passive: false });
-
-  canvas.addEventListener('touchend', (e) => {
-    if (touchStartX === undefined) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX;
-    const dy = t.clientY - touchStartY;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (Math.max(absDx, absDy) < 15) {
-      // tap - start or restart
-      if (!gameRunning && !gameOver) startGame();
-      else if (gameOver) restartGame();
-      return;
-    }
-
-    if (absDx > absDy) {
-      setDirection(dx > 0 ? 1 : -1, 0);
-    } else {
-      setDirection(0, dy > 0 ? 1 : -1);
-    }
-  });
-
-  // buttons
-  document.getElementById('start-btn').addEventListener('click', startGame);
-  document.getElementById('retry-btn').addEventListener('click', restartGame);
-
-  function startGame() {
-    startOverlay.classList.remove('visible');
-    init();
-    tickTimer = setTimeout(tick, speed);
-  }
-
-  function restartGame() {
-    gameoverOverlay.classList.remove('visible');
-    clearTimeout(tickTimer);
-    init();
-    draw();
-    tickTimer = setTimeout(tick, speed);
-  }
-
-  // keep particles/food animating during idle
-  function renderLoop() {
-    if (!gameRunning && !gameOver) {
-      draw();
-    } else if (gameOver) {
-      updateParticles();
-      draw();
-    }
-    requestAnimationFrame(renderLoop);
-  }
-  requestAnimationFrame(renderLoop);
-})();
-</script>
 </body>
 </html>

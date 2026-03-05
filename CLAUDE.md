@@ -11,8 +11,8 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 
 ## File Structure
 ```
-landing.html              # Main landing page (NEON ARCADE hub)
-index.html                # Neon Snake (the original)
+index.html                # Main landing page (NEON ARCADE hub)
+neon-snake.html           # Neon Snake (the original)
 impostor-pixel.html       # Spot the different tile
 catalyst.html             # One-touch chain reaction
 pong-both-sides.html      # Control both paddles
