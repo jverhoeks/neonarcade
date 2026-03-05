@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BURNDOWN - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+  --fire-red: #ff4500;
+  --fire-yellow: #ffcc00;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(255,140,0,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 90%, rgba(255,45,123,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,69,0,0.04) 0%, transparent 60%);
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 20px; }
+.screen.active { display: flex; }
+
+/* START SCREEN */
+#startScreen .title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: 6px;
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255,140,0,0.6), 0 0 40px rgba(255,140,0,0.2), 0 0 80px rgba(255,69,0,0.15);
+  margin-bottom: 8px;
+}
+
+#startScreen .subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 20px);
+  letter-spacing: 3px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  text-align: center;
+  max-width: 400px;
+}
+
+#startScreen .tower-num {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 3vw, 22px);
+  color: var(--fire-yellow);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 10px rgba(255,204,0,0.4);
+}
+
+#startScreen .daily-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+#startScreen .best-time {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--text-mid);
+  margin-bottom: 30px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-orange);
+  background: rgba(255,140,0,0.06);
+  color: var(--neon-orange);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(255,140,0,0.15); box-shadow: 0 0 20px rgba(255,140,0,0.2); transform: scale(1.04); }
+.play-btn:active { transform: scale(0.98); }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+
+/* GAME SCREEN */
+#gameScreen {
+  justify-content: flex-start;
+  padding: 10px 15px;
+}
+
+.game-header {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.timer {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(20px, 5vw, 32px);
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255,140,0,0.5);
+}
+
+.progress-label {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: clamp(12px, 3vw, 16px);
+  color: var(--text-mid);
+  letter-spacing: 2px;
+}
+
+.mistakes-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--neon-pink);
+  letter-spacing: 1px;
+}
+
+/* TOWER */
+.tower-container {
+  width: 100%;
+  max-width: 500px;
+  height: 160px;
+  position: relative;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.tower-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 2px;
+  transition: transform 0.3s ease;
+}
+
+.tower-block {
+  width: clamp(60px, 20vw, 100px);
+  height: 7px;
+  border-radius: 1px;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.tower-block.done {
+  animation: blockBurn 0.6s forwards;
+}
+
+@keyframes blockBurn {
+  0% { opacity: 1; transform: translateX(0) rotate(0); }
+  30% { background: var(--fire-red) !important; box-shadow: 0 0 12px rgba(255,69,0,0.8); }
+  100% { opacity: 0; transform: translateX(40px) rotate(15deg) translateY(20px); }
+}
+
+/* TASK AREA */
+.task-area {
+  width: 100%;
+  max-width: 500px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-type {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.task-prompt {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: clamp(20px, 5vw, 32px);
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  min-height: 40px;
+  line-height: 1.2;
+}
+
+.stroop-word {
+  font-size: clamp(28px, 7vw, 48px);
+  font-weight: 900;
+}
+
+.stroop-hint {
+  font-size: 0.6em;
+  color: var(--text-mid);
+}
+
+.input-area {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.text-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 16px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-align: center;
+  background: rgba(255,140,0,0.06);
+  border: 1px solid rgba(255,140,0,0.3);
+  border-radius: 3px;
+  color: #fff;
+  outline: none;
+  text-transform: uppercase;
+}
+.text-input:focus { border-color: var(--neon-orange); box-shadow: 0 0 15px rgba(255,140,0,0.2); }
+
+.submit-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 12px 50px;
+  border: 1px solid var(--neon-orange);
+  background: rgba(255,140,0,0.1);
+  color: var(--neon-orange);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.submit-btn:hover { background: rgba(255,140,0,0.2); box-shadow: 0 0 20px rgba(255,140,0,0.25); }
+.submit-btn:active { transform: scale(0.96); }
+
+/* REFLEX DOTS */
+.dots-container {
+  display: flex;
+  gap: clamp(10px, 3vw, 20px);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.reflex-dot {
+  width: clamp(48px, 12vw, 70px);
+  height: clamp(48px, 12vw, 70px);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+  border: 2px solid rgba(255,255,255,0.15);
+}
+.reflex-dot:active { transform: scale(0.9); }
+
+/* SPEED TAP */
+.tap-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(16px, 4vw, 24px);
+  padding: clamp(20px, 5vw, 35px) clamp(40px, 10vw, 80px);
+  border: 2px solid var(--neon-orange);
+  background: rgba(255,140,0,0.12);
+  color: var(--neon-orange);
+  cursor: pointer;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.08s;
+  text-shadow: 0 0 10px rgba(255,140,0,0.5);
+}
+.tap-btn:active { transform: scale(0.95); background: rgba(255,140,0,0.25); }
+
+.tap-counter {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(28px, 7vw, 48px);
+  color: var(--fire-yellow);
+  text-shadow: 0 0 15px rgba(255,204,0,0.5);
+  margin-bottom: 10px;
+}
+
+/* MEMORY DISPLAY */
+.memory-numbers {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(28px, 7vw, 48px);
+  letter-spacing: 12px;
+  color: var(--neon-orange);
+  text-shadow: 0 0 15px rgba(255,140,0,0.6);
+  margin-bottom: 15px;
+}
+
+/* PENALTY FLASH */
+.penalty-flash {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,45,123,0.15);
+  z-index: 100;
+  pointer-events: none;
+  animation: penaltyFade 0.4s forwards;
+}
+@keyframes penaltyFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* SCREEN SHAKE */
+.shake {
+  animation: shakeAnim 0.25s;
+}
+@keyframes shakeAnim {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+}
+
+/* RESULT SCREEN */
+#resultScreen .result-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(28px, 6vw, 48px);
+  letter-spacing: 4px;
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255,140,0,0.6), 0 0 40px rgba(255,140,0,0.2);
+  margin-bottom: 8px;
+}
+
+#resultScreen .result-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.result-stats {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 8px;
+}
+
+.stat-box { text-align: center; }
+.stat-box .stat-val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(24px, 6vw, 36px);
+  color: var(--fire-yellow);
+  text-shadow: 0 0 10px rgba(255,204,0,0.4);
+}
+.stat-box .stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.result-best {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--neon-green);
+  margin-bottom: 6px;
+}
+
+.result-percentile {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--neon-purple);
+  margin-bottom: 24px;
+}
+
+.result-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 12px 36px;
+  border: 1px solid var(--neon-green);
+  background: rgba(57,255,20,0.06);
+  color: var(--neon-green);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+
+.challenge-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 12px 36px;
+  border: 1px solid var(--neon-purple);
+  background: rgba(180,77,255,0.06);
+  color: var(--neon-purple);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.challenge-btn:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 20px rgba(180,77,255,0.2); }
+
+.copied-msg {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--neon-green);
+  opacity: 0;
+  transition: opacity 0.3s;
+  height: 20px;
+}
+.copied-msg.show { opacity: 1; }
+
+/* FIRE PARTICLES */
+#fireCanvas {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+</style>
+</head>
+<body>
+<canvas id="fireCanvas"></canvas>
+<div id="app">
+
+  <div id="startScreen" class="screen active">
+    <div class="title">BURNDOWN</div>
+    <div class="subtitle">Race through 20 micro-tasks. Wrong answers cost 3 seconds. Burn the tower down.</div>
+    <div class="tower-num" id="towerNum">TOWER #1</div>
+    <div class="daily-label">DAILY CHALLENGE</div>
+    <div class="best-time" id="bestTimeDisplay"></div>
+    <button class="play-btn" id="startBtn">IGNITE</button>
+    <div class="controls-hint">TYPE ANSWERS / TAP TARGETS / ENTER TO SUBMIT</div>
+  </div>
+
+  <div id="gameScreen" class="screen">
+    <div class="game-header">
+      <div class="timer" id="timerDisplay">0:00.0</div>
+      <div class="progress-label" id="progressLabel">1 / 20</div>
+      <div class="mistakes-label" id="mistakesLabel"></div>
+    </div>
+    <div class="tower-container" id="towerContainer">
+      <div class="tower-wrap" id="towerWrap"></div>
+    </div>
+    <div class="task-area" id="taskArea">
+      <div class="task-type" id="taskType"></div>
+      <div class="task-prompt" id="taskPrompt"></div>
+      <div class="input-area" id="inputArea"></div>
+    </div>
+  </div>
+
+  <div id="resultScreen" class="screen">
+    <div class="result-title">TOWER CLEARED</div>
+    <div class="result-subtitle" id="resultSubtitle">THE TOWER HAS FALLEN</div>
+    <div class="result-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="resultTime">0:00.0</div>
+        <div class="stat-label">TIME</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="resultMistakes">0</div>
+        <div class="stat-label">MISTAKES</div>
+      </div>
+    </div>
+    <div class="result-best" id="resultBest"></div>
+    <div class="result-percentile" id="resultPercentile"></div>
+    <div class="result-buttons">
+      <button class="share-btn" id="shareBtn">SHARE RESULT</button>
+      <button class="challenge-btn" id="challengeBtn">CHALLENGE LINK</button>
+      <div class="copied-msg" id="copiedMsg">COPIED TO CLIPBOARD</div>
+      <button class="play-btn" id="replayBtn" style="margin-top:8px;">PLAY AGAIN</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  // ============= CONFIG =============
+  const TOTAL_BLOCKS = 20;
+  const PENALTY_SECONDS = 3;
+  const SPEED_TAP_TARGET = 10;
+  const MEMORY_SHOW_MS = 2000;
+
+  // ============= AUDIO =============
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTick() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(880, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    o.start(); o.stop(audioCtx.currentTime + 0.1);
+  }
+
+  function playWhoosh() {
+    ensureAudio();
+    const bufSize = audioCtx.sampleRate * 0.3;
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const filt = audioCtx.createBiquadFilter();
+    filt.type = 'bandpass';
+    filt.frequency.setValueAtTime(2000, audioCtx.currentTime);
+    filt.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.3);
+    filt.Q.value = 2;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
+    src.start(); src.stop(audioCtx.currentTime + 0.3);
+  }
+
+  function playBuzzer() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(150, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    o.start(); o.stop(audioCtx.currentTime + 0.3);
+  }
+
+  function playFanfare() {
+    ensureAudio();
+    const notes = [523, 659, 784, 1047];
+    notes.forEach((freq, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.12);
+      g.gain.setValueAtTime(0, audioCtx.currentTime);
+      g.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + i * 0.12);
+      g.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.12 + 0.1);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.12 + 0.4);
+      o.start(audioCtx.currentTime + i * 0.12);
+      o.stop(audioCtx.currentTime + i * 0.12 + 0.4);
+    });
+  }
+
+  // ============= SEEDED RNG =============
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function getDailySeed() {
+    var d = new Date();
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  }
+
+  function getTowerNumber(seed) {
+    var rng = mulberry32(seed);
+    return Math.floor(rng() * 999) + 1;
+  }
+
+  // ============= TASK BANK (100+ tasks) =============
+  var TRIVIA_TASKS = [
+    { q: "Capital of France?", a: "PARIS" },
+    { q: "Capital of Japan?", a: "TOKYO" },
+    { q: "Capital of Italy?", a: "ROME" },
+    { q: "Capital of Germany?", a: "BERLIN" },
+    { q: "Capital of Spain?", a: "MADRID" },
+    { q: "Capital of Australia?", a: "CANBERRA" },
+    { q: "Capital of Brazil?", a: "BRASILIA" },
+    { q: "Capital of Canada?", a: "OTTAWA" },
+    { q: "Capital of Egypt?", a: "CAIRO" },
+    { q: "Capital of India?", a: "NEW DELHI" },
+    { q: "Largest planet in our solar system?", a: "JUPITER" },
+    { q: "Smallest planet in our solar system?", a: "MERCURY" },
+    { q: "How many sides does a hexagon have?", a: "6" },
+    { q: "What color mixing red and blue?", a: "PURPLE" },
+    { q: "What color mixing red and yellow?", a: "ORANGE" },
+    { q: "How many continents are there?", a: "7" },
+    { q: "Largest ocean on Earth?", a: "PACIFIC" },
+    { q: "How many legs does a spider have?", a: "8" },
+    { q: "Chemical symbol for gold?", a: "AU" },
+    { q: "Chemical symbol for water?", a: "H2O" },
+    { q: "What planet is known as the Red Planet?", a: "MARS" },
+    { q: "How many days in a leap year?", a: "366" },
+    { q: "What is the hardest natural substance?", a: "DIAMOND" },
+    { q: "Capital of Thailand?", a: "BANGKOK" },
+    { q: "How many bones in the human body?", a: "206" },
+    { q: "Fastest land animal?", a: "CHEETAH" },
+    { q: "Which element has atomic number 1?", a: "HYDROGEN" },
+    { q: "Capital of Argentina?", a: "BUENOS AIRES" },
+    { q: "How many teeth does an adult have?", a: "32" },
+    { q: "What is the boiling point of water in Celsius?", a: "100" }
+  ];
+
+  var MATH_TASKS = [
+    { q: "7 + 8 x 3 = ?", a: "31" },
+    { q: "12 x 12 = ?", a: "144" },
+    { q: "100 - 37 = ?", a: "63" },
+    { q: "9 x 9 = ?", a: "81" },
+    { q: "56 / 8 = ?", a: "7" },
+    { q: "15 + 27 = ?", a: "42" },
+    { q: "3 x 17 = ?", a: "51" },
+    { q: "200 - 88 = ?", a: "112" },
+    { q: "11 x 11 = ?", a: "121" },
+    { q: "45 + 55 = ?", a: "100" },
+    { q: "6 x 7 + 2 = ?", a: "44" },
+    { q: "99 - 33 = ?", a: "66" },
+    { q: "8 x 8 = ?", a: "64" },
+    { q: "150 / 5 = ?", a: "30" },
+    { q: "25 x 4 = ?", a: "100" },
+    { q: "7 x 7 = ?", a: "49" },
+    { q: "144 / 12 = ?", a: "12" },
+    { q: "33 + 67 = ?", a: "100" },
+    { q: "5 x 5 + 5 = ?", a: "30" },
+    { q: "1000 - 777 = ?", a: "223" }
+  ];
+
+  var WORD_TASKS = [
+    { word: "HELLO", a: "OLLEH" },
+    { word: "WORLD", a: "DLROW" },
+    { word: "SPEED", a: "DEEPS" },
+    { word: "FLAME", a: "EMALF" },
+    { word: "TOWER", a: "REWOT" },
+    { word: "BLAZE", a: "EZALB" },
+    { word: "STORM", a: "MROTS" },
+    { word: "LIGHT", a: "THGIL" },
+    { word: "BRAIN", a: "NIARB" },
+    { word: "QUICK", a: "KCIUQ" },
+    { word: "SHARP", a: "PRAHS" },
+    { word: "NIGHT", a: "THGIN" },
+    { word: "POWER", a: "REWOP" },
+    { word: "GHOST", a: "TSOHG" },
+    { word: "CYBER", a: "REBYC" },
+    { word: "CRISP", a: "PSIRC" },
+    { word: "DRIFT", a: "TFIRD" },
+    { word: "SWIRL", a: "LRIWS" },
+    { word: "PRISM", a: "MSIRP" },
+    { word: "GLYPH", a: "HPYLG" }
+  ];
+
+  var PATTERN_TASKS = [
+    { seq: "2, 4, 8, ?", a: "16" },
+    { seq: "1, 3, 5, 7, ?", a: "9" },
+    { seq: "3, 6, 9, 12, ?", a: "15" },
+    { seq: "1, 4, 9, 16, ?", a: "25" },
+    { seq: "2, 6, 18, 54, ?", a: "162" },
+    { seq: "10, 20, 30, 40, ?", a: "50" },
+    { seq: "1, 1, 2, 3, 5, ?", a: "8" },
+    { seq: "5, 10, 20, 40, ?", a: "80" },
+    { seq: "1, 2, 4, 7, 11, ?", a: "16" },
+    { seq: "3, 9, 27, 81, ?", a: "243" },
+    { seq: "7, 14, 21, 28, ?", a: "35" },
+    { seq: "4, 8, 16, 32, ?", a: "64" },
+    { seq: "6, 12, 24, 48, ?", a: "96" },
+    { seq: "50, 45, 40, 35, ?", a: "30" },
+    { seq: "1, 3, 9, 27, ?", a: "81" }
+  ];
+
+  var COLOR_TASKS = [
+    { word: "BLUE", textColor: "#ff2d2d", colorName: "red", a: "RED" },
+    { word: "RED", textColor: "#39ff14", colorName: "green", a: "GREEN" },
+    { word: "GREEN", textColor: "#4488ff", colorName: "blue", a: "BLUE" },
+    { word: "YELLOW", textColor: "#b44dff", colorName: "purple", a: "PURPLE" },
+    { word: "PURPLE", textColor: "#ff8c00", colorName: "orange", a: "ORANGE" },
+    { word: "ORANGE", textColor: "#ff2d2d", colorName: "red", a: "RED" },
+    { word: "RED", textColor: "#4488ff", colorName: "blue", a: "BLUE" },
+    { word: "GREEN", textColor: "#ff2d2d", colorName: "red", a: "RED" },
+    { word: "BLUE", textColor: "#39ff14", colorName: "green", a: "GREEN" },
+    { word: "YELLOW", textColor: "#ff2d2d", colorName: "red", a: "RED" },
+    { word: "PURPLE", textColor: "#39ff14", colorName: "green", a: "GREEN" },
+    { word: "RED", textColor: "#ff8c00", colorName: "orange", a: "ORANGE" },
+    { word: "ORANGE", textColor: "#4488ff", colorName: "blue", a: "BLUE" },
+    { word: "GREEN", textColor: "#b44dff", colorName: "purple", a: "PURPLE" },
+    { word: "BLUE", textColor: "#ff8c00", colorName: "orange", a: "ORANGE" }
+  ];
+
+  var REFLEX_COLORS = ['#ff2d2d', '#39ff14', '#4488ff', '#ffd700', '#ff2dff'];
+  var REFLEX_NAMES = ['RED', 'GREEN', 'BLUE', 'YELLOW', 'PINK'];
+
+  // ============= GENERATE TASKS =============
+  function generateTasks(seed) {
+    var rng = mulberry32(seed);
+    var types = ['TRIVIA', 'MATH', 'WORD', 'PATTERN', 'COLOR', 'REFLEX', 'SPEED', 'MEMORY'];
+    var taskList = [];
+
+    for (var i = 0; i < TOTAL_BLOCKS; i++) {
+      var typeIdx = Math.floor(rng() * types.length);
+      var type = types[typeIdx];
+      var task;
+
+      if (type === 'TRIVIA') {
+        var t = TRIVIA_TASKS[Math.floor(rng() * TRIVIA_TASKS.length)];
+        task = { type: 'TRIVIA', prompt: t.q, answer: t.a };
+      } else if (type === 'MATH') {
+        var t = MATH_TASKS[Math.floor(rng() * MATH_TASKS.length)];
+        task = { type: 'MATH', prompt: t.q, answer: t.a };
+      } else if (type === 'WORD') {
+        var t = WORD_TASKS[Math.floor(rng() * WORD_TASKS.length)];
+        task = { type: 'WORD', prompt: 'Type this backwards: ' + t.word, answer: t.a };
+      } else if (type === 'PATTERN') {
+        var t = PATTERN_TASKS[Math.floor(rng() * PATTERN_TASKS.length)];
+        task = { type: 'PATTERN', prompt: 'What comes next: ' + t.seq, answer: t.a };
+      } else if (type === 'COLOR') {
+        var t = COLOR_TASKS[Math.floor(rng() * COLOR_TASKS.length)];
+        task = { type: 'COLOR', word: t.word, textColor: t.textColor, prompt: 'What COLOR is the text?', answer: t.a };
+      } else if (type === 'REFLEX') {
+        var targetIdx = Math.floor(rng() * 5);
+        var order = [0, 1, 2, 3, 4];
+        for (var j = order.length - 1; j > 0; j--) {
+          var k = Math.floor(rng() * (j + 1));
+          var tmp = order[j]; order[j] = order[k]; order[k] = tmp;
+        }
+        task = { type: 'REFLEX', targetColor: REFLEX_NAMES[targetIdx], targetIdx: targetIdx, order: order, prompt: 'Tap the ' + REFLEX_NAMES[targetIdx] + ' dot' };
+      } else if (type === 'SPEED') {
+        task = { type: 'SPEED', prompt: 'Tap this button ' + SPEED_TAP_TARGET + ' times!', target: SPEED_TAP_TARGET };
+      } else if (type === 'MEMORY') {
+        var nums = [];
+        for (var j = 0; j < 4; j++) nums.push(Math.floor(rng() * 9) + 1);
+        var askIdx = Math.floor(rng() * 4);
+        var ordinal = ['1st', '2nd', '3rd', '4th'][askIdx];
+        task = { type: 'MEMORY', nums: nums, askIdx: askIdx, ordinal: ordinal, prompt: 'What was the ' + ordinal + ' number?', answer: String(nums[askIdx]) };
+      }
+      taskList.push(task);
+    }
+    return taskList;
+  }
+
+  // ============= DOM REFS =============
+  var startScreen = document.getElementById('startScreen');
+  var gameScreen = document.getElementById('gameScreen');
+  var resultScreen = document.getElementById('resultScreen');
+  var startBtn = document.getElementById('startBtn');
+  var replayBtn = document.getElementById('replayBtn');
+  var shareBtn = document.getElementById('shareBtn');
+  var challengeBtn = document.getElementById('challengeBtn');
+  var copiedMsg = document.getElementById('copiedMsg');
+  var timerDisplay = document.getElementById('timerDisplay');
+  var progressLabel = document.getElementById('progressLabel');
+  var mistakesLabel = document.getElementById('mistakesLabel');
+  var towerWrap = document.getElementById('towerWrap');
+  var taskType = document.getElementById('taskType');
+  var taskPrompt = document.getElementById('taskPrompt');
+  var inputArea = document.getElementById('inputArea');
+  var towerNumEl = document.getElementById('towerNum');
+  var bestTimeDisplay = document.getElementById('bestTimeDisplay');
+  var resultTime = document.getElementById('resultTime');
+  var resultMistakes = document.getElementById('resultMistakes');
+  var resultBest = document.getElementById('resultBest');
+  var resultPercentile = document.getElementById('resultPercentile');
+  var fireCanvas = document.getElementById('fireCanvas');
+  var fireCtx = fireCanvas.getContext('2d');
+
+  // ============= GAME STATE =============
+  var currentSeed, towerNumber, tasks;
+  var currentTask = 0;
+  var mistakes = 0;
+  var startTime = 0;
+  var penaltyTime = 0;
+  var timerRAF;
+  var tapCount = 0;
+  var memoryPhase = '';
+  var isRunning = false;
+  var finalElapsed = 0;
+
+  // ============= FIRE PARTICLES =============
+  var fireParticles = [];
+  var dpr = window.devicePixelRatio || 1;
+
+  function resizeFireCanvas() {
+    dpr = window.devicePixelRatio || 1;
+    fireCanvas.width = window.innerWidth * dpr;
+    fireCanvas.height = window.innerHeight * dpr;
+    fireCanvas.style.width = window.innerWidth + 'px';
+    fireCanvas.style.height = window.innerHeight + 'px';
+    fireCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resizeFireCanvas();
+  window.addEventListener('resize', resizeFireCanvas);
+
+  function spawnFireParticles(x, y, count) {
+    for (var i = 0; i < count; i++) {
+      var colors = ['#ff4500', '#ffcc00', '#ff8c00', '#ff6633', '#ffaa00'];
+      fireParticles.push({
+        x: x + (Math.random() - 0.5) * 40,
+        y: y + (Math.random() - 0.5) * 20,
+        vx: (Math.random() - 0.5) * 3,
+        vy: -Math.random() * 4 - 1,
+        life: 1,
+        decay: Math.random() * 0.03 + 0.015,
+        size: Math.random() * 4 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+  }
+
+  function updateFireParticles() {
+    fireCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (var i = fireParticles.length - 1; i >= 0; i--) {
+      var p = fireParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy -= 0.02;
+      p.life -= p.decay;
+      if (p.life <= 0) { fireParticles.splice(i, 1); continue; }
+      fireCtx.globalAlpha = p.life;
+      fireCtx.fillStyle = p.color;
+      fireCtx.beginPath();
+      fireCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      fireCtx.fill();
+    }
+    fireCtx.globalAlpha = 1;
+  }
+
+  function ambientFire() {
+    if (isRunning) {
+      var progress = currentTask / TOTAL_BLOCKS;
+      var count = Math.floor(progress * 3) + 1;
+      for (var i = 0; i < count; i++) {
+        fireParticles.push({
+          x: window.innerWidth * Math.random(),
+          y: window.innerHeight + 10,
+          vx: (Math.random() - 0.5) * 1,
+          vy: -Math.random() * 2 - 0.5,
+          life: 0.6,
+          decay: Math.random() * 0.015 + 0.008,
+          size: Math.random() * 3 + 1,
+          color: Math.random() > 0.5 ? 'rgba(255,69,0,0.4)' : 'rgba(255,204,0,0.3)'
+        });
+      }
+    }
+  }
+
+  var idleCounter = 0;
+  function fireLoop() {
+    updateFireParticles();
+    idleCounter++;
+    if (idleCounter % 3 === 0) ambientFire();
+    if (startScreen.classList.contains('active') && idleCounter % 15 === 0) {
+      spawnFireParticles(
+        window.innerWidth / 2 + (Math.random() - 0.5) * 100,
+        window.innerHeight * 0.38,
+        2
+      );
+    }
+    requestAnimationFrame(fireLoop);
+  }
+  fireLoop();
+
+  // ============= SEED / URL =============
+  function getSeedFromURL() {
+    var params = new URLSearchParams(window.location.search);
+    var s = params.get('seed');
+    return s ? parseInt(s, 36) : null;
+  }
+
+  function initGame() {
+    var urlSeed = getSeedFromURL();
+    currentSeed = urlSeed || getDailySeed();
+    towerNumber = getTowerNumber(currentSeed);
+    towerNumEl.textContent = 'TOWER #' + towerNumber;
+
+    var best = localStorage.getItem('burndown_best');
+    if (best) {
+      bestTimeDisplay.textContent = 'BEST: ' + formatTime(parseFloat(best));
+    } else {
+      bestTimeDisplay.textContent = '';
+    }
+
+    tasks = generateTasks(currentSeed);
+  }
+
+  // ============= FORMATTING =============
+  function formatTime(ms) {
+    var totalSec = ms / 1000;
+    var min = Math.floor(totalSec / 60);
+    var sec = totalSec % 60;
+    return min + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1);
+  }
+
+  // ============= SCREENS =============
+  function showScreen(screen) {
+    [startScreen, gameScreen, resultScreen].forEach(function(s) { s.classList.remove('active'); });
+    screen.classList.add('active');
+  }
+
+  // ============= TOWER =============
+  function buildTower() {
+    towerWrap.textContent = '';
+    for (var i = 0; i < TOTAL_BLOCKS; i++) {
+      var hue = 20 + (i / TOTAL_BLOCKS) * 20;
+      var lightness = 50 + (i / TOTAL_BLOCKS) * 15;
+      var color = 'hsl(' + hue + ', 100%, ' + lightness + '%)';
+      var block = document.createElement('div');
+      block.className = 'tower-block';
+      block.dataset.index = i;
+      block.style.background = color;
+      block.style.boxShadow = '0 0 6px ' + color + ', 0 0 12px rgba(255,140,0,0.15)';
+      towerWrap.appendChild(block);
+    }
+  }
+
+  function burnBlock(index) {
+    var blocks = towerWrap.querySelectorAll('.tower-block');
+    var block = blocks[index];
+    if (block) {
+      var rect = block.getBoundingClientRect();
+      spawnFireParticles(rect.left + rect.width / 2, rect.top, 15);
+      block.classList.add('done');
+      playWhoosh();
+    }
+  }
+
+  // ============= TIMER =============
+  function updateTimer() {
+    if (!isRunning) return;
+    var elapsed = Date.now() - startTime + penaltyTime;
+    timerDisplay.textContent = formatTime(elapsed);
+    timerRAF = requestAnimationFrame(updateTimer);
+  }
+
+  function getElapsed() {
+    return Date.now() - startTime + penaltyTime;
+  }
+
+  // ============= TASK RENDERING =============
+  function clearInputArea() {
+    while (inputArea.firstChild) inputArea.removeChild(inputArea.firstChild);
+  }
+
+  function renderTask() {
+    var task = tasks[currentTask];
+    progressLabel.textContent = (currentTask + 1) + ' / ' + TOTAL_BLOCKS;
+    mistakesLabel.textContent = mistakes > 0 ? (mistakes + ' MISTAKE' + (mistakes > 1 ? 'S' : '') + ' (+' + (mistakes * PENALTY_SECONDS) + 's)') : '';
+    taskType.textContent = task.type;
+    clearInputArea();
+
+    if (task.type === 'TRIVIA' || task.type === 'MATH' || task.type === 'WORD' || task.type === 'PATTERN') {
+      taskPrompt.textContent = task.prompt;
+      renderTextInput(task);
+    } else if (task.type === 'COLOR') {
+      taskPrompt.textContent = '';
+      var stroopSpan = document.createElement('span');
+      stroopSpan.className = 'stroop-word';
+      stroopSpan.style.color = task.textColor;
+      stroopSpan.textContent = task.word;
+      taskPrompt.appendChild(stroopSpan);
+      taskPrompt.appendChild(document.createElement('br'));
+      var hintSpan = document.createElement('span');
+      hintSpan.className = 'stroop-hint';
+      hintSpan.textContent = 'What COLOR is the text?';
+      taskPrompt.appendChild(hintSpan);
+      renderTextInput(task);
+    } else if (task.type === 'REFLEX') {
+      taskPrompt.textContent = task.prompt;
+      renderReflexDots(task);
+    } else if (task.type === 'SPEED') {
+      tapCount = 0;
+      taskPrompt.textContent = task.prompt;
+      renderSpeedTap(task);
+    } else if (task.type === 'MEMORY') {
+      memoryPhase = 'show';
+      taskPrompt.textContent = 'MEMORIZE THESE NUMBERS';
+      renderMemoryShow(task);
+    }
+  }
+
+  function renderTextInput(task) {
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'text-input';
+    input.autocomplete = 'off';
+    input.autocapitalize = 'characters';
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('spellcheck', 'false');
+
+    var btn = document.createElement('button');
+    btn.className = 'submit-btn';
+    btn.textContent = 'SUBMIT';
+
+    function submit() {
+      var val = input.value.trim().toUpperCase();
+      if (!val) return;
+      checkAnswer(val, task.answer.toUpperCase());
+    }
+
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') submit();
+    });
+
+    inputArea.appendChild(input);
+    inputArea.appendChild(btn);
+    setTimeout(function() { input.focus(); }, 50);
+  }
+
+  function renderReflexDots(task) {
+    var container = document.createElement('div');
+    container.className = 'dots-container';
+
+    task.order.forEach(function(colorIdx) {
+      var dot = document.createElement('div');
+      dot.className = 'reflex-dot';
+      dot.style.background = REFLEX_COLORS[colorIdx];
+      dot.style.boxShadow = '0 0 10px ' + REFLEX_COLORS[colorIdx];
+      dot.addEventListener('click', function() {
+        if (colorIdx === task.targetIdx) {
+          advanceTask();
+        } else {
+          applyPenalty();
+          dot.style.transform = 'scale(0.8)';
+          setTimeout(function() { dot.style.transform = ''; }, 200);
+        }
+      });
+      container.appendChild(dot);
+    });
+
+    inputArea.appendChild(container);
+  }
+
+  function renderSpeedTap(task) {
+    var counter = document.createElement('div');
+    counter.className = 'tap-counter';
+    counter.textContent = tapCount + ' / ' + task.target;
+
+    var btn = document.createElement('button');
+    btn.className = 'tap-btn';
+    btn.textContent = 'TAP!';
+
+    btn.addEventListener('click', function() {
+      tapCount++;
+      counter.textContent = tapCount + ' / ' + task.target;
+      playTick();
+      if (tapCount >= task.target) {
+        advanceTask();
+      }
+    });
+
+    inputArea.appendChild(counter);
+    inputArea.appendChild(btn);
+  }
+
+  function renderMemoryShow(task) {
+    var display = document.createElement('div');
+    display.className = 'memory-numbers';
+    display.textContent = task.nums.join('  ');
+    inputArea.appendChild(display);
+
+    var memTask = currentTask;
+    setTimeout(function() {
+      if (memoryPhase === 'show' && currentTask === memTask && isRunning) {
+        memoryPhase = 'ask';
+        taskPrompt.textContent = task.prompt;
+        clearInputArea();
+        renderTextInput(task);
+      }
+    }, MEMORY_SHOW_MS);
+  }
+
+  // ============= ANSWER CHECKING =============
+  function checkAnswer(given, expected) {
+    var g = given.replace(/\s+/g, '').toUpperCase();
+    var e = expected.replace(/\s+/g, '').toUpperCase();
+
+    if (g === e) {
+      advanceTask();
+    } else {
+      applyPenalty();
+      var input = inputArea.querySelector('.text-input');
+      if (input) { input.value = ''; input.focus(); }
+    }
+  }
+
+  function applyPenalty() {
+    mistakes++;
+    penaltyTime += PENALTY_SECONDS * 1000;
+    mistakesLabel.textContent = mistakes + ' MISTAKE' + (mistakes > 1 ? 'S' : '') + ' (+' + (mistakes * PENALTY_SECONDS) + 's)';
+    playBuzzer();
+
+    var flash = document.createElement('div');
+    flash.className = 'penalty-flash';
+    document.body.appendChild(flash);
+    setTimeout(function() { if (flash.parentNode) flash.parentNode.removeChild(flash); }, 400);
+
+    var app = document.getElementById('app');
+    app.classList.add('shake');
+    setTimeout(function() { app.classList.remove('shake'); }, 250);
+  }
+
+  function advanceTask() {
+    playTick();
+    burnBlock(currentTask);
+    currentTask++;
+
+    if (currentTask >= TOTAL_BLOCKS) {
+      finishGame();
+      return;
+    }
+
+    setTimeout(function() {
+      renderTask();
+    }, 150);
+  }
+
+  // ============= GAME FLOW =============
+  function startGame() {
+    ensureAudio();
+    currentTask = 0;
+    mistakes = 0;
+    penaltyTime = 0;
+    tapCount = 0;
+    isRunning = true;
+    finalElapsed = 0;
+
+    buildTower();
+    showScreen(gameScreen);
+
+    startTime = Date.now();
+    updateTimer();
+    renderTask();
+  }
+
+  function getPercentile(ms) {
+    var sec = ms / 1000;
+    if (sec < 30) return 1;
+    if (sec < 45) return 3;
+    if (sec < 60) return 8;
+    if (sec < 75) return 15;
+    if (sec < 90) return 25;
+    if (sec < 120) return 40;
+    if (sec < 150) return 55;
+    if (sec < 180) return 70;
+    if (sec < 240) return 85;
+    return 95;
+  }
+
+  function finishGame() {
+    isRunning = false;
+    cancelAnimationFrame(timerRAF);
+    finalElapsed = getElapsed();
+    playFanfare();
+
+    for (var i = 0; i < 5; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          spawnFireParticles(
+            window.innerWidth * (0.2 + Math.random() * 0.6),
+            window.innerHeight * (0.3 + Math.random() * 0.4),
+            20
+          );
+        }, idx * 100);
+      })(i);
+    }
+
+    var best = localStorage.getItem('burndown_best');
+    var isNewBest = !best || finalElapsed < parseFloat(best);
+    if (isNewBest) {
+      localStorage.setItem('burndown_best', finalElapsed.toString());
+    }
+
+    setTimeout(function() {
+      showScreen(resultScreen);
+      resultTime.textContent = formatTime(finalElapsed);
+      resultMistakes.textContent = String(mistakes);
+
+      if (isNewBest) {
+        resultBest.textContent = 'NEW PERSONAL BEST!';
+        resultBest.style.color = 'var(--neon-green)';
+      } else {
+        resultBest.textContent = 'BEST: ' + formatTime(parseFloat(best));
+        resultBest.style.color = 'var(--neon-gold)';
+      }
+
+      resultPercentile.textContent = 'TOP ' + getPercentile(finalElapsed) + '% TODAY';
+    }, 800);
+  }
+
+  // ============= SHARING =============
+  function getShareText() {
+    var percentile = getPercentile(finalElapsed);
+    var timeStr = formatTime(finalElapsed);
+    return '\u{1F525} BURNDOWN\n\u{23F1}\u{FE0F} ' + timeStr + ' | ' + mistakes + ' mistake' + (mistakes !== 1 ? 's' : '') + '\n\u{1F3D7}\u{FE0F} Tower #' + towerNumber + '\nTop ' + percentile + '% today\nThink you\'re faster?';
+  }
+
+  function getChallengeURL() {
+    var base = window.location.origin + window.location.pathname;
+    return base + '?seed=' + currentSeed.toString(36);
+  }
+
+  shareBtn.addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() { flashCopied(); });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() { flashCopied(); });
+    }
+  });
+
+  challengeBtn.addEventListener('click', function() {
+    var url = getChallengeURL();
+    var text = getShareText() + '\n' + url;
+    if (navigator.share) {
+      navigator.share({ text: text, url: url }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() { flashCopied(); });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() { flashCopied(); });
+    }
+  });
+
+  function flashCopied() {
+    copiedMsg.classList.add('show');
+    setTimeout(function() { copiedMsg.classList.remove('show'); }, 2000);
+  }
+
+  // ============= EVENT LISTENERS =============
+  startBtn.addEventListener('click', startGame);
+  replayBtn.addEventListener('click', function() {
+    initGame();
+    startGame();
+  });
+
+  // ============= INIT =============
+  initGame();
+})();
+</script>
+</body>
+</html>

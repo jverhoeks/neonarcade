@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TERRITORY — NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+  --color-blue: #3b82f6;
+  --color-red: #ef4444;
+  --color-green: #22c55e;
+  --color-yellow: #eab308;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,240,255,0.07) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.05) 0%, transparent 50%);
+}
+
+#app { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* START SCREEN */
+#start-screen, #game-screen, #over-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; inset: 0; }
+#start-screen.active, #game-screen.active, #over-screen.active { display: flex; }
+
+.title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(32px, 8vw, 56px); letter-spacing: 6px; text-transform: uppercase; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); margin-bottom: 8px; }
+.subtitle { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(14px, 3vw, 18px); letter-spacing: 3px; text-transform: uppercase; color: var(--text-mid); max-width: 340px; text-align: center; line-height: 1.5; margin-bottom: 32px; }
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.controls-hint { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 2px; color: var(--text-dim); margin-top: 24px; text-transform: uppercase; text-align: center; line-height: 1.6; }
+
+/* GAME SCREEN */
+#game-screen { justify-content: flex-start; padding-top: 12px; gap: 8px; }
+.game-header { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 400px; padding: 0 8px; }
+.turn-label { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px; letter-spacing: 2px; color: var(--text-mid); }
+.turn-count { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 18px; color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+.score-label { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px; letter-spacing: 2px; color: var(--text-mid); }
+.score-value { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 18px; color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
+.grid-container { position: relative; }
+#grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
+.cell {
+  width: var(--cell-size); height: var(--cell-size); border-radius: 3px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s; position: relative; cursor: default;
+}
+.cell.revealed { animation: cellReveal 0.4s ease-out; }
+.cell.pending {
+  border: 2px solid var(--neon-cyan); background: rgba(0,240,255,0.12);
+  box-shadow: 0 0 12px rgba(0,240,255,0.3); cursor: pointer;
+  animation: pendingPulse 1.2s ease-in-out infinite;
+}
+.cell.claimed-blue { background: var(--color-blue); border-color: var(--color-blue); box-shadow: 0 0 6px rgba(59,130,246,0.4); }
+.cell.claimed-red { background: var(--color-red); border-color: var(--color-red); box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+.cell.claimed-green { background: var(--color-green); border-color: var(--color-green); box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+.cell.claimed-yellow { background: var(--color-yellow); border-color: var(--color-yellow); box-shadow: 0 0 6px rgba(234,179,8,0.4); }
+
+@keyframes cellReveal {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes pendingPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(0,240,255,0.3); }
+  50% { box-shadow: 0 0 22px rgba(0,240,255,0.6); }
+}
+
+.color-buttons { display: flex; gap: 10px; padding: 8px 0; }
+.color-btn {
+  width: clamp(56px, 16vw, 72px); height: clamp(56px, 16vw, 72px);
+  border-radius: 6px; border: 2px solid rgba(255,255,255,0.15);
+  cursor: pointer; transition: all 0.15s; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px;
+  letter-spacing: 1px; color: rgba(255,255,255,0.9);
+}
+.color-btn::after {
+  content: attr(data-key); position: absolute; bottom: 4px; right: 6px;
+  font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 300;
+  color: rgba(255,255,255,0.4); letter-spacing: 0;
+}
+.color-btn.btn-blue { background: var(--color-blue); border-color: var(--color-blue); }
+.color-btn.btn-red { background: var(--color-red); border-color: var(--color-red); }
+.color-btn.btn-green { background: var(--color-green); border-color: var(--color-green); }
+.color-btn.btn-yellow { background: var(--color-yellow); border-color: var(--color-yellow); }
+.color-btn:hover { transform: scale(1.08); }
+.color-btn:active { transform: scale(0.95); }
+.color-btn.selected { border-color: #fff; box-shadow: 0 0 16px rgba(255,255,255,0.4); transform: scale(1.08); }
+.color-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+.territory-scores { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.territory-score {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 1px;
+}
+.territory-dot { width: 10px; height: 10px; border-radius: 2px; }
+.territory-dot.dot-blue { background: var(--color-blue); }
+.territory-dot.dot-red { background: var(--color-red); }
+.territory-dot.dot-green { background: var(--color-green); }
+.territory-dot.dot-yellow { background: var(--color-yellow); }
+
+/* OVER SCREEN */
+#over-screen { gap: 12px; padding: 16px; overflow-y: auto; }
+.over-title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(24px, 6vw, 40px); letter-spacing: 4px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); }
+.over-subtitle { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 14px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+
+.final-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; margin: 4px 0; }
+.final-cell { width: var(--final-cell); height: var(--final-cell); border-radius: 2px; background: rgba(255,255,255,0.05); }
+.final-cell.fc-blue { background: var(--color-blue); }
+.final-cell.fc-red { background: var(--color-red); }
+.final-cell.fc-green { background: var(--color-green); }
+.final-cell.fc-yellow { background: var(--color-yellow); }
+.final-cell.fc-empty { background: rgba(255,255,255,0.05); }
+
+.final-scores { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin: 4px 0; }
+.final-score-item { text-align: center; }
+.final-score-color { font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+.final-score-color.fsc-blue { color: var(--color-blue); }
+.final-score-color.fsc-red { color: var(--color-red); }
+.final-score-color.fsc-green { color: var(--color-green); }
+.final-score-color.fsc-yellow { color: var(--color-yellow); }
+.final-score-num { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 22px; }
+
+.total-score { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(28px, 7vw, 44px); color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.2); }
+.total-label { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+.best-score { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px; color: var(--neon-purple); letter-spacing: 1px; }
+.new-best { color: var(--neon-green); animation: newBestPulse 0.6s ease-in-out 3; }
+@keyframes newBestPulse { 50% { transform: scale(1.15); } }
+
+.over-buttons { display: flex; gap: 12px; margin-top: 8px; }
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.08);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.18); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+
+.shake { animation: shake 0.25s ease-in-out; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+.particle {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  pointer-events: none; animation: particleFly 0.7s ease-out forwards;
+}
+@keyframes particleFly {
+  0% { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0); }
+}
+
+.daily-label { font-family: 'Orbitron', monospace; font-weight: 400; font-size: 11px; letter-spacing: 2px; color: var(--neon-purple); text-shadow: 0 0 8px rgba(180,77,255,0.3); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="start-screen" class="active">
+    <div class="daily-label" id="daily-label"></div>
+    <div class="title">TERRITORY</div>
+    <div class="subtitle">Claim cells. Build territories. Maximize your connected regions across 4 colors in 64 turns.</div>
+    <button class="play-btn" id="start-btn">START</button>
+    <div class="controls-hint">
+      KEYS 1-4 TO PICK COLOR<br>
+      CLICK CELL OR AUTO-ASSIGN
+    </div>
+  </div>
+
+  <div id="game-screen">
+    <div class="game-header">
+      <div>
+        <div class="turn-label">TURN</div>
+        <div class="turn-count" id="turn-count">0/64</div>
+      </div>
+      <div class="daily-label" id="game-daily-label"></div>
+      <div style="text-align:right">
+        <div class="score-label">SCORE</div>
+        <div class="score-value" id="live-score">0</div>
+      </div>
+    </div>
+    <div class="grid-container">
+      <div id="grid"></div>
+    </div>
+    <div class="territory-scores" id="territory-scores"></div>
+    <div class="color-buttons" id="color-buttons">
+      <button class="color-btn btn-blue" data-color="blue" data-key="1">BLUE</button>
+      <button class="color-btn btn-red" data-color="red" data-key="2">RED</button>
+      <button class="color-btn btn-green" data-color="green" data-key="3">GRN</button>
+      <button class="color-btn btn-yellow" data-color="yellow" data-key="4">YLW</button>
+    </div>
+  </div>
+
+  <div id="over-screen">
+    <div class="over-title">TERRITORY</div>
+    <div class="over-subtitle">CONQUEST COMPLETE</div>
+    <div class="final-grid" id="final-grid"></div>
+    <div class="final-scores" id="final-scores"></div>
+    <div class="total-label">TOTAL SCORE</div>
+    <div class="total-score" id="total-score"></div>
+    <div class="best-score" id="best-score"></div>
+    <div class="over-buttons">
+      <button class="share-btn" id="share-btn">SHARE</button>
+      <button class="play-btn" id="replay-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+<div class="particles" id="particles"></div>
+
+<script>
+(() => {
+  // === CONFIG ===
+  const GRID = 8;
+  const TOTAL = GRID * GRID;
+  const COLORS = ['blue', 'red', 'green', 'yellow'];
+  const COLOR_EMOJI = { blue: '\u{1F7E6}', red: '\u{1F7E5}', green: '\u{1F7E9}', yellow: '\u{1F7E8}' };
+  const COLOR_HEX = { blue: '#3b82f6', red: '#ef4444', green: '#22c55e', yellow: '#eab308' };
+  const EMPTY_EMOJI = '\u2B1B';
+
+  // === DOM ===
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const overScreen = document.getElementById('over-screen');
+  const gridEl = document.getElementById('grid');
+  const turnCountEl = document.getElementById('turn-count');
+  const liveScoreEl = document.getElementById('live-score');
+  const territoryScoresEl = document.getElementById('territory-scores');
+  const colorButtonsEl = document.getElementById('color-buttons');
+  const finalGridEl = document.getElementById('final-grid');
+  const finalScoresEl = document.getElementById('final-scores');
+  const totalScoreEl = document.getElementById('total-score');
+  const bestScoreEl = document.getElementById('best-score');
+  const startBtn = document.getElementById('start-btn');
+  const shareBtn = document.getElementById('share-btn');
+  const replayBtn = document.getElementById('replay-btn');
+  const particlesEl = document.getElementById('particles');
+  const dailyLabelEl = document.getElementById('daily-label');
+  const gameDailyLabelEl = document.getElementById('game-daily-label');
+
+  // === SIZING ===
+  function updateSizes() {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const maxGrid = Math.min(vw - 24, vh * 0.48, 400);
+    const cellSize = Math.floor((maxGrid - 3 * (GRID - 1)) / GRID);
+    document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
+    const finalCell = Math.min(Math.floor((Math.min(vw - 40, 320) - 2 * 7) / 8), 36);
+    document.documentElement.style.setProperty('--final-cell', finalCell + 'px');
+  }
+  updateSizes();
+  window.addEventListener('resize', updateSizes);
+
+  // === SEEDED RNG (daily mode) ===
+  function getDayNumber() {
+    const epoch = new Date('2024-01-01').getTime();
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return Math.floor((today - epoch) / 86400000);
+  }
+
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function generateRevealOrder(seed) {
+    const rng = mulberry32(seed);
+    const indices = Array.from({ length: TOTAL }, (_, i) => i);
+    for (let i = TOTAL - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices;
+  }
+
+  // === AUDIO ===
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(freq, dur, type, vol) {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol || 0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
+  }
+
+  function soundReveal() { playTone(520, 0.15, 'sine', 0.1); }
+  function soundClaim(colorIdx) {
+    const freqs = [440, 523, 659, 784];
+    playTone(freqs[colorIdx], 0.2, 'triangle', 0.12);
+    setTimeout(function() { playTone(freqs[colorIdx] * 1.25, 0.15, 'triangle', 0.08); }, 80);
+  }
+  function soundGameOver() {
+    [0, 100, 200, 300, 400].forEach(function(d, i) {
+      setTimeout(function() { playTone(330 + i * 110, 0.3, 'sine', 0.1); }, d);
+    });
+  }
+  function soundError() { playTone(180, 0.25, 'sawtooth', 0.08); }
+
+  // === PARTICLES ===
+  function spawnParticles(x, y, color, count) {
+    count = count || 10;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      const dist = 30 + Math.random() * 50;
+      p.style.setProperty('--px', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--py', Math.sin(angle) * dist + 'px');
+      particlesEl.appendChild(p);
+      setTimeout(function() { p.remove(); }, 700);
+    }
+  }
+
+  // === GAME STATE ===
+  let grid = [];
+  let revealOrder = [];
+  let turn = 0;
+  let pendingCell = -1;
+  let selectedColor = 0;
+  let cells = [];
+  let dayNum = 0;
+  let gameActive = false;
+  let territoryStats = { blue: 0, red: 0, green: 0, yellow: 0 };
+
+  // === TERRITORY CALCULATION ===
+  function calcLargestTerritory(color) {
+    const visited = new Array(TOTAL).fill(false);
+    let largest = 0;
+    for (let i = 0; i < TOTAL; i++) {
+      if (visited[i] || grid[i] !== color) continue;
+      let size = 0;
+      const queue = [i];
+      visited[i] = true;
+      while (queue.length) {
+        const idx = queue.shift();
+        size++;
+        const r = Math.floor(idx / GRID), c = idx % GRID;
+        const neighbors = [];
+        if (r > 0) neighbors.push(idx - GRID);
+        if (r < GRID - 1) neighbors.push(idx + GRID);
+        if (c > 0) neighbors.push(idx - 1);
+        if (c < GRID - 1) neighbors.push(idx + 1);
+        for (let ni = 0; ni < neighbors.length; ni++) {
+          const n = neighbors[ni];
+          if (!visited[n] && grid[n] === color) {
+            visited[n] = true;
+            queue.push(n);
+          }
+        }
+      }
+      if (size > largest) largest = size;
+    }
+    return largest;
+  }
+
+  function calcScore() {
+    let total = 0;
+    for (let ci = 0; ci < COLORS.length; ci++) {
+      const c = COLORS[ci];
+      territoryStats[c] = calcLargestTerritory(c);
+      total += territoryStats[c];
+    }
+    return total;
+  }
+
+  // === SCREEN MANAGEMENT ===
+  function showScreen(id) {
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    overScreen.classList.remove('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  // === INIT GRID ===
+  function buildGrid() {
+    gridEl.textContent = '';
+    cells = [];
+    for (let i = 0; i < TOTAL; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.idx = i;
+      (function(idx) {
+        cell.addEventListener('click', function() { onCellClick(idx); });
+      })(i);
+      gridEl.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  // === DAILY PUZZLE NUMBER ===
+  function updateDailyLabel() {
+    dayNum = getDayNumber();
+    const label = 'DAILY #' + dayNum;
+    dailyLabelEl.textContent = label;
+    gameDailyLabelEl.textContent = label;
+  }
+
+  // === UPDATE TERRITORY DISPLAY ===
+  function updateTerritoryDisplay() {
+    territoryScoresEl.textContent = '';
+    for (let ci = 0; ci < COLORS.length; ci++) {
+      const c = COLORS[ci];
+      const item = document.createElement('div');
+      item.className = 'territory-score';
+      const dot = document.createElement('div');
+      dot.className = 'territory-dot dot-' + c;
+      const span = document.createElement('span');
+      span.style.color = COLOR_HEX[c];
+      span.textContent = territoryStats[c];
+      item.appendChild(dot);
+      item.appendChild(span);
+      territoryScoresEl.appendChild(item);
+    }
+  }
+
+  // === UPDATE COLOR BUTTON SELECTION ===
+  function updateColorButtons() {
+    const btns = colorButtonsEl.querySelectorAll('.color-btn');
+    for (let i = 0; i < btns.length; i++) {
+      if (i === selectedColor) {
+        btns[i].classList.add('selected');
+      } else {
+        btns[i].classList.remove('selected');
+      }
+      if (pendingCell === -1 && turn > 0) {
+        btns[i].classList.add('disabled');
+      } else {
+        btns[i].classList.remove('disabled');
+      }
+    }
+  }
+
+  // === REVEAL NEXT CELL ===
+  function revealNext() {
+    if (turn >= TOTAL) {
+      endGame();
+      return;
+    }
+    const idx = revealOrder[turn];
+    pendingCell = idx;
+    cells[idx].classList.add('revealed', 'pending');
+    soundReveal();
+    updateColorButtons();
+  }
+
+  // === CLAIM CELL ===
+  function claimCell(colorIdx) {
+    if (pendingCell === -1 || !gameActive) return;
+    const idx = pendingCell;
+    const color = COLORS[colorIdx];
+    grid[idx] = color;
+    cells[idx].classList.remove('pending');
+    cells[idx].className = 'cell revealed claimed-' + color;
+
+    const rect = cells[idx].getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, COLOR_HEX[color], 8);
+
+    soundClaim(colorIdx);
+    pendingCell = -1;
+    turn++;
+
+    const score = calcScore();
+    liveScoreEl.textContent = score;
+    turnCountEl.textContent = turn + '/64';
+    updateTerritoryDisplay();
+
+    if (turn >= TOTAL) {
+      setTimeout(endGame, 400);
+    } else {
+      setTimeout(revealNext, 350);
+    }
+  }
+
+  // === CELL CLICK ===
+  function onCellClick(idx) {
+    if (idx === pendingCell && gameActive) {
+      claimCell(selectedColor);
+    }
+  }
+
+  // === COLOR BUTTON CLICK ===
+  function onColorBtnClick(e) {
+    var btn = e.currentTarget;
+    var colorIdx = COLORS.indexOf(btn.dataset.color);
+    selectedColor = colorIdx;
+    updateColorButtons();
+    if (pendingCell !== -1 && gameActive) {
+      claimCell(colorIdx);
+    }
+  }
+
+  // === KEYBOARD ===
+  document.addEventListener('keydown', function(e) {
+    if (!gameActive) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (startScreen.classList.contains('active')) startGame();
+        else if (overScreen.classList.contains('active')) startGame();
+      }
+      return;
+    }
+    var num = parseInt(e.key);
+    if (num >= 1 && num <= 4) {
+      selectedColor = num - 1;
+      updateColorButtons();
+      if (pendingCell !== -1) {
+        claimCell(num - 1);
+      }
+    }
+  });
+
+  // === START GAME ===
+  function startGame() {
+    ensureAudio();
+    grid = new Array(TOTAL).fill(null);
+    turn = 0;
+    pendingCell = -1;
+    selectedColor = 0;
+    territoryStats = { blue: 0, red: 0, green: 0, yellow: 0 };
+    gameActive = true;
+
+    dayNum = getDayNumber();
+    revealOrder = generateRevealOrder(dayNum);
+
+    buildGrid();
+    liveScoreEl.textContent = '0';
+    turnCountEl.textContent = '0/64';
+    updateTerritoryDisplay();
+    updateColorButtons();
+    showScreen('game-screen');
+
+    setTimeout(revealNext, 400);
+  }
+
+  // === END GAME ===
+  function endGame() {
+    gameActive = false;
+    var score = calcScore();
+    soundGameOver();
+
+    finalGridEl.textContent = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'final-cell' + (grid[i] ? ' fc-' + grid[i] : ' fc-empty');
+      finalGridEl.appendChild(cell);
+    }
+
+    finalScoresEl.textContent = '';
+    for (let ci = 0; ci < COLORS.length; ci++) {
+      const c = COLORS[ci];
+      const item = document.createElement('div');
+      item.className = 'final-score-item';
+      const colorLabel = document.createElement('div');
+      colorLabel.className = 'final-score-color fsc-' + c;
+      colorLabel.textContent = c.toUpperCase();
+      const numLabel = document.createElement('div');
+      numLabel.className = 'final-score-num';
+      numLabel.style.color = COLOR_HEX[c];
+      numLabel.textContent = territoryStats[c];
+      item.appendChild(colorLabel);
+      item.appendChild(numLabel);
+      finalScoresEl.appendChild(item);
+    }
+
+    totalScoreEl.textContent = score + '/64';
+
+    var key = 'territory_best';
+    var best = parseInt(localStorage.getItem(key)) || 0;
+    if (score > best) {
+      localStorage.setItem(key, score);
+      bestScoreEl.textContent = 'NEW BEST!';
+      bestScoreEl.className = 'best-score new-best';
+    } else {
+      bestScoreEl.textContent = 'BEST: ' + best;
+      bestScoreEl.className = 'best-score';
+    }
+
+    showScreen('over-screen');
+
+    setTimeout(function() {
+      for (let ci = 0; ci < COLORS.length; ci++) {
+        spawnParticles(
+          window.innerWidth * (0.2 + Math.random() * 0.6),
+          window.innerHeight * (0.3 + Math.random() * 0.3),
+          COLOR_HEX[COLORS[ci]], 15
+        );
+      }
+    }, 300);
+  }
+
+  // === SHARE ===
+  function getShareText() {
+    var score = calcScore();
+    var gridStr = '';
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        var color = grid[r * GRID + c];
+        gridStr += color ? COLOR_EMOJI[color] : EMPTY_EMOJI;
+      }
+      gridStr += '\n';
+    }
+    return '\u{1F5FA}\u{FE0F} TERRITORY #' + dayNum + '\n'
+      + '\u{1F7E6} Blue: ' + territoryStats.blue + '  \u{1F7E5} Red: ' + territoryStats.red + '\n'
+      + '\u{1F7E9} Green: ' + territoryStats.green + '  \u{1F7E8} Yellow: ' + territoryStats.yellow + '\n'
+      + 'Total: ' + score + '/64\n'
+      + gridStr
+      + 'neonarcade.fun';
+  }
+
+  function shareResult() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      shareBtn.textContent = 'COPIED!';
+      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+    }).catch(function() {
+      shareBtn.textContent = 'FAILED';
+      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+    });
+  }
+
+  // === EVENT LISTENERS ===
+  startBtn.addEventListener('click', startGame);
+  replayBtn.addEventListener('click', startGame);
+  shareBtn.addEventListener('click', shareResult);
+
+  var colorBtns = colorButtonsEl.querySelectorAll('.color-btn');
+  for (var bi = 0; bi < colorBtns.length; bi++) {
+    colorBtns[bi].addEventListener('click', onColorBtnClick);
+  }
+
+  // === INIT ===
+  updateDailyLabel();
+  buildGrid();
+
+  // Idle animation on start screen
+  var idleInterval;
+  function startIdleAnim() {
+    var idleCells = gridEl.querySelectorAll('.cell');
+    var idx = 0;
+    var shuffled = Array.from({ length: TOTAL }, function(_, i) { return i; }).sort(function() { return Math.random() - 0.5; });
+    idleInterval = setInterval(function() {
+      if (!startScreen.classList.contains('active')) {
+        clearInterval(idleInterval);
+        return;
+      }
+      if (idx >= TOTAL) {
+        for (var ci = 0; ci < idleCells.length; ci++) {
+          idleCells[ci].className = 'cell';
+        }
+        idx = 0;
+        return;
+      }
+      var ci = shuffled[idx];
+      var color = COLORS[Math.floor(Math.random() * 4)];
+      idleCells[ci].className = 'cell revealed claimed-' + color;
+      idx++;
+    }, 120);
+  }
+  startIdleAnim();
+})();
+</script>
+</body>
+</html>

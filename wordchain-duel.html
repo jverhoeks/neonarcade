@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>WORDCHAIN DUEL - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.07) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.05) 0%, transparent 50%);
+}
+
+#app { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* SCREENS */
+.screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; }
+.screen.active { display: flex; }
+
+.title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(28px, 7vw, 52px); letter-spacing: 6px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); text-align: center; margin-top: 8vh; }
+.subtitle { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(14px, 3vw, 20px); letter-spacing: 3px; color: var(--text-mid); text-transform: uppercase; margin-top: 12px; text-align: center; padding: 0 20px; max-width: 500px; line-height: 1.5; }
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; margin-top: 24px; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.controls-hint { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-top: 16px; }
+
+.best-score-display { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 2px; color: var(--neon-gold); margin-top: 14px; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+
+.example-chain { font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 15px; color: var(--text-dim); margin-top: 14px; letter-spacing: 1px; }
+.example-chain .hl { color: var(--neon-cyan); text-shadow: 0 0 6px rgba(0,240,255,0.3); font-weight: 700; }
+
+/* Mode buttons */
+.mode-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
+.mode-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px;
+  letter-spacing: 2px; padding: 10px 20px;
+  border: 1px solid var(--neon-purple); background: rgba(180,77,255,0.06);
+  color: var(--neon-purple); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.mode-btn:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 16px rgba(180,77,255,0.2); transform: scale(1.04); }
+.mode-btn.active { background: rgba(180,77,255,0.2); box-shadow: 0 0 16px rgba(180,77,255,0.3); border-color: var(--neon-purple); }
+
+.daily-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px;
+  letter-spacing: 2px; padding: 10px 20px;
+  border: 1px solid var(--neon-gold); background: rgba(255,215,0,0.06);
+  color: var(--neon-gold); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.daily-btn:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 16px rgba(255,215,0,0.2); transform: scale(1.04); }
+.daily-btn.active { background: rgba(255,215,0,0.2); box-shadow: 0 0 16px rgba(255,215,0,0.3); }
+
+/* Challenge banner */
+.challenge-banner { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 15px; color: var(--neon-pink); letter-spacing: 2px; margin-top: 14px; padding: 8px 18px; border: 1px solid var(--neon-pink); background: rgba(255,45,123,0.08); border-radius: 3px; text-shadow: 0 0 10px rgba(255,45,123,0.4); text-align: center; }
+
+/* Category label */
+.category-label { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-top: 8px; }
+
+/* GAME SCREEN */
+#game-screen { justify-content: flex-start; }
+
+.game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 500px; padding: 12px 20px 4px; }
+
+.timer { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 28px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.6); transition: color 0.3s; }
+.timer.warning { color: var(--neon-orange); text-shadow: 0 0 10px rgba(255,140,0,0.6); }
+.timer.critical { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.6); animation: pulse-critical 0.5s infinite alternate; }
+@keyframes pulse-critical { from { opacity: 1; } to { opacity: 0.6; } }
+
+.score-display { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 20px; color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+
+.chain-count { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+
+.timer-bar { width: 100%; max-width: 500px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin: 4px 0; padding: 0 20px; }
+.timer-bar-inner { height: 100%; width: 100%; max-width: 460px; margin: 0 auto; position: relative; }
+.timer-fill { height: 100%; background: var(--neon-cyan); border-radius: 2px; transition: width 0.1s linear, background 0.3s; box-shadow: 0 0 8px rgba(0,240,255,0.5); width: 100%; }
+.timer-fill.warn { background: var(--neon-orange); box-shadow: 0 0 8px rgba(255,140,0,0.5); }
+.timer-fill.danger { background: var(--neon-pink); box-shadow: 0 0 8px rgba(255,45,123,0.5); }
+
+/* Chain display */
+.chain-container { flex: 1; width: 100%; max-width: 500px; overflow-y: auto; padding: 8px 20px; scrollbar-width: thin; scrollbar-color: var(--neon-cyan) transparent; -webkit-overflow-scrolling: touch; }
+.chain-container::-webkit-scrollbar { width: 4px; }
+.chain-container::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 2px; }
+
+.chain-word { font-family: 'Orbitron', monospace; font-weight: 700; font-size: clamp(15px, 3.5vw, 20px); letter-spacing: 3px; padding: 5px 12px; margin: 2px 0; color: #fff; display: flex; align-items: center; animation: word-enter 0.3s ease-out; }
+@keyframes word-enter { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+.chain-word .link-letter { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.5); }
+.chain-word .normal-letters { color: rgba(255,255,255,0.7); }
+.chain-word .bonus-tag { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--neon-gold); margin-left: 8px; letter-spacing: 1px; text-shadow: 0 0 6px rgba(255,215,0,0.4); }
+.chain-word .speed-tag { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--neon-green); margin-left: 4px; letter-spacing: 1px; text-shadow: 0 0 6px rgba(57,255,20,0.4); }
+.chain-word .points-tag { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-dim); margin-left: auto; letter-spacing: 1px; }
+
+.chain-connector { font-family: 'Rajdhani', sans-serif; font-size: 11px; color: var(--neon-purple); letter-spacing: 2px; padding-left: 16px; text-shadow: 0 0 6px rgba(180,77,255,0.3); }
+
+/* Input area */
+.input-area { width: 100%; max-width: 500px; padding: 8px 20px 16px; }
+
+.required-start { font-family: 'Orbitron', monospace; font-size: 13px; color: var(--neon-cyan); letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+
+.word-input-wrap { position: relative; }
+
+#word-input {
+  width: 100%; padding: 14px 16px; font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 18px; letter-spacing: 3px; text-transform: uppercase;
+  background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.2);
+  color: #fff; border-radius: 3px; outline: none; -webkit-user-select: text; user-select: text;
+  touch-action: auto; transition: border-color 0.2s, box-shadow 0.2s;
+}
+#word-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,240,255,0.15); }
+#word-input.error { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255,45,123,0.2); animation: shake 0.25s; }
+#word-input.success { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57,255,20,0.2); }
+#word-input::placeholder { color: var(--text-dim); font-weight: 300; letter-spacing: 3px; font-size: 13px; }
+
+.error-msg { font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 13px; color: var(--neon-pink); letter-spacing: 1px; margin-top: 6px; min-height: 18px; text-shadow: 0 0 6px rgba(255,45,123,0.3); }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* RESULT SCREEN */
+#result-screen { justify-content: flex-start; overflow-y: auto; }
+
+.result-title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(24px, 6vw, 40px); letter-spacing: 5px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); margin-top: 5vh; }
+
+.result-stats { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+.stat-box { text-align: center; }
+.stat-value { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 26px; color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+.stat-label { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+
+.new-best { font-family: 'Orbitron', monospace; font-size: 14px; color: var(--neon-green); letter-spacing: 3px; margin-top: 8px; text-shadow: 0 0 10px rgba(57,255,20,0.4); animation: pulse-critical 0.6s infinite alternate; }
+
+.result-chain-container { width: 100%; max-width: 500px; padding: 8px 20px; max-height: 30vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--neon-cyan) transparent; margin-top: 8px; }
+
+.result-chain-word { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px; letter-spacing: 2px; padding: 2px 0; display: inline; }
+.result-chain-word .link-letter { color: var(--neon-cyan); text-shadow: 0 0 6px rgba(0,240,255,0.4); }
+.result-chain-word .normal-letters { color: rgba(255,255,255,0.7); }
+.result-arrow { color: var(--text-dim); font-size: 12px; margin: 0 4px; }
+
+.result-buttons { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
+
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 12px 24px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+
+.challenge-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 12px 24px;
+  border: 1px solid var(--neon-purple); background: rgba(180,77,255,0.06);
+  color: var(--neon-purple); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.challenge-btn:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 20px rgba(180,77,255,0.2); transform: scale(1.04); }
+
+.copied-toast {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+  font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 2px;
+  color: var(--neon-green); background: rgba(57,255,20,0.1); border: 1px solid var(--neon-green);
+  padding: 10px 24px; border-radius: 3px; z-index: 100; opacity: 0; transition: opacity 0.3s;
+  text-shadow: 0 0 8px rgba(57,255,20,0.4); pointer-events: none;
+}
+.copied-toast.visible { opacity: 1; }
+
+/* Particles */
+.particle {
+  position: fixed; pointer-events: none; z-index: 50; border-radius: 50%;
+  animation: particle-fly 0.6s ease-out forwards;
+}
+@keyframes particle-fly {
+  0% { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.2); }
+}
+
+/* Floating score popup */
+.score-popup {
+  position: fixed; pointer-events: none; z-index: 50;
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 16px;
+  color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.5);
+  animation: float-up 0.8s ease-out forwards;
+}
+@keyframes float-up {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+/* Canvas background */
+#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+/* Footer */
+.footer {
+  position: fixed; bottom: 8px; left: 0; width: 100%; text-align: center; z-index: 10;
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
+  letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+}
+.footer a { color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+.footer a:hover { color: var(--neon-cyan); }
+.footer .sep { margin: 0 6px; opacity: 0.4; }
+
+/* Daily badge */
+.daily-badge { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 2px; color: var(--neon-gold); background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); padding: 4px 10px; border-radius: 2px; margin-top: 8px; text-shadow: 0 0 6px rgba(255,215,0,0.3); }
+
+/* Category indicator in game */
+.game-category { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px; letter-spacing: 2px; color: var(--neon-purple); text-transform: uppercase; text-shadow: 0 0 6px rgba(180,77,255,0.3); }
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div id="app">
+  <div id="start-screen" class="screen active">
+    <div class="title">WORDCHAIN</div>
+    <div class="subtitle">Build the longest word chain under pressure. Each word must start with the last letter of the previous word.</div>
+    <div class="example-chain">PLAN<span class="hl">E</span> &rarr; <span class="hl">E</span>AGLE &rarr; EAGL<span class="hl">E</span> &rarr; <span class="hl">E</span>XILE</div>
+    <div id="challenge-info" class="challenge-banner" style="display:none"></div>
+    <div class="mode-row">
+      <button class="daily-btn" id="btn-daily">DAILY</button>
+      <button class="mode-btn" id="btn-cat-any">ANY WORD</button>
+      <button class="mode-btn" id="btn-cat-animals">ANIMALS</button>
+      <button class="mode-btn" id="btn-cat-countries">PLACES</button>
+    </div>
+    <button class="play-btn" id="btn-start">START</button>
+    <div class="controls-hint">Type word + Enter to submit</div>
+    <div class="best-score-display" id="best-display"></div>
+    <div id="daily-badge" class="daily-badge" style="display:none"></div>
+  </div>
+
+  <div id="game-screen" class="screen">
+    <div class="game-header">
+      <div>
+        <div class="timer" id="timer">15.0</div>
+        <div class="chain-count" id="chain-count">0 WORDS</div>
+      </div>
+      <div style="text-align:center">
+        <div class="game-category" id="game-cat"></div>
+      </div>
+      <div style="text-align:right">
+        <div class="score-display" id="score-display">0</div>
+        <div class="chain-count">POINTS</div>
+      </div>
+    </div>
+    <div class="timer-bar"><div class="timer-bar-inner"><div class="timer-fill" id="timer-fill"></div></div></div>
+    <div class="chain-container" id="chain-container"></div>
+    <div class="input-area">
+      <div class="required-start" id="required-start"></div>
+      <div class="word-input-wrap">
+        <input type="text" id="word-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="TYPE A WORD...">
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="screen">
+    <div class="result-title">CHAIN COMPLETE</div>
+    <div class="result-stats">
+      <div class="stat-box"><div class="stat-value" id="r-words">0</div><div class="stat-label">WORDS</div></div>
+      <div class="stat-box"><div class="stat-value" id="r-score">0</div><div class="stat-label">POINTS</div></div>
+      <div class="stat-box"><div class="stat-value" id="r-longest">0</div><div class="stat-label">LONGEST</div></div>
+      <div class="stat-box"><div class="stat-value" id="r-best">0</div><div class="stat-label">BEST</div></div>
+    </div>
+    <div class="new-best" id="new-best" style="display:none">NEW BEST!</div>
+    <div id="beat-challenge" class="challenge-banner" style="display:none"></div>
+    <div class="result-chain-container" id="result-chain"></div>
+    <div class="result-buttons">
+      <button class="share-btn" id="btn-share">SHARE</button>
+      <button class="challenge-btn" id="btn-challenge">CHALLENGE</button>
+      <button class="play-btn" id="btn-again">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<div class="copied-toast" id="toast">COPIED TO CLIPBOARD</div>
+
+<div class="footer">
+  <a href="index.html">&larr; ARCADE</a>
+  <span class="sep">|</span>
+  Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks + Mr Claude</a>
+</div>
+
+<script>
+(() => {
+  // ===================== WORD LISTS =====================
+  const WORDS_RAW = "able about above abuse acid acre acted actor added admit adult after again agent aging agree ahead aimed alarm album alert alien align alike alive allay allot allow alone along alter among ample amuse angel anger angle angry annoy apart apple apply arena argue arise armor army arose array arrow aside asset atlas attic audio audit avoid awake award aware awful bacon badge badly bands banks baron based basic basin batch beach beams beans bears beast began begin being belly below bench berry bible birth black blade blame blank blast blaze bleed blend bless blind block blood bloom blown blues board boats bolts bombs bonds bones bonus books boost booth boots bound boxer brain brand brass brave bread break breed brick bride brief bring broad broke brown brush buddy budge build built bunch burst buyer cabin cable camel candy cards cargo carry cases catch cause cedar cease chain chair chaos charm chart chase cheap check cheek cheer chess chest chief child china chips chose chunk cigar civic civil claim clash class clean clear clerk click cliff climb cling clock clone close cloth cloud clubs coach coast codes coils color comic coral costs couch could count court cover crack craft crane crash crazy cream creek creep crime crops cross crowd crown cruel crush cubic curve cycle daily dance dared deals death debut decay decks decor delay delta dense depot depth derby desks devil diary digit dirty disco dodge doing donor doors doses doubt dough draft drain drama drank drawn dream dress dried drift drink drive drops drove drunk dryer dummy dunce dusty dutch dying eager eagle early earth eased easel eight elbow elder elect elite email ember emoji empty ended enemy enjoy enter entry equal error essay evade event every exact exams exile exist extra fable faced facts fairy faith falls false fancy fatal fault feast fence ferry fever fiber field fifth fight files final finds fired fires first fixed flags flame flash flesh flies float flock flood floor flora flour flows fluid flush focal focus fonts force forge forth forum found frame frank fraud fresh front froze fruit fully funds funny fuzzy gains gamma gangs gates gauge genes genre ghost giant given gives gland glass gleam glide globe gloom glory gloss glove going goods grace grade grain grand grant grape grasp grass grave great green greet grief grill grind grips gross group grove grown guard guess guide guild guilt guise gusts habit halls hands handy happy harsh haste haven heads heard heart heavy hedge heels hello hence herbs hired holes homes honey honor hooks hoped horse hosts hotel hours house hover human humor hurry ideal ideas image imply inbox index indie infer inner input inter intro issue items ivory jewel jimmy joint jones joust judge juice jumbo jumps keeps kicks kinds knack kneel knelt knife knock knots known label lacks lakes lands lanes large laser lasts later laugh layer leads learn lease least leave legal lemon level lever light liked limit lined linen liner links lions lists liter lived liver lives loads lobby local locks lodge logic login looks loops loose lotus lover lower loyal lucky lunar lunch lying macro magic major maker manor maple march marks marsh masks match mayor meals media meets melon mercy merit metal meter midst might minds minor minus mixed model modes money monks month moral motor mount mouse mouth moved movie music naive named nasty naval nerve never newly night noble nodes noise north noted notes novel nurse oasis occur ocean offer often olive onset opens opted orbit order organ other ought outer owned oxide ozone packs pages paint pairs panel panic paper parks parts party paste patch pause peace peach pearl peers penny phase phone photo piano piece pilot pinch pitch pixel place plain plane plans plant plate plaza plead pleas plots plumb plume plush poems point polar polls poppy porch ports posed posts pouch pound power press price pride prime print prior prize probe prong prone proof proud prove proxy psalm pulls pulse pumps punch pupil purse quest queue quick quiet quota quote races radar rails raise rally ranch range ranks rapid rated ratio razor reach react reads realm rebel recap refer reign relax relay remit renew repay repel reset resin retro rider ridge right rigid rings riots risen risks risky rival river roads robot rocks roles rooms roots rouge rough round route rover royal rugby ruins ruler rules rural sadly saint salad sales salon sauce saved saved scale scare scene scent scope score scout scrap seals seems seize sense serve seven shade shake shall shame shape share sharp shelf shell shift shine ships shirt shock shoot shore short shout shown sides siege sight sigma signs silly since sixth sixty sized skate skill skull slate slave sleep slice slide slope smart smell smile smoke snake solar solid solve songs sorry souls sound south space spare spark spawn speak speed spend spent spice spike spine split spoke spoon sport spray squad stack staff stage stake stall stamp stand stark start state stays steal steam steel steep steer stems steps stern stick stiff still stock stole stone stood store storm story stove strap straw strip stuck stuff style sugar suite sunny super surge swamp swear sweet swept swift swing sword sworn syrup table taken tales tanks tapes taste taxes teach teams tears tempo tends terms tests thank theme thick thing think third those three threw throw thumb tidal tiger tight tiles timer tired tires title today token tools topic torch total touch tough towel tower towns toxic trace track trade trail train trait traps trash tread treat trend trial tribe trick tried trips troop truck truly trump trunk trust truth tumor tunes turns tutor twice twist types ultra uncle under unify union unite unity until upper upset urban usage users using usual utter valid value valve vapor vault verse video views vigor vinyl viral virus visit vista vital vivid vocal vodka voice voted voter wages wants waste watch water waves wears weave wells whale wheat wheel where which while white whole whose wider width witch woman women words works world worry worse worst worth would wound wrath write wrote yacht yards years yield young youth zones absorb accent accept access accord action active actual adjust admire advent advice aerial afford agenda allows almost always amazon amount animal annual answer appeal appear arrive artist aspect assist assume attach attack autumn avenue barely basket battle beauty become before behalf behind belong beyond bishop borrow bottom breath bridge bright broken bronze budget burden butter camera campus cancel carbon career castle caught center chapel charge chosen circle circus client closer coffee colony column comedy coming commit common comply convey corner costly cotton couple course cousin create crisis cruise custom damage dancer danger debate decade decent defeat defend degree demand denial depart desert design desire detail device devote differ dinner direct divide domain donate double dozens driven easily editor effect effort eighth employ enable endure engage engine enough ensure entire escape estate evolve exceed except excite excuse exempt expand expect expert export extend extent fabric facing factor fairly fallen family famous farmer father female figure filter finale finger fiscal flavor flower follow forced forest forget formal former fossil fourth freely frozen future galaxy garden gather gender gentle global golden govern gravel ground growth guitar hardly heaven hidden highly honest horror impose income indeed indoor inform injury inland insect inside insist intact intend invest island itself jungle junior justice kernel kidney ladder lately launch lawyer league length lesson letter lifted lively locate lonely lovely luxury mainly manage manner marble margin marine marker master matter medium member memory mental mentor merely method middle mighty mirror mobile modern modest moment mostly motion moving murder museum mutual namely narrow nation nature nearby needle nickel nobody normal notice notify number object obtain occupy offend oppose option orange origin outfit output palace parade parent partly patrol patron pencil people period permit phrase planet plasma player please plenty pocket poetry police policy poorly portal poster potato prayer prefer prince prison profit prompt proper public pursue puzzle rabbit racing random rarely rather reason recall recent recipe record reduce reform regard region reject relate relief remain remind remote remove rental repair repeat report rescue resign resist resort result retail retain retire reveal ribbon rising robust rocket romantic sacred safety sample scheme school screen search season secret sector secure select senior series settle severe shadow signal silent silver simple sketch soccer socket solely sought source speech spirit spoken spread square stable stolen strain strand stream street stress strict strike string strong struck studio submit sudden suffer summer summit supply surely survey switch symbol system tablet tackle talent target temple tender terror threat throne tissue tongue toward travel treaty tribal tunnel unfair unique unless unlike update upward urgent valley vendor verbal victim violet virtue vision volume walker wealth weekly weight window winner winter wisdom within wonder wooden worker worthy yellow";
+
+  const ANIMALS_RAW = "aardvark albatross alligator alpaca ant anteater antelope ape armadillo baboon badger bat bear beaver beetle bison boar buffalo bull bunny butterfly camel caribou cat caterpillar chameleon cheetah chicken chimp chinchilla clam cobra cockatoo cod condor cougar cow coyote crab crane cricket crocodile crow cuckoo deer dingo dog dolphin donkey dove dragonfly duck eagle eel elephant elk emu falcon ferret finch firefly fish flamingo flea fly fox frog gazelle gecko gerbil giraffe goat goose gorilla grasshopper grouse gull hamster hare hawk hedgehog heron hippo hornet horse hound hummingbird hyena iguana impala jackal jaguar jay jellyfish kangaroo kiwi koala ladybug lamb lark lemur leopard lion lizard llama lobster locust loon louse lynx macaw magpie mallard mamba manatee mantis mare marten meerkat mink minnow mole mongoose monkey moose mosquito moth mouse mule newt nightingale ocelot octopus opossum orangutan orca osprey ostrich otter owl ox panda panther parrot partridge peacock pelican penguin perch pheasant pig pigeon pike piranha platypus pony porcupine porpoise prawn puma python quail rabbit raccoon ram rat rattlesnake raven reindeer rhinoceros robin rodent rooster salamander salmon sardine scorpion seahorse seal shark sheep shrimp skunk sloth slug snail snake sparrow spider squid squirrel stag starfish stingray stork swallow swan termite tern tiger toad tortoise toucan trout tuna turkey turtle viper vulture wallaby walrus warthog wasp weasel whale wolf wolverine wombat woodpecker worm yak zebra";
+
+  const PLACES_RAW = "africa alaska albania algeria amsterdam angola ankara argentina arizona arkansas armenia asia athens atlanta austria bahamas bahrain bali baltimore bangkok barbados barcelona bavaria beijing beirut belgium belize bengal berlin bermuda bhutan bogota bolivia borneo boston botswana brazil brisbane brunei brussels budapest burma cairo cambodia cameroon canada canberra canton caracas carolina chad chile china cleveland colombia colorado columbus congo copenhagen cornwall corsica croatia cuba cyprus dallas damascus delhi denmark denver detroit dhaka djibouti dominica dresden dublin dundee durban ecuador edinburgh egypt england eritrea essex estonia ethiopia europa fiji finland florence florida france frankfurt gabon galway geneva georgia germany ghana gibraltar glasgow greenland grenada guatemala guinea guyana haiti hamburg hanover havana hawaii helena helsinki honduras houston hungary iceland idaho illinois india indiana indonesia iowa iran iraq ireland israel istanbul italy ivory jamaica japan java jersey jordan kabul kampala kansas kashmir kathmandu kenya kingston korea kosovo kuwait lagos laos latvia lebanon lesotho liberia liberty libya lima lisbon lithuania london louisiana luxembourg lyon macau macedonia madagascar madrid maine malawi malaysia mali malta manila manitoba maryland mauritius melbourne memphis mexico miami michigan milan minnesota missouri monaco mongolia montana montreal morocco moscow mozambique mumbai munich myanmar nairobi namibia naples nassau nepal netherlands newark nigeria norway oakland oakland odessa ohio oklahoma oman ontario oregon orlando oslo ottawa oxford pacific pakistan panama papua paris pennsylvania persia peru phoenix poland portland portugal prague prussia qatar quebec quito raleigh richmond romania rome russia rwanda sacramento sahara samoa santiago saturn seattle senegal seoul serbia seville shanghai siberia sicily sierra singapore slovakia slovenia sofia solomon somalia spain spokane stanford stockholm stockholm sudan sumatra surrey sweden switzerland sydney syria tahiti taipei taiwan tampa tanzania tasmania tehran tennessee texas thailand tibet tirana tokyo tonga toronto trinidad tunisia turkey tuscany uganda ukraine ulster uruguay utah uzbek valencia vancouver vatican venezuela vermont verona vienna vietnam virginia wales warsaw washington wellington westminster wisconsin wyoming yemen yorkshire zambia zanzibar zimbabwe zurich";
+
+  // Build dictionaries
+  const DICT = new Set();
+  const ANIMALS = new Set();
+  const PLACES = new Set();
+
+  WORDS_RAW.split(/\s+/).forEach(function(w) {
+    var c = w.toLowerCase().trim();
+    if (c.length >= 3) DICT.add(c);
+  });
+
+  ANIMALS_RAW.split(/\s+/).forEach(function(w) {
+    var c = w.toLowerCase().trim();
+    if (c.length >= 3) { ANIMALS.add(c); DICT.add(c); }
+  });
+
+  PLACES_RAW.split(/\s+/).forEach(function(w) {
+    var c = w.toLowerCase().trim();
+    if (c.length >= 3) { PLACES.add(c); DICT.add(c); }
+  });
+
+  // Rare words for bonus scoring
+  const RARE_WORDS = new Set([
+    'abyss','adept','aegis','agile','anvil','azure','basil','bliss','brisk','broth',
+    'budge','burly','cache','cadet','cedar','cider','cigar','clasp','cocoa','covet',
+    'decoy','detox','dwell','easel','ember','epoch','evoke','expat','facet','fauna',
+    'flora','forge','frail','fungi','gauze','genre','gleam','glyph','gouge','guise',
+    'gully','haven','hazel','helix','hoist','husky','infer','ivory','jaunt','jewel',
+    'karma','knack','knelt','lance','lapse','ledge','lever','limbs','lotus','lucid',
+    'lunar','manor','maple','marsh','mason','merge','midst','mince','mourn','mural',
+    'naive','nexus','niche','nudge','oasis','onset','optic','oxide','ozone','perch',
+    'plumb','plume','plush','prism','probe','prone','prune','proxy','psalm','purge',
+    'quasi','quota','realm','recap','renew','repay','ridge','rinse','rouge','rover',
+    'savor','sedan','shear','shrub','siege','sigma','skull','snare','solar','spawn',
+    'spice','stomp','stoop','strut','stunt','suede','surge','swirl','tenor','thorn',
+    'torch','towel','truce','tunic','tweak','ultra','unify','usher','utter','vault',
+    'venom','vigor','vinyl','vista','vivid','vodka','vying','wager','wrath','yacht',
+    'yearn','yield','abode','adorn','etude','fluke','graft','incur','moist','sable',
+    'tithe','umbra','vouch','wield','yodel','zephyr'
+  ]);
+
+  // ===================== AUDIO =====================
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playKeystroke() {
+    ensureAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 800 + Math.random() * 400;
+    g.gain.value = 0.04;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playChainLink() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    var freqs = [523, 659, 784, 1047];
+    for (var i = 0; i < freqs.length; i++) {
+      (function(freq, idx) {
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.value = freq;
+        g.gain.value = 0;
+        g.gain.setValueAtTime(0, t + idx * 0.05);
+        g.gain.linearRampToValueAtTime(0.07, t + idx * 0.05 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.05 + 0.12);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t + idx * 0.05); o.stop(t + idx * 0.05 + 0.12);
+      })(freqs[i], i);
+    }
+  }
+
+  function playSpeedBonus() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    var freqs = [880, 1109, 1319];
+    for (var i = 0; i < freqs.length; i++) {
+      (function(freq, idx) {
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = freq;
+        g.gain.value = 0;
+        g.gain.setValueAtTime(0, t + idx * 0.04);
+        g.gain.linearRampToValueAtTime(0.06, t + idx * 0.04 + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.04 + 0.1);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t + idx * 0.04); o.stop(t + idx * 0.04 + 0.1);
+      })(freqs[i], i);
+    }
+  }
+
+  function playBuzz() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.value = 120;
+    g.gain.value = 0.1;
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(t + 0.2);
+  }
+
+  function playGameOver() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    var freqs = [440, 370, 311, 261];
+    for (var i = 0; i < freqs.length; i++) {
+      (function(freq, idx) {
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = freq;
+        g.gain.value = 0;
+        g.gain.setValueAtTime(0, t + idx * 0.15);
+        g.gain.linearRampToValueAtTime(0.08, t + idx * 0.15 + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.15 + 0.3);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t + idx * 0.15); o.stop(t + idx * 0.15 + 0.3);
+      })(freqs[i], i);
+    }
+  }
+
+  function playTick() {
+    ensureAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 1200;
+    g.gain.value = 0.03;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.03);
+  }
+
+  // ===================== DOM REFS =====================
+  var startScreen = document.getElementById('start-screen');
+  var gameScreen = document.getElementById('game-screen');
+  var resultScreen = document.getElementById('result-screen');
+  var btnStart = document.getElementById('btn-start');
+  var btnDaily = document.getElementById('btn-daily');
+  var btnCatAny = document.getElementById('btn-cat-any');
+  var btnCatAnimals = document.getElementById('btn-cat-animals');
+  var btnCatCountries = document.getElementById('btn-cat-countries');
+  var btnAgain = document.getElementById('btn-again');
+  var btnShare = document.getElementById('btn-share');
+  var btnChallenge = document.getElementById('btn-challenge');
+  var timerEl = document.getElementById('timer');
+  var timerFill = document.getElementById('timer-fill');
+  var scoreEl = document.getElementById('score-display');
+  var chainCountEl = document.getElementById('chain-count');
+  var chainContainer = document.getElementById('chain-container');
+  var wordInput = document.getElementById('word-input');
+  var requiredStart = document.getElementById('required-start');
+  var errorMsg = document.getElementById('error-msg');
+  var bestDisplay = document.getElementById('best-display');
+  var challengeInfo = document.getElementById('challenge-info');
+  var dailyBadge = document.getElementById('daily-badge');
+  var gameCatEl = document.getElementById('game-cat');
+  var toast = document.getElementById('toast');
+  var rWords = document.getElementById('r-words');
+  var rScore = document.getElementById('r-score');
+  var rLongest = document.getElementById('r-longest');
+  var rBest = document.getElementById('r-best');
+  var newBestEl = document.getElementById('new-best');
+  var beatChallengeEl = document.getElementById('beat-challenge');
+  var resultChain = document.getElementById('result-chain');
+  var bgCanvas = document.getElementById('bg-canvas');
+
+  // ===================== HiDPI CANVAS BACKGROUND =====================
+  var ctx = bgCanvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var canvasW, canvasH;
+  var bgParticles = [];
+
+  function resizeCanvas() {
+    canvasW = window.innerWidth;
+    canvasH = window.innerHeight;
+    bgCanvas.width = canvasW * dpr;
+    bgCanvas.height = canvasH * dpr;
+    bgCanvas.style.width = canvasW + 'px';
+    bgCanvas.style.height = canvasH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function initBgParticles() {
+    bgParticles = [];
+    for (var i = 0; i < 40; i++) {
+      bgParticles.push({
+        x: Math.random() * canvasW,
+        y: Math.random() * canvasH,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: 1 + Math.random() * 2,
+        alpha: 0.1 + Math.random() * 0.2,
+        color: Math.random() > 0.5 ? '0,240,255' : '180,77,255'
+      });
+    }
+  }
+
+  function drawBg() {
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    for (var i = 0; i < bgParticles.length; i++) {
+      var p = bgParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = canvasW;
+      if (p.x > canvasW) p.x = 0;
+      if (p.y < 0) p.y = canvasH;
+      if (p.y > canvasH) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + p.color + ',' + p.alpha + ')';
+      ctx.fill();
+    }
+    // Draw connections between close particles
+    for (var i = 0; i < bgParticles.length; i++) {
+      for (var j = i + 1; j < bgParticles.length; j++) {
+        var dx = bgParticles[i].x - bgParticles[j].x;
+        var dy = bgParticles[i].y - bgParticles[j].y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.moveTo(bgParticles[i].x, bgParticles[i].y);
+          ctx.lineTo(bgParticles[j].x, bgParticles[j].y);
+          ctx.strokeStyle = 'rgba(0,240,255,' + (0.04 * (1 - d / 120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  resizeCanvas();
+  initBgParticles();
+  window.addEventListener('resize', function() { resizeCanvas(); initBgParticles(); });
+
+  // 60fps render loop
+  var lastFrame = 0;
+  function renderLoop(ts) {
+    requestAnimationFrame(renderLoop);
+    if (ts - lastFrame < 16) return;
+    lastFrame = ts;
+    drawBg();
+  }
+  requestAnimationFrame(renderLoop);
+
+  // ===================== GAME STATE =====================
+  var gameState = 'start';
+  var chain = [];
+  var chainPoints = [];
+  var usedWords = new Set();
+  var score = 0;
+  var wordTimeLeft = 0;
+  var maxWordTime = 15;
+  var timerRAF = null;
+  var lastTimerTs = 0;
+  var startingLetter = '';
+  var seed = 0;
+  var challengeScore = 0;
+  var isChallenge = false;
+  var isDaily = false;
+  var category = 'any'; // 'any', 'animals', 'places'
+  var wordCount = 0;
+  var lastWordTime = 0; // timestamp of last successful word
+
+  // Timer decreases: starts at 15s, decreases by 0.5s per word, minimum 4s
+  function getTimeForWord(n) {
+    return Math.max(4, 15 - n * 0.5);
+  }
+
+  // ===================== SEEDED RANDOM =====================
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function getDailySeed() {
+    var d = new Date();
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  }
+
+  function getStartingLetter(s) {
+    var rng = mulberry32(s);
+    var letters = 'abcdefghijklmnoprstuvw'; // common starting letters
+    return letters[Math.floor(rng() * letters.length)];
+  }
+
+  // ===================== CHALLENGE ENCODING =====================
+  function encodeChallenge(sd, sc, cat, ch) {
+    var data = sd + '|' + sc + '|' + cat + '|' + ch.join(',');
+    return btoa(data).replace(/=/g, '');
+  }
+
+  function decodeChallenge(hash) {
+    try {
+      var h = hash;
+      while (h.length % 4 !== 0) h += '=';
+      var decoded = atob(h);
+      var parts = decoded.split('|');
+      if (parts.length >= 3) {
+        return {
+          seed: parseInt(parts[0]),
+          score: parseInt(parts[1]),
+          category: parts[2] || 'any',
+          chain: parts[3] ? parts[3].split(',') : []
+        };
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  // ===================== PARTICLES =====================
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+      var dist = 30 + Math.random() * 50;
+      var dx = Math.cos(angle) * dist;
+      var dy = Math.sin(angle) * dist;
+      p.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + (3 + Math.random() * 4) + 'px;height:' + (3 + Math.random() * 4) + 'px;background:' + color + ';--dx:' + dx + 'px;--dy:' + dy + 'px;';
+      document.body.appendChild(p);
+      (function(el) { setTimeout(function() { el.remove(); }, 600); })(p);
+    }
+  }
+
+  function spawnScorePopup(x, y, text) {
+    var el = document.createElement('div');
+    el.className = 'score-popup';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.body.appendChild(el);
+    setTimeout(function() { el.remove(); }, 800);
+  }
+
+  // ===================== SAFE DOM HELPERS =====================
+  function createSpan(cls, text) {
+    var s = document.createElement('span');
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  }
+
+  function getLastLetter(word) {
+    return word.charAt(word.length - 1).toLowerCase();
+  }
+
+  function buildChainWordEl(word, isFirst, pts, isRare, hasSpeedBonus) {
+    var div = document.createElement('div');
+    div.className = 'chain-word';
+    var upper = word.toUpperCase();
+
+    if (isFirst) {
+      div.appendChild(createSpan('normal-letters', upper.slice(0, -1)));
+      div.appendChild(createSpan('link-letter', upper.slice(-1)));
+      div.appendChild(createSpan('points-tag', 'START'));
+    } else {
+      div.appendChild(createSpan('link-letter', upper.charAt(0)));
+      div.appendChild(createSpan('normal-letters', upper.slice(1, -1)));
+      div.appendChild(createSpan('link-letter', upper.slice(-1)));
+
+      if (isRare) {
+        div.appendChild(createSpan('bonus-tag', 'RARE x2'));
+      }
+      if (hasSpeedBonus) {
+        div.appendChild(createSpan('speed-tag', 'FAST'));
+      }
+      div.appendChild(createSpan('points-tag', '+' + pts));
+    }
+
+    return div;
+  }
+
+  // ===================== CATEGORY VALIDATION =====================
+  function isValidForCategory(word) {
+    if (category === 'any') return DICT.has(word);
+    if (category === 'animals') return ANIMALS.has(word);
+    if (category === 'places') return PLACES.has(word);
+    return false;
+  }
+
+  function getCategoryLabel() {
+    if (category === 'animals') return 'ANIMALS';
+    if (category === 'places') return 'PLACES';
+    return '';
+  }
+
+  function getCategoryDictName() {
+    if (category === 'animals') return 'ANIMALS';
+    if (category === 'places') return 'PLACES';
+    return 'WORDS';
+  }
+
+  // ===================== SCREENS =====================
+  function showScreen(name) {
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    resultScreen.classList.remove('active');
+    if (name === 'start') startScreen.classList.add('active');
+    else if (name === 'game') gameScreen.classList.add('active');
+    else if (name === 'result') resultScreen.classList.add('active');
+    gameState = name;
+  }
+
+  // ===================== CATEGORY SELECTION =====================
+  function setCategory(cat) {
+    category = cat;
+    btnCatAny.classList.toggle('active', cat === 'any');
+    btnCatAnimals.classList.toggle('active', cat === 'animals');
+    btnCatCountries.classList.toggle('active', cat === 'places');
+  }
+
+  function setDaily(val) {
+    isDaily = val;
+    btnDaily.classList.toggle('active', val);
+    if (val) {
+      var ds = getDailySeed();
+      var letter = getStartingLetter(ds);
+      dailyBadge.textContent = 'TODAY: START WITH "' + letter.toUpperCase() + '"';
+      dailyBadge.style.display = 'block';
+    } else {
+      dailyBadge.style.display = 'none';
+    }
+  }
+
+  btnCatAny.addEventListener('click', function() { setCategory('any'); });
+  btnCatAnimals.addEventListener('click', function() { setCategory('animals'); });
+  btnCatCountries.addEventListener('click', function() { setCategory('places'); });
+  btnDaily.addEventListener('click', function() { setDaily(!isDaily); });
+
+  // ===================== INIT =====================
+  function init() {
+    setCategory('any');
+    setDaily(false);
+
+    var hash = window.location.hash.slice(1);
+    if (hash) {
+      var challenge = decodeChallenge(hash);
+      if (challenge) {
+        isChallenge = true;
+        seed = challenge.seed;
+        challengeScore = challenge.score;
+        if (challenge.category) setCategory(challenge.category);
+        startingLetter = getStartingLetter(seed);
+        challengeInfo.style.display = 'block';
+        challengeInfo.textContent = 'CHALLENGE: Beat ' + challengeScore + ' pts starting with "' + startingLetter.toUpperCase() + '"';
+      }
+    }
+    updateBestDisplay();
+    showScreen('start');
+  }
+
+  function updateBestDisplay() {
+    var key = 'wordchain_best';
+    if (isDaily) key = 'wordchain_daily_best_' + getDailySeed();
+    var best = localStorage.getItem(key);
+    if (best) {
+      bestDisplay.textContent = 'BEST: ' + best + ' PTS';
+      bestDisplay.style.display = 'block';
+    } else {
+      bestDisplay.style.display = 'none';
+    }
+  }
+
+  // ===================== GAME START =====================
+  function startGame() {
+    ensureAudio();
+
+    if (isDaily) {
+      seed = getDailySeed();
+      startingLetter = getStartingLetter(seed);
+    } else if (!isChallenge) {
+      seed = Date.now() ^ (Math.random() * 0xFFFFFF | 0);
+      startingLetter = getStartingLetter(seed);
+    }
+
+    // Find a starting word from the dictionary
+    var firstWord = findStartingWord(startingLetter);
+
+    chain = [firstWord];
+    chainPoints = [0];
+    usedWords = new Set([firstWord.toLowerCase()]);
+    score = 0;
+    wordCount = 0;
+    maxWordTime = getTimeForWord(0);
+    wordTimeLeft = maxWordTime;
+
+    showScreen('game');
+
+    gameCatEl.textContent = getCategoryLabel();
+    updateTimerDisplay();
+    scoreEl.textContent = '0';
+    chainCountEl.textContent = '1 WORD';
+    chainContainer.textContent = '';
+    errorMsg.textContent = '';
+
+    var wordEl = buildChainWordEl(firstWord, true, 0, false, false);
+    chainContainer.appendChild(wordEl);
+    updateRequiredStart();
+
+    wordInput.value = '';
+    wordInput.disabled = false;
+    setTimeout(function() { wordInput.focus(); }, 100);
+
+    lastTimerTs = performance.now();
+    lastWordTime = performance.now();
+    if (timerRAF) cancelAnimationFrame(timerRAF);
+    timerRAF = requestAnimationFrame(timerTick);
+  }
+
+  function findStartingWord(letter) {
+    // Find a word starting with the given letter from active dictionary
+    var dict = category === 'animals' ? ANIMALS : category === 'places' ? PLACES : DICT;
+    var candidates = [];
+    dict.forEach(function(w) {
+      if (w.charAt(0) === letter && w.length >= 4 && w.length <= 7) {
+        candidates.push(w);
+      }
+    });
+    if (candidates.length === 0) {
+      dict.forEach(function(w) {
+        if (w.charAt(0) === letter) candidates.push(w);
+      });
+    }
+    var rng = mulberry32(seed + 99);
+    return candidates[Math.floor(rng() * candidates.length)] || 'start';
+  }
+
+  // ===================== TIMER =====================
+  function timerTick(ts) {
+    if (gameState !== 'game') return;
+    var dt = (ts - lastTimerTs) / 1000;
+    lastTimerTs = ts;
+    wordTimeLeft -= dt;
+
+    if (wordTimeLeft <= 0) {
+      wordTimeLeft = 0;
+      updateTimerDisplay();
+      endGame();
+      return;
+    }
+
+    // Play tick sound in last 3 seconds
+    if (wordTimeLeft <= 3 && wordTimeLeft + dt > Math.ceil(wordTimeLeft)) {
+      playTick();
+    }
+
+    updateTimerDisplay();
+    timerRAF = requestAnimationFrame(timerTick);
+  }
+
+  function updateTimerDisplay() {
+    var t = Math.max(0, wordTimeLeft);
+    timerEl.textContent = t.toFixed(1);
+
+    var pct = (t / maxWordTime) * 100;
+    timerFill.style.width = pct + '%';
+
+    if (t <= 3) {
+      timerEl.className = 'timer critical';
+      timerFill.className = 'timer-fill danger';
+    } else if (t <= 6) {
+      timerEl.className = 'timer warning';
+      timerFill.className = 'timer-fill warn';
+    } else {
+      timerEl.className = 'timer';
+      timerFill.className = 'timer-fill';
+    }
+  }
+
+  // ===================== CHAIN RENDERING =====================
+  function renderChainWord(word, isFirst) {
+    var pts = isFirst ? 0 : chainPoints[chainPoints.length - 1];
+    var isRare = RARE_WORDS.has(word.toLowerCase());
+    var timeSinceLastWord = (performance.now() - lastWordTime) / 1000;
+    var hasSpeedBonus = !isFirst && timeSinceLastWord < 3;
+
+    if (!isFirst) {
+      var connector = document.createElement('div');
+      connector.className = 'chain-connector';
+      connector.textContent = getLastLetter(chain[chain.length - 2]).toUpperCase() + ' \u2192';
+      chainContainer.appendChild(connector);
+    }
+
+    var wordEl = buildChainWordEl(word, isFirst, pts, isRare, hasSpeedBonus);
+    chainContainer.appendChild(wordEl);
+    chainContainer.scrollTop = chainContainer.scrollHeight;
+  }
+
+  function updateRequiredStart() {
+    var lastWord = chain[chain.length - 1];
+    var letter = getLastLetter(lastWord).toUpperCase();
+    requiredStart.textContent = 'NEXT WORD: STARTS WITH "' + letter + '"';
+  }
+
+  // ===================== WORD SUBMISSION =====================
+  function submitWord() {
+    var raw = wordInput.value.trim().toLowerCase();
+    wordInput.value = '';
+
+    if (!raw) return;
+
+    var lastWord = chain[chain.length - 1];
+    var required = getLastLetter(lastWord);
+
+    // Must start with the last letter of previous word
+    if (raw.charAt(0) !== required) {
+      showError('MUST START WITH "' + required.toUpperCase() + '"');
+      playBuzz();
+      return;
+    }
+
+    if (raw.length < 3) {
+      showError('TOO SHORT (MIN 3 LETTERS)');
+      playBuzz();
+      return;
+    }
+
+    // Check only letters
+    if (!/^[a-z]+$/.test(raw)) {
+      showError('LETTERS ONLY');
+      playBuzz();
+      return;
+    }
+
+    if (!isValidForCategory(raw)) {
+      var catName = getCategoryDictName();
+      showError('"' + raw.toUpperCase() + '" NOT IN ' + catName);
+      playBuzz();
+      return;
+    }
+
+    if (usedWords.has(raw)) {
+      showError('ALREADY USED!');
+      playBuzz();
+      return;
+    }
+
+    // Valid word - calculate score
+    var timeSinceLastWord = (performance.now() - lastWordTime) / 1000;
+    var speedBonus = timeSinceLastWord < 3;
+
+    var isRare = RARE_WORDS.has(raw);
+    var pts = raw.length * 10;
+    // Length bonus for long words
+    if (raw.length >= 7) pts += 30;
+    else if (raw.length >= 5) pts += 10;
+    // Rare word bonus
+    if (isRare) pts *= 2;
+    // Speed bonus (answered in < 3 seconds)
+    if (speedBonus) pts = Math.floor(pts * 1.5);
+
+    chain.push(raw);
+    usedWords.add(raw);
+    chainPoints.push(pts);
+    score += pts;
+    wordCount++;
+
+    scoreEl.textContent = score;
+    chainCountEl.textContent = (chain.length) + ' WORDS';
+    errorMsg.textContent = '';
+
+    renderChainWord(raw, false);
+    updateRequiredStart();
+
+    // Reset timer with decreased time
+    maxWordTime = getTimeForWord(wordCount);
+    wordTimeLeft = maxWordTime;
+    lastTimerTs = performance.now();
+    lastWordTime = performance.now();
+    updateTimerDisplay();
+
+    playChainLink();
+    if (speedBonus) {
+      setTimeout(playSpeedBonus, 200);
+    }
+
+    wordInput.classList.add('success');
+    setTimeout(function() { wordInput.classList.remove('success'); }, 300);
+
+    var rect = wordInput.getBoundingClientRect();
+    var particleColor = isRare ? '#ffd700' : speedBonus ? '#39ff14' : '#00f0ff';
+    var particleCount = isRare ? 16 : speedBonus ? 14 : 10;
+    spawnParticles(rect.left + rect.width / 2, rect.top, particleColor, particleCount);
+    spawnScorePopup(rect.right - 40, rect.top - 10, '+' + pts);
+  }
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    wordInput.classList.add('error');
+    setTimeout(function() { wordInput.classList.remove('error'); }, 300);
+  }
+
+  // ===================== GAME END =====================
+  function endGame() {
+    if (timerRAF) { cancelAnimationFrame(timerRAF); timerRAF = null; }
+    wordInput.disabled = true;
+    playGameOver();
+
+    var longestWord = chain.reduce(function(a, b) { return a.length >= b.length ? a : b; }, '');
+
+    rWords.textContent = chain.length;
+    rScore.textContent = score;
+    rLongest.textContent = longestWord.length;
+
+    var key = isDaily ? 'wordchain_daily_best_' + getDailySeed() : 'wordchain_best';
+    var prev = parseInt(localStorage.getItem(key) || '0');
+    rBest.textContent = Math.max(prev, score);
+
+    if (score > prev) {
+      localStorage.setItem(key, String(score));
+      newBestEl.style.display = 'block';
+    } else {
+      newBestEl.style.display = 'none';
+    }
+
+    if (isChallenge) {
+      beatChallengeEl.style.display = 'block';
+      if (score > challengeScore) {
+        beatChallengeEl.textContent = 'YOU WON! ' + score + ' vs ' + challengeScore;
+        beatChallengeEl.style.borderColor = 'var(--neon-green)';
+        beatChallengeEl.style.color = 'var(--neon-green)';
+        beatChallengeEl.style.background = 'rgba(57,255,20,0.08)';
+      } else if (score === challengeScore) {
+        beatChallengeEl.textContent = 'TIED! ' + score + ' vs ' + challengeScore;
+        beatChallengeEl.style.borderColor = 'var(--neon-orange)';
+        beatChallengeEl.style.color = 'var(--neon-orange)';
+        beatChallengeEl.style.background = 'rgba(255,140,0,0.08)';
+      } else {
+        beatChallengeEl.textContent = 'DEFEATED! ' + score + ' vs ' + challengeScore;
+        beatChallengeEl.style.borderColor = 'var(--neon-pink)';
+        beatChallengeEl.style.color = 'var(--neon-pink)';
+        beatChallengeEl.style.background = 'rgba(255,45,123,0.08)';
+      }
+    } else {
+      beatChallengeEl.style.display = 'none';
+    }
+
+    // Render result chain using safe DOM methods
+    resultChain.textContent = '';
+    for (var i = 0; i < chain.length; i++) {
+      var w = chain[i];
+      var upper = w.toUpperCase();
+      var wordSpan = document.createElement('span');
+      wordSpan.className = 'result-chain-word';
+
+      if (i === 0) {
+        wordSpan.appendChild(createSpan('normal-letters', upper.slice(0, -1)));
+        wordSpan.appendChild(createSpan('link-letter', upper.slice(-1)));
+      } else {
+        wordSpan.appendChild(createSpan('link-letter', upper.charAt(0)));
+        wordSpan.appendChild(createSpan('normal-letters', upper.slice(1)));
+      }
+
+      resultChain.appendChild(wordSpan);
+
+      if (i < chain.length - 1) {
+        var arrow = document.createElement('span');
+        arrow.className = 'result-arrow';
+        arrow.textContent = ' \u2192 ';
+        resultChain.appendChild(arrow);
+      }
+    }
+
+    // Spawn celebration particles
+    setTimeout(function() {
+      for (var i = 0; i < 3; i++) {
+        spawnParticles(
+          canvasW * (0.2 + Math.random() * 0.6),
+          canvasH * (0.2 + Math.random() * 0.4),
+          i === 0 ? '#00f0ff' : i === 1 ? '#ffd700' : '#b44dff',
+          12
+        );
+      }
+    }, 300);
+
+    showScreen('result');
+  }
+
+  // ===================== SHARING =====================
+  function getChainEmoji() {
+    var len = Math.min(chain.length, 20);
+    var blocks = '';
+    for (var i = 0; i < len; i++) {
+      var w = chain[i];
+      if (w.length >= 7) blocks += '\uD83D\uDFE8'; // yellow
+      else if (w.length >= 5) blocks += '\uD83D\uDFE9'; // green
+      else blocks += '\u2B1C'; // white
+    }
+    if (chain.length > 20) blocks += '...';
+    return blocks;
+  }
+
+  function getShareText() {
+    var emoji = getChainEmoji();
+    var catTag = category !== 'any' ? ' [' + getCategoryLabel() + ']' : '';
+    var dailyTag = isDaily ? ' #daily' : '';
+    var preview = chain.slice(0, 5).map(function(w) { return w.toUpperCase(); }).join(' \u2192 ');
+    var more = chain.length > 5 ? ' \u2192 ...' : '';
+    return '\u26D3\uFE0F WORDCHAIN' + catTag + dailyTag + '\n' +
+      chain.length + ' words | ' + score + ' pts\n' +
+      emoji + '\n' +
+      preview + more + '\n' +
+      'Can you beat my chain?';
+  }
+
+  function getChallengeText() {
+    var encoded = encodeChallenge(seed, score, category, chain.slice(0, 5));
+    var url = window.location.origin + window.location.pathname + '#' + encoded;
+    var catTag = category !== 'any' ? ' [' + getCategoryLabel() + ']' : '';
+    return '\u26D3\uFE0F WORDCHAIN CHALLENGE' + catTag + '\n' +
+      'I scored ' + score + ' pts with ' + chain.length + ' words!\n' +
+      'Starting letter: "' + startingLetter.toUpperCase() + '"\n' +
+      'Beat me: ' + url;
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg || 'COPIED TO CLIPBOARD';
+    toast.classList.add('visible');
+    setTimeout(function() { toast.classList.remove('visible'); }, 2000);
+  }
+
+  function shareOrCopy(text) {
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {});
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('COPIED TO CLIPBOARD');
+      }).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('COPIED TO CLIPBOARD');
+  }
+
+  // ===================== EVENT HANDLERS =====================
+  btnStart.addEventListener('click', function() { startGame(); });
+
+  btnAgain.addEventListener('click', function() {
+    isChallenge = false;
+    window.location.hash = '';
+    challengeInfo.style.display = 'none';
+    showScreen('start');
+    updateBestDisplay();
+  });
+
+  btnShare.addEventListener('click', function() { shareOrCopy(getShareText()); });
+  btnChallenge.addEventListener('click', function() { shareOrCopy(getChallengeText()); });
+
+  wordInput.addEventListener('keydown', function(e) {
+    if (gameState !== 'game') return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitWord();
+    } else if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+      playKeystroke();
+    }
+  });
+
+  wordInput.addEventListener('input', function() {
+    if (gameState !== 'game') return;
+    wordInput.value = wordInput.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (gameState === 'start' && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      startGame();
+    }
+    if (gameState === 'result' && e.key === 'Enter') {
+      e.preventDefault();
+      isChallenge = false;
+      window.location.hash = '';
+      challengeInfo.style.display = 'none';
+      showScreen('start');
+      updateBestDisplay();
+    }
+  });
+
+  // ===================== BOOT =====================
+  init();
+})();
+</script>
+</body>
+</html>
