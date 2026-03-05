@@ -516,6 +516,13 @@ body {
 /* Canvas for sharing */
 #share-canvas { display: none; }
 
+.score-table { margin: 8px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', sans-serif; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #6a6a80; font-size: 13px; width: 20px; }
+.score-val  { color: #00e5ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,229,255,0.4); flex: 1; text-align: center; }
+.score-time { color: #6a6a80; font-size: 12px; text-align: right; }
+
 /* Responsive */
 @media (max-height: 700px) {
   .swatch { border-radius: 12px; }
@@ -598,6 +605,7 @@ body {
     <div class="result-rank" id="result-rank"></div>
     <div id="new-best-label" class="new-best" style="display:none">NEW PERSONAL BEST</div>
     <div class="result-rounds" id="result-rounds"></div>
+    <div class="score-table" id="palette-score-table"></div>
     <div class="result-btns">
       <button class="result-btn share" id="btn-share">SHARE</button>
       <button class="result-btn" id="btn-share-img">IMAGE</button>
@@ -613,6 +621,50 @@ body {
 <script>
 (function() {
   'use strict';
+
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function renderScoreTable(el, scores) {
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var title = document.createElement('div');
+    title.className = 'score-table-title';
+    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    el.appendChild(title);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = String(s.score);
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      el.appendChild(row);
+    });
+  }
 
   // ===================== SEEDED RNG =====================
   function mulberry32(seed) {
@@ -808,9 +860,9 @@ body {
   }
 
   function updateBestDisplay() {
-    var best = localStorage.getItem('palette-best');
-    if (best) {
-      $startBest.textContent = 'BEST: ' + best + ' - ' + getRank(parseInt(best));
+    var scores = JSON.parse(localStorage.getItem('neonarcade_scores_palette') || '[]');
+    if (scores.length > 0) {
+      $startBest.textContent = 'BEST: ' + scores[0].score + ' - ' + getRank(scores[0].score);
     } else {
       $startBest.textContent = '';
     }
@@ -1056,9 +1108,9 @@ body {
     $resultScore.textContent = '0';
     $resultRank.textContent = rank;
 
-    var prev = parseInt(localStorage.getItem('palette-best') || '0');
-    if (total > prev) {
-      localStorage.setItem('palette-best', total.toString());
+    var topScores = saveScore('neonarcade_scores_palette', total);
+    var prev = topScores.length > 1 ? topScores[1].score : 0;
+    if (total >= topScores[0].score && (topScores.length === 1 || total > prev)) {
       $newBest.style.display = 'block';
     } else {
       $newBest.style.display = 'none';
@@ -1067,6 +1119,7 @@ body {
     buildResultRows();
     showScreen('result-screen');
     animateScore(total);
+    renderScoreTable(document.getElementById('palette-score-table'), topScores);
   }
 
   function animateScore(target) {

@@ -3,1330 +3,1022 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BURNDOWN - NEON ARCADE</title>
+<title>BURNDOWN — NEON ARCADE</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
-:root {
-  --bg-deep: #0a0a12;
-  --bg-surface: #12121f;
-  --neon-cyan: #00f0ff;
-  --neon-green: #39ff14;
-  --neon-gold: #ffd700;
-  --neon-pink: #ff2d7b;
-  --neon-purple: #b44dff;
-  --neon-orange: #ff8c00;
-  --text-dim: #4a4a6a;
-  --text-mid: #8888aa;
-  --fire-red: #ff4500;
-  --fire-yellow: #ffcc00;
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%; overflow: hidden;
+    background: #0a0a12;
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+  body::after {
+    content: '';
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent, transparent 2px,
+      rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+    );
+    z-index: 999;
+  }
 
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
-}
+  .bg-glow {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,140,0,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 30% 10%, rgba(255,140,0,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 90%, rgba(255,45,123,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(255,69,0,0.04) 0%, transparent 60%);
-}
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10;
+  }
+  .screen.hidden { display: none; }
 
-#app {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+  /* START */
+  #startScreen {
+    background: #0a0a12;
+    gap: 20px;
+    padding: 40px 20px;
+  }
 
-.screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 20px; }
-.screen.active { display: flex; }
+  .game-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(40px, 10vw, 80px);
+    letter-spacing: 6px;
+    color: #ff8c00;
+    text-shadow:
+      0 0 10px rgba(255,140,0,0.7),
+      0 0 40px rgba(255,140,0,0.3),
+      0 0 80px rgba(255,140,0,0.15);
+    line-height: 1;
+  }
 
-/* START SCREEN */
-#startScreen .title {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
-  font-size: clamp(36px, 8vw, 64px);
-  letter-spacing: 6px;
-  color: var(--neon-orange);
-  text-shadow: 0 0 10px rgba(255,140,0,0.6), 0 0 40px rgba(255,140,0,0.2), 0 0 80px rgba(255,69,0,0.15);
-  margin-bottom: 8px;
-}
+  .game-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 18px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #8888aa;
+    text-align: center;
+    max-width: 400px;
+    line-height: 1.6;
+  }
 
-#startScreen .subtitle {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 300;
-  font-size: clamp(14px, 3vw, 20px);
-  letter-spacing: 3px;
-  color: var(--text-mid);
-  text-transform: uppercase;
-  margin-bottom: 24px;
-  text-align: center;
-  max-width: 400px;
-}
+  .start-stats {
+    display: flex;
+    gap: 32px;
+    margin: 10px 0;
+  }
+  .stat-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
+    letter-spacing: 3px; text-transform: uppercase; color: #4a4a6a;
+  }
+  .stat-val {
+    font-family: 'Orbitron', monospace; font-weight: 700; font-size: 20px; color: #ff8c00;
+  }
 
-#startScreen .tower-num {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: clamp(16px, 3vw, 22px);
-  color: var(--fire-yellow);
-  letter-spacing: 2px;
-  margin-bottom: 6px;
-  text-shadow: 0 0 10px rgba(255,204,0,0.4);
-}
+  .divider {
+    width: 200px; height: 1px; flex-shrink: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,140,0,0.4), transparent);
+  }
 
-#startScreen .daily-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 300;
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-bottom: 30px;
-}
+  .best-time-display {
+    font-family: 'Orbitron', monospace; font-size: 13px;
+    letter-spacing: 2px; color: #4a4a6a;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .best-time-val { color: #ffd700; }
 
-#startScreen .best-time {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  color: var(--text-mid);
-  margin-bottom: 30px;
-}
+  .play-btn {
+    font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+    letter-spacing: 3px; padding: 16px 48px;
+    border: 1px solid #ff8c00; background: rgba(255,140,0,0.08);
+    color: #ff8c00; cursor: pointer; border-radius: 3px;
+    text-transform: uppercase; transition: all 0.2s; touch-action: manipulation;
+  }
+  .play-btn:hover, .play-btn:active {
+    background: rgba(255,140,0,0.18);
+    box-shadow: 0 0 24px rgba(255,140,0,0.25); transform: scale(1.04);
+  }
 
-.play-btn {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 3px;
-  padding: 14px 40px;
-  border: 1px solid var(--neon-orange);
-  background: rgba(255,140,0,0.06);
-  color: var(--neon-orange);
-  cursor: pointer;
-  border-radius: 3px;
-  text-transform: uppercase;
-  transition: all 0.2s;
-}
-.play-btn:hover { background: rgba(255,140,0,0.15); box-shadow: 0 0 20px rgba(255,140,0,0.2); transform: scale(1.04); }
-.play-btn:active { transform: scale(0.98); }
+  .controls-hint {
+    font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
+    letter-spacing: 2px; text-transform: uppercase; color: #4a4a6a;
+    text-align: center; line-height: 1.8;
+  }
 
-.controls-hint {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 300;
-  font-size: 12px;
-  letter-spacing: 2px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-top: 20px;
-}
+  /* GAME SCREEN */
+  #gameScreen {
+    background: #0a0a12; flex-direction: row;
+    align-items: stretch; justify-content: center;
+    padding: 0; gap: 0;
+  }
 
-/* GAME SCREEN */
-#gameScreen {
-  justify-content: flex-start;
-  padding: 10px 15px;
-}
+  .tower-col {
+    width: 60px; min-width: 60px;
+    display: flex; flex-direction: column;
+    align-items: center; padding: 12px 6px; gap: 3px;
+    background: rgba(18,18,31,0.8);
+    border-right: 1px solid rgba(255,140,0,0.1);
+    overflow: hidden;
+  }
 
-.game-header {
-  width: 100%;
-  max-width: 500px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
+  .tower-label {
+    font-family: 'Orbitron', monospace; font-size: 7px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: #4a4a6a;
+    writing-mode: vertical-rl; text-orientation: mixed;
+    margin-bottom: 6px; flex-shrink: 0;
+  }
 
-.timer {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: clamp(20px, 5vw, 32px);
-  color: var(--neon-orange);
-  text-shadow: 0 0 10px rgba(255,140,0,0.5);
-}
+  .tower-blocks {
+    display: flex; flex-direction: column; gap: 3px;
+    flex: 1; justify-content: flex-start;
+    width: 100%; align-items: center;
+  }
 
-.progress-label {
-  font-family: 'Orbitron', monospace;
-  font-weight: 400;
-  font-size: clamp(12px, 3vw, 16px);
-  color: var(--text-mid);
-  letter-spacing: 2px;
-}
+  .tower-block {
+    width: 32px; height: 18px; border-radius: 2px; flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.3s;
+  }
+  .tower-block.done {
+    background: rgba(57,255,20,0.15); border-color: rgba(57,255,20,0.4);
+    box-shadow: 0 0 6px rgba(57,255,20,0.2);
+  }
+  .tower-block.current {
+    background: rgba(255,140,0,0.2); border-color: rgba(255,140,0,0.8);
+    animation: pulseTower 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes pulseTower {
+    from { box-shadow: 0 0 6px rgba(255,140,0,0.3); }
+    to   { box-shadow: 0 0 14px rgba(255,140,0,0.7); }
+  }
 
-.mistakes-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--neon-pink);
-  letter-spacing: 1px;
-}
+  .flame-zone {
+    width: 48px; height: 36px; position: relative;
+    overflow: hidden; flex-shrink: 0; margin-top: 4px;
+  }
+  .flame {
+    position: absolute; bottom: 0;
+    border-radius: 50% 50% 20% 20%;
+    animation: flicker 0.3s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+  }
+  .flame:nth-child(1){ left:2px;  width:7px; height:22px; background:#ff8c00; animation-duration:0.25s; }
+  .flame:nth-child(2){ left:10px; width:9px; height:30px; background:#ffd700; animation-delay:0.1s; animation-duration:0.35s; }
+  .flame:nth-child(3){ left:20px; width:7px; height:18px; background:#ff2d7b; animation-delay:0.05s; animation-duration:0.28s; }
+  .flame:nth-child(4){ left:29px; width:8px; height:26px; background:#ff8c00; animation-delay:0.15s; animation-duration:0.32s; }
+  .flame:nth-child(5){ left:38px; width:6px; height:14px; background:#ffd700; animation-delay:0.08s; animation-duration:0.22s; }
+  @keyframes flicker {
+    from { transform: scaleX(1) scaleY(1) rotate(-3deg); opacity:0.8; }
+    to   { transform: scaleX(0.8) scaleY(1.15) rotate(3deg); opacity:1; }
+  }
 
-/* TOWER */
-.tower-container {
-  width: 100%;
-  max-width: 500px;
-  height: 160px;
-  position: relative;
-  margin-bottom: 15px;
-  overflow: hidden;
-}
+  .task-col {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: stretch; max-width: 600px; overflow: hidden;
+  }
 
-.tower-wrap {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 2px;
-  transition: transform 0.3s ease;
-}
+  .timer-bar {
+    background: rgba(18,18,31,0.9);
+    border-bottom: 1px solid rgba(255,140,0,0.2);
+    padding: 10px 16px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; flex-shrink: 0; position: relative;
+  }
 
-.tower-block {
-  width: clamp(60px, 20vw, 100px);
-  height: 7px;
-  border-radius: 1px;
-  transition: all 0.4s ease;
-  position: relative;
-}
+  .timer-display {
+    font-family: 'Orbitron', monospace; font-weight: 900;
+    font-size: clamp(24px, 5vw, 40px); color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0,240,255,0.5), 0 0 30px rgba(0,240,255,0.2);
+    letter-spacing: 2px; line-height: 1; min-width: 90px;
+  }
+  .timer-display.penalty-flash {
+    animation: penaltyFlash 0.5s ease-out;
+  }
+  @keyframes penaltyFlash {
+    0%   { color:#ff2d7b; text-shadow:0 0 20px rgba(255,45,123,0.8); transform:scale(1.1); }
+    100% { color:#00f0ff; text-shadow:0 0 10px rgba(0,240,255,0.5); transform:scale(1); }
+  }
 
-.tower-block.done {
-  animation: blockBurn 0.6s forwards;
-}
+  .penalty-label {
+    position: absolute; left:50%; top:4px;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', monospace; font-size:20px; font-weight:700;
+    color:#ff2d7b; opacity:0; pointer-events:none;
+    text-shadow:0 0 12px rgba(255,45,123,0.9); white-space:nowrap;
+  }
+  .penalty-label.show { animation: showPenalty 0.8s ease-out forwards; }
+  @keyframes showPenalty {
+    0%   { opacity:1; transform:translateX(-50%) translateY(0); }
+    80%  { opacity:0.8; transform:translateX(-50%) translateY(-20px); }
+    100% { opacity:0; transform:translateX(-50%) translateY(-24px); }
+  }
 
-@keyframes blockBurn {
-  0% { opacity: 1; transform: translateX(0) rotate(0); }
-  30% { background: var(--fire-red) !important; box-shadow: 0 0 12px rgba(255,69,0,0.8); }
-  100% { opacity: 0; transform: translateX(40px) rotate(15deg) translateY(20px); }
-}
+  .progress-info { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .task-counter {
+    font-family:'Orbitron',monospace; font-size:12px; font-weight:700;
+    letter-spacing:2px; color:#ff8c00;
+  }
+  .error-count {
+    font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:300;
+    letter-spacing:2px; text-transform:uppercase; color:#4a4a6a; white-space:nowrap;
+  }
+  .error-count-val { color:#ff2d7b; }
 
-/* TASK AREA */
-.task-area {
-  width: 100%;
-  max-width: 500px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+  .task-area {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:16px 20px; gap:18px; overflow-y:auto; position:relative;
+  }
+  .task-area.shake { animation:screenShake 0.25s ease-out; }
+  @keyframes screenShake {
+    0%   { transform:translate(0,0); }
+    20%  { transform:translate(-3px,2px); }
+    40%  { transform:translate(3px,-2px); }
+    60%  { transform:translate(-2px,3px); }
+    80%  { transform:translate(2px,-1px); }
+    100% { transform:translate(0,0); }
+  }
+  .task-area.slide-out { animation:slideOut 0.18s ease-in forwards; }
+  .task-area.slide-in  { animation:slideIn  0.18s ease-out forwards; }
+  @keyframes slideOut { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-28px)} }
+  @keyframes slideIn  { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
 
-.task-type {
-  font-family: 'Orbitron', monospace;
-  font-weight: 400;
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
+  .task-type-label {
+    font-family:'Rajdhani',sans-serif; font-weight:300; font-size:12px;
+    letter-spacing:4px; text-transform:uppercase; color:#4a4a6a; text-align:center;
+  }
+  .task-question {
+    font-family:'Orbitron',monospace; font-weight:700;
+    font-size:clamp(18px,4.5vw,30px); text-align:center;
+    color:#fff; letter-spacing:2px; line-height:1.3;
+  }
 
-.task-prompt {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: clamp(20px, 5vw, 32px);
-  color: #fff;
-  text-align: center;
-  margin-bottom: 20px;
-  min-height: 40px;
-  line-height: 1.2;
-}
+  .task-input-wrap {
+    display:flex; flex-direction:column; align-items:center;
+    gap:12px; width:100%; max-width:340px;
+  }
+  .task-input {
+    width:100%; background:rgba(18,18,31,0.9);
+    border:1px solid rgba(255,140,0,0.4); border-radius:4px;
+    color:#fff; font-family:'Orbitron',monospace; font-size:22px;
+    font-weight:700; letter-spacing:4px; text-align:center;
+    padding:14px 16px; outline:none;
+    touch-action:auto; -webkit-user-select:text; user-select:text;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .task-input:focus { border-color:#ff8c00; box-shadow:0 0 16px rgba(255,140,0,0.2); }
+  .task-input.wrong {
+    border-color:#ff2d7b; box-shadow:0 0 16px rgba(255,45,123,0.4);
+    animation:inputShake 0.3s ease-out;
+  }
+  @keyframes inputShake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+  }
+  .task-hint {
+    font-family:'Rajdhani',sans-serif; font-weight:300; font-size:12px;
+    letter-spacing:2px; color:#4a4a6a; text-transform:uppercase;
+  }
+  .submit-btn {
+    font-family:'Orbitron',monospace; font-weight:700; font-size:13px;
+    letter-spacing:3px; padding:14px 40px;
+    border:1px solid #ff8c00; background:rgba(255,140,0,0.08);
+    color:#ff8c00; cursor:pointer; border-radius:3px;
+    text-transform:uppercase; transition:all 0.15s;
+    touch-action:manipulation; min-height:52px; width:100%;
+  }
+  .submit-btn:hover,.submit-btn:active {
+    background:rgba(255,140,0,0.2); box-shadow:0 0 16px rgba(255,140,0,0.3);
+  }
 
-.stroop-word {
-  font-size: clamp(28px, 7vw, 48px);
-  font-weight: 900;
-}
+  .choices-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    width:100%; max-width:400px;
+  }
+  .choice-btn {
+    font-family:'Orbitron',monospace; font-weight:700;
+    font-size:clamp(11px,2.5vw,14px); letter-spacing:1px;
+    padding:0 10px; min-height:64px;
+    border:1px solid rgba(0,240,255,0.3); background:rgba(0,240,255,0.04);
+    color:#00f0ff; cursor:pointer; border-radius:4px;
+    text-transform:uppercase; transition:all 0.15s;
+    touch-action:manipulation; line-height:1.3;
+    word-break:break-word; display:flex; align-items:center;
+    justify-content:center; text-align:center;
+  }
+  .choice-btn:hover,.choice-btn:active {
+    background:rgba(0,240,255,0.12); box-shadow:0 0 14px rgba(0,240,255,0.2);
+    transform:scale(1.02);
+  }
+  .choice-btn.correct {
+    background:rgba(57,255,20,0.15)!important; border-color:#39ff14!important;
+    color:#39ff14!important; box-shadow:0 0 16px rgba(57,255,20,0.3);
+  }
+  .choice-btn.wrong-choice {
+    background:rgba(255,45,123,0.08)!important; border-color:rgba(255,45,123,0.3)!important;
+    color:rgba(255,45,123,0.5)!important;
+  }
 
-.stroop-hint {
-  font-size: 0.6em;
-  color: var(--text-mid);
-}
+  .dots-flex {
+    display:flex; flex-wrap:wrap; gap:14px;
+    justify-content:center; max-width:360px;
+  }
+  .dot-btn {
+    width:68px; height:68px; border-radius:50%;
+    border:2px solid rgba(255,255,255,0.15);
+    cursor:pointer; transition:all 0.15s;
+    touch-action:manipulation; flex-shrink:0;
+  }
+  .dot-btn:hover,.dot-btn:active {
+    transform:scale(1.14); border-color:rgba(255,255,255,0.5);
+    box-shadow:0 0 20px rgba(255,255,255,0.3);
+  }
 
-.input-area {
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
+  .color-swatch {
+    width:130px; height:90px; border-radius:8px;
+    border:1px solid rgba(255,255,255,0.1);
+    box-shadow:0 0 30px rgba(0,0,0,0.5); flex-shrink:0;
+  }
 
-.text-input {
-  width: 100%;
-  max-width: 300px;
-  padding: 12px 16px;
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: 2px;
-  text-align: center;
-  background: rgba(255,140,0,0.06);
-  border: 1px solid rgba(255,140,0,0.3);
-  border-radius: 3px;
-  color: #fff;
-  outline: none;
-  text-transform: uppercase;
-}
-.text-input:focus { border-color: var(--neon-orange); box-shadow: 0 0 15px rgba(255,140,0,0.2); }
+  /* RESULT */
+  #resultScreen {
+    background:#0a0a12; gap:14px; padding:24px 20px;
+    text-align:center; overflow-y:auto;
+  }
+  .result-title {
+    font-family:'Orbitron',monospace; font-weight:900;
+    font-size:clamp(14px,3vw,20px); letter-spacing:6px;
+    color:#ff8c00; text-shadow:0 0 10px rgba(255,140,0,0.6);
+    text-transform:uppercase;
+  }
+  .result-time {
+    font-family:'Orbitron',monospace; font-weight:900;
+    font-size:clamp(44px,11vw,80px); color:#00f0ff;
+    text-shadow:0 0 16px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.2);
+    line-height:1; letter-spacing:2px;
+  }
+  .result-tier {
+    font-family:'Orbitron',monospace; font-weight:900;
+    font-size:clamp(18px,4.5vw,28px); letter-spacing:4px; text-transform:uppercase;
+  }
+  .tier-blazing { color:#ffd700; text-shadow:0 0 12px rgba(255,215,0,0.6); }
+  .tier-fast    { color:#39ff14; text-shadow:0 0 12px rgba(57,255,20,0.5); }
+  .tier-average { color:#00f0ff; text-shadow:0 0 10px rgba(0,240,255,0.5); }
+  .tier-slow    { color:#ff8c00; text-shadow:0 0 10px rgba(255,140,0,0.5); }
 
-.submit-btn {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 3px;
-  padding: 12px 50px;
-  border: 1px solid var(--neon-orange);
-  background: rgba(255,140,0,0.1);
-  color: var(--neon-orange);
-  cursor: pointer;
-  border-radius: 3px;
-  text-transform: uppercase;
-  transition: all 0.15s;
-}
-.submit-btn:hover { background: rgba(255,140,0,0.2); box-shadow: 0 0 20px rgba(255,140,0,0.25); }
-.submit-btn:active { transform: scale(0.96); }
+  .result-stats { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+  .result-stat { display:flex; flex-direction:column; align-items:center; gap:3px; min-width:80px; }
+  .result-stat-label {
+    font-family:'Rajdhani',sans-serif; font-weight:300; font-size:10px;
+    letter-spacing:3px; text-transform:uppercase; color:#4a4a6a;
+  }
+  .result-stat-val { font-family:'Orbitron',monospace; font-weight:700; font-size:20px; color:#fff; }
 
-/* REFLEX DOTS */
-.dots-container {
-  display: flex;
-  gap: clamp(10px, 3vw, 20px);
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 10px;
-}
+  .new-best-badge {
+    font-family:'Orbitron',monospace; font-weight:700; font-size:11px;
+    letter-spacing:3px; color:#ffd700; text-shadow:0 0 8px rgba(255,215,0,0.5);
+    border:1px solid rgba(255,215,0,0.3); padding:6px 16px; border-radius:3px;
+    background:rgba(255,215,0,0.06); animation:badgePulse 1s ease-in-out infinite alternate;
+  }
+  @keyframes badgePulse {
+    from { box-shadow:0 0 6px rgba(255,215,0,0.2); }
+    to   { box-shadow:0 0 16px rgba(255,215,0,0.5); }
+  }
 
-.reflex-dot {
-  width: clamp(48px, 12vw, 70px);
-  height: clamp(48px, 12vw, 70px);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.1s;
-  border: 2px solid rgba(255,255,255,0.15);
-}
-.reflex-dot:active { transform: scale(0.9); }
+  .result-grid-row {
+    display:grid; grid-template-columns:repeat(20,1fr);
+    gap:3px; max-width:300px; width:100%; margin:0 auto;
+  }
+  .result-grid-cell {
+    aspect-ratio:1; border-radius:2px;
+    background:rgba(57,255,20,0.3); border:1px solid rgba(57,255,20,0.5);
+  }
 
-/* SPEED TAP */
-.tap-btn {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
-  font-size: clamp(16px, 4vw, 24px);
-  padding: clamp(20px, 5vw, 35px) clamp(40px, 10vw, 80px);
-  border: 2px solid var(--neon-orange);
-  background: rgba(255,140,0,0.12);
-  color: var(--neon-orange);
-  cursor: pointer;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  transition: all 0.08s;
-  text-shadow: 0 0 10px rgba(255,140,0,0.5);
-}
-.tap-btn:active { transform: scale(0.95); background: rgba(255,140,0,0.25); }
+  .result-buttons { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .share-btn {
+    font-family:'Orbitron',monospace; font-weight:700; font-size:12px;
+    letter-spacing:3px; padding:14px 28px;
+    border:1px solid #39ff14; background:rgba(57,255,20,0.08);
+    color:#39ff14; cursor:pointer; border-radius:3px;
+    text-transform:uppercase; transition:all 0.2s;
+    touch-action:manipulation; min-height:50px;
+  }
+  .share-btn:hover,.share-btn:active {
+    background:rgba(57,255,20,0.18); box-shadow:0 0 20px rgba(57,255,20,0.3);
+  }
+  .again-btn {
+    font-family:'Orbitron',monospace; font-weight:700; font-size:12px;
+    letter-spacing:3px; padding:14px 28px;
+    border:1px solid #ff8c00; background:rgba(255,140,0,0.08);
+    color:#ff8c00; cursor:pointer; border-radius:3px;
+    text-transform:uppercase; transition:all 0.2s;
+    touch-action:manipulation; min-height:50px;
+  }
+  .again-btn:hover,.again-btn:active {
+    background:rgba(255,140,0,0.18); box-shadow:0 0 20px rgba(255,140,0,0.3);
+  }
+  .home-link {
+    font-family:'Rajdhani',sans-serif; font-weight:300; font-size:11px;
+    letter-spacing:3px; text-transform:uppercase; color:#4a4a6a;
+    text-decoration:none; transition:color 0.2s;
+  }
+  .home-link:hover { color:#8888aa; }
 
-.tap-counter {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: clamp(28px, 7vw, 48px);
-  color: var(--fire-yellow);
-  text-shadow: 0 0 15px rgba(255,204,0,0.5);
-  margin-bottom: 10px;
-}
+  .copy-toast {
+    position:fixed; bottom:30px; left:50%;
+    transform:translateX(-50%) translateY(60px);
+    background:rgba(57,255,20,0.12); border:1px solid rgba(57,255,20,0.4);
+    color:#39ff14; font-family:'Orbitron',monospace;
+    font-size:12px; font-weight:700; letter-spacing:3px;
+    padding:12px 24px; border-radius:4px; z-index:9999;
+    transition:transform 0.3s ease; pointer-events:none;
+  }
+  .copy-toast.show { transform:translateX(-50%) translateY(0); }
 
-/* MEMORY DISPLAY */
-.memory-numbers {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
-  font-size: clamp(28px, 7vw, 48px);
-  letter-spacing: 12px;
-  color: var(--neon-orange);
-  text-shadow: 0 0 15px rgba(255,140,0,0.6);
-  margin-bottom: 15px;
-}
+  .score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+  .score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+  .score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+  .score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+  .score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
 
-/* PENALTY FLASH */
-.penalty-flash {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,45,123,0.15);
-  z-index: 100;
-  pointer-events: none;
-  animation: penaltyFade 0.4s forwards;
-}
-@keyframes penaltyFade {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
+  .hidden { display:none!important; }
 
-/* SCREEN SHAKE */
-.shake {
-  animation: shakeAnim 0.25s;
-}
-@keyframes shakeAnim {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-3px, 2px); }
-  40% { transform: translate(3px, -2px); }
-  60% { transform: translate(-2px, -3px); }
-  80% { transform: translate(2px, 3px); }
-}
-
-/* RESULT SCREEN */
-#resultScreen .result-title {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
-  font-size: clamp(28px, 6vw, 48px);
-  letter-spacing: 4px;
-  color: var(--neon-orange);
-  text-shadow: 0 0 10px rgba(255,140,0,0.6), 0 0 40px rgba(255,140,0,0.2);
-  margin-bottom: 8px;
-}
-
-#resultScreen .result-subtitle {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 300;
-  font-size: 14px;
-  letter-spacing: 2px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-bottom: 24px;
-}
-
-.result-stats {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 8px;
-}
-
-.stat-box { text-align: center; }
-.stat-box .stat-val {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: clamp(24px, 6vw, 36px);
-  color: var(--fire-yellow);
-  text-shadow: 0 0 10px rgba(255,204,0,0.4);
-}
-.stat-box .stat-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 300;
-  font-size: 12px;
-  letter-spacing: 2px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-}
-
-.result-best {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 500;
-  font-size: 15px;
-  color: var(--neon-green);
-  margin-bottom: 6px;
-}
-
-.result-percentile {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  color: var(--neon-purple);
-  margin-bottom: 24px;
-}
-
-.result-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-}
-
-.share-btn {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 3px;
-  padding: 12px 36px;
-  border: 1px solid var(--neon-green);
-  background: rgba(57,255,20,0.06);
-  color: var(--neon-green);
-  cursor: pointer;
-  border-radius: 3px;
-  text-transform: uppercase;
-  transition: all 0.2s;
-}
-.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
-
-.challenge-btn {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 3px;
-  padding: 12px 36px;
-  border: 1px solid var(--neon-purple);
-  background: rgba(180,77,255,0.06);
-  color: var(--neon-purple);
-  cursor: pointer;
-  border-radius: 3px;
-  text-transform: uppercase;
-  transition: all 0.2s;
-}
-.challenge-btn:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 20px rgba(180,77,255,0.2); }
-
-.copied-msg {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--neon-green);
-  opacity: 0;
-  transition: opacity 0.3s;
-  height: 20px;
-}
-.copied-msg.show { opacity: 1; }
-
-/* FIRE PARTICLES */
-#fireCanvas {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
+  @media(max-width:520px){
+    .tower-col{width:42px;min-width:42px;padding:10px 4px;}
+    .tower-block{width:26px;height:14px;}
+    .flame-zone{width:36px;}
+    .timer-display{font-size:20px;min-width:70px;}
+    .task-question{font-size:16px;}
+    .choice-btn{min-height:54px;font-size:10px;}
+    .dot-btn{width:56px;height:56px;}
+    .choices-grid{gap:8px;}
+  }
 </style>
 </head>
 <body>
-<canvas id="fireCanvas"></canvas>
-<div id="app">
+<div class="bg-glow"></div>
 
-  <div id="startScreen" class="screen active">
-    <div class="title">BURNDOWN</div>
-    <div class="subtitle">Race through 20 micro-tasks. Wrong answers cost 3 seconds. Burn the tower down.</div>
-    <div class="tower-num" id="towerNum">TOWER #1</div>
-    <div class="daily-label">DAILY CHALLENGE</div>
-    <div class="best-time" id="bestTimeDisplay"></div>
-    <button class="play-btn" id="startBtn">IGNITE</button>
-    <div class="controls-hint">TYPE ANSWERS / TAP TARGETS / ENTER TO SUBMIT</div>
-  </div>
-
-  <div id="gameScreen" class="screen">
-    <div class="game-header">
-      <div class="timer" id="timerDisplay">0:00.0</div>
-      <div class="progress-label" id="progressLabel">1 / 20</div>
-      <div class="mistakes-label" id="mistakesLabel"></div>
+<!-- START SCREEN -->
+<div class="screen" id="startScreen">
+  <div class="game-logo">BURNDOWN</div>
+  <div class="game-subtitle">20 tasks. Beat the clock.<br>Wrong answer = +5s penalty.</div>
+  <div class="divider"></div>
+  <div class="start-stats">
+    <div class="stat-box">
+      <div class="stat-label">Tasks</div>
+      <div class="stat-val">20</div>
     </div>
-    <div class="tower-container" id="towerContainer">
-      <div class="tower-wrap" id="towerWrap"></div>
+    <div class="stat-box">
+      <div class="stat-label">Penalty</div>
+      <div class="stat-val">+5s</div>
     </div>
-    <div class="task-area" id="taskArea">
-      <div class="task-type" id="taskType"></div>
-      <div class="task-prompt" id="taskPrompt"></div>
-      <div class="input-area" id="inputArea"></div>
+    <div class="stat-box">
+      <div class="stat-label">Types</div>
+      <div class="stat-val">6</div>
     </div>
   </div>
+  <div class="best-time-display">
+    <span>BEST:</span>
+    <span class="best-time-val" id="bestTimeVal">--</span>
+  </div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">
+    type answer + press enter<br>
+    or tap the answer buttons
+  </div>
+</div>
 
-  <div id="resultScreen" class="screen">
-    <div class="result-title">TOWER CLEARED</div>
-    <div class="result-subtitle" id="resultSubtitle">THE TOWER HAS FALLEN</div>
-    <div class="result-stats">
-      <div class="stat-box">
-        <div class="stat-val" id="resultTime">0:00.0</div>
-        <div class="stat-label">TIME</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" id="resultMistakes">0</div>
-        <div class="stat-label">MISTAKES</div>
+<!-- GAME SCREEN -->
+<div class="screen hidden" id="gameScreen">
+
+  <div class="tower-col">
+    <div class="tower-label">TOWER</div>
+    <div class="tower-blocks" id="towerBlocks"></div>
+    <div class="flame-zone">
+      <div class="flame"></div>
+      <div class="flame"></div>
+      <div class="flame"></div>
+      <div class="flame"></div>
+      <div class="flame"></div>
+    </div>
+  </div>
+
+  <div class="task-col">
+    <div class="timer-bar">
+      <div class="timer-display" id="timerDisplay">0.0</div>
+      <div class="penalty-label" id="penaltyLabel">+5s</div>
+      <div class="progress-info">
+        <div class="task-counter" id="taskCounter">1 / 20</div>
+        <div class="error-count">ERR: <span class="error-count-val" id="errorCountVal">0</span></div>
       </div>
     </div>
-    <div class="result-best" id="resultBest"></div>
-    <div class="result-percentile" id="resultPercentile"></div>
-    <div class="result-buttons">
-      <button class="share-btn" id="shareBtn">SHARE RESULT</button>
-      <button class="challenge-btn" id="challengeBtn">CHALLENGE LINK</button>
-      <div class="copied-msg" id="copiedMsg">COPIED TO CLIPBOARD</div>
-      <button class="play-btn" id="replayBtn" style="margin-top:8px;">PLAY AGAIN</button>
-    </div>
+    <div class="task-area" id="taskArea"></div>
   </div>
 
 </div>
 
+<!-- RESULT SCREEN -->
+<div class="screen hidden" id="resultScreen">
+  <div class="result-title">BURNDOWN COMPLETE</div>
+  <div class="result-time" id="resultTime">0.0s</div>
+  <div class="result-tier" id="resultTier">BLAZING</div>
+  <div class="divider"></div>
+  <div class="result-stats">
+    <div class="result-stat">
+      <div class="result-stat-label">Base</div>
+      <div class="result-stat-val" id="resultBaseTime">--</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Penalties</div>
+      <div class="result-stat-val" id="resultPenalties">--</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Errors</div>
+      <div class="result-stat-val" id="resultErrors">--</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">Best</div>
+      <div class="result-stat-val" id="resultBest">--</div>
+    </div>
+  </div>
+  <div class="new-best-badge hidden" id="newBestBadge">NEW BEST TIME!</div>
+  <div class="result-grid-row" id="resultGrid"></div>
+  <div class="score-table" id="burndownScoreTable"></div>
+  <div class="result-buttons">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="again-btn" id="againBtn">PLAY AGAIN</button>
+  </div>
+  <a href="index.html" class="home-link">BACK TO NEON ARCADE</a>
+</div>
+
+<div class="copy-toast" id="copyToast">COPIED!</div>
+
 <script>
 (() => {
-  // ============= CONFIG =============
-  const TOTAL_BLOCKS = 20;
-  const PENALTY_SECONDS = 3;
-  const SPEED_TAP_TARGET = 10;
-  const MEMORY_SHOW_MS = 2000;
+  'use strict';
 
-  // ============= AUDIO =============
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let audioCtx;
-  function ensureAudio() {
-    if (!audioCtx) audioCtx = new AudioCtx();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return a.score - b.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
   }
-
-  function playTick() {
-    ensureAudio();
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'sine';
-    o.frequency.setValueAtTime(880, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
-    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-    o.start(); o.stop(audioCtx.currentTime + 0.1);
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
   }
-
-  function playWhoosh() {
-    ensureAudio();
-    const bufSize = audioCtx.sampleRate * 0.3;
-    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'bandpass';
-    filt.frequency.setValueAtTime(2000, audioCtx.currentTime);
-    filt.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.3);
-    filt.Q.value = 2;
-    const g = audioCtx.createGain();
-    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-    src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
-    src.start(); src.stop(audioCtx.currentTime + 0.3);
-  }
-
-  function playBuzzer() {
-    ensureAudio();
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'sawtooth';
-    o.frequency.setValueAtTime(150, audioCtx.currentTime);
-    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-    o.start(); o.stop(audioCtx.currentTime + 0.3);
-  }
-
-  function playFanfare() {
-    ensureAudio();
-    const notes = [523, 659, 784, 1047];
-    notes.forEach((freq, i) => {
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.connect(g); g.connect(audioCtx.destination);
-      o.type = 'sine';
-      o.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.12);
-      g.gain.setValueAtTime(0, audioCtx.currentTime);
-      g.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + i * 0.12);
-      g.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.12 + 0.1);
-      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.12 + 0.4);
-      o.start(audioCtx.currentTime + i * 0.12);
-      o.stop(audioCtx.currentTime + i * 0.12 + 0.4);
+  function renderScoreTable(scores) {
+    var el = document.getElementById('burndownScoreTable');
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var title = document.createElement('div');
+    title.className = 'score-table-title';
+    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    el.appendChild(title);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = s.score.toFixed(1) + 's';
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      el.appendChild(row);
     });
   }
 
-  // ============= SEEDED RNG =============
-  function mulberry32(a) {
-    return function() {
-      a |= 0; a = a + 0x6D2B79F5 | 0;
-      var t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
+  // ── Audio ──────────────────────────────────────────────
+  const AC = new (window.AudioContext || window.webkitAudioContext)();
+
+  function tone(freq, type, vol, dur) {
+    try {
+      const g = AC.createGain();
+      const o = AC.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, AC.currentTime);
+      g.gain.setValueAtTime(vol, AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
+      o.connect(g); g.connect(AC.destination);
+      o.start(); o.stop(AC.currentTime + dur);
+    } catch(e) {}
   }
 
-  function getDailySeed() {
-    var d = new Date();
-    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-  }
+  const snd = {
+    correct() { tone(880,'sine',0.28,0.14); setTimeout(()=>tone(1320,'sine',0.18,0.12),70); },
+    wrong()   { tone(140,'sawtooth',0.35,0.45); setTimeout(()=>tone(100,'square',0.2,0.3),80); },
+    tick()    { tone(440,'square',0.07,0.07); },
+    finish()  { [523,659,784,1047].forEach((n,i)=>setTimeout(()=>tone(n,'sine',0.28,0.28),i*110)); },
+  };
 
-  function getTowerNumber(seed) {
-    var rng = mulberry32(seed);
-    return Math.floor(rng() * 999) + 1;
-  }
-
-  // ============= TASK BANK (100+ tasks) =============
-  var TRIVIA_TASKS = [
-    { q: "Capital of France?", a: "PARIS" },
-    { q: "Capital of Japan?", a: "TOKYO" },
-    { q: "Capital of Italy?", a: "ROME" },
-    { q: "Capital of Germany?", a: "BERLIN" },
-    { q: "Capital of Spain?", a: "MADRID" },
-    { q: "Capital of Australia?", a: "CANBERRA" },
-    { q: "Capital of Brazil?", a: "BRASILIA" },
-    { q: "Capital of Canada?", a: "OTTAWA" },
-    { q: "Capital of Egypt?", a: "CAIRO" },
-    { q: "Capital of India?", a: "NEW DELHI" },
-    { q: "Largest planet in our solar system?", a: "JUPITER" },
-    { q: "Smallest planet in our solar system?", a: "MERCURY" },
-    { q: "How many sides does a hexagon have?", a: "6" },
-    { q: "What color mixing red and blue?", a: "PURPLE" },
-    { q: "What color mixing red and yellow?", a: "ORANGE" },
-    { q: "How many continents are there?", a: "7" },
-    { q: "Largest ocean on Earth?", a: "PACIFIC" },
-    { q: "How many legs does a spider have?", a: "8" },
-    { q: "Chemical symbol for gold?", a: "AU" },
-    { q: "Chemical symbol for water?", a: "H2O" },
-    { q: "What planet is known as the Red Planet?", a: "MARS" },
-    { q: "How many days in a leap year?", a: "366" },
-    { q: "What is the hardest natural substance?", a: "DIAMOND" },
-    { q: "Capital of Thailand?", a: "BANGKOK" },
-    { q: "How many bones in the human body?", a: "206" },
-    { q: "Fastest land animal?", a: "CHEETAH" },
-    { q: "Which element has atomic number 1?", a: "HYDROGEN" },
-    { q: "Capital of Argentina?", a: "BUENOS AIRES" },
-    { q: "How many teeth does an adult have?", a: "32" },
-    { q: "What is the boiling point of water in Celsius?", a: "100" }
+  // ── Task pool ─────────────────────────────────────────
+  const POOL = [
+    // MATH
+    {type:'math', q:'5 \xd7 9 = ?', a:'45'},
+    {type:'math', q:'144 \xf7 12 = ?', a:'12'},
+    {type:'math', q:'3 + 4 \xd7 2 = ?', a:'11'},
+    {type:'math', q:'\u221a81 = ?', a:'9'},
+    {type:'math', q:'2\u2075 = ?', a:'32'},
+    {type:'math', q:'15% of 60 = ?', a:'9'},
+    {type:'math', q:'7\u00b2 \u2212 1 = ?', a:'48'},
+    {type:'math', q:'1000 \xf7 8 = ?', a:'125'},
+    {type:'math', q:'13 \xd7 7 = ?', a:'91'},
+    {type:'math', q:'\u221a144 = ?', a:'12'},
+    {type:'math', q:'25% of 200 = ?', a:'50'},
+    {type:'math', q:'6\u00b3 = ?', a:'216'},
+    {type:'math', q:'99 \xf7 9 = ?', a:'11'},
+    {type:'math', q:'2 + 3 \xd7 4 = ?', a:'14'},
+    {type:'math', q:'\u221a256 = ?', a:'16'},
+    {type:'math', q:'8\u00b2 + 1 = ?', a:'65'},
+    {type:'math', q:'17 \xd7 3 = ?', a:'51'},
+    {type:'math', q:'10% of 350 = ?', a:'35'},
+    // WORD
+    {type:'word', q:'OPPOSITE OF NORTH?', a:'SOUTH'},
+    {type:'word', q:'CAPITAL OF JAPAN?', a:'TOKYO'},
+    {type:'word', q:'SIDES ON A HEXAGON?', a:'6'},
+    {type:'word', q:'LARGEST PLANET?', a:'JUPITER'},
+    {type:'word', q:'OPPOSITE OF ANCIENT?', a:'MODERN'},
+    {type:'word', q:'WATER BOILS AT (\u00b0C)?', a:'100'},
+    {type:'word', q:'CAPITAL OF FRANCE?', a:'PARIS'},
+    {type:'word', q:'OPPOSITE OF HOT?', a:'COLD'},
+    {type:'word', q:'DAYS IN FEB (NON-LEAP)?', a:'28'},
+    {type:'word', q:'OPPOSITE OF FAST?', a:'SLOW'},
+    {type:'word', q:'CAPITAL OF GERMANY?', a:'BERLIN'},
+    {type:'word', q:'HOW MANY CONTINENTS?', a:'7'},
+    // SEQUENCE
+    {type:'sequence', q:'2, 4, 8, 16, __ ?',   choices:['24','32','28','20'], a:'32'},
+    {type:'sequence', q:'1, 1, 2, 3, 5, __ ?', choices:['7','8','9','6'],    a:'8'},
+    {type:'sequence', q:'100, 90, 80, __ ?',   choices:['60','70','75','65'], a:'70'},
+    {type:'sequence', q:'3, 6, 12, 24, __ ?',  choices:['36','48','42','30'], a:'48'},
+    {type:'sequence', q:'1, 4, 9, 16, __ ?',   choices:['20','25','22','18'], a:'25'},
+    {type:'sequence', q:'5, 10, 20, 40, __ ?', choices:['60','80','70','50'], a:'80'},
+    {type:'sequence', q:'7, 14, 21, 28, __ ?', choices:['32','35','33','38'], a:'35'},
+    {type:'sequence', q:'81, 27, 9, 3, __ ?',  choices:['1','2','0','-1'],   a:'1'},
+    // ODD ONE OUT
+    {type:'oddone', q:'ODD ONE OUT:', choices:['DOG','CAT','EAGLE','FISH'],    a:'EAGLE'},
+    {type:'oddone', q:'ODD ONE OUT:', choices:['RED','BLUE','GREEN','BANANA'], a:'BANANA'},
+    {type:'oddone', q:'ODD ONE OUT:', choices:['2','4','7','8'],               a:'7'},
+    {type:'oddone', q:'ODD ONE OUT:', choices:['PIANO','GUITAR','DRUM','FLUTE'], a:'DRUM'},
+    {type:'oddone', q:'ODD ONE OUT:', choices:['EARTH','MARS','SUN','VENUS'],  a:'SUN'},
+    {type:'oddone', q:'ODD ONE OUT:', choices:['ROSE','TULIP','VIOLET','OAK'], a:'OAK'},
+    {type:'oddone', q:'ODD ONE OUT:', choices:['SWIM','RUN','JUMP','SLEEP'],   a:'SLEEP'},
+    // TAP TARGET
+    {type:'taptarget', q:'TAP THE RED DOT!', target:'RED',
+      dots:[{c:'#ff2d7b',n:'RED'},{c:'#00f0ff',n:'CYAN'},{c:'#39ff14',n:'GREEN'},{c:'#ffd700',n:'GOLD'}]},
+    {type:'taptarget', q:'TAP THE BLUE DOT!', target:'BLUE',
+      dots:[{c:'#ff8c00',n:'ORANGE'},{c:'#4169e1',n:'BLUE'},{c:'#39ff14',n:'GREEN'},{c:'#ff2d7b',n:'PINK'}]},
+    {type:'taptarget', q:'TAP THE GREEN DOT!', target:'GREEN',
+      dots:[{c:'#ffd700',n:'GOLD'},{c:'#b44dff',n:'PURPLE'},{c:'#39ff14',n:'GREEN'},{c:'#00f0ff',n:'CYAN'},{c:'#ff2d7b',n:'PINK'}]},
+    {type:'taptarget', q:'TAP THE GOLD DOT!', target:'GOLD',
+      dots:[{c:'#ff2d7b',n:'PINK'},{c:'#00f0ff',n:'CYAN'},{c:'#ffd700',n:'GOLD'},{c:'#39ff14',n:'GREEN'}]},
+    {type:'taptarget', q:'TAP THE PURPLE DOT!', target:'PURPLE',
+      dots:[{c:'#b44dff',n:'PURPLE'},{c:'#ff8c00',n:'ORANGE'},{c:'#00f0ff',n:'CYAN'},{c:'#ffd700',n:'GOLD'},{c:'#ff2d7b',n:'RED'}]},
+    {type:'taptarget', q:'TAP THE ORANGE DOT!', target:'ORANGE',
+      dots:[{c:'#ff2d7b',n:'PINK'},{c:'#39ff14',n:'GREEN'},{c:'#ff8c00',n:'ORANGE'},{c:'#00f0ff',n:'CYAN'}]},
+    // COLOR NAME
+    {type:'colorname', q:'WHAT COLOR IS THIS?', swatch:'#FF6B6B', choices:['CORAL','CRIMSON','SALMON','ROSE'],     a:'CORAL'},
+    {type:'colorname', q:'WHAT COLOR IS THIS?', swatch:'#4ECDC4', choices:['TEAL','CYAN','TURQUOISE','MINT'],      a:'TEAL'},
+    {type:'colorname', q:'WHAT COLOR IS THIS?', swatch:'#FFE66D', choices:['GOLD','LEMON','AMBER','KHAKI'],        a:'LEMON'},
+    {type:'colorname', q:'WHAT COLOR IS THIS?', swatch:'#A29BFE', choices:['VIOLET','LAVENDER','INDIGO','LILAC'],  a:'LAVENDER'},
+    {type:'colorname', q:'WHAT COLOR IS THIS?', swatch:'#55EFC4', choices:['LIME','MINT','SEAFOAM','JADE'],        a:'MINT'},
   ];
 
-  var MATH_TASKS = [
-    { q: "7 + 8 x 3 = ?", a: "31" },
-    { q: "12 x 12 = ?", a: "144" },
-    { q: "100 - 37 = ?", a: "63" },
-    { q: "9 x 9 = ?", a: "81" },
-    { q: "56 / 8 = ?", a: "7" },
-    { q: "15 + 27 = ?", a: "42" },
-    { q: "3 x 17 = ?", a: "51" },
-    { q: "200 - 88 = ?", a: "112" },
-    { q: "11 x 11 = ?", a: "121" },
-    { q: "45 + 55 = ?", a: "100" },
-    { q: "6 x 7 + 2 = ?", a: "44" },
-    { q: "99 - 33 = ?", a: "66" },
-    { q: "8 x 8 = ?", a: "64" },
-    { q: "150 / 5 = ?", a: "30" },
-    { q: "25 x 4 = ?", a: "100" },
-    { q: "7 x 7 = ?", a: "49" },
-    { q: "144 / 12 = ?", a: "12" },
-    { q: "33 + 67 = ?", a: "100" },
-    { q: "5 x 5 + 5 = ?", a: "30" },
-    { q: "1000 - 777 = ?", a: "223" }
-  ];
-
-  var WORD_TASKS = [
-    { word: "HELLO", a: "OLLEH" },
-    { word: "WORLD", a: "DLROW" },
-    { word: "SPEED", a: "DEEPS" },
-    { word: "FLAME", a: "EMALF" },
-    { word: "TOWER", a: "REWOT" },
-    { word: "BLAZE", a: "EZALB" },
-    { word: "STORM", a: "MROTS" },
-    { word: "LIGHT", a: "THGIL" },
-    { word: "BRAIN", a: "NIARB" },
-    { word: "QUICK", a: "KCIUQ" },
-    { word: "SHARP", a: "PRAHS" },
-    { word: "NIGHT", a: "THGIN" },
-    { word: "POWER", a: "REWOP" },
-    { word: "GHOST", a: "TSOHG" },
-    { word: "CYBER", a: "REBYC" },
-    { word: "CRISP", a: "PSIRC" },
-    { word: "DRIFT", a: "TFIRD" },
-    { word: "SWIRL", a: "LRIWS" },
-    { word: "PRISM", a: "MSIRP" },
-    { word: "GLYPH", a: "HPYLG" }
-  ];
-
-  var PATTERN_TASKS = [
-    { seq: "2, 4, 8, ?", a: "16" },
-    { seq: "1, 3, 5, 7, ?", a: "9" },
-    { seq: "3, 6, 9, 12, ?", a: "15" },
-    { seq: "1, 4, 9, 16, ?", a: "25" },
-    { seq: "2, 6, 18, 54, ?", a: "162" },
-    { seq: "10, 20, 30, 40, ?", a: "50" },
-    { seq: "1, 1, 2, 3, 5, ?", a: "8" },
-    { seq: "5, 10, 20, 40, ?", a: "80" },
-    { seq: "1, 2, 4, 7, 11, ?", a: "16" },
-    { seq: "3, 9, 27, 81, ?", a: "243" },
-    { seq: "7, 14, 21, 28, ?", a: "35" },
-    { seq: "4, 8, 16, 32, ?", a: "64" },
-    { seq: "6, 12, 24, 48, ?", a: "96" },
-    { seq: "50, 45, 40, 35, ?", a: "30" },
-    { seq: "1, 3, 9, 27, ?", a: "81" }
-  ];
-
-  var COLOR_TASKS = [
-    { word: "BLUE", textColor: "#ff2d2d", colorName: "red", a: "RED" },
-    { word: "RED", textColor: "#39ff14", colorName: "green", a: "GREEN" },
-    { word: "GREEN", textColor: "#4488ff", colorName: "blue", a: "BLUE" },
-    { word: "YELLOW", textColor: "#b44dff", colorName: "purple", a: "PURPLE" },
-    { word: "PURPLE", textColor: "#ff8c00", colorName: "orange", a: "ORANGE" },
-    { word: "ORANGE", textColor: "#ff2d2d", colorName: "red", a: "RED" },
-    { word: "RED", textColor: "#4488ff", colorName: "blue", a: "BLUE" },
-    { word: "GREEN", textColor: "#ff2d2d", colorName: "red", a: "RED" },
-    { word: "BLUE", textColor: "#39ff14", colorName: "green", a: "GREEN" },
-    { word: "YELLOW", textColor: "#ff2d2d", colorName: "red", a: "RED" },
-    { word: "PURPLE", textColor: "#39ff14", colorName: "green", a: "GREEN" },
-    { word: "RED", textColor: "#ff8c00", colorName: "orange", a: "ORANGE" },
-    { word: "ORANGE", textColor: "#4488ff", colorName: "blue", a: "BLUE" },
-    { word: "GREEN", textColor: "#b44dff", colorName: "purple", a: "PURPLE" },
-    { word: "BLUE", textColor: "#ff8c00", colorName: "orange", a: "ORANGE" }
-  ];
-
-  var REFLEX_COLORS = ['#ff2d2d', '#39ff14', '#4488ff', '#ffd700', '#ff2dff'];
-  var REFLEX_NAMES = ['RED', 'GREEN', 'BLUE', 'YELLOW', 'PINK'];
-
-  // ============= GENERATE TASKS =============
-  function generateTasks(seed) {
-    var rng = mulberry32(seed);
-    var types = ['TRIVIA', 'MATH', 'WORD', 'PATTERN', 'COLOR', 'REFLEX', 'SPEED', 'MEMORY'];
-    var taskList = [];
-
-    for (var i = 0; i < TOTAL_BLOCKS; i++) {
-      var typeIdx = Math.floor(rng() * types.length);
-      var type = types[typeIdx];
-      var task;
-
-      if (type === 'TRIVIA') {
-        var t = TRIVIA_TASKS[Math.floor(rng() * TRIVIA_TASKS.length)];
-        task = { type: 'TRIVIA', prompt: t.q, answer: t.a };
-      } else if (type === 'MATH') {
-        var t = MATH_TASKS[Math.floor(rng() * MATH_TASKS.length)];
-        task = { type: 'MATH', prompt: t.q, answer: t.a };
-      } else if (type === 'WORD') {
-        var t = WORD_TASKS[Math.floor(rng() * WORD_TASKS.length)];
-        task = { type: 'WORD', prompt: 'Type this backwards: ' + t.word, answer: t.a };
-      } else if (type === 'PATTERN') {
-        var t = PATTERN_TASKS[Math.floor(rng() * PATTERN_TASKS.length)];
-        task = { type: 'PATTERN', prompt: 'What comes next: ' + t.seq, answer: t.a };
-      } else if (type === 'COLOR') {
-        var t = COLOR_TASKS[Math.floor(rng() * COLOR_TASKS.length)];
-        task = { type: 'COLOR', word: t.word, textColor: t.textColor, prompt: 'What COLOR is the text?', answer: t.a };
-      } else if (type === 'REFLEX') {
-        var targetIdx = Math.floor(rng() * 5);
-        var order = [0, 1, 2, 3, 4];
-        for (var j = order.length - 1; j > 0; j--) {
-          var k = Math.floor(rng() * (j + 1));
-          var tmp = order[j]; order[j] = order[k]; order[k] = tmp;
-        }
-        task = { type: 'REFLEX', targetColor: REFLEX_NAMES[targetIdx], targetIdx: targetIdx, order: order, prompt: 'Tap the ' + REFLEX_NAMES[targetIdx] + ' dot' };
-      } else if (type === 'SPEED') {
-        task = { type: 'SPEED', prompt: 'Tap this button ' + SPEED_TAP_TARGET + ' times!', target: SPEED_TAP_TARGET };
-      } else if (type === 'MEMORY') {
-        var nums = [];
-        for (var j = 0; j < 4; j++) nums.push(Math.floor(rng() * 9) + 1);
-        var askIdx = Math.floor(rng() * 4);
-        var ordinal = ['1st', '2nd', '3rd', '4th'][askIdx];
-        task = { type: 'MEMORY', nums: nums, askIdx: askIdx, ordinal: ordinal, prompt: 'What was the ' + ordinal + ' number?', answer: String(nums[askIdx]) };
-      }
-      taskList.push(task);
+  // ── RNG ───────────────────────────────────────────────
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0xFFFFFFFF; };
+  }
+  function shuffle(arr, r) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
-    return taskList;
+    return a;
+  }
+  function dailySeed() {
+    const d = new Date();
+    return (d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()) >>> 0;
   }
 
-  // ============= DOM REFS =============
-  var startScreen = document.getElementById('startScreen');
-  var gameScreen = document.getElementById('gameScreen');
-  var resultScreen = document.getElementById('resultScreen');
-  var startBtn = document.getElementById('startBtn');
-  var replayBtn = document.getElementById('replayBtn');
-  var shareBtn = document.getElementById('shareBtn');
-  var challengeBtn = document.getElementById('challengeBtn');
-  var copiedMsg = document.getElementById('copiedMsg');
-  var timerDisplay = document.getElementById('timerDisplay');
-  var progressLabel = document.getElementById('progressLabel');
-  var mistakesLabel = document.getElementById('mistakesLabel');
-  var towerWrap = document.getElementById('towerWrap');
-  var taskType = document.getElementById('taskType');
-  var taskPrompt = document.getElementById('taskPrompt');
-  var inputArea = document.getElementById('inputArea');
-  var towerNumEl = document.getElementById('towerNum');
-  var bestTimeDisplay = document.getElementById('bestTimeDisplay');
-  var resultTime = document.getElementById('resultTime');
-  var resultMistakes = document.getElementById('resultMistakes');
-  var resultBest = document.getElementById('resultBest');
-  var resultPercentile = document.getElementById('resultPercentile');
-  var fireCanvas = document.getElementById('fireCanvas');
-  var fireCtx = fireCanvas.getContext('2d');
+  const TOTAL = 20;
+  function buildTasks() { return shuffle(POOL, rng(dailySeed())).slice(0, TOTAL); }
 
-  // ============= GAME STATE =============
-  var currentSeed, towerNumber, tasks;
-  var currentTask = 0;
-  var mistakes = 0;
-  var startTime = 0;
-  var penaltyTime = 0;
-  var timerRAF;
-  var tapCount = 0;
-  var memoryPhase = '';
-  var isRunning = false;
-  var finalElapsed = 0;
+  // ── State ─────────────────────────────────────────────
+  let tasks = [], idx = 0, t0 = 0, elapsed = 0, penalties = 0, errors = 0;
+  let timerIv = null, active = false, locked = false;
+  const PENALTY = 5000;
 
-  // ============= FIRE PARTICLES =============
-  var fireParticles = [];
-  var dpr = window.devicePixelRatio || 1;
+  // ── DOM ───────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const SS = $('startScreen'), GS = $('gameScreen'), RS = $('resultScreen');
+  const timerEl = $('timerDisplay'), penLbl = $('penaltyLabel');
+  const counterEl = $('taskCounter'), errEl = $('errorCountVal');
+  const taskArea = $('taskArea'), towerEl = $('towerBlocks');
+  const bestValEl = $('bestTimeVal'), toastEl = $('copyToast');
 
-  function resizeFireCanvas() {
-    dpr = window.devicePixelRatio || 1;
-    fireCanvas.width = window.innerWidth * dpr;
-    fireCanvas.height = window.innerHeight * dpr;
-    fireCanvas.style.width = window.innerWidth + 'px';
-    fireCanvas.style.height = window.innerHeight + 'px';
-    fireCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  resizeFireCanvas();
-  window.addEventListener('resize', resizeFireCanvas);
-
-  function spawnFireParticles(x, y, count) {
-    for (var i = 0; i < count; i++) {
-      var colors = ['#ff4500', '#ffcc00', '#ff8c00', '#ff6633', '#ffaa00'];
-      fireParticles.push({
-        x: x + (Math.random() - 0.5) * 40,
-        y: y + (Math.random() - 0.5) * 20,
-        vx: (Math.random() - 0.5) * 3,
-        vy: -Math.random() * 4 - 1,
-        life: 1,
-        decay: Math.random() * 0.03 + 0.015,
-        size: Math.random() * 4 + 2,
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
-    }
+  // ── Best time ─────────────────────────────────────────
+  function getBest() { const v = localStorage.getItem('burndown_best'); return v ? +v : null; }
+  function saveBest(s) { localStorage.setItem('burndown_best', s.toFixed(3)); }
+  function refreshBest() {
+    const b = getBest();
+    bestValEl.textContent = b !== null ? b.toFixed(1) + 's' : '--';
+    bestValEl.style.color = b !== null ? '#ffd700' : '#4a4a6a';
   }
 
-  function updateFireParticles() {
-    fireCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    for (var i = fireParticles.length - 1; i >= 0; i--) {
-      var p = fireParticles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy -= 0.02;
-      p.life -= p.decay;
-      if (p.life <= 0) { fireParticles.splice(i, 1); continue; }
-      fireCtx.globalAlpha = p.life;
-      fireCtx.fillStyle = p.color;
-      fireCtx.beginPath();
-      fireCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-      fireCtx.fill();
-    }
-    fireCtx.globalAlpha = 1;
-  }
-
-  function ambientFire() {
-    if (isRunning) {
-      var progress = currentTask / TOTAL_BLOCKS;
-      var count = Math.floor(progress * 3) + 1;
-      for (var i = 0; i < count; i++) {
-        fireParticles.push({
-          x: window.innerWidth * Math.random(),
-          y: window.innerHeight + 10,
-          vx: (Math.random() - 0.5) * 1,
-          vy: -Math.random() * 2 - 0.5,
-          life: 0.6,
-          decay: Math.random() * 0.015 + 0.008,
-          size: Math.random() * 3 + 1,
-          color: Math.random() > 0.5 ? 'rgba(255,69,0,0.4)' : 'rgba(255,204,0,0.3)'
-        });
-      }
-    }
-  }
-
-  var idleCounter = 0;
-  function fireLoop() {
-    updateFireParticles();
-    idleCounter++;
-    if (idleCounter % 3 === 0) ambientFire();
-    if (startScreen.classList.contains('active') && idleCounter % 15 === 0) {
-      spawnFireParticles(
-        window.innerWidth / 2 + (Math.random() - 0.5) * 100,
-        window.innerHeight * 0.38,
-        2
-      );
-    }
-    requestAnimationFrame(fireLoop);
-  }
-  fireLoop();
-
-  // ============= SEED / URL =============
-  function getSeedFromURL() {
-    var params = new URLSearchParams(window.location.search);
-    var s = params.get('seed');
-    return s ? parseInt(s, 36) : null;
-  }
-
-  function initGame() {
-    var urlSeed = getSeedFromURL();
-    currentSeed = urlSeed || getDailySeed();
-    towerNumber = getTowerNumber(currentSeed);
-    towerNumEl.textContent = 'TOWER #' + towerNumber;
-
-    var best = localStorage.getItem('burndown_best');
-    if (best) {
-      bestTimeDisplay.textContent = 'BEST: ' + formatTime(parseFloat(best));
-    } else {
-      bestTimeDisplay.textContent = '';
-    }
-
-    tasks = generateTasks(currentSeed);
-  }
-
-  // ============= FORMATTING =============
-  function formatTime(ms) {
-    var totalSec = ms / 1000;
-    var min = Math.floor(totalSec / 60);
-    var sec = totalSec % 60;
-    return min + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1);
-  }
-
-  // ============= SCREENS =============
-  function showScreen(screen) {
-    [startScreen, gameScreen, resultScreen].forEach(function(s) { s.classList.remove('active'); });
-    screen.classList.add('active');
-  }
-
-  // ============= TOWER =============
+  // ── Tower ─────────────────────────────────────────────
   function buildTower() {
-    towerWrap.textContent = '';
-    for (var i = 0; i < TOTAL_BLOCKS; i++) {
-      var hue = 20 + (i / TOTAL_BLOCKS) * 20;
-      var lightness = 50 + (i / TOTAL_BLOCKS) * 15;
-      var color = 'hsl(' + hue + ', 100%, ' + lightness + '%)';
-      var block = document.createElement('div');
-      block.className = 'tower-block';
-      block.dataset.index = i;
-      block.style.background = color;
-      block.style.boxShadow = '0 0 6px ' + color + ', 0 0 12px rgba(255,140,0,0.15)';
-      towerWrap.appendChild(block);
+    while (towerEl.firstChild) towerEl.removeChild(towerEl.firstChild);
+    for (let i = 0; i < TOTAL; i++) {
+      const b = document.createElement('div');
+      b.className = 'tower-block';
+      b.id = 'tb' + i;
+      towerEl.appendChild(b);
+    }
+  }
+  function refreshTower() {
+    for (let i = 0; i < TOTAL; i++) {
+      const b = $('tb' + i);
+      if (!b) continue;
+      b.className = i < idx ? 'tower-block done' : i === idx ? 'tower-block current' : 'tower-block';
     }
   }
 
-  function burnBlock(index) {
-    var blocks = towerWrap.querySelectorAll('.tower-block');
-    var block = blocks[index];
-    if (block) {
-      var rect = block.getBoundingClientRect();
-      spawnFireParticles(rect.left + rect.width / 2, rect.top, 15);
-      block.classList.add('done');
-      playWhoosh();
-    }
+  // ── Timer ─────────────────────────────────────────────
+  function startTimer() {
+    t0 = Date.now();
+    timerIv = setInterval(() => {
+      if (!active) return;
+      elapsed = Date.now() - t0;
+      timerEl.textContent = ((elapsed + penalties) / 1000).toFixed(1);
+    }, 50);
+  }
+  function stopTimer() { clearInterval(timerIv); timerIv = null; }
+  function totalSec() { return (elapsed + penalties) / 1000; }
+
+  // ── Helpers ───────────────────────────────────────────
+  function makeEl(tag, cls, txt) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt !== undefined) e.textContent = txt;
+    return e;
+  }
+  function clearEl(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+  // ── Render task ───────────────────────────────────────
+  const LABELS = {math:'MATH', word:'KNOWLEDGE', sequence:'SEQUENCE', oddone:'ODD ONE OUT', taptarget:'TAP TARGET', colorname:'COLOR NAME'};
+
+  function renderTask(t) {
+    clearEl(taskArea);
+    taskArea.appendChild(makeEl('div', 'task-type-label', LABELS[t.type] || t.type.toUpperCase()));
+    taskArea.appendChild(makeEl('div', 'task-question', t.q));
+    if (t.type === 'math' || t.type === 'word') renderText(t);
+    else if (t.type === 'sequence' || t.type === 'oddone') renderChoices(t.choices, t.a);
+    else if (t.type === 'taptarget') renderDots(t);
+    else if (t.type === 'colorname') { renderSwatch(t.swatch); renderChoices(t.choices, t.a); }
+    const inp = taskArea.querySelector('.task-input');
+    if (inp) setTimeout(() => { try { inp.focus(); } catch(e){} }, 80);
   }
 
-  // ============= TIMER =============
-  function updateTimer() {
-    if (!isRunning) return;
-    var elapsed = Date.now() - startTime + penaltyTime;
-    timerDisplay.textContent = formatTime(elapsed);
-    timerRAF = requestAnimationFrame(updateTimer);
+  function renderText(t) {
+    const wrap = makeEl('div', 'task-input-wrap');
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.className = 'task-input';
+    inp.autocomplete = 'off'; inp.autocorrect = 'off'; inp.spellcheck = false;
+    inp.placeholder = '?'; inp.setAttribute('inputmode', 'text');
+    wrap.appendChild(inp);
+    wrap.appendChild(makeEl('div', 'task-hint', 'type answer then press enter'));
+    const btn = makeEl('button', 'submit-btn', 'SUBMIT');
+    btn.addEventListener('click', () => checkText(inp, t));
+    wrap.appendChild(btn);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); checkText(inp, t); } });
+    taskArea.appendChild(wrap);
   }
 
-  function getElapsed() {
-    return Date.now() - startTime + penaltyTime;
+  function checkText(inp, t) {
+    if (!active || locked) return;
+    const v = inp.value.trim().toUpperCase();
+    if (!v) { try { inp.focus(); } catch(e){} return; }
+    if (v === t.a.toUpperCase()) { snd.correct(); nextTask(); }
+    else wrongAnswer(inp, 'input');
   }
 
-  // ============= TASK RENDERING =============
-  function clearInputArea() {
-    while (inputArea.firstChild) inputArea.removeChild(inputArea.firstChild);
-  }
-
-  function renderTask() {
-    var task = tasks[currentTask];
-    progressLabel.textContent = (currentTask + 1) + ' / ' + TOTAL_BLOCKS;
-    mistakesLabel.textContent = mistakes > 0 ? (mistakes + ' MISTAKE' + (mistakes > 1 ? 'S' : '') + ' (+' + (mistakes * PENALTY_SECONDS) + 's)') : '';
-    taskType.textContent = task.type;
-    clearInputArea();
-
-    if (task.type === 'TRIVIA' || task.type === 'MATH' || task.type === 'WORD' || task.type === 'PATTERN') {
-      taskPrompt.textContent = task.prompt;
-      renderTextInput(task);
-    } else if (task.type === 'COLOR') {
-      taskPrompt.textContent = '';
-      var stroopSpan = document.createElement('span');
-      stroopSpan.className = 'stroop-word';
-      stroopSpan.style.color = task.textColor;
-      stroopSpan.textContent = task.word;
-      taskPrompt.appendChild(stroopSpan);
-      taskPrompt.appendChild(document.createElement('br'));
-      var hintSpan = document.createElement('span');
-      hintSpan.className = 'stroop-hint';
-      hintSpan.textContent = 'What COLOR is the text?';
-      taskPrompt.appendChild(hintSpan);
-      renderTextInput(task);
-    } else if (task.type === 'REFLEX') {
-      taskPrompt.textContent = task.prompt;
-      renderReflexDots(task);
-    } else if (task.type === 'SPEED') {
-      tapCount = 0;
-      taskPrompt.textContent = task.prompt;
-      renderSpeedTap(task);
-    } else if (task.type === 'MEMORY') {
-      memoryPhase = 'show';
-      taskPrompt.textContent = 'MEMORIZE THESE NUMBERS';
-      renderMemoryShow(task);
-    }
-  }
-
-  function renderTextInput(task) {
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'text-input';
-    input.autocomplete = 'off';
-    input.autocapitalize = 'characters';
-    input.setAttribute('autocorrect', 'off');
-    input.setAttribute('spellcheck', 'false');
-
-    var btn = document.createElement('button');
-    btn.className = 'submit-btn';
-    btn.textContent = 'SUBMIT';
-
-    function submit() {
-      var val = input.value.trim().toUpperCase();
-      if (!val) return;
-      checkAnswer(val, task.answer.toUpperCase());
-    }
-
-    btn.addEventListener('click', submit);
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') submit();
-    });
-
-    inputArea.appendChild(input);
-    inputArea.appendChild(btn);
-    setTimeout(function() { input.focus(); }, 50);
-  }
-
-  function renderReflexDots(task) {
-    var container = document.createElement('div');
-    container.className = 'dots-container';
-
-    task.order.forEach(function(colorIdx) {
-      var dot = document.createElement('div');
-      dot.className = 'reflex-dot';
-      dot.style.background = REFLEX_COLORS[colorIdx];
-      dot.style.boxShadow = '0 0 10px ' + REFLEX_COLORS[colorIdx];
-      dot.addEventListener('click', function() {
-        if (colorIdx === task.targetIdx) {
-          advanceTask();
-        } else {
-          applyPenalty();
-          dot.style.transform = 'scale(0.8)';
-          setTimeout(function() { dot.style.transform = ''; }, 200);
-        }
+  function renderChoices(choices, correct) {
+    const grid = makeEl('div', 'choices-grid');
+    choices.forEach(c => {
+      const btn = makeEl('button', 'choice-btn', c);
+      btn.addEventListener('click', () => {
+        if (!active || locked) return;
+        if (c === correct) { btn.classList.add('correct'); snd.correct(); setTimeout(nextTask, 180); }
+        else { btn.classList.add('wrong-choice'); wrongAnswer(btn, 'choice'); }
       });
-      container.appendChild(dot);
+      grid.appendChild(btn);
     });
-
-    inputArea.appendChild(container);
+    taskArea.appendChild(grid);
   }
 
-  function renderSpeedTap(task) {
-    var counter = document.createElement('div');
-    counter.className = 'tap-counter';
-    counter.textContent = tapCount + ' / ' + task.target;
-
-    var btn = document.createElement('button');
-    btn.className = 'tap-btn';
-    btn.textContent = 'TAP!';
-
-    btn.addEventListener('click', function() {
-      tapCount++;
-      counter.textContent = tapCount + ' / ' + task.target;
-      playTick();
-      if (tapCount >= task.target) {
-        advanceTask();
-      }
+  function renderDots(t) {
+    const flex = makeEl('div', 'dots-flex');
+    t.dots.forEach(dot => {
+      const btn = document.createElement('button');
+      btn.className = 'dot-btn';
+      btn.style.background = dot.c;
+      btn.style.boxShadow = '0 0 18px ' + dot.c + '77';
+      btn.addEventListener('click', () => {
+        if (!active || locked) return;
+        if (dot.n === t.target) { snd.correct(); nextTask(); }
+        else wrongAnswer(btn, 'dot');
+      });
+      flex.appendChild(btn);
     });
-
-    inputArea.appendChild(counter);
-    inputArea.appendChild(btn);
+    taskArea.appendChild(flex);
   }
 
-  function renderMemoryShow(task) {
-    var display = document.createElement('div');
-    display.className = 'memory-numbers';
-    display.textContent = task.nums.join('  ');
-    inputArea.appendChild(display);
-
-    var memTask = currentTask;
-    setTimeout(function() {
-      if (memoryPhase === 'show' && currentTask === memTask && isRunning) {
-        memoryPhase = 'ask';
-        taskPrompt.textContent = task.prompt;
-        clearInputArea();
-        renderTextInput(task);
-      }
-    }, MEMORY_SHOW_MS);
+  function renderSwatch(color) {
+    const sw = makeEl('div', 'color-swatch');
+    sw.style.background = color;
+    sw.style.boxShadow = '0 0 30px ' + color + '55';
+    taskArea.appendChild(sw);
   }
 
-  // ============= ANSWER CHECKING =============
-  function checkAnswer(given, expected) {
-    var g = given.replace(/\s+/g, '').toUpperCase();
-    var e = expected.replace(/\s+/g, '').toUpperCase();
+  // ── Wrong answer ──────────────────────────────────────
+  function wrongAnswer(triggerEl, kind) {
+    if (locked) return;
+    locked = true;
+    errors++; penalties += PENALTY;
+    errEl.textContent = errors;
 
-    if (g === e) {
-      advanceTask();
-    } else {
-      applyPenalty();
-      var input = inputArea.querySelector('.text-input');
-      if (input) { input.value = ''; input.focus(); }
-    }
-  }
+    penLbl.className = 'penalty-label';
+    void penLbl.offsetWidth;
+    penLbl.className = 'penalty-label show';
 
-  function applyPenalty() {
-    mistakes++;
-    penaltyTime += PENALTY_SECONDS * 1000;
-    mistakesLabel.textContent = mistakes + ' MISTAKE' + (mistakes > 1 ? 'S' : '') + ' (+' + (mistakes * PENALTY_SECONDS) + 's)';
-    playBuzzer();
+    timerEl.classList.remove('penalty-flash');
+    void timerEl.offsetWidth;
+    timerEl.classList.add('penalty-flash');
 
-    var flash = document.createElement('div');
-    flash.className = 'penalty-flash';
-    document.body.appendChild(flash);
-    setTimeout(function() { if (flash.parentNode) flash.parentNode.removeChild(flash); }, 400);
+    taskArea.classList.remove('shake');
+    void taskArea.offsetWidth;
+    taskArea.classList.add('shake');
 
-    var app = document.getElementById('app');
-    app.classList.add('shake');
-    setTimeout(function() { app.classList.remove('shake'); }, 250);
-  }
+    snd.wrong();
 
-  function advanceTask() {
-    playTick();
-    burnBlock(currentTask);
-    currentTask++;
-
-    if (currentTask >= TOTAL_BLOCKS) {
-      finishGame();
-      return;
+    if (kind === 'input' && triggerEl) {
+      triggerEl.classList.remove('wrong');
+      void triggerEl.offsetWidth;
+      triggerEl.classList.add('wrong');
+      triggerEl.value = '';
+      setTimeout(() => {
+        if (triggerEl) { triggerEl.classList.remove('wrong'); try { triggerEl.focus(); } catch(e){} }
+      }, 380);
     }
 
-    setTimeout(function() {
-      renderTask();
-    }, 150);
+    setTimeout(() => {
+      locked = false;
+      taskArea.classList.remove('shake');
+      timerEl.classList.remove('penalty-flash');
+    }, 700);
   }
 
-  // ============= GAME FLOW =============
+  // ── Next task ─────────────────────────────────────────
+  function nextTask() {
+    snd.tick();
+    idx++;
+    counterEl.textContent = Math.min(idx + 1, TOTAL) + ' / ' + TOTAL;
+    refreshTower();
+    if (idx >= TOTAL) { finishGame(); return; }
+    taskArea.classList.add('slide-out');
+    setTimeout(() => {
+      taskArea.classList.remove('slide-out');
+      renderTask(tasks[idx]);
+      taskArea.classList.add('slide-in');
+      setTimeout(() => taskArea.classList.remove('slide-in'), 220);
+    }, 180);
+  }
+
+  // ── Start / Finish ────────────────────────────────────
   function startGame() {
-    ensureAudio();
-    currentTask = 0;
-    mistakes = 0;
-    penaltyTime = 0;
-    tapCount = 0;
-    isRunning = true;
-    finalElapsed = 0;
-
-    buildTower();
-    showScreen(gameScreen);
-
-    startTime = Date.now();
-    updateTimer();
-    renderTask();
-  }
-
-  function getPercentile(ms) {
-    var sec = ms / 1000;
-    if (sec < 30) return 1;
-    if (sec < 45) return 3;
-    if (sec < 60) return 8;
-    if (sec < 75) return 15;
-    if (sec < 90) return 25;
-    if (sec < 120) return 40;
-    if (sec < 150) return 55;
-    if (sec < 180) return 70;
-    if (sec < 240) return 85;
-    return 95;
+    try { if (AC.state === 'suspended') AC.resume(); } catch(e){}
+    tasks = buildTasks(); idx = 0; penalties = 0; errors = 0;
+    locked = false; elapsed = 0; active = true;
+    buildTower(); refreshTower();
+    timerEl.textContent = '0.0';
+    counterEl.textContent = '1 / ' + TOTAL;
+    errEl.textContent = '0';
+    penLbl.className = 'penalty-label';
+    SS.classList.add('hidden'); RS.classList.add('hidden'); GS.classList.remove('hidden');
+    renderTask(tasks[0]);
+    startTimer();
   }
 
   function finishGame() {
-    isRunning = false;
-    cancelAnimationFrame(timerRAF);
-    finalElapsed = getElapsed();
-    playFanfare();
+    active = false; stopTimer(); snd.finish();
+    const ts = totalSec(), bs = elapsed / 1000, ps = penalties / 1000;
+    let tier, tcls;
+    if (ts < 60)       { tier = 'BLAZING';   tcls = 'tier-blazing'; }
+    else if (ts < 90)  { tier = 'FAST';      tcls = 'tier-fast'; }
+    else if (ts < 120) { tier = 'AVERAGE';   tcls = 'tier-average'; }
+    else               { tier = 'SLOW BURN'; tcls = 'tier-slow'; }
 
-    for (var i = 0; i < 5; i++) {
-      (function(idx) {
-        setTimeout(function() {
-          spawnFireParticles(
-            window.innerWidth * (0.2 + Math.random() * 0.6),
-            window.innerHeight * (0.3 + Math.random() * 0.4),
-            20
-          );
-        }, idx * 100);
-      })(i);
-    }
+    const prev = getBest();
+    const isNew = (prev === null || ts < prev);
+    const topScores = saveScore('neonarcade_scores_burndown', Math.round(ts * 1000) / 1000);
+    if (isNew) saveBest(ts);
+    refreshBest();
+    const best = topScores[0].score;
 
-    var best = localStorage.getItem('burndown_best');
-    var isNewBest = !best || finalElapsed < parseFloat(best);
-    if (isNewBest) {
-      localStorage.setItem('burndown_best', finalElapsed.toString());
-    }
+    $('resultTime').textContent     = ts.toFixed(1) + 's';
+    const te = $('resultTier'); te.textContent = tier; te.className = 'result-tier ' + tcls;
+    $('resultBaseTime').textContent = bs.toFixed(1) + 's';
+    $('resultPenalties').textContent = '+' + ps.toFixed(0) + 's';
+    $('resultErrors').textContent   = errors;
+    $('resultBest').textContent     = best.toFixed(1) + 's';
 
-    setTimeout(function() {
-      showScreen(resultScreen);
-      resultTime.textContent = formatTime(finalElapsed);
-      resultMistakes.textContent = String(mistakes);
+    const nb = $('newBestBadge');
+    if (isNew && prev !== null) nb.classList.remove('hidden'); else nb.classList.add('hidden');
+    renderScoreTable(topScores);
 
-      if (isNewBest) {
-        resultBest.textContent = 'NEW PERSONAL BEST!';
-        resultBest.style.color = 'var(--neon-green)';
-      } else {
-        resultBest.textContent = 'BEST: ' + formatTime(parseFloat(best));
-        resultBest.style.color = 'var(--neon-gold)';
-      }
+    const grid = $('resultGrid');
+    clearEl(grid);
+    for (let i = 0; i < TOTAL; i++) grid.appendChild(makeEl('div', 'result-grid-cell'));
 
-      resultPercentile.textContent = 'TOP ' + getPercentile(finalElapsed) + '% TODAY';
-    }, 800);
+    GS.classList.add('hidden'); RS.classList.remove('hidden');
   }
 
-  // ============= SHARING =============
-  function getShareText() {
-    var percentile = getPercentile(finalElapsed);
-    var timeStr = formatTime(finalElapsed);
-    return '\u{1F525} BURNDOWN\n\u{23F1}\u{FE0F} ' + timeStr + ' | ' + mistakes + ' mistake' + (mistakes !== 1 ? 's' : '') + '\n\u{1F3D7}\u{FE0F} Tower #' + towerNumber + '\nTop ' + percentile + '% today\nThink you\'re faster?';
+  // ── Share ─────────────────────────────────────────────
+  function shareText() {
+    const ts = totalSec(), ps = penalties / 1000;
+    let tier;
+    if (ts < 60) tier = 'BLAZING'; else if (ts < 90) tier = 'FAST';
+    else if (ts < 120) tier = 'AVERAGE'; else tier = 'SLOW BURN';
+    const penLine = errors > 0 ? errors + '/' + TOTAL + ' wrong | +' + ps.toFixed(0) + 's penalty' : 'No mistakes!';
+    const blocks = '\uD83D\uDFE9'.repeat(TOTAL);
+    return ['\uD83D\uDD25 BURNDOWN', 'Cleared in ' + ts.toFixed(1) + 's | ' + tier, penLine, blocks, 'Beat my time!'].join('\n');
   }
-
-  function getChallengeURL() {
-    var base = window.location.origin + window.location.pathname;
-    return base + '?seed=' + currentSeed.toString(36);
+  function doShare() {
+    const text = shareText();
+    const mobile = /Mobi|Android/i.test(navigator.userAgent);
+    if (mobile && navigator.share) { navigator.share({text}).catch(() => toClipboard(text)); }
+    else { toClipboard(text); }
   }
-
-  shareBtn.addEventListener('click', function() {
-    var text = getShareText();
-    if (navigator.share) {
-      navigator.share({ text: text }).catch(function() {
-        navigator.clipboard.writeText(text).then(function() { flashCopied(); });
+  function toClipboard(text) {
+    navigator.clipboard.writeText(text)
+      .then(() => toast('COPIED!'))
+      .catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); toast('COPIED!'); } catch(e) { toast('COPY FAILED'); }
+        document.body.removeChild(ta);
       });
-    } else {
-      navigator.clipboard.writeText(text).then(function() { flashCopied(); });
-    }
-  });
-
-  challengeBtn.addEventListener('click', function() {
-    var url = getChallengeURL();
-    var text = getShareText() + '\n' + url;
-    if (navigator.share) {
-      navigator.share({ text: text, url: url }).catch(function() {
-        navigator.clipboard.writeText(text).then(function() { flashCopied(); });
-      });
-    } else {
-      navigator.clipboard.writeText(text).then(function() { flashCopied(); });
-    }
-  });
-
-  function flashCopied() {
-    copiedMsg.classList.add('show');
-    setTimeout(function() { copiedMsg.classList.remove('show'); }, 2000);
+  }
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 2000);
   }
 
-  // ============= EVENT LISTENERS =============
-  startBtn.addEventListener('click', startGame);
-  replayBtn.addEventListener('click', function() {
-    initGame();
-    startGame();
-  });
+  // ── Events ────────────────────────────────────────────
+  $('startBtn').addEventListener('click', startGame);
+  $('shareBtn').addEventListener('click', doShare);
+  $('againBtn').addEventListener('click', startGame);
+  document.addEventListener('touchstart', () => { try { if (AC.state==='suspended') AC.resume(); } catch(e){} }, {once:true});
 
-  // ============= INIT =============
-  initGame();
+  // ── Init ──────────────────────────────────────────────
+  refreshBest();
 })();
 </script>
 </body>

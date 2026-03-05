@@ -255,6 +255,12 @@ body::after {
   padding: 4px 12px; border-radius: 2px; margin-bottom: 18px;
   text-shadow: 0 0 8px rgba(255,215,0,0.3);
 }
+.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
 </style>
 </head>
 <body>
@@ -283,7 +289,7 @@ body::after {
   </div>
   <div class="hint-box" id="hintBox"></div>
   <div class="input-row">
-    <input type="text" id="answerInput" placeholder="Decode the message..." autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <input type="text" id="answerInput" placeholder="Type the decoded word..." autocomplete="off" autocapitalize="characters" spellcheck="false">
     <button class="submit-btn" id="submitBtn">DECODE</button>
   </div>
   <button class="skip-btn" id="skipBtn">SKIP ROUND</button>
@@ -305,6 +311,7 @@ body::after {
   <div class="score-label">TOTAL SCORE</div>
   <div class="new-best" id="newBestMsg" style="display:none">NEW PERSONAL BEST</div>
   <div class="best-score" id="resultsBest"></div>
+  <div class="score-table" id="signalScoreTable"></div>
   <div class="btn-row">
     <button class="share-btn" id="shareBtn">SHARE</button>
     <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
@@ -314,70 +321,74 @@ body::after {
 
 <script>
 (() => {
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function renderScoreTable(scores) {
+    var el = document.getElementById('signalScoreTable');
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var title = document.createElement('div');
+    title.className = 'score-table-title';
+    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    el.appendChild(title);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = String(s.score);
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      el.appendChild(row);
+    });
+  }
+
   const ROUNDS = 5;
   const ROUND_TIMES = [60, 50, 45, 35, 30];
-  const HINT1_TIME = 15;
+  const HINT1_TIME = 10;
   const HINT2_TIME = 30;
   const STORAGE_KEY = 'signal_best';
   const STORAGE_DAILY = 'signal_daily';
 
   const EASY_MESSAGES = [
-    "CATS SECRETLY RUN THE INTERNET",
-    "PIZZA IS A BREAKFAST FOOD FIGHT ME",
-    "MY PLANT IS JUDGING ME AGAIN",
-    "SOCKS VANISH IN THE DRYER DIMENSION",
-    "BIRDS ARE GOVERNMENT DRONES OBVIOUSLY",
-    "MONDAYS SHOULD BE ILLEGAL WORLDWIDE",
-    "COFFEE IS JUST BEAN SOUP ACTUALLY",
-    "MY COUCH HAS A GRAVITY FIELD",
-    "SHARKS ARE JUST ANGRY DOLPHINS",
-    "NAPS SHOULD BE A HUMAN RIGHT",
-    "MY FRIDGE HUMS SHOW TUNES AT NIGHT",
-    "PENGUINS LOOK LIKE TINY WAITERS",
-    "CLOUDS ARE SKY COTTON CANDY",
-    "MY ALARM CLOCK IS MY ENEMY",
-    "TOAST ALWAYS LANDS BUTTER SIDE DOWN",
-    "SLOTHS HAVE IT ALL FIGURED OUT",
-    "PIGEONS RUN THIS CITY NOT US"
+    "PIZZA", "SLOTH", "GHOST", "TACOS", "SHARK",
+    "CHAOS", "SNACK", "COUCH", "CLOUD", "SLEEP",
+    "BRAIN", "VIBES", "PIXEL", "KARMA", "TOAST"
   ];
 
   const MEDIUM_MESSAGES = [
-    "MY WIFI PASSWORD IS PASSWORD",
-    "AUTOCORRECT IS MY WORST ENEMA",
-    "I PUT THE PRO IN PROCRASTINATE",
-    "MY BRAIN HAS TOO MANY TABS OPEN",
-    "ADULTING IS A SCAM I WANT A REFUND",
-    "I SPEAK FLUENT SARCASM AND EMOJI",
-    "MY DIET STARTS AGAIN ON MONDAY",
-    "SLEEP IS JUST FREE TRIAL OF DEATH",
-    "MY MEMORY IS WORSE THAN A GOLDFISH",
-    "RUNNING LATE IS MY CARDIO ROUTINE",
-    "MY SPIRIT ANIMAL IS A POTATO",
-    "I EXERCISE BY JUMPING TO CONCLUSIONS",
-    "MY BANK ACCOUNT IS A HORROR STORY",
-    "COMMON SENSE IS NOT SO COMMON",
-    "MY PATIENCE LEFT WITHOUT A NOTE",
-    "CALORIES DO NOT COUNT ON WEEKENDS",
-    "I NEED A SIX MONTH VACATION TWICE A YEAR"
+    "PENGUIN", "PIGEON", "COFFEE", "POTATO", "WIZARD",
+    "ZOMBIE", "DRAGON", "CACTUS", "GOBLIN", "AVOCADO",
+    "BANANA", "HAUNTED", "CRYPTIC", "PHANTOM", "VOLTAGE"
   ];
 
   const HARD_MESSAGES = [
-    "I TOLD MY COMPUTER A JOKE AND IT CRASHED",
-    "MY DOG ATE MY HOMEWORK AND GOT AN A PLUS",
-    "THE FLOOR IS LAVA BUT THE RENT IS DUE",
-    "MY PHONE BATTERY DIES FASTER THAN MY DREAMS",
-    "I WHISPERED TO THE VOID AND IT SAID NEW PHONE WHO DIS",
-    "LIFE GAVE ME LEMONS BUT I WANTED TACOS INSTEAD",
-    "MY HOUSEPLANT AND I HAVE TRUST ISSUES NOW",
-    "TIME FLIES WHEN YOU ARE DOOM SCROLLING AT THREE AM",
-    "MY NEIGHBOR THINKS THE MOON IS A HOLOGRAM",
-    "I ACCIDENTALLY JOINED A CULT IT WAS BOOK CLUB",
-    "MY SMART FRIDGE JUST ROASTED MY EATING HABITS",
-    "PARALLEL UNIVERSES WHERE I AM A MORNING PERSON",
-    "THE SIMULATION CRASHED AND NOBODY NOTICED",
-    "MY CAT FILED A COMPLAINT WITH MANAGEMENT",
-    "GRAVITY IS JUST THE EARTH BEING CLINGY",
-    "MY TOASTER IS SMARTER THAN MY LAST DATE"
+    "HOLOGRAM", "BLACKHOLE", "ALGORITHM", "AUTOPILOT", "INVISIBLE",
+    "FREQUENCY", "DIMENSION", "EVOLUTION", "JELLYFISH", "OBSIDIAN",
+    "ENCRYPTED", "MAGNITUDE", "LABYRINTH", "TURBULENT", "SYNTHETIC"
   ];
 
   let audioCtx = null;
@@ -708,9 +719,9 @@ body::after {
 
     if (elapsed >= HINT1_TIME && !hint1Shown) {
       hint1Shown = true;
-      var words = roundMessages[r].split(' ');
-      var firstLetters = words.map(function(w) { return w[0]; }).join(' _ ');
-      hintBox.textContent = 'HINT: First letters: ' + firstLetters;
+      var word = roundMessages[r];
+      var blanks = word[0] + ' ' + Array(word.length - 1).fill('_').join(' ');
+      hintBox.textContent = 'HINT: ' + word.length + ' letters — ' + blanks;
       playTick();
     }
     if (elapsed >= HINT2_TIME && !hint2Shown) {
@@ -853,15 +864,17 @@ body::after {
 
     totalScoreEl.textContent = String(score);
 
-    var best = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
-    if (score > best) {
-      localStorage.setItem(STORAGE_KEY, String(score));
+    var prevBest = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+    var topScores = saveScore('neonarcade_scores_signal', score);
+    var best = topScores[0].score;
+    localStorage.setItem(STORAGE_KEY, String(best));
+    if (score > prevBest) {
       newBestMsg.style.display = '';
-      resultsBest.textContent = 'BEST: ' + score;
     } else {
       newBestMsg.style.display = 'none';
-      resultsBest.textContent = best ? 'BEST: ' + best : '';
     }
+    resultsBest.textContent = best ? 'BEST: ' + best : '';
+    renderScoreTable(topScores);
 
     localStorage.setItem(STORAGE_DAILY, JSON.stringify({ day: dayNum, score: score, results: roundResults }));
     copiedMsg.textContent = '';

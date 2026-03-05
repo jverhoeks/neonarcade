@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WORDCHAIN — NEON ARCADE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a12;
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.07) 2px,
+      rgba(0,0,0,0.07) 4px
+    );
+    z-index: 999;
+  }
+
+  /* BG radial glows */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,45,123,0.05) 0%, transparent 70%);
+    z-index: 0;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 24px;
+    transition: opacity 0.3s ease;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; }
+
+  /* ─── START SCREEN ─── */
+  #start-screen {
+    gap: 20px;
+    background: #0a0a12;
+  }
+
+  .arcade-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .game-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 72px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.2);
+    line-height: 1;
+  }
+
+  .game-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 2.5vw, 18px);
+    letter-spacing: 3px;
+    color: #8888aa;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .example-chain {
+    background: rgba(255,215,0,0.04);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 6px;
+    padding: 16px 28px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+  }
+  .example-chain .ex-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .example-chain .ex-words {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 0;
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(11px, 2vw, 14px);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .ex-word {
+    color: #8888aa;
+  }
+  .ex-word .bridge {
+    color: #ffd700;
+    text-shadow: 0 0 8px rgba(255,215,0,0.5);
+  }
+  .ex-arrow {
+    color: #4a4a6a;
+    margin: 0 6px;
+  }
+
+  .rules-list {
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    color: #8888aa;
+  }
+  .rule-icon {
+    color: #ffd700;
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .play-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 3px;
+    padding: 14px 48px;
+    border: 1px solid #ffd700;
+    background: rgba(255,215,0,0.06);
+    color: #ffd700;
+    cursor: pointer;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .play-btn:hover {
+    background: rgba(255,215,0,0.15);
+    box-shadow: 0 0 24px rgba(255,215,0,0.25);
+    transform: scale(1.04);
+  }
+  .play-btn:active { transform: scale(0.97); }
+
+  /* ─── GAME SCREEN ─── */
+  #game-screen {
+    background: #0a0a12;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .game-layout {
+    width: 100%;
+    height: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px 20px;
+    gap: 12px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* HUD row */
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .hud-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .hud-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+  }
+  .hud-value {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 28px;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255,215,0,0.5);
+    line-height: 1;
+  }
+  .hud-value.timer-warn {
+    color: #ff2d7b;
+    text-shadow: 0 0 12px rgba(255,45,123,0.7);
+    animation: pulse-warn 0.5s ease infinite alternate;
+  }
+  @keyframes pulse-warn {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+
+  .hud-best {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+  }
+  .hud-best span {
+    color: #8888aa;
+    font-weight: 500;
+  }
+
+  /* Chain history */
+  .chain-history {
+    flex-shrink: 0;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+    padding: 8px 0 4px;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+  }
+
+  .chain-word-wrap {
+    display: flex;
+    align-items: center;
+    animation: slide-in 0.2s ease;
+    flex-shrink: 0;
+  }
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .chain-word {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(11px, 2.2vw, 14px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #555577;
+    white-space: nowrap;
+  }
+  .chain-word .word-bridge {
+    color: #ffd700;
+    text-shadow: 0 0 8px rgba(255,215,0,0.6);
+  }
+  .chain-word.latest {
+    color: #aaaacc;
+  }
+  .chain-word.latest .word-bridge {
+    color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0,240,255,0.7);
+  }
+
+  .chain-arrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    color: #333355;
+    margin: 0 5px;
+    flex-shrink: 0;
+  }
+
+  .chain-start-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  /* Bridge display */
+  .bridge-section {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 0 6px;
+  }
+
+  .bridge-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+  }
+
+  .bridge-letters {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(56px, 14vw, 96px);
+    letter-spacing: 12px;
+    color: #00f0ff;
+    text-shadow:
+      0 0 20px rgba(0,240,255,0.8),
+      0 0 60px rgba(0,240,255,0.4),
+      0 0 120px rgba(0,240,255,0.15);
+    line-height: 1;
+    animation: bridge-pulse 2s ease-in-out infinite;
+    transition: all 0.15s ease;
+  }
+  @keyframes bridge-pulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(0,240,255,0.8), 0 0 60px rgba(0,240,255,0.4), 0 0 120px rgba(0,240,255,0.15); }
+    50% { text-shadow: 0 0 30px rgba(0,240,255,1), 0 0 80px rgba(0,240,255,0.5), 0 0 140px rgba(0,240,255,0.2); }
+  }
+  .bridge-letters.flash-new {
+    animation: bridge-flash 0.3s ease;
+  }
+  @keyframes bridge-flash {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.2); color: #ffd700; text-shadow: 0 0 30px rgba(255,215,0,1), 0 0 80px rgba(255,215,0,0.5); }
+    100% { transform: scale(1); }
+  }
+
+  /* Feedback message */
+  .feedback-msg {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    min-height: 20px;
+    text-align: center;
+    transition: opacity 0.2s;
+  }
+  .feedback-msg.ok { color: #39ff14; text-shadow: 0 0 10px rgba(57,255,20,0.6); }
+  .feedback-msg.err { color: #ff2d7b; text-shadow: 0 0 10px rgba(255,45,123,0.6); }
+  .feedback-msg.used { color: #ff8c00; text-shadow: 0 0 10px rgba(255,140,0,0.6); }
+
+  /* Input row */
+  .input-section {
+    flex-shrink: 0;
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  .word-input {
+    flex: 1;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: clamp(16px, 4vw, 20px);
+    letter-spacing: 3px;
+    padding: 14px 18px;
+    background: rgba(0,240,255,0.03);
+    border: 1px solid rgba(0,240,255,0.25);
+    border-radius: 4px;
+    color: #fff;
+    text-transform: uppercase;
+    outline: none;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  .word-input:focus {
+    border-color: rgba(0,240,255,0.6);
+    background: rgba(0,240,255,0.05);
+    box-shadow: 0 0 16px rgba(0,240,255,0.12);
+  }
+  .word-input.flash-ok {
+    border-color: #39ff14;
+    background: rgba(57,255,20,0.06);
+    box-shadow: 0 0 20px rgba(57,255,20,0.2);
+    animation: flash-ok 0.3s ease;
+  }
+  @keyframes flash-ok { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+
+  .word-input.shake {
+    animation: shake 0.25s ease;
+    border-color: #ff2d7b;
+    background: rgba(255,45,123,0.06);
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-5px); }
+    30% { transform: translateX(5px); }
+    45% { transform: translateX(-4px); }
+    60% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+    90% { transform: translateX(2px); }
+  }
+
+  .submit-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 14px 18px;
+    border: 1px solid rgba(0,240,255,0.4);
+    background: rgba(0,240,255,0.06);
+    color: #00f0ff;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+  .submit-btn:hover {
+    background: rgba(0,240,255,0.15);
+    box-shadow: 0 0 16px rgba(0,240,255,0.2);
+  }
+  .submit-btn:active { transform: scale(0.96); }
+
+  /* Word counter mini */
+  .word-count-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .bonus-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: #ffd700;
+    text-transform: uppercase;
+    background: rgba(255,215,0,0.08);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 3px;
+    padding: 2px 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .bonus-tag.show { opacity: 1; animation: bonus-pop 0.4s ease; }
+  @keyframes bonus-pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Particles */
+  #particle-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* ─── RESULT SCREEN ─── */
+  #result-screen {
+    gap: 20px;
+    background: #0a0a12;
+  }
+
+  .result-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(24px, 6vw, 48px);
+    letter-spacing: 6px;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.2);
+  }
+
+  .result-stats {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+  }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 42px;
+    line-height: 1;
+    color: #00f0ff;
+    text-shadow: 0 0 16px rgba(0,240,255,0.6);
+  }
+  .stat-num.new-best {
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.8);
+    animation: new-best-pulse 0.6s ease 3;
+  }
+  @keyframes new-best-pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .new-record-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255,215,0,0.6);
+    background: rgba(255,215,0,0.08);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 3px;
+    padding: 4px 12px;
+    text-transform: uppercase;
+    display: none;
+  }
+  .new-record-badge.show { display: block; }
+
+  .best-chain-display {
+    max-width: 500px;
+    width: 100%;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+  .best-chain-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #4a4a6a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .best-chain-words {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #555577;
+    line-height: 1.8;
+    word-break: break-all;
+  }
+  .best-chain-words .bw {
+    color: #8888aa;
+  }
+  .best-chain-words .bb {
+    color: #ffd700;
+  }
+  .best-chain-words .bar {
+    color: #333355;
+    margin: 0 4px;
+  }
+
+  .result-btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .share-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 14px 32px;
+    border: 1px solid #ffd700;
+    background: rgba(255,215,0,0.06);
+    color: #ffd700;
+    cursor: pointer;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .share-btn:hover {
+    background: rgba(255,215,0,0.15);
+    box-shadow: 0 0 24px rgba(255,215,0,0.25);
+    transform: scale(1.04);
+  }
+
+  .again-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 14px 32px;
+    border: 1px solid rgba(0,240,255,0.4);
+    background: rgba(0,240,255,0.06);
+    color: #00f0ff;
+    cursor: pointer;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .again-btn:hover {
+    background: rgba(0,240,255,0.15);
+    box-shadow: 0 0 24px rgba(0,240,255,0.2);
+    transform: scale(1.04);
+  }
+
+  .share-confirm {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #39ff14;
+    text-transform: uppercase;
+    min-height: 20px;
+    text-shadow: 0 0 8px rgba(57,255,20,0.5);
+  }
+
+  /* Game screen timer ring */
+  .timer-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+
+  /* Invisible spacer for flex */
+  .flex-spacer { flex: 1; min-height: 0; }
+</style>
+</head>
+<body>
+
+<!-- Particle canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- ─── START SCREEN ─── -->
+<div id="start-screen" class="screen">
+  <div class="arcade-tag">Neon Arcade</div>
+  <div class="game-title">WORDCHAIN</div>
+  <div class="game-subtitle">Build the longest chain in 90 seconds</div>
+
+  <div class="example-chain">
+    <div class="ex-label">Example chain</div>
+    <div class="ex-words">
+      <span class="ex-word">CHA<span class="bridge">IN</span></span>
+      <span class="ex-arrow">→</span>
+      <span class="ex-word">IN<span class="bridge">LET</span></span>
+      <span class="ex-arrow">→</span>
+      <span class="ex-word">LET<span class="bridge">HAL</span></span>
+      <span class="ex-arrow">→</span>
+      <span class="ex-word">HAL<span class="bridge">LOW</span></span>
+      <span class="ex-arrow">→</span>
+      <span class="ex-word">LOW<span class="bridge">ER</span></span>
+    </div>
+  </div>
+
+  <div class="rules-list">
+    <div class="rule-item"><span class="rule-icon">&#9654;</span> New word must START with last 2 letters of previous</div>
+    <div class="rule-item"><span class="rule-icon">&#9654;</span> Minimum 3 letters — no repeating words</div>
+    <div class="rule-item"><span class="rule-icon">&#9654;</span> +1 bonus for 7+ letter words, +2 for 9+</div>
+    <div class="rule-item"><span class="rule-icon">&#9654;</span> 90 seconds — go as long as you can</div>
+  </div>
+
+  <button class="play-btn" id="start-btn">START</button>
+  <div class="hud-best" id="start-best" style="margin-top:4px;"></div>
+</div>
+
+<!-- ─── GAME SCREEN ─── -->
+<div id="game-screen" class="screen hidden">
+  <div class="game-layout">
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-chain">
+        <div class="hud-label">Chain</div>
+        <div class="hud-value" id="chain-count">0</div>
+      </div>
+      <div id="hud-best-game" class="hud-best"></div>
+      <div class="timer-ring-wrap">
+        <div class="hud-label" style="text-align:right">Time</div>
+        <div class="hud-value" id="timer-display">1:30</div>
+      </div>
+    </div>
+
+    <!-- Chain history -->
+    <div class="chain-history" id="chain-history">
+      <span class="chain-start-label">Start typing...</span>
+    </div>
+
+    <!-- Bridge display -->
+    <div class="bridge-section">
+      <div class="bridge-label">Next word must start with</div>
+      <div class="bridge-letters" id="bridge-letters">--</div>
+    </div>
+
+    <!-- Word count & bonus -->
+    <div class="word-count-row">
+      <div class="feedback-msg" id="feedback-msg"></div>
+      <div class="bonus-tag" id="bonus-tag">+BONUS</div>
+    </div>
+
+    <div class="flex-spacer"></div>
+
+    <!-- Input -->
+    <div class="input-section">
+      <input
+        type="text"
+        id="word-input"
+        class="word-input"
+        placeholder="TYPE WORD..."
+        autocomplete="off"
+        autocapitalize="characters"
+        autocorrect="off"
+        spellcheck="false"
+        enterkeyhint="done"
+      >
+      <button class="submit-btn" id="submit-btn">ENTER</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── RESULT SCREEN ─── -->
+<div id="result-screen" class="screen hidden">
+  <div class="arcade-tag">Game Over</div>
+  <div class="result-title">WORDCHAIN</div>
+
+  <div class="result-stats">
+    <div class="stat-block">
+      <div class="stat-label">Chain Length</div>
+      <div class="stat-num" id="result-chain">0</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-label">Best Ever</div>
+      <div class="stat-num" id="result-best">0</div>
+    </div>
+  </div>
+
+  <div class="new-record-badge" id="new-record-badge">NEW RECORD</div>
+
+  <div class="best-chain-display" id="best-chain-display">
+    <div class="best-chain-label">Your chain</div>
+    <div class="best-chain-words" id="best-chain-words"></div>
+  </div>
+
+  <div class="score-table"></div>
+
+  <div class="result-btn-row">
+    <button class="share-btn" id="share-btn">SHARE</button>
+    <button class="again-btn" id="again-btn">PLAY AGAIN</button>
+  </div>
+
+  <div class="share-confirm" id="share-confirm"></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ─── WORD LIST ───
+  const WORDS = new Set([
+    'ABOUT','ABOVE','ABIDE','ABLED','ACORN','ACTED','ACUTE','ADAPT','ADEPT','ADMIT','ADOBE','ADULT','AFTER','AGAIN','AGENT','AGILE','AGING','AGREE','AHEAD','AIDED','AISLE','ALERT','ALIKE','ALIVE','ALLAY','ALLEY','ALLOT','ALLOW','ALONE','ALONG','ALOOF','ALTER','AMBER','AMBIT','AMPLE','ANGEL','ANGER','ANGLE','ANKLE','ANNEX','ANTIC','ANVIL','APART','APPLE','APPLY','ARENA','ARGUE','ARISE','ARMOR','AROMA','ARSON','ASIDE','ATLAS','ATONE','ATTIC','AUDIO','AUGUR','AVERT','AVOID','AWAKE','AWARD','AWARE','AWFUL',
+    'BADLY','BASIC','BASIN','BATCH','BEACH','BEARD','BEAST','BEGIN','BELOW','BENCH','BIRTH','BLACK','BLADE','BLAND','BLANK','BLAST','BLAZE','BLEND','BLESS','BLIND','BLOCK','BLOOD','BOARD','BOOST','BOUND','BRAIN','BRAND','BRAVE','BREAD','BREAK','BREED','BRICK','BRIDE','BRIEF','BRING','BROAD','BROOK','BROWN','BRUSH','BUILD','BURST',
+    'CABLE','CANDY','CARGO','CARRY','CEDAR','CHAIN','CHALK','CHARM','CHART','CHASE','CHEAP','CHECK','CHEER','CHEST','CHIEF','CHILD','CIVIC','CLAIM','CLASS','CLEAN','CLEAR','CLIMB','CLOCK','CLONE','CLOSE','CLOUD','COACH','COAST','COMET','CORAL','COUNT','COURT','COVER','CRASH','CREAM','CREST','CRIME','CROSS','CROWD','CROWN','CRUEL','CRUSH','CRUST','CURVE',
+    'DAILY','DANCE','DATED','DEBUT','DECOY','DEPOT','DEPTH','DISCO','DODGE','DOING','DOUGH','DRAFT','DRAIN','DRAMA','DREAM','DRIFT','DRIVE','DRUNK','DRYER',
+    'EAGER','EAGLE','EARLY','EARTH','EIGHT','ELITE','EMBER','EMOTE','EMPTY','ENDED','ENEMY','ENJOY','ENTRY','EQUAL','ERROR','ESSAY','EVADE','EVENT','EXACT','EXCEL','EXIST','EXTRA',
+    'FABLE','FAITH','FALLS','FANCY','FEAST','FENCE','FEVER','FIELD','FIFTY','FIGHT','FINAL','FIRST','FIXED','FLAME','FLAIR','FLARE','FLASH','FLEET','FLESH','FLOAT','FLOOD','FLOUR','FOCUS','FORGE','FORTH','FOUND','FRAME','FRANK','FRAUD','FRESH','FRONT','FROST','FRUIT','FULLY','FUNKY',
+    'GIANT','GIVEN','GLARE','GLASS','GLEAM','GLIDE','GLOBE','GLOOM','GLOSS','GLOVE','GRAIN','GRAND','GRANT','GRASP','GRASS','GRAVE','GRAZE','GREED','GREET','GRIEF','GRIME','GRIND','GROAN','GROUP','GROVE','GROWL','GROWN','GUARD','GUIDE','GUILD',
+    'HAPPY','HARSH','HASTE','HATCH','HAUNT','HEART','HEAVY','HEDGE','HEIST','HERON','HORSE','HOTEL','HOUND','HUMAN','HUMOR','HURRY',
+    'IDEAL','IMAGE','INFER','INNER','INPUT','IRONY','ISSUE','IVORY',
+    'JAZZY','JELLY','JEWEL','JOUST','JUICE','JUMBO',
+    'KNACK','KNOCK','KNEEL',
+    'LABEL','LANCE','LAYER','LEARN','LEASE','LEAVE','LEGAL','LEMON','LEVEL','LIGHT','LIMIT','LINER','LOGIC','LOOSE','LOTUS','LOWER','LUCKY','LUNAR',
+    'MAGIC','MAKER','MANOR','MAPLE','MARCH','MATCH','MEDIA','MERIT','MERRY','METAL','MIGHT','MIXED','MODAL','MODEL','MONEY','MONTH','MOOSE','MORAL','MORPH','MOTIF','MOTOR','MOUNT','MOUSE','MOUTH','MOVIE','MUSIC',
+    'NAVAL','NERVE','NEVER','NIGHT','NINJA','NOBLE','NOISE','NORTH','NOTED','NOVEL','NURSE',
+    'OCEAN','OFFER','OFTEN','OLIVE','ONION','ONSET','ORBIT','ORDER','OTHER','OUTER','OZONE',
+    'PAINT','PANEL','PANIC','PAPER','PARTY','PATCH','PAUSE','PEACE','PEARL','PEDAL','PENNY','PERCH','PHASE','PHONE','PHOTO','PIANO','PIECE','PILOT','PIXEL','PIZZA','PLACE','PLAIN','PLANE','PLANT','PLEAD','PLUCK','PLUMB','PLUME','PLUMP','POINT','POLAR','PORCH','POWER','PRESS','PRICE','PRIDE','PRIME','PRINT','PRIZE','PROBE','PRONE','PROUD','PULSE','PUNCH',
+    'RACER','RADAR','RADIO','RALLY','RANCH','RAPID','RAVEN','REBEL','REMIX','REPAY','RIDER','RIVAL','RIVET','ROBOT','ROCKY','ROUGE','ROUGH','ROUND','ROUTE','ROYAL','RULER','RUSTY',
+    'SAINT','SALSA','SAMBA','SCALE','SCOOP','SCOPE','SCORE','SCOUT','SEIZE','SENSE','SERUM','SERVE','SEVEN','SHADE','SHAFT','SHAME','SHAPE','SHARE','SHARP','SHELF','SHELL','SHIFT','SHINE','SHIRT','SHOCK','SHORE','SHOUT','SIEGE','SIGMA','SINCE','SKILL','SKIRT','SKULL','SLANT','SLATE','SLAVE','SLEEK','SLIDE','SLIME','SLOTH','SNAKE','SNARE','SNEAK','SOLAR','SOLVE','SONIC','SORRY','SOUTH','SPACE','SPARE','SPARK','SPAWN','SPEED','SPELL','SPEND','SPICE','SPILL','SPINE','SPORT','SPRAY','STAGE','STAIR','STAKE','STALE','STARE','STARK','START','STEAM','STEEP','STERN','STICK','STING','STOIC','STORM','STORY','STOVE','SUGAR','SUITE','SUNNY','SWAMP','SWEAR','SWEEP','SWEET','SWIFT','SWORD',
+    'TALON','TAUNT','TEMPO','TENOR','TENSE','THANK','THEME','THICK','THING','THINK','THIRD','THORN','TIGER','TIMER','TITAN','TONAL','TORCH','TOUCH','TOUGH','TOWER','TOXIC','TRACE','TRACK','TRADE','TRAIL','TRAIN','TRAIT','TREND','TRICK','TRIBE','TROLL','TROVE','TRUCE','TRULY','TRUTH','TULIP','TUMOR','TUNER','TWEAK',
+    'ULTRA','UPPER','USAGE','USHER','UNTIL','UNCUT',
+    'VALOR','VALVE','VENOM','VERSE','VIRAL','VITAL','VIVID','VOCAL','VOICE','VOTER',
+    'WAFER','WAGON','WALTZ','WASTE','WATCH','WATER','WEAVE','WEDGE','WEIRD','WHALE','WHIRL','WHISK','WHITE','WHOLE','WITCH','WOMAN','WOMEN','WORLD','WORSE','WORST','WORTH','WOUND','WRATH',
+    'YACHT','YEARN','YIELD','YOUNG','YOUTH','ZEBRA','ZONES',
+    // Extended bridging words
+    'ERRAND','INTEND','ENDEAR','CHANT','ANTLER','ERRANT','RENTAL','OUTLET','LETTER','ALLOW','LOWER','ERASE','ASSET','INLET','LETHAL','ALONG','LONGER','UNDER','ESTATE','ERODE','ALOFT','OFTEN','FENDER','ORDEAL','ANKLE','ONSET','NETTLE','LESSON','ONWARD','ARDENT','ENTER','CEDAR','GENTLE','SETTLE','ELBOW','BOWER','DEMON','NERVE',
+    // Bridge coverage extras
+    'INNER','INWARD','ANGER','GERMS','ERMINE','MINGLE','LESSER','SERMON','MONGER','ONAGER','AGREED','REDBUD','BUDS','BUDGET','GENTRY','TRICKLE','LETTER','TERROR','ORRERY','ERRING','RINGTONE','TONER','ONEROUS','ROSTER','STEREO','REOPEN','OPENER','PERNOD',
+    // ST- words for starting
+    'STILL','START','STAND','STANK','STAID','STERN','STEEL','STEAD','STEAM','STEEP','STEED','STEER','STEIN','STERN','STEW','STICK','STIFF','STILL','STING','STINK','STIR','STIRS','STOCK','STOMP','STOOD','STOOL','STOOP','STORE','STARK','STUDY','STUFF','STUMP','STUNG','STUNK','STUNT','STUPA',
+    // RM- OM- LO- more
+    'LOITER','LOATHE','LOCAL','LOCUS','LODGE','LOFTY','LOGIN','LONER','ONSET','ONRUSH',
+    // CH- IN- LE-
+    'CHANGE','CHAMP','CHALK','CHASE','CHEAP','CHEAT','CHEEK','CHIDE','CHILL','CHIME','CHIMP','CHINA','CHOIR','CHOKE','INKY','INCA','INCUR','INDEX','INEPT','INERT','INFRA','INLAY','INLET','INNER','INPUT','INTER','LEVEE','LIVER','LEVER','LEMON','Lenin','LENTO','LEMON',
+    // ER- AR- OR-
+    'ERGO','ERGOT','ERODE','ERROR','ERUPT','ARTY','ARTIC','ARIEL','ARIEL','ORCAS','ORCHID',
+    // More common bridging
+    'GRAND','BRAND','HANDLE','ANOINT','INTENT','ENTIRE','RESIDE','IDEAL','RENAL','NAÏVE',
+    // OR words
+    'ORCHARD','ORACLE','ORATE','ORBIT','ORCHID',
+    // More LE words
+    'LEARN','LEASE','LEAST','LEAVE','LEGAL','LEMON','LEMUR',
+    // More ER words
+    'ERODE','ERROR','ERRAND','ERRANT','ERRING',
+    // IN words
+    'INFER','INNER','INPUT','INEPT',
+    // AL words
+    'ALERT','ALIAS','ALIGN','ALIKE','ALLAY','ALLEY','ALLOT','ALLOW','ALLOY','ALONE','ALONG','ALOOF','ALTER','ALGAE',
+    // Common longer words
+    'SIGNAL','GLOBAL','MENTAL','RENTAL','DENTAL','HERBAL','VERBAL','MORTAL','PORTAL','MARBLE','GARBLE','STARTLE','CASTLE','GENTLE','SETTLE','KETTLE','NETTLE','METTLE','BATTLE','CATTLE','BOTTLE','LITTLE','MIDDLE','FIDDLE','RIDDLE','HUDDLE','PUDDLE','MUDDLE','NOODLE','DOODLE','POODLE','GOOGLE','SINGLE','MINGLE','JINGLE','TINGLE','SIMPLE','TEMPLE','TREMOR','TREBLE','FEEBLE','PEOPLE','COUPLE','PURPLE','MARVEL','TRAVEL','GRAVEL','SHOVEL','NOVEL','MOVEL',
+    // Sports/common
+    'SOCCER','HOCKEY','TURKEY','MONKEY','DONKEY','JOCKEY','TROLLEY','GALLEY','VALLEY','VOLLEY','PULLEY','BULLY','FULLY','DULLY','BELLY','JELLY','SMELLY','TELLY','LEMON','MELON','FELON','SALON','TALON','VALOR',
+    // Action/common
+    'ENTER','INTER','INTER','INFER','OFFER','AFTER','ALTER','OTHER',
+    // Nature
+    'STORM','FLAME','CRANE','SNAKE','EAGLE','TIGER','LION','CORAL','AMBER','CEDAR','MAPLE',
+    // -ER bridge targets
+    'ERUPT','ERECT',
+    // -ST bridge targets
+    'STAMP','STALK','STALL','STALE','STAIN',
+    // -RM bridge
+    'ARMOR',
+    // -ET bridge
+    'ETUDE',
+    // Common -AL
+    'ALTAR','ALGAE',
+    // -NG
+    'ANGEL','ANGER','ANGLE','ANGRY','ANGST',
+    // More
+    'BROTH','BROIL','BROOD','BRINK','BRINE','BRAID','BRASH','BRAWL','BRAWN',
+    'CRAVE','CRAWL','CREAK','CREED','CREEP','CRISP','CRONE','CROOK','CROON',
+    'DRAFT','DRAWL','DREAD','DRILL','DRINK','DROOP','DRAPE',
+    'FLAME','FLANK','FLAP','FLAUNT','FLAW','FLECK','FLESH','FLINCH','FLING','FLINT','FLOP','FLOSS','FLOUT','FLOWN',
+    'FRANC','FREAK','FREER','FROTH','FROWN','FROZE',
+    'GRIPE','GRILL','GRIST','GROUT','GRUFF',
+    'PLAIT','PLANK','PLASH','PLASM','PLATE','PLAZA','PLEAD','PLEAT','PLIED','PLINK','PLOD','PLOP','PLOY','PLOW',
+    'PROWL','PRAWN','PRANK','PRAISE','PRAY','PROSE','PROOF','PRONG',
+    'SCALP','SCALD','SCAM','SCAN','SCAMP','SCAR','SCAT','SCENE','SCOFF','SCOLD','SCONE','SCOUR','SCOWL','SCRAM','SCRAP','SCREE','SCREW','SCRIM','SCRUB','SCUFF',
+    'SHACK','SHAG','SHAKE','SHALL','SHALE','SHAME','SHANK','SHARK','SHAWL','SHEEN','SHRUB','SHRUG','SHRUNK',
+    'SNIFF','SNOB','SNOOP','SNORE','SNORT','SNOUT','SNOWBALL','SNUB','SNUFF',
+    'SPADE','SPAN','SPARK','SPEAK','SPECK','SPEED','SPEW','SPIKE','SPIRE','SPITE','SPLASH','SPLAT','SPLIT','SPLOTCH','SPOIL','SPOKE','SPOOF','SPOOK','SPOOL','SPOON','SPORE','SPOUT',
+    'SPRAY','SPRIG','SPRIT','SPROUT','SPUNK','SPUR',
+    'SQUAB','SQUALL','SQUAT','SQUEAK','SQUEAL','SQUEAM','SQUINT','SQUIRM','SQUIRT',
+    'STRAP','STRAW','STRAY','STREAK','STREAM','STREET','STRESS','STREW','STRIDE','STRIFE','STRIKE','STRING','STRIP','STRIVE','STROLL','STRONG','STRUT',
+    'SWAB','SWAG','SWAN','SWAP','SWAT','SWAY','SWILL','SWOON',
+    'TRACE','TRASH','TRAWL','TREAD','TREAT','TREK','TRESS','TRIAL','TRIM','TRIO','TRIP','TRITE','TROTH','TROUT','TROVE','TRUCK','TRUMP','TRUNK','TRUSS','TRUST','TRY',
+    'WRING','WRIST','WRITE',
+    // Common 3-4 letter words for chain continuity
+    'ACE','AGE','AID','AIM','AIR','ALE','APE','ARC','ARE','ARK','ARM','ART','ASH','ATE','AWE','AXE',
+    'BAD','BAG','BAN','BAR','BAT','BED','BIG','BIT','BOW','BOX','BUD','BUG','BUN','BUS','BUT',
+    'CAB','CAM','CAP','CAR','CAT','COB','COD','COG','COP','COT','COW','CUB','CUD','CUP','CUT',
+    'DAB','DAM','DEN','DEW','DIM','DIP','DOE','DON','DOT','DUE','DUG','DYE',
+    'EAR','EAT','EEL','EGG','ELK','ELM','EMU','END','ERA','EVE',
+    'FAN','FAR','FAT','FAX','FED','FEW','FIG','FIN','FIT','FIX','FLY','FOB','FOG','FOR','FOX','FRY','FUN','FUR',
+    'GAB','GAG','GAP','GAS','GEL','GEM','GOB','GOD','GUN','GUT','GUY',
+    'HAD','HAM','HAP','HAS','HAT','HAY','HIM','HIP','HIS','HIT','HOB','HOD','HOG','HOP','HOT','HOW','HUB','HUE','HUG','HUM',
+    'ICE','ILL','IMP','INK','ION','IRE',
+    'JAB','JAG','JAM','JAW','JAY','JET','JIB','JIG','JOB','JOT','JOY','JUG','JUT',
+    'KEG','KIT',
+    'LAB','LAD','LAG','LAP','LAW','LAX','LAY','LEA','LED','LEG','LET','LID','LIP','LIT','LOG','LOT','LOW',
+    'MAD','MAP','MAR','MAT','MAW','MAX','MAY','MEN','MET','MOB','MOD','MOM','MOP','MUD','MUG','MUM',
+    'NAB','NAG','NAP','NAY','NET','NEW','NIB','NIP','NOB','NOD','NOR','NOT','NOW','NUB','NUN','NUT',
+    'OAF','OAK','OAR','OAT','ODD','ODE','OFT','OHM','OIL','OLD','OPT','ORB','ORE','OWE','OWL','OWN',
+    'PAD','PAL','PAN','PAP','PAR','PAT','PAW','PAY','PEA','PEG','PEN','PEP','PET','PIE','PIG','PIN','PIT','PLY','POD','POI','POP','POT','POW','PRY','PUB','PUG','PUN','PUP','PUS','PUT',
+    'RAG','RAM','RAN','RAP','RAT','RAW','RAY','RED','REF','REP','RIB','RID','RIG','RIM','RIP','ROB','ROD','ROE','ROT','ROW','RUB','RUG','RUM','RUN','RUT',
+    'SAC','SAG','SAP','SAT','SAW','SAY','SEA','SET','SEW','SIN','SIP','SIR','SIT','SIX','SKI','SKY','SOB','SOD','SON','SOP','SOT','SOW','SOY','SPA','SPY','STY','SUB','SUM','SUN','SUP',
+    'TAB','TAG','TAN','TAP','TAR','TAT','TAX','TEA','TIP','TOE','TOG','TON','TOO','TOP','TOT','TOW','TOY','TUB','TUG','TUN','TUP','TUT','TWO',
+    'URN','USE',
+    'VAN','VAT','VIA','VIE','VOW',
+    'WAD','WAR','WAS','WAX','WAY','WEB','WED','WET','WHO','WHY','WIG','WIN','WIT','WOE','WOG','WOK','WON','WOO','WOW',
+    'YAK','YAM','YAP','YEA','YES','YET','YEW','YOU',
+    'ZAP','ZAG','ZEN','ZIP','ZIT','ZOO',
+    // More 4-letter words
+    'ABLE','ACHE','ACME','ACRE','ACTS','ADDS','ADOR','AFAR','AILS','AIMS','AIRS','ALSO','ANTE','ANTS','ARCH','AREA','ARES','ARKS','ARMS','ARTS','AVER',
+    'BACK','BADE','BALD','BALE','BALK','BALL','BALM','BANE','BANG','BARD','BARK','BARN','BASE','BASK','BATE','BAUD','BAWL','BAYS','BEAD','BEAK','BEAL','BEAN','BEAR','BEAT','BEEN','BEER','BEES','BEET','BEES','BELT','BETS','BILE','BILL','BIND','BING','BIRD','BITE','BITS','BLAB','BLOT','BLOW','BLEW','BLUE','BLUR','BOAR','BOAT','BOLD','BOLE','BOLL','BOLT','BONE','BONG','BOOK','BOOM','BOON','BOOR','BOOT','BORE','BORN','BOTH','BOUT',
+    'BROW','BURN','BURP',
+    'CAFE','CAGE','CAKE','CALF','CALL','CALM','CAME','CAMP','CANE','CAPE','CAPS','CARE','CART','CASE','CASH','CAST','CATS','CAVE','CEIL','CELL','CENT','CHAT','CHIN','CHIP','CHOP','CHOW','CHUB','CLAM','CLAP','CLAW','CLAY','CLIP','CLOP','CLOT','CLUE','CODE','COIN','COLA','COLD','COME','CONE','COOK','COOL','COPE','CORD','CORE','CORN','COST','COZY','CZAR',
+    'DARE','DARK','DARN','DART','DATA','DATE','DAWN','DAYS','DEAD','DEAF','DEAL','DEAR','DECK','DEED','DEEP','DEER','DEFT','DELI','DELL','DENT','DENY','DESK','DIAL','DICE','DIET','DILL','DIME','DINE','DIRE','DIRT','DISK','DIVA','DIVE','DOCK','DOLE','DOME','DONE','DOOR','DORK','DOSE','DOVE','DAZE','DRAG','DRIP','DROP',
+    'DUSK','DUST','DUTY',
+    'EACH','EASE','EAST','EDGE','EMIT','EPIC','ESPY','EVEN','EVER','EVIL','EWER','EXAM','EXIT','EYRE',
+    'FACE','FACT','FADE','FAIL','FAIR','FAKE','FAME','FARE','FARM','FAST','FATE','FAUN','FAWN','FAZE','FEAT','FEEL','FEET','FELL','FELT','FERN','FILE','FILL','FILM','FIND','FINE','FIRE','FIRM','FISH','FIST','FITS','FLAG','FLAT','FLAW','FLEA','FLEW','FLIT','FLOP','FLOW','FOAM','FOLD','FOLK','FOND','FONT','FOOD','FOOL','FOOT','FORD','FORE','FORK','FORM','FORT','FOUL','FOUR','FOWL','FREE','FRET','FROM','FUEL','FULL','FUME','FUSE','FUZE',
+    'GALE','GALL','GAME','GANG','GAPE','GATE','GAVE','GAZE','GELD','GILD','GILL','GIST','GLAD','GLEE','GLEN','GLIB','GLOB','GLUG','GLUT','GOAD','GOAT','GOES','GOLD','GOLF','GONE','GONG','GOOD','GOOF','GORE','GORY','GOWN','GRAB','GRADE','GRAFT','GRIM','GRIP','GRIT','GROG','GRUB',
+    'HACK','HAIL','HAIR','HALE','HALL','HALT','HAME','HAND','HANG','HARD','HARE','HARK','HARM','HARP','HATE','HAUL','HAVE','HAZE','HAZY','HEAD','HEAL','HEAP','HEAT','HEEL','HEIR','HELL','HELM','HELP','HEMP','HERD','HERE','HEWS','HIDE','HIGH','HIKE','HILL','HIRE','HIVE','HOAR','HOLD','HOLE','HOME','HOOD','HOOK','HOPE','HORN','HOST','HOWL','HULK','HULL','HUNG',
+    'ICON','IDLE','LAIR','LAKE','LAME','LAMP','LAND','LANE','LARD','LARK','LASH','LAST','LATE','LAUD','LAVA','LAWN','LEAD','LEAF','LEAN','LEAP','LEER','LEND','LIES','LIKE','LIME','LINE','LINK','LIST','LIVE','LOAD','LOAF','LOAM','LOAN','LOCK','LOFT','LONG','LORE','LORN','LOSE','LOSS','LOST','LOUD','LOVE','LULL','LUMP','LUNG','LUST','LUTE',
+    'MACE','MADE','MAID','MAIL','MAIN','MAKE','MALE','MALL','MALT','MANE','MAST','MAZE','MEAL','MEAN','MEAT','MEET','MELD','MELT','MEMO','MERE','MESA','MESH','MICE','MILD','MILE','MILL','MIME','MIND','MINE','MINT','MISS','MIST','MOAN','MOAT','MOCK','MOLD','MOLE','MOLT','MOOD','MOOR','MORE','MOST','MOTH','MOTE','MOWN','MUCH','MUCK','MULE','MURK',
+    'NAIL','NAME','NAPE','NARY','NEAR','NEAT','NECK','NEED','NEST','NEWS','NEXT','NICE','NICK','NINE','NODE','NONE','NOOK','NOON','NOSE','NOTE','NUMB',
+    'OATH','ODDS','ONCE','ONLY','OPEN','ORAL','OVEN','OVER','OXEN',
+    'PACE','PACK','PAGE','PAIL','PAIR','PALE','PALM','PARE','PARK','PAST','PATH','PAVE','PEAK','PEAL','PEAR','PEAT','PEEL','PEER','PELT','PERK','PERM','PEST','PICK','PIER','PINE','PINK','PIPE','PLAN','PLAY','PLEA','PLOW','PLOY','PLUG','PLUS','POEM','POET','POLE','POLL','POND','PONG','POOL','POOR','POPE','PORE','PORT','POSE','POST','POUR','PREV','PREY','PRIM','PROD','PROP','PROW','PURE','PUSH',
+    'RAID','RAIN','RAKE','RANK','RARE','RASH','RAVE','READ','REAL','REAP','RECK','REED','REEL','REIN','RELY','RENT','RENT','REST','RICE','RICH','RIDE','RING','RIOT','RIPE','RISE','RISK','ROAM','ROAR','ROBE','ROLE','ROLL','ROOF','ROOK','ROOM','ROOT','ROPE','ROSE','RUIN','RULE','RUNE','RUSE','RUSH','RUST',
+    'SAFE','SAGE','SAIL','SAKE','SALE','SALT','SAME','SAND','SANE','SANG','SANK','SASH','SAVE','SEAL','SEAM','SEAR','SEAT','SEEK','SEEM','SEEN','SEEP','SELF','SELL','SEND','SENT','SHED','SHIM','SHIN','SHIP','SHOE','SHOT','SHOW','SIDE','SIFT','SIGN','SILK','SILL','SILO','SING','SINK','SITE','SIZE','SKIN','SKIP','SLAB','SLAG','SLAP','SLAT','SLAY','SLEW','SLIM','SLIP','SLIT','SLOP','SLOT','SLOW','SLUG','SLUM','SLUR','SMUG','SNAG','SNAP','SOAR','SOCK','SOFT','SOIL','SOLE','SOME','SONG','SOON','SORE','SORT','SOUL','SOUP','SPAN','SPIN','SPIT','SPOT','STAB','STUB','SLUG','SUIT','SUNK','SURF','SWAM','SWIM',
+    'TACK','TAIL','TAKE','TALE','TALL','TAME','TAPE','TASK','TAUT','TEAR','TEEM','TELL','TENT','TERM','TEST','TEXT','THAN','THAT','THEN','THEY','THIN','THIS','THOU','THUS','TICK','TIDE','TIED','TIER','TILE','TILL','TIME','TINE','TINY','TIRE','TOAD','TOGA','TOLD','TOLL','TOMB','TOME','TONE','TOOL','TORE','TORN','TORT','TOSS','TOUT','TRAY','TREE','TRIO','TRIM','TRIO','TRUE','TUBE','TUCK','TUNE','TURF','TUSK','TWIN','TYPE',
+    'UGLY','UPON','USED',
+    'VAIN','VAST','VEIL','VEIN','VERY','VEST','VETO','VIEW','VILE','VINE','VISE','VOID',
+    'WADE','WAIL','WAKE','WALK','WALL','WANT','WARE','WARM','WARN','WARP','WARS','WARY','WAVE','WEAK','WEAL','WEAN','WEAR','WEED','WEEK','WELL','WEND','WERE','WEST','WHAM','WHAT','WHEN','WHET','WHIM','WHIP','WIDE','WIFE','WILD','WILL','WILT','WIMP','WIND','WINE','WING','WINK','WIRE','WISE','WISH','WOLF','WOOD','WOOL','WORD','WORE','WORK','WORM','WOVE','WRAP','WREN','WRIT',
+    'YAWN','YEAR','YELL',
+  ]);
+
+  // ─── DAY SEED ───
+  const DAY_SEEDS = ['CHAIN','SPARK','STORM','DREAM','PIXEL','GLOBE','TEMPO'];
+  function getTodaySeed() {
+    const d = new Date();
+    return DAY_SEEDS[d.getDay()];
+  }
+
+  // ─── AUDIO ───
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function playTone(freq, type, duration, gain, startDelay = 0) {
+    try {
+      const ctx = getAudioCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = type;
+      o.frequency.setValueAtTime(freq, ctx.currentTime + startDelay);
+      g.gain.setValueAtTime(0, ctx.currentTime + startDelay);
+      g.gain.linearRampToValueAtTime(gain, ctx.currentTime + startDelay + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startDelay + duration);
+      o.start(ctx.currentTime + startDelay);
+      o.stop(ctx.currentTime + startDelay + duration + 0.05);
+    } catch(e) {}
+  }
+  function soundKeystroke() {
+    playTone(800, 'sine', 0.04, 0.04);
+  }
+  function soundAccepted() {
+    playTone(523, 'sine', 0.12, 0.15);
+    playTone(659, 'sine', 0.12, 0.12, 0.08);
+    playTone(784, 'sine', 0.18, 0.1, 0.16);
+  }
+  function soundBonus() {
+    playTone(880, 'sine', 0.1, 0.12);
+    playTone(1047, 'sine', 0.1, 0.1, 0.07);
+    playTone(1318, 'sine', 0.15, 0.09, 0.14);
+  }
+  function soundRejected() {
+    playTone(200, 'sawtooth', 0.15, 0.12);
+    playTone(150, 'sawtooth', 0.1, 0.08, 0.12);
+  }
+  function soundTimerWarn() {
+    playTone(440, 'square', 0.08, 0.06);
+  }
+  function soundGameOver() {
+    playTone(300, 'sawtooth', 0.1, 0.15);
+    playTone(200, 'sawtooth', 0.12, 0.12, 0.12);
+    playTone(150, 'sawtooth', 0.2, 0.1, 0.26);
+  }
+
+  // ─── PARTICLES ───
+  const canvas = document.getElementById('particle-canvas');
+  const pctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function spawnParticles(x, y, color, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2,
+        life: 1,
+        decay: 0.025 + Math.random() * 0.02,
+        size: 2 + Math.random() * 3,
+        color
+      });
+    }
+  }
+
+  function tickParticles() {
+    pctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.15;
+      p.vx *= 0.96;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      pctx.globalAlpha = p.life;
+      pctx.fillStyle = p.color;
+      pctx.beginPath();
+      pctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      pctx.fill();
+    }
+    pctx.globalAlpha = 1;
+  }
+
+  // ─── STATE ───
+  let chain = [];
+  let usedWords = new Set();
+  let score = 0;
+  let timeLeft = 90;
+  let timerInterval = null;
+  let bridgeLetters = '';
+  let feedbackTimeout = null;
+  let bonusTimeout = null;
+  let gameActive = false;
+  let longestWord = '';
+
+  const LS_KEY = 'wordchain_best';
+  function getBest() { return parseInt(localStorage.getItem(LS_KEY) || '0', 10); }
+  function setBest(v) { localStorage.setItem(LS_KEY, String(v)); }
+
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function renderScoreTable(scores) {
+    var el = document.querySelector('.score-table');
+    if (!el) return;
+    var html = '<div class="score-table-title">🏆 YOUR BESTS</div>';
+    scores.forEach(function(s, i) {
+      html += '<div class="score-row">'
+        + '<span class="score-rank">' + (i+1) + '</span>'
+        + '<span class="score-val">' + s.score + '</span>'
+        + '<span class="score-time">' + timeAgo(s.ts) + '</span>'
+        + '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  // ─── DOM ───
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  const startBest = document.getElementById('start-best');
+  const startBtn = document.getElementById('start-btn');
+  const chainCount = document.getElementById('chain-count');
+  const timerDisplay = document.getElementById('timer-display');
+  const bridgeEl = document.getElementById('bridge-letters');
+  const chainHistory = document.getElementById('chain-history');
+  const wordInput = document.getElementById('word-input');
+  const submitBtn = document.getElementById('submit-btn');
+  const feedbackMsg = document.getElementById('feedback-msg');
+  const bonusTag = document.getElementById('bonus-tag');
+  const hudBestGame = document.getElementById('hud-best-game');
+  const resultChain = document.getElementById('result-chain');
+  const resultBest = document.getElementById('result-best');
+  const newRecordBadge = document.getElementById('new-record-badge');
+  const bestChainWords = document.getElementById('best-chain-words');
+  const shareBtn = document.getElementById('share-btn');
+  const againBtn = document.getElementById('again-btn');
+  const shareConfirm = document.getElementById('share-confirm');
+
+  // ─── SHOW/HIDE ───
+  function showScreen(s) {
+    [startScreen, gameScreen, resultScreen].forEach(el => el.classList.add('hidden'));
+    s.classList.remove('hidden');
+  }
+
+  // ─── INIT START SCREEN ───
+  function initStartScreen() {
+    const b = getBest();
+    startBest.textContent = b > 0 ? `Best: ${b} words` : '';
+    showScreen(startScreen);
+  }
+
+  // ─── START GAME ───
+  function startGame() {
+    const seed = getTodaySeed();
+    chain = [seed];
+    usedWords = new Set([seed]);
+    bridgeLetters = seed.slice(-2);
+    score = 0;
+    timeLeft = 90;
+    longestWord = seed;
+    gameActive = true;
+
+    chainCount.textContent = '0';
+    updateTimerDisplay();
+    timerDisplay.classList.remove('timer-warn');
+    updateBridgeDisplay(false);
+    updateChainHistory();
+    updateHudBest();
+    clearFeedback();
+    wordInput.value = '';
+    wordInput.classList.remove('flash-ok','shake');
+
+    showScreen(gameScreen);
+    setTimeout(() => wordInput.focus(), 100);
+
+    // Start timer
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+
+  // ─── TIMER ───
+  function tickTimer() {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 10 && timeLeft > 0) {
+      timerDisplay.classList.add('timer-warn');
+      soundTimerWarn();
+    }
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      gameActive = false;
+      endGame();
+    }
+  }
+  function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    timerDisplay.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  }
+
+  // ─── CHAIN HISTORY ───
+  function updateChainHistory() {
+    chainHistory.innerHTML = '';
+    const display = chain.slice(-5);
+    display.forEach((word, i) => {
+      const isLatest = i === display.length - 1;
+      const isFirst = i === 0 && chain.length <= 5;
+
+      if (i > 0 || (chain.length > 5)) {
+        const arr = document.createElement('span');
+        arr.className = 'chain-arrow';
+        arr.textContent = '→';
+        chainHistory.appendChild(arr);
+      }
+
+      const wrap = document.createElement('span');
+      wrap.className = 'chain-word-wrap';
+
+      const wordEl = document.createElement('span');
+      wordEl.className = 'chain-word' + (isLatest ? ' latest' : '');
+
+      const bodyPart = word.slice(0, -2);
+      const bridgePart = word.slice(-2);
+      wordEl.innerHTML = `<span>${bodyPart}</span><span class="word-bridge">${bridgePart}</span>`;
+
+      wrap.appendChild(wordEl);
+      chainHistory.appendChild(wrap);
+    });
+
+    // Scroll to end
+    chainHistory.scrollLeft = chainHistory.scrollWidth;
+  }
+
+  // ─── BRIDGE DISPLAY ───
+  function updateBridgeDisplay(flash) {
+    bridgeEl.textContent = bridgeLetters;
+    if (flash) {
+      bridgeEl.classList.remove('flash-new');
+      void bridgeEl.offsetWidth; // reflow
+      bridgeEl.classList.add('flash-new');
+      setTimeout(() => bridgeEl.classList.remove('flash-new'), 400);
+    }
+  }
+
+  // ─── HUD BEST ───
+  function updateHudBest() {
+    const b = getBest();
+    hudBestGame.textContent = b > 0 ? `Best: ${b}` : '';
+  }
+
+  // ─── FEEDBACK ───
+  function showFeedback(msg, type) {
+    clearTimeout(feedbackTimeout);
+    feedbackMsg.textContent = msg;
+    feedbackMsg.className = 'feedback-msg ' + type;
+    feedbackTimeout = setTimeout(() => {
+      feedbackMsg.textContent = '';
+      feedbackMsg.className = 'feedback-msg';
+    }, 1800);
+  }
+  function clearFeedback() {
+    clearTimeout(feedbackTimeout);
+    feedbackMsg.textContent = '';
+    feedbackMsg.className = 'feedback-msg';
+  }
+
+  // ─── BONUS TAG ───
+  function showBonus(pts) {
+    clearTimeout(bonusTimeout);
+    bonusTag.textContent = pts === 1 ? '+1 LONG!' : '+2 MEGA!';
+    bonusTag.classList.add('show');
+    bonusTimeout = setTimeout(() => bonusTag.classList.remove('show'), 1500);
+  }
+
+  // ─── SUBMIT WORD ───
+  function submitWord() {
+    if (!gameActive) return;
+    const raw = wordInput.value.trim().toUpperCase();
+    wordInput.value = '';
+
+    if (!raw) return;
+
+    // Check min length
+    if (raw.length < 3) {
+      wordInput.classList.remove('shake');
+      void wordInput.offsetWidth;
+      wordInput.classList.add('shake');
+      showFeedback('MIN 3 LETTERS', 'err');
+      soundRejected();
+      setTimeout(() => wordInput.classList.remove('shake'), 300);
+      return;
+    }
+
+    // Check starts with bridge
+    if (!raw.startsWith(bridgeLetters)) {
+      wordInput.classList.remove('shake');
+      void wordInput.offsetWidth;
+      wordInput.classList.add('shake');
+      showFeedback(`MUST START WITH "${bridgeLetters}"`, 'err');
+      soundRejected();
+      setTimeout(() => wordInput.classList.remove('shake'), 300);
+      return;
+    }
+
+    // Check already used
+    if (usedWords.has(raw)) {
+      wordInput.classList.remove('shake');
+      void wordInput.offsetWidth;
+      wordInput.classList.add('shake');
+      showFeedback('ALREADY USED!', 'used');
+      soundRejected();
+      setTimeout(() => wordInput.classList.remove('shake'), 300);
+      return;
+    }
+
+    // Check in word list
+    if (!WORDS.has(raw)) {
+      wordInput.classList.remove('shake');
+      void wordInput.offsetWidth;
+      wordInput.classList.add('shake');
+      showFeedback('NOT A VALID WORD', 'err');
+      soundRejected();
+      setTimeout(() => wordInput.classList.remove('shake'), 300);
+      return;
+    }
+
+    // ─ ACCEPTED ─
+    chain.push(raw);
+    usedWords.add(raw);
+    bridgeLetters = raw.slice(-2);
+    score++;
+
+    // Bonus
+    let bonus = 0;
+    if (raw.length >= 9) bonus = 2;
+    else if (raw.length >= 7) bonus = 1;
+    score += bonus;
+
+    // Track longest
+    if (raw.length > longestWord.length) longestWord = raw;
+
+    chainCount.textContent = String(score);
+    updateBridgeDisplay(true);
+    updateChainHistory();
+
+    // Visual/sound feedback
+    wordInput.classList.remove('flash-ok','shake');
+    void wordInput.offsetWidth;
+    wordInput.classList.add('flash-ok');
+    setTimeout(() => wordInput.classList.remove('flash-ok'), 350);
+
+    if (bonus > 0) {
+      soundBonus();
+      showBonus(bonus);
+      showFeedback(`+${bonus} BONUS! ${raw}`, 'ok');
+    } else {
+      soundAccepted();
+      showFeedback(`${raw} \u2713`, 'ok');
+    }
+
+    // Particles at input position
+    const inputRect = wordInput.getBoundingClientRect();
+    spawnParticles(
+      inputRect.left + inputRect.width / 2,
+      inputRect.top + inputRect.height / 2,
+      bonus > 0 ? '#ffd700' : '#00f0ff',
+      bonus > 0 ? 20 : 12
+    );
+
+    wordInput.focus();
+  }
+
+  // ─── END GAME ───
+  function endGame() {
+    soundGameOver();
+    const prev = getBest();
+    const isNewBest = score > prev;
+    if (isNewBest) setBest(score);
+    const topScores = saveScore('neonarcade_scores_wordchain', score);
+
+    resultChain.textContent = String(score);
+    const bestNow = getBest();
+    resultBest.textContent = String(bestNow);
+    renderScoreTable(topScores);
+
+    if (isNewBest && score > 0) {
+      resultChain.classList.add('new-best');
+      newRecordBadge.classList.add('show');
+    } else {
+      resultChain.classList.remove('new-best');
+      newRecordBadge.classList.remove('show');
+    }
+
+    // Render chain snippet
+    renderBestChain();
+    shareConfirm.textContent = '';
+
+    setTimeout(() => showScreen(resultScreen), 400);
+  }
+
+  function renderBestChain() {
+    const display = chain.slice(0, 8);
+    let html = '';
+    display.forEach((w, i) => {
+      if (i > 0) html += `<span class="bar">→</span>`;
+      const body = w.slice(0, -2);
+      const bridge = w.slice(-2);
+      html += `<span class="bw">${body}</span><span class="bb">${bridge}</span>`;
+    });
+    if (chain.length > 8) html += `<span class="bar">+${chain.length - 8} more</span>`;
+    bestChainWords.innerHTML = html;
+  }
+
+  // ─── SHARE ───
+  function buildShareText() {
+    const w = chain.slice(1, 4).join(' → ') || chain[0];
+    return `\uD83D\uDD17 WORDCHAIN\nChain: ${score} word${score !== 1 ? 's' : ''} in 90s\nBest: ${longestWord} (${longestWord.length} letters)\n${w}...\nCan you chain longer? → play now`;
+  }
+  shareBtn.addEventListener('click', () => {
+    const text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ title: 'WORDCHAIN', text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        shareConfirm.textContent = 'COPIED TO CLIPBOARD!';
+        setTimeout(() => shareConfirm.textContent = '', 2000);
+      }).catch(() => {
+        shareConfirm.textContent = 'COPY FAILED';
+      });
+    }
+  });
+
+  // ─── INPUT EVENTS ───
+  wordInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitWord();
+    } else if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key.length === 1) {
+      soundKeystroke();
+    }
+  });
+
+  wordInput.addEventListener('input', () => {
+    // Force uppercase display
+    const pos = wordInput.selectionStart;
+    wordInput.value = wordInput.value.toUpperCase();
+    wordInput.selectionStart = pos;
+    wordInput.selectionEnd = pos;
+  });
+
+  submitBtn.addEventListener('click', submitWord);
+
+  startBtn.addEventListener('click', startGame);
+  againBtn.addEventListener('click', () => {
+    showScreen(startScreen);
+    initStartScreen();
+  });
+
+  // ─── RAF LOOP ───
+  function loop() {
+    tickParticles();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // ─── INIT ───
+  initStartScreen();
+
+})();
+</script>
+</body>
+</html>

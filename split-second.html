@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SPLIT SECOND — NEON ARCADE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  z-index: 999;
+}
+
+/* ---- CANVAS ---- */
+#game-canvas {
+  display: block;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #0a0a12;
+}
+
+/* ---- SCREENS ---- */
+.screen {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  text-align: center;
+  padding: 20px;
+}
+.screen.active { display: flex; }
+
+/* ---- BG GLOW ---- */
+.screen-bg {
+  background: radial-gradient(ellipse at 50% 30%, rgba(0,240,255,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(255,45,123,0.05) 0%, transparent 50%),
+              rgba(10,10,18,0.92);
+}
+
+/* ---- START SCREEN ---- */
+#start-screen {
+  background: radial-gradient(ellipse at 50% 30%, rgba(0,240,255,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(255,45,123,0.06) 0%, transparent 50%),
+              rgba(10,10,18,0.95);
+}
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 8vw, 72px);
+  letter-spacing: 8px;
+  color: #00f0ff;
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.3), 0 0 100px rgba(0,240,255,0.15);
+  animation: titlePulse 3s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.3); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.9), 0 0 80px rgba(0,240,255,0.5), 0 0 120px rgba(0,240,255,0.2); }
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(13px, 2.5vw, 18px);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(0,240,255,0.5);
+  margin-bottom: 40px;
+}
+.game-intro {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 2.2vw, 18px);
+  font-weight: 500;
+  color: #8888aa;
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.game-intro strong {
+  color: #ffd700;
+}
+.daily-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #4a4a6a;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+.daily-badge span { color: #b44dff; }
+
+.best-display {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #4a4a6a;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+}
+.best-display span { color: #ffd700; }
+
+.btn-start {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 5px;
+  padding: 16px 48px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.25s;
+}
+.btn-start:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 30px rgba(0,240,255,0.3);
+  transform: scale(1.04);
+}
+.controls-hint {
+  margin-top: 24px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+}
+
+/* ---- COUNTDOWN SCREEN ---- */
+#countdown-screen {
+  background: rgba(0,0,0,0.95);
+}
+.countdown-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 5px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.countdown-number {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(100px, 20vw, 180px);
+  color: #00f0ff;
+  text-shadow: 0 0 40px rgba(0,240,255,0.8), 0 0 100px rgba(0,240,255,0.4);
+  animation: countPop 0.7s ease-out forwards;
+  line-height: 1;
+}
+@keyframes countPop {
+  0% { transform: scale(1.6); opacity: 0; }
+  40% { transform: scale(0.95); opacity: 1; }
+  70% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.countdown-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: rgba(0,240,255,0.35);
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+/* ---- FLASH COUNTER ---- */
+#flash-counter {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.3);
+  z-index: 200;
+}
+#flash-counter.visible { display: block; }
+
+/* ---- RECALL SCREEN ---- */
+#recall-screen {
+  background: radial-gradient(ellipse at 50% 20%, rgba(255,45,123,0.07) 0%, transparent 50%),
+              rgba(10,10,18,0.97);
+  justify-content: flex-start;
+  padding-top: 0;
+}
+.recall-inner {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 20px;
+  min-height: 100%;
+  justify-content: center;
+}
+.recall-header {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.recall-progress {
+  width: 100%;
+  max-width: 400px;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.recall-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #b44dff);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.question-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 3.5vw, 24px);
+  letter-spacing: 2px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  text-shadow: 0 0 20px rgba(255,255,255,0.15);
+}
+.question-num {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #4a4a6a;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.speed-timer {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #ffd700;
+  margin-bottom: 24px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.4);
+}
+.speed-timer.urgent { color: #ff2d7b; text-shadow: 0 0 10px rgba(255,45,123,0.5); }
+
+.answer-grid {
+  width: 100%;
+  max-width: 480px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.answer-btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 2.8vw, 20px);
+  letter-spacing: 1px;
+  padding: 18px 12px;
+  min-height: 70px;
+  border: 1px solid rgba(0,240,255,0.25);
+  background: rgba(0,240,255,0.04);
+  color: #cccce0;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.answer-btn:hover:not(:disabled) {
+  background: rgba(0,240,255,0.12);
+  border-color: rgba(0,240,255,0.5);
+  color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0,240,255,0.15);
+}
+.answer-btn .btn-key {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: #4a4a6a;
+  flex-shrink: 0;
+}
+.answer-btn.correct {
+  background: rgba(57,255,20,0.15);
+  border-color: #39ff14;
+  color: #39ff14;
+  box-shadow: 0 0 20px rgba(57,255,20,0.25);
+}
+.answer-btn.wrong {
+  background: rgba(255,45,123,0.15);
+  border-color: #ff2d7b;
+  color: #ff2d7b;
+  box-shadow: 0 0 20px rgba(255,45,123,0.25);
+}
+.answer-btn.reveal-correct {
+  background: rgba(57,255,20,0.1);
+  border-color: rgba(57,255,20,0.5);
+  color: rgba(57,255,20,0.7);
+}
+.answer-btn:disabled { cursor: default; }
+
+@keyframes shakeIt {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.shake { animation: shakeIt 0.3s ease; }
+
+/* ---- SCORE TABLE ---- */
+.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+
+/* ---- RESULTS SCREEN ---- */
+#results-screen {
+  background: radial-gradient(ellipse at 50% 20%, rgba(0,240,255,0.06) 0%, transparent 55%),
+              radial-gradient(ellipse at 70% 80%, rgba(255,45,123,0.05) 0%, transparent 45%),
+              rgba(10,10,18,0.96);
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+.results-inner {
+  width: 100%;
+  max-width: 520px;
+  padding: 32px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.results-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(26px, 6vw, 44px);
+  letter-spacing: 4px;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3);
+  margin-bottom: 6px;
+}
+.results-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(20px, 4vw, 30px);
+  letter-spacing: 3px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.results-score span { color: #00f0ff; }
+.results-newbest {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #39ff14;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(57,255,20,0.5);
+}
+.results-breakdown {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.breakdown-item {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid transparent;
+}
+.breakdown-item.correct-item {
+  background: rgba(57,255,20,0.1);
+  border-color: rgba(57,255,20,0.4);
+}
+.breakdown-item.wrong-item {
+  background: rgba(255,45,123,0.1);
+  border-color: rgba(255,45,123,0.4);
+}
+.results-stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.stat-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 4px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #00f0ff;
+}
+.results-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+.btn-share {
+  flex: 1;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 14px 16px;
+  border: 1px solid #ffd700;
+  background: rgba(255,215,0,0.06);
+  color: #ffd700;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-share:hover {
+  background: rgba(255,215,0,0.15);
+  box-shadow: 0 0 20px rgba(255,215,0,0.25);
+}
+.btn-again {
+  flex: 1;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0,240,255,0.4);
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-again:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+}
+.copy-toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(57,255,20,0.15);
+  border: 1px solid #39ff14;
+  color: #39ff14;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+.copy-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- TIME TO RECALL SCREEN ---- */
+#recall-intro-screen {
+  background: rgba(0,0,0,0.97);
+}
+.recall-intro-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(20px, 5vw, 40px);
+  letter-spacing: 6px;
+  color: #ff2d7b;
+  text-shadow: 0 0 30px rgba(255,45,123,0.7), 0 0 80px rgba(255,45,123,0.3);
+  animation: recallPop 0.5s ease-out;
+  text-align: center;
+}
+@keyframes recallPop {
+  0% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.recall-intro-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: rgba(255,45,123,0.4);
+  text-transform: uppercase;
+  margin-top: 12px;
+  animation: recallPop 0.5s ease-out 0.1s both;
+}
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<!-- Flash counter overlay -->
+<div id="flash-counter">0/10</div>
+
+<!-- START SCREEN -->
+<div id="start-screen" class="screen active">
+  <div class="game-title">SPLIT SECOND</div>
+  <div class="game-subtitle">Visual Memory Test</div>
+  <p class="game-intro">
+    <strong>10 images</strong> flash for <strong>300ms</strong> each.<br>
+    Then answer 10 questions about what you saw.<br>
+    Same daily sequence for everyone.
+  </p>
+  <div class="daily-badge">DAILY #<span id="day-number">1</span></div>
+  <div class="best-display" id="best-display" style="display:none">
+    BEST: <span id="best-score">0</span>/100
+  </div>
+  <button class="btn-start" id="start-btn">START</button>
+  <p class="controls-hint">KEYBOARD: A / B / C / D to answer</p>
+</div>
+
+<!-- COUNTDOWN SCREEN -->
+<div id="countdown-screen" class="screen">
+  <div class="countdown-label">GET READY</div>
+  <div class="countdown-number" id="countdown-num">3</div>
+  <div class="countdown-sub">MEMORIZE EVERY IMAGE</div>
+</div>
+
+<!-- RECALL INTRO SCREEN -->
+<div id="recall-intro-screen" class="screen">
+  <div class="recall-intro-text">TIME TO RECALL</div>
+  <div class="recall-intro-sub">10 questions — answer fast for bonus points</div>
+</div>
+
+<!-- RECALL SCREEN -->
+<div id="recall-screen" class="screen">
+  <div class="recall-inner">
+    <div class="recall-header">TIME TO RECALL</div>
+    <div class="recall-progress">
+      <div class="recall-progress-bar" id="recall-progress-bar" style="width:0%"></div>
+    </div>
+    <div class="question-num" id="question-num">QUESTION 1 / 10</div>
+    <div class="question-text" id="question-text">Loading...</div>
+    <div class="speed-timer" id="speed-timer">+5 BONUS &lt; 3s</div>
+    <div class="answer-grid" id="answer-grid">
+      <button class="answer-btn" data-idx="0"><span class="btn-key">A</span><span class="btn-label"></span></button>
+      <button class="answer-btn" data-idx="1"><span class="btn-key">B</span><span class="btn-label"></span></button>
+      <button class="answer-btn" data-idx="2"><span class="btn-key">C</span><span class="btn-label"></span></button>
+      <button class="answer-btn" data-idx="3"><span class="btn-key">D</span><span class="btn-label"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="results-screen" class="screen">
+  <div class="results-inner">
+    <div class="results-title" id="results-title">HAWK EYE</div>
+    <div class="results-score">SCORE: <span id="results-score-num">80</span>/100</div>
+    <div class="results-newbest" id="results-newbest" style="display:none">NEW BEST!</div>
+    <div class="results-breakdown" id="results-breakdown"></div>
+    <div class="results-stats">
+      <div class="stat-box">
+        <div class="stat-label">Correct</div>
+        <div class="stat-value" id="stat-correct">8/10</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Speed Bonus</div>
+        <div class="stat-value" id="stat-speed">+5</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Best</div>
+        <div class="stat-value" id="stat-best">80</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Daily #</div>
+        <div class="stat-value" id="stat-daily">1</div>
+      </div>
+    </div>
+    <div class="score-table"></div>
+    <div class="results-buttons">
+      <button class="btn-share" id="share-btn">SHARE</button>
+      <button class="btn-again" id="again-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<div class="copy-toast" id="copy-toast">COPIED!</div>
+
+<script>
+(() => {
+
+// ============================================================
+// LEADERBOARD UTILITIES
+// ============================================================
+function saveScore(key, score) {
+  var scores = JSON.parse(localStorage.getItem(key) || '[]');
+  scores.push({ score: score, ts: Date.now() });
+  scores.sort(function(a, b) { return b.score - a.score; });
+  scores = scores.slice(0, 5);
+  localStorage.setItem(key, JSON.stringify(scores));
+  return scores;
+}
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  var mins  = Math.floor(diff / 60000);
+  var hours = Math.floor(diff / 3600000);
+  var days  = Math.floor(diff / 86400000);
+  if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+  if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+  return 'just now';
+}
+function renderScoreTable(scores) {
+  var el = document.querySelector('.score-table');
+  if (!el) return;
+  while (el.firstChild) el.removeChild(el.firstChild);
+  var title = document.createElement('div');
+  title.className = 'score-table-title';
+  title.textContent = '\u{1F3C6} YOUR BESTS';
+  el.appendChild(title);
+  scores.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'score-row';
+    var rank = document.createElement('span');
+    rank.className = 'score-rank';
+    rank.textContent = String(i + 1);
+    var val = document.createElement('span');
+    val.className = 'score-val';
+    val.textContent = String(s.score);
+    var time = document.createElement('span');
+    time.className = 'score-time';
+    time.textContent = timeAgo(s.ts);
+    row.appendChild(rank);
+    row.appendChild(val);
+    row.appendChild(time);
+    el.appendChild(row);
+  });
+}
+
+// ============================================================
+// RNG
+// ============================================================
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ============================================================
+// CANVAS + SIZING
+// ============================================================
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, DPR;
+
+function resize() {
+  DPR = window.devicePixelRatio || 1;
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(DPR, DPR);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ============================================================
+// AUDIO
+// ============================================================
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function beep(freq, type, duration, gain, delay) {
+  try {
+    const ac = getAudio();
+    const osc = ac.createOscillator();
+    const gn = ac.createGain();
+    osc.connect(gn);
+    gn.connect(ac.destination);
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    const t = ac.currentTime + (delay || 0);
+    gn.gain.setValueAtTime(gain || 0.3, t);
+    gn.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.start(t);
+    osc.stop(t + duration + 0.05);
+  } catch(e) {}
+}
+function playFlashSound() {
+  // camera shutter click: short broadband noise burst
+  try {
+    const ac = getAudio();
+    const buf = ac.createBuffer(1, ac.sampleRate * 0.04, ac.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.25;
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    const gn = ac.createGain();
+    gn.gain.setValueAtTime(0.4, ac.currentTime);
+    gn.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.04);
+    src.connect(gn);
+    gn.connect(ac.destination);
+    src.start();
+    src.stop(ac.currentTime + 0.05);
+  } catch(e) {}
+}
+function playCountdownBeep(final) {
+  if (final) {
+    beep(880, 'sine', 0.25, 0.35);
+  } else {
+    beep(440, 'sine', 0.18, 0.25);
+  }
+}
+function playCorrect() {
+  beep(660, 'sine', 0.12, 0.3);
+  beep(880, 'sine', 0.18, 0.25, 0.1);
+}
+function playWrong() {
+  beep(180, 'sawtooth', 0.25, 0.3);
+}
+function playFanfare() {
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((n, i) => beep(n, 'sine', 0.2, 0.25, i * 0.1));
+}
+
+// ============================================================
+// DAY NUMBER
+// ============================================================
+function getDayNum() {
+  const epoch = new Date('2025-01-01').getTime();
+  return Math.floor((Date.now() - epoch) / 86400000);
+}
+
+// ============================================================
+// NEON COLORS
+// ============================================================
+const NEON = ['#00f0ff', '#ff2d7b', '#39ff14', '#ffd700', '#b44dff', '#ff8c00'];
+const NEON_NAMES = ['Cyan', 'Pink', 'Green', 'Gold', 'Purple', 'Orange'];
+const COLOR_MAP = {
+  '#00f0ff': 'Cyan',
+  '#ff2d7b': 'Pink',
+  '#39ff14': 'Green',
+  '#ffd700': 'Gold',
+  '#b44dff': 'Purple',
+  '#ff8c00': 'Orange',
+};
+
+function rColor(rng) {
+  return NEON[Math.floor(rng() * NEON.length)];
+}
+
+// ============================================================
+// IMAGE CONFIGS
+// ============================================================
+function shuffleArray(arr, rng) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function pick(arr, rng) {
+  return arr[Math.floor(rng() * arr.length)];
+}
+
+function uniquePick(arr, count, rng) {
+  const copy = [...arr];
+  shuffleArray(copy, rng);
+  return copy.slice(0, count);
+}
+
+function generateChoices(correct, pool, rng) {
+  // Returns array of 4 choices where one is correct, shuffled
+  const distractors = pool.filter(x => x !== correct);
+  shuffleArray(distractors, rng);
+  const choices = [correct, ...distractors.slice(0, 3)];
+  shuffleArray(choices, rng);
+  return choices;
+}
+
+function generateImageConfig(type, rng) {
+  switch(type) {
+
+    case 0: { // COUNT SHAPES — draw N circles
+      const count = 3 + Math.floor(rng() * 5); // 3-7
+      const positions = [];
+      for (let i = 0; i < count; i++) {
+        positions.push({ x: 0.1 + rng() * 0.8, y: 0.15 + rng() * 0.7 });
+      }
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        colors.push(NEON[i % NEON.length]);
+      }
+      const pool = [count - 2, count - 1, count, count + 1, count + 2].filter(n => n >= 1 && n <= 9);
+      // ensure count is in pool
+      const choices = generateChoices(count, pool, rng);
+      return { type: 0, count, positions, colors,
+               question: 'How many circles appeared?',
+               choices: choices.map(n => String(n)),
+               answer: String(count) };
+    }
+
+    case 1: { // DOMINANT COLOR — blobs, which is biggest
+      const colorIdxs = uniquePick([0,1,2,3,4,5], 3, rng);
+      // Assign sizes — first one is the biggest
+      const sizes = [0.45 + rng() * 0.15, 0.25 + rng() * 0.1, 0.12 + rng() * 0.08];
+      // Shuffle blobs so biggest isn't always first drawn (but track which)
+      const blobs = colorIdxs.map((ci, i) => ({ colorIdx: ci, size: sizes[i] }));
+      shuffleArray(blobs, rng);
+      const biggestBlob = blobs.reduce((a, b) => a.size > b.size ? a : b);
+      const dominant = NEON_NAMES[biggestBlob.colorIdx];
+      const choices = blobs.map(b => NEON_NAMES[b.colorIdx]);
+      // fill to 4 choices if needed
+      while (choices.length < 4) {
+        const extra = NEON_NAMES.find(n => !choices.includes(n));
+        if (extra) choices.push(extra);
+        else break;
+      }
+      const finalChoices = generateChoices(dominant, choices, rng);
+      return { type: 1, blobs, question: 'Which color covered the MOST area?',
+               choices: finalChoices, answer: dominant };
+    }
+
+    case 2: { // POSITION — star in quadrant
+      const quadrant = Math.floor(rng() * 4); // 0=TL,1=TR,2=BL,3=BR
+      const quadrantNames = ['Top-Left', 'Top-Right', 'Bottom-Left', 'Bottom-Right'];
+      const baseX = [0.1, 0.55, 0.1, 0.55];
+      const baseY = [0.1, 0.1, 0.55, 0.55];
+      const x = baseX[quadrant] + rng() * 0.35;
+      const y = baseY[quadrant] + rng() * 0.35;
+      const color = rColor(rng);
+      return { type: 2, quadrant, x, y, color,
+               question: 'Where was the star?',
+               choices: [...quadrantNames],
+               answer: quadrantNames[quadrant] };
+    }
+
+    case 3: { // NUMBER digit
+      const digit = 1 + Math.floor(rng() * 9); // 1-9
+      const color = rColor(rng);
+      const pool = [1,2,3,4,5,6,7,8,9];
+      const choices = generateChoices(digit, pool, rng).map(String);
+      return { type: 3, digit, color,
+               question: 'What number appeared?',
+               choices, answer: String(digit) };
+    }
+
+    case 4: { // ARROW direction
+      const dirs = ['Up', 'Down', 'Left', 'Right'];
+      const direction = pick(dirs, rng);
+      const color = rColor(rng);
+      return { type: 4, direction, color,
+               question: 'Which way did the arrow point?',
+               choices: [...dirs],
+               answer: direction };
+    }
+
+    case 5: { // LETTER
+      const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ'.split('');
+      const letter = pick(letters, rng);
+      const color = rColor(rng);
+      const choices = generateChoices(letter, letters, rng).slice(0, 4);
+      return { type: 5, letter, color,
+               question: 'Which letter appeared?',
+               choices, answer: letter };
+    }
+
+    case 6: { // COLOR COUNT — count distinct colors of rects
+      const numColors = 2 + Math.floor(rng() * 4); // 2-5
+      const colorIdxs = uniquePick([0,1,2,3,4,5], numColors, rng);
+      const rects = [];
+      for (let i = 0; i < numColors; i++) {
+        rects.push({
+          x: 0.05 + (i / numColors) * 0.9,
+          y: 0.15 + rng() * 0.5,
+          w: 0.75 / numColors,
+          h: 0.15 + rng() * 0.35,
+          colorIdx: colorIdxs[i]
+        });
+      }
+      const pool = [2,3,4,5];
+      const choices = generateChoices(numColors, pool, rng).map(String);
+      return { type: 6, rects, numColors,
+               question: 'How many different colors appeared?',
+               choices, answer: String(numColors) };
+    }
+
+    case 7: { // SHAPE TYPE
+      const shapes = ['Circle', 'Triangle', 'Square', 'Diamond'];
+      const shape = pick(shapes, rng);
+      const color = rColor(rng);
+      return { type: 7, shape, color,
+               question: 'What shape appeared?',
+               choices: [...shapes],
+               answer: shape };
+    }
+
+    case 8: { // PATTERN — 3x3 grid, some cells filled
+      const total = 9;
+      const filled = 3 + Math.floor(rng() * 4); // 3-6
+      const cells = Array(total).fill(false);
+      const indices = uniquePick([...Array(total).keys()], filled, rng);
+      indices.forEach(i => cells[i] = true);
+      const color = rColor(rng);
+      const pool = [3,4,5,6];
+      const choices = generateChoices(filled, pool, rng).map(String);
+      return { type: 8, cells, filled, color,
+               question: 'How many grid cells were filled?',
+               choices, answer: String(filled) };
+    }
+
+    case 9: { // TWO SHAPES — different sizes, which color is larger
+      const c1idx = Math.floor(rng() * NEON.length);
+      let c2idx = Math.floor(rng() * NEON.length);
+      while (c2idx === c1idx) c2idx = Math.floor(rng() * NEON.length);
+
+      // Decide which is larger: shape1 or shape2
+      const bigOne = rng() < 0.5 ? 0 : 1;
+      const sizes = bigOne === 0 ? [90 + rng() * 30, 40 + rng() * 25] : [40 + rng() * 25, 90 + rng() * 30];
+      const shapeTypes = ['circle', 'rect'];
+      const sh1 = pick(shapeTypes, rng);
+      const sh2 = pick(shapeTypes, rng);
+      const bigColor = NEON_NAMES[bigOne === 0 ? c1idx : c2idx];
+      const allColors = [NEON_NAMES[c1idx], NEON_NAMES[c2idx]];
+      const choices = generateChoices(bigColor, NEON_NAMES, rng).slice(0, 4);
+      // Ensure both actual colors are in choices
+      if (!choices.includes(NEON_NAMES[c1idx])) choices[2] = NEON_NAMES[c1idx];
+      if (!choices.includes(NEON_NAMES[c2idx])) choices[3] = NEON_NAMES[c2idx];
+      return { type: 9, c1: NEON[c1idx], c2: NEON[c2idx], c1Name: NEON_NAMES[c1idx], c2Name: NEON_NAMES[c2idx],
+               sizes, sh1, sh2, bigOne,
+               question: 'What color was the LARGER shape?',
+               choices, answer: bigColor };
+    }
+
+    default:
+      return generateImageConfig(0, rng);
+  }
+}
+
+function generateImages(dayNum) {
+  const rng = mulberry32(dayNum * 1337 + 42);
+  const types = [0,1,2,3,4,5,6,7,8,9];
+  shuffleArray(types, rng);
+  const configs = [];
+  for (let i = 0; i < 10; i++) {
+    configs.push(generateImageConfig(types[i], rng));
+  }
+  return configs;
+}
+
+// ============================================================
+// DRAWING
+// ============================================================
+function setGlow(color, blur) {
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+}
+function clearGlow() {
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'transparent';
+}
+
+function drawStar(x, y, r, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  setGlow(color, 30);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const angle = (i * Math.PI) / 5 - Math.PI / 2;
+    const radius = i % 2 === 0 ? r : r * 0.45;
+    const px = Math.cos(angle) * radius;
+    const py = Math.sin(angle) * radius;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+  clearGlow();
+  ctx.restore();
+}
+
+function drawArrow(x, y, dir, size, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  const rot = { Up: -Math.PI/2, Down: Math.PI/2, Left: Math.PI, Right: 0 };
+  ctx.rotate(rot[dir] || 0);
+  setGlow(color, 25);
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = size * 0.12;
+  ctx.lineCap = 'round';
+  // Draw arrow body
+  ctx.beginPath();
+  ctx.moveTo(-size, 0);
+  ctx.lineTo(size * 0.3, 0);
+  ctx.stroke();
+  // Draw arrowhead
+  ctx.beginPath();
+  ctx.moveTo(size, 0);
+  ctx.lineTo(size * 0.3, -size * 0.45);
+  ctx.lineTo(size * 0.3, size * 0.45);
+  ctx.closePath();
+  ctx.fill();
+  clearGlow();
+  ctx.restore();
+}
+
+function drawShape(cx, cy, shape, size, color) {
+  ctx.save();
+  setGlow(color, 25);
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  if (shape === 'circle' || shape === 'Circle') {
+    ctx.beginPath();
+    ctx.arc(cx, cy, size, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (shape === 'Square') {
+    ctx.fillRect(cx - size, cy - size, size * 2, size * 2);
+  } else if (shape === 'Triangle') {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - size);
+    ctx.lineTo(cx + size * 0.87, cy + size * 0.5);
+    ctx.lineTo(cx - size * 0.87, cy + size * 0.5);
+    ctx.closePath();
+    ctx.fill();
+  } else if (shape === 'Diamond') {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - size);
+    ctx.lineTo(cx + size * 0.7, cy);
+    ctx.lineTo(cx, cy + size);
+    ctx.lineTo(cx - size * 0.7, cy);
+    ctx.closePath();
+    ctx.fill();
+  } else if (shape === 'rect') {
+    ctx.fillRect(cx - size, cy - size * 0.7, size * 2, size * 1.4);
+  }
+  clearGlow();
+  ctx.restore();
+}
+
+function drawImage(config) {
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0, 0, W, H);
+
+  switch(config.type) {
+
+    case 0: { // Count circles
+      config.positions.forEach((p, i) => {
+        const cx = p.x * W, cy = p.y * H;
+        const color = config.colors[i];
+        setGlow(color, 20);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 28 + Math.min(W, H) * 0.02, 0, Math.PI * 2);
+        ctx.fill();
+        clearGlow();
+      });
+      break;
+    }
+
+    case 1: { // Dominant color blobs
+      config.blobs.forEach((blob, i) => {
+        const color = NEON[blob.colorIdx];
+        const rx = (0.2 + i * 0.3) * W;
+        const ry = (0.25 + (i % 2) * 0.3) * H;
+        const radius = blob.size * Math.min(W, H) * 0.65;
+        const grd = ctx.createRadialGradient(rx, ry, 0, rx, ry, radius);
+        grd.addColorStop(0, color);
+        grd.addColorStop(0.5, color + '88');
+        grd.addColorStop(1, 'transparent');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.ellipse(rx, ry, radius, radius * (0.7 + Math.random() * 0.3), Math.random() * Math.PI, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      break;
+    }
+
+    case 2: { // Star position
+      drawStar(config.x * W, config.y * H, Math.min(W, H) * 0.07, config.color);
+      break;
+    }
+
+    case 3: { // Number
+      const sz = Math.min(W, H) * 0.38;
+      ctx.font = `900 ${sz}px 'Orbitron', monospace`;
+      ctx.fillStyle = config.color;
+      setGlow(config.color, 50);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(config.digit), W / 2, H / 2);
+      clearGlow();
+      break;
+    }
+
+    case 4: { // Arrow
+      drawArrow(W / 2, H / 2, config.direction, Math.min(W, H) * 0.2, config.color);
+      break;
+    }
+
+    case 5: { // Letter
+      const sz = Math.min(W, H) * 0.38;
+      ctx.font = `900 ${sz}px 'Orbitron', monospace`;
+      ctx.fillStyle = config.color;
+      setGlow(config.color, 50);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(config.letter, W / 2, H / 2);
+      clearGlow();
+      break;
+    }
+
+    case 6: { // Color rects
+      config.rects.forEach(r => {
+        const color = NEON[r.colorIdx];
+        setGlow(color, 15);
+        ctx.fillStyle = color;
+        ctx.fillRect(r.x * W, r.y * H, r.w * W, r.h * H);
+        clearGlow();
+      });
+      break;
+    }
+
+    case 7: { // Shape type
+      const sz = Math.min(W, H) * 0.22;
+      drawShape(W / 2, H / 2, config.shape, sz, config.color);
+      break;
+    }
+
+    case 8: { // 3x3 grid pattern
+      const cellSize = Math.min(W, H) * 0.14;
+      const gap = cellSize * 0.12;
+      const totalW = 3 * cellSize + 2 * gap;
+      const totalH = 3 * cellSize + 2 * gap;
+      const startX = (W - totalW) / 2;
+      const startY = (H - totalH) / 2;
+      for (let i = 0; i < 9; i++) {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        const cx = startX + col * (cellSize + gap);
+        const cy = startY + row * (cellSize + gap);
+        if (config.cells[i]) {
+          setGlow(config.color, 18);
+          ctx.fillStyle = config.color;
+        } else {
+          clearGlow();
+          ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        }
+        ctx.fillRect(cx, cy, cellSize, cellSize);
+      }
+      clearGlow();
+      break;
+    }
+
+    case 9: { // Two shapes
+      const sz1 = config.sizes[0] * (Math.min(W, H) / 500);
+      const sz2 = config.sizes[1] * (Math.min(W, H) / 500);
+      drawShape(W * 0.32, H * 0.5, config.sh1 === 'circle' ? 'circle' : 'rect', sz1, config.c1);
+      drawShape(W * 0.68, H * 0.5, config.sh2 === 'circle' ? 'circle' : 'Square', sz2, config.c2);
+      break;
+    }
+  }
+}
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let dayNum, images, imageConfigs;
+let gameAnswers = [];
+let currentQuestion = 0;
+let score = 0;
+let speedBonuses = 0;
+let questionStartTime = 0;
+let timerInterval = null;
+let answering = false;
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  if (id) document.getElementById(id).classList.add('active');
+}
+
+function showFlashCounter(visible) {
+  const el = document.getElementById('flash-counter');
+  el.classList.toggle('visible', visible);
+}
+
+// ============================================================
+// FLASH SEQUENCE
+// ============================================================
+async function runFlashSequence() {
+  showScreen(null);
+  showFlashCounter(true);
+
+  for (let i = 0; i < 10; i++) {
+    // Black gap
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, W, H);
+    document.getElementById('flash-counter').textContent = `${i + 1}/10`;
+    await sleep(500);
+
+    // Show image for exactly 300ms
+    drawImage(imageConfigs[i]);
+    playFlashSound();
+    await sleep(300);
+  }
+
+  // Final black
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, H);
+  showFlashCounter(false);
+
+  await sleep(300);
+  showRecallIntro();
+}
+
+// ============================================================
+// RECALL INTRO
+// ============================================================
+async function showRecallIntro() {
+  showScreen('recall-intro-screen');
+  await sleep(1400);
+  startQuestions();
+}
+
+// ============================================================
+// QUESTIONS
+// ============================================================
+function startQuestions() {
+  gameAnswers = [];
+  currentQuestion = 0;
+  score = 0;
+  speedBonuses = 0;
+  showNextQuestion();
+}
+
+function showNextQuestion() {
+  if (currentQuestion >= 10) {
+    showResults();
+    return;
+  }
+  const config = imageConfigs[currentQuestion];
+  const pct = (currentQuestion / 10) * 100;
+  document.getElementById('recall-progress-bar').style.width = pct + '%';
+  document.getElementById('question-num').textContent = `QUESTION ${currentQuestion + 1} / 10`;
+  document.getElementById('question-text').textContent = config.question;
+
+  // Set answer buttons
+  const btns = document.querySelectorAll('.answer-btn');
+  btns.forEach((btn, i) => {
+    btn.classList.remove('correct', 'wrong', 'reveal-correct');
+    btn.disabled = false;
+    btn.querySelector('.btn-label').textContent = config.choices[i] || '';
+    btn.querySelector('.btn-key').textContent = ['A','B','C','D'][i];
+  });
+
+  // Reset speed timer
+  const timerEl = document.getElementById('speed-timer');
+  timerEl.textContent = '+5 BONUS < 3s';
+  timerEl.classList.remove('urgent');
+
+  answering = true;
+  questionStartTime = Date.now();
+
+  // Start countdown timer display
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!answering) return;
+    const elapsed = (Date.now() - questionStartTime) / 1000;
+    const remaining = Math.max(0, 3 - elapsed);
+    if (remaining > 0) {
+      timerEl.textContent = `+5 BONUS < ${remaining.toFixed(1)}s`;
+      timerEl.classList.toggle('urgent', remaining < 1);
+    } else {
+      timerEl.textContent = 'NO SPEED BONUS';
+      timerEl.classList.add('urgent');
+      clearInterval(timerInterval);
+    }
+  }, 100);
+
+  showScreen('recall-screen');
+}
+
+async function handleAnswer(idx) {
+  if (!answering) return;
+  answering = false;
+  if (timerInterval) clearInterval(timerInterval);
+
+  const config = imageConfigs[currentQuestion];
+  const chosen = config.choices[idx];
+  const correct = chosen === config.answer;
+  const elapsed = (Date.now() - questionStartTime) / 1000;
+  const speedBonus = correct && elapsed < 3 ? 5 : 0;
+
+  if (correct) {
+    score += 10;
+    speedBonuses += speedBonus;
+    playCorrect();
+  } else {
+    playWrong();
+  }
+
+  gameAnswers.push({ correct, elapsed, speedBonus, chosen, answer: config.answer });
+
+  // Visual feedback
+  const btns = document.querySelectorAll('.answer-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[idx].classList.add(correct ? 'correct' : 'wrong');
+
+  if (!correct) {
+    // Show the correct answer
+    const correctIdx = config.choices.indexOf(config.answer);
+    if (correctIdx >= 0 && correctIdx !== idx) {
+      btns[correctIdx].classList.add('reveal-correct');
+    }
+    // Shake the recall screen
+    const recallInner = document.querySelector('.recall-inner');
+    recallInner.classList.remove('shake');
+    void recallInner.offsetWidth;
+    recallInner.classList.add('shake');
+  }
+
+  // Update speed timer
+  const timerEl = document.getElementById('speed-timer');
+  if (correct && speedBonus > 0) {
+    timerEl.textContent = '+5 SPEED BONUS!';
+    timerEl.classList.remove('urgent');
+  } else if (correct) {
+    timerEl.textContent = 'CORRECT';
+    timerEl.classList.remove('urgent');
+  } else {
+    timerEl.textContent = 'WRONG';
+    timerEl.classList.add('urgent');
+  }
+
+  await sleep(800);
+  currentQuestion++;
+  showNextQuestion();
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults() {
+  const totalScore = score + speedBonuses;
+  document.getElementById('results-score-num').textContent = totalScore;
+
+  const correctCount = gameAnswers.filter(a => a.correct).length;
+  document.getElementById('stat-correct').textContent = `${correctCount}/10`;
+  document.getElementById('stat-speed').textContent = `+${speedBonuses}`;
+  document.getElementById('stat-daily').textContent = dayNum;
+
+  const title = getTitle(totalScore);
+  document.getElementById('results-title').textContent = title;
+
+  // Breakdown
+  const breakdown = document.getElementById('results-breakdown');
+  breakdown.innerHTML = '';
+  gameAnswers.forEach(a => {
+    const item = document.createElement('div');
+    item.className = 'breakdown-item ' + (a.correct ? 'correct-item' : 'wrong-item');
+    item.textContent = a.correct ? '✓' : '✗';
+    breakdown.appendChild(item);
+  });
+
+  // Best score
+  var topScores = saveScore('neonarcade_scores_splitsecond', totalScore);
+  var displayBest = topScores[0].score;
+  document.getElementById('stat-best').textContent = displayBest;
+  document.getElementById('results-newbest').style.display = totalScore >= displayBest ? 'block' : 'none';
+
+  showScreen('results-screen');
+  renderScoreTable(topScores);
+  if (correctCount >= 8) playFanfare();
+
+  // Setup share
+  document.getElementById('share-btn').onclick = shareResult;
+  document.getElementById('again-btn').onclick = playAgain;
+}
+
+function getTitle(score) {
+  if (score >= 100) return 'PHOTOGRAPHIC';
+  if (score >= 80) return 'HAWK EYE';
+  if (score >= 60) return 'SHARP';
+  if (score >= 40) return 'AVERAGE';
+  return 'BLINKED';
+}
+
+function shareResult() {
+  const totalScore = score + speedBonuses;
+  const correctCount = gameAnswers.filter(a => a.correct).length;
+  const title = getTitle(totalScore);
+  const blocks = gameAnswers.map(a => a.correct ? '✅' : '❌').join('');
+  const text = `👁️ SPLIT SECOND\nScore: ${correctCount}/10 — ${title}\n${blocks}\n0.3 seconds to see it. Did you?\nneonarcade.app`;
+
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => copyToClipboard(text));
+  } else {
+    copyToClipboard(text);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('copy-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const toast = document.getElementById('copy-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+// ============================================================
+// COUNTDOWN
+// ============================================================
+async function runCountdown() {
+  showScreen('countdown-screen');
+  const numEl = document.getElementById('countdown-num');
+
+  for (let n = 3; n >= 1; n--) {
+    numEl.textContent = n;
+    numEl.style.animation = 'none';
+    void numEl.offsetWidth;
+    numEl.style.animation = 'countPop 0.7s ease-out forwards';
+    playCountdownBeep(n === 1);
+    await sleep(900);
+  }
+
+  numEl.textContent = 'GO!';
+  numEl.style.animation = 'none';
+  void numEl.offsetWidth;
+  numEl.style.animation = 'countPop 0.4s ease-out forwards';
+  numEl.style.color = '#39ff14';
+  numEl.style.textShadow = '0 0 40px rgba(57,255,20,0.8), 0 0 100px rgba(57,255,20,0.4)';
+  beep(880, 'sine', 0.3, 0.4);
+  await sleep(600);
+
+  runFlashSequence();
+}
+
+// ============================================================
+// INIT / START
+// ============================================================
+function init() {
+  dayNum = getDayNum();
+  document.getElementById('day-number').textContent = dayNum;
+  document.getElementById('stat-daily').textContent = dayNum;
+
+  var storedScores = JSON.parse(localStorage.getItem('neonarcade_scores_splitsecond') || '[]');
+  var best = storedScores.length > 0 ? storedScores[0].score : 0;
+  if (best > 0) {
+    document.getElementById('best-display').style.display = 'block';
+    document.getElementById('best-score').textContent = best;
+  }
+
+  imageConfigs = generateImages(dayNum);
+
+  // Reset canvas
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0, 0, W, H);
+}
+
+function startGame() {
+  // Re-seed for this day
+  imageConfigs = generateImages(dayNum);
+  score = 0;
+  speedBonuses = 0;
+  gameAnswers = [];
+  currentQuestion = 0;
+
+  // Reset countdown number style
+  const numEl = document.getElementById('countdown-num');
+  numEl.style.color = '#00f0ff';
+  numEl.style.textShadow = '0 0 40px rgba(0,240,255,0.8), 0 0 100px rgba(0,240,255,0.4)';
+
+  runCountdown();
+}
+
+function playAgain() {
+  showScreen('start-screen');
+  // Refresh best display
+  var storedScores = JSON.parse(localStorage.getItem('neonarcade_scores_splitsecond') || '[]');
+  var best = storedScores.length > 0 ? storedScores[0].score : 0;
+  if (best > 0) {
+    document.getElementById('best-display').style.display = 'block';
+    document.getElementById('best-score').textContent = best;
+  }
+}
+
+// ============================================================
+// INPUT
+// ============================================================
+document.getElementById('start-btn').addEventListener('click', () => {
+  getAudio(); // unlock audio context
+  startGame();
+});
+document.getElementById('start-btn').addEventListener('touchstart', e => {
+  e.preventDefault();
+  getAudio();
+  startGame();
+}, { passive: false });
+
+document.querySelectorAll('.answer-btn').forEach(btn => {
+  btn.addEventListener('click', () => handleAnswer(parseInt(btn.dataset.idx, 10)));
+  btn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    handleAnswer(parseInt(btn.dataset.idx, 10));
+  }, { passive: false });
+});
+
+document.addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  if (key === 'enter' || key === ' ') {
+    const startScreen = document.getElementById('start-screen');
+    if (startScreen.classList.contains('active')) {
+      getAudio();
+      startGame();
+      return;
+    }
+    const resultsScreen = document.getElementById('results-screen');
+    if (resultsScreen.classList.contains('active')) {
+      playAgain();
+      return;
+    }
+  }
+  const recallScreen = document.getElementById('recall-screen');
+  if (!recallScreen.classList.contains('active')) return;
+  const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+  if (keyMap[key] !== undefined) {
+    handleAnswer(keyMap[key]);
+  }
+});
+
+// ============================================================
+// START
+// ============================================================
+init();
+
+})();
+</script>
+</body>
+</html>

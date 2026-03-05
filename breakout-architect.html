@@ -86,6 +86,13 @@ canvas{display:block;margin:0 auto}
 .stat-row{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:18px;letter-spacing:2px;color:var(--text-mid);margin:4px 0}
 .stat-row span{color:var(--neon-cyan);font-weight:700}
 .stat-row.best span{color:var(--neon-gold)}
+
+.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
 </style>
 </head>
 <body>
@@ -134,6 +141,7 @@ canvas{display:block;margin:0 auto}
   <div class="stat-row">Time: <span id="goTime">0.0s</span></div>
   <div class="stat-row">Score: <span id="goScore">0</span></div>
   <div class="stat-row best" id="goBestRow">Best: <span id="goBest">—</span></div>
+  <div class="score-table" id="goScoreTable"></div>
   <div class="btn-row" style="margin-top:20px">
     <button class="play-btn green" id="btnShare">SHARE</button>
     <button class="play-btn" id="btnPlayAgain">PLAY AGAIN</button>
@@ -146,6 +154,52 @@ canvas{display:block;margin:0 auto}
 <script>
 (()=>{
 'use strict';
+
+/* ======================== LEADERBOARD UTILITIES ======================== */
+function saveScore(key, score) {
+  var scores = JSON.parse(localStorage.getItem(key) || '[]');
+  scores.push({ score: score, ts: Date.now() });
+  scores.sort(function(a, b) { return b.score - a.score; });
+  scores = scores.slice(0, 5);
+  localStorage.setItem(key, JSON.stringify(scores));
+  return scores;
+}
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  var mins  = Math.floor(diff / 60000);
+  var hours = Math.floor(diff / 3600000);
+  var days  = Math.floor(diff / 86400000);
+  if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+  if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+  return 'just now';
+}
+function renderScoreTable(scores) {
+  var el = document.getElementById('goScoreTable');
+  if (!el) return;
+  while (el.firstChild) el.removeChild(el.firstChild);
+  var title = document.createElement('div');
+  title.className = 'score-table-title';
+  title.textContent = '\u{1F3C6} YOUR BESTS';
+  el.appendChild(title);
+  scores.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'score-row';
+    var rank = document.createElement('span');
+    rank.className = 'score-rank';
+    rank.textContent = String(i + 1);
+    var val = document.createElement('span');
+    val.className = 'score-val';
+    val.textContent = String(s.score);
+    var time = document.createElement('span');
+    time.className = 'score-time';
+    time.textContent = timeAgo(s.ts);
+    row.appendChild(rank);
+    row.appendChild(val);
+    row.appendChild(time);
+    el.appendChild(row);
+  });
+}
 
 /* ======================== CONFIG ======================== */
 const COLS=12,ROWS=8;
@@ -790,16 +844,16 @@ function showGameOver(won){
   document.getElementById('goScore').textContent=finalScore;
 
   // Best score
-  var key=challengeGrid?'ba_challenge_best':'ba_best';
-  var prev=parseFloat(localStorage.getItem(key))||0;
+  var topScores=saveScore('neonarcade_scores_breakout',finalScore);
+  var displayBest=topScores[0].score;
   var bestRow=document.getElementById('goBestRow');
-  if(won&&(prev===0||finalScore>prev)){
-    localStorage.setItem(key,String(finalScore));
+  if(won&&finalScore>=displayBest){
     document.getElementById('goBest').textContent=finalScore+' (NEW!)';
   }else{
-    document.getElementById('goBest').textContent=prev||'--';
+    document.getElementById('goBest').textContent=displayBest||'--';
   }
   bestRow.style.display=won?'':'none';
+  renderScoreTable(topScores);
 
   // Share button
   document.getElementById('btnShare').onclick=function(){

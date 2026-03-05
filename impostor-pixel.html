@@ -304,6 +304,31 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  .score-table {
+    margin: 16px auto;
+    max-width: 320px;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .score-table-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 8px;
+    text-shadow: 0 0 8px rgba(255,215,0,0.4);
+  }
+  .score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+  .score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+  .score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+
   /* Ambient floating dots */
   .ambient-dot {
     position: fixed;
@@ -352,6 +377,7 @@
   <div class="go-title">GAME OVER</div>
   <div class="go-stats" id="go-stats"></div>
   <div class="go-new-hs" id="go-new-hs" style="display:none;">NEW HIGH SCORE!</div>
+  <div class="score-table" id="score-table-impostor"></div>
   <div class="go-buttons">
     <button class="btn btn-share" id="btn-share">SHARE</button>
     <button class="btn" id="btn-retry">RETRY</button>
@@ -361,6 +387,54 @@
 <div class="copied-toast" id="copied-toast">COPIED!</div>
 
 <script>
+// ============================================================
+// Score leaderboard utilities
+// ============================================================
+function saveScore(key, score) {
+  var scores = JSON.parse(localStorage.getItem(key) || '[]');
+  scores.push({ score: score, ts: Date.now() });
+  scores.sort(function(a, b) { return b.score - a.score; });
+  scores = scores.slice(0, 5);
+  localStorage.setItem(key, JSON.stringify(scores));
+  return scores;
+}
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  var mins  = Math.floor(diff / 60000);
+  var hours = Math.floor(diff / 3600000);
+  var days  = Math.floor(diff / 86400000);
+  if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+  if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+  return 'just now';
+}
+function renderScoreTable(scores, elId) {
+  var el = document.getElementById(elId || 'score-table-impostor');
+  if (!el) return;
+  el.textContent = '';
+  var title = document.createElement('div');
+  title.className = 'score-table-title';
+  title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+  el.appendChild(title);
+  scores.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'score-row';
+    var rank = document.createElement('span');
+    rank.className = 'score-rank';
+    rank.textContent = i + 1;
+    var val = document.createElement('span');
+    val.className = 'score-val';
+    val.textContent = s.score;
+    var time = document.createElement('span');
+    time.className = 'score-time';
+    time.textContent = timeAgo(s.ts);
+    row.appendChild(rank);
+    row.appendChild(val);
+    row.appendChild(time);
+    el.appendChild(row);
+  });
+}
+
 // ============================================================
 // Audio
 // ============================================================
@@ -706,6 +780,7 @@ function gameOver(wasWrongTile) {
 
   var score = round - 1;
   var isNewHs = score > getHighScore();
+  var topScores = saveScore('neonarcade_scores_impostor', score);
   if (isNewHs) setHighScore(score);
 
   // Build stats using DOM methods
@@ -738,6 +813,7 @@ function gameOver(wasWrongTile) {
   var hsEl = document.getElementById('go-new-hs');
   hsEl.style.display = isNewHs ? 'block' : 'none';
 
+  renderScoreTable(topScores, 'score-table-impostor');
   setTimeout(function() { showScreen('over'); }, 300);
 }
 

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TRUECOLOR — NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+  z-index: 999;
+}
+
+/* SCREENS */
+.screen {
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; height: 100%; position: fixed; top: 0; left: 0; padding: 16px;
+}
+.screen.active { display: flex; }
+
+/* START */
+#startScreen {
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 20%, rgba(0,240,255,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(180,77,255,0.07) 0%, transparent 70%),
+    #0a0a12;
+  gap: 22px;
+}
+.brand {
+  font-family: 'Orbitron', monospace; font-weight: 400; font-size: 11px;
+  letter-spacing: 6px; color: #4a4a6a; text-transform: uppercase; margin-bottom: -10px;
+}
+.title {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(36px, 8vw, 72px); letter-spacing: 6px; color: #b44dff;
+  text-shadow: 0 0 10px rgba(180,77,255,0.8), 0 0 40px rgba(180,77,255,0.3), 0 0 80px rgba(180,77,255,0.1);
+  text-align: center;
+}
+.subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: clamp(14px, 2.5vw, 18px); letter-spacing: 3px; color: #8888aa;
+  text-align: center; text-transform: uppercase;
+}
+.start-desc {
+  font-size: clamp(14px, 2vw, 16px); color: #8888aa; text-align: center;
+  max-width: 440px; line-height: 1.6; font-weight: 500;
+}
+.illusion-demo {
+  position: relative; width: 220px; height: 100px;
+  border-radius: 6px; overflow: hidden; border: 1px solid rgba(180,77,255,0.3);
+  flex-shrink: 0; display: flex;
+}
+.demo-half { flex: 1; display: flex; align-items: center; justify-content: center; }
+.demo-patch { width: 50px; height: 50px; background: #808080; }
+.demo-label {
+  position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  font-size: 9px; font-family: 'Orbitron', monospace; letter-spacing: 2px;
+  color: rgba(255,255,255,0.5); white-space: nowrap;
+}
+.controls-hint {
+  font-size: 12px; font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  letter-spacing: 2px; color: #4a4a6a; text-transform: uppercase; text-align: center;
+}
+
+/* BUTTONS */
+.btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid #00f0ff; background: rgba(0,240,255,0.06);
+  color: #00f0ff; cursor: pointer; border-radius: 3px; text-transform: uppercase;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.25); transform: scale(1.04); }
+.btn:active { transform: scale(0.97); }
+.btn-purple { border-color: #b44dff; background: rgba(180,77,255,0.06); color: #b44dff; }
+.btn-purple:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 20px rgba(180,77,255,0.25); }
+
+/* GAME SCREEN */
+#gameScreen { padding: 0; gap: 0; }
+#illusionArea {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color 0.4s ease;
+}
+#centerPatch {
+  width: clamp(140px, 20vw, 220px); height: clamp(140px, 20vw, 220px);
+  flex-shrink: 0; position: relative; z-index: 2;
+}
+
+/* HUD */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  padding: 14px 20px 10px; display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(to bottom, rgba(10,10,18,0.9) 0%, transparent 100%);
+}
+#roundLabel { font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 3px; color: #4a4a6a; white-space: nowrap; }
+#timerBar { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+#timerFill { height: 100%; width: 100%; background: #00f0ff; border-radius: 2px; transition: width 0.1s linear, background-color 0.3s; box-shadow: 0 0 8px rgba(0,240,255,0.6); }
+#scoreDisplay { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; letter-spacing: 2px; color: #00f0ff; text-shadow: 0 0 10px rgba(0,240,255,0.5); white-space: nowrap; }
+#illusionLabel {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; text-align: center;
+  font-family: 'Orbitron', monospace; font-size: 9px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.2); padding-bottom: 180px;
+}
+
+/* CHOICES */
+#choicesPanel {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; padding: 12px 16px 24px;
+  background: linear-gradient(to top, rgba(10,10,18,0.97) 65%, transparent 100%);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+#promptText { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px; letter-spacing: 3px; color: #4a4a6a; text-transform: uppercase; }
+#swatchGrid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.swatch {
+  width: clamp(64px, 16vw, 90px); height: clamp(64px, 16vw, 90px);
+  border-radius: 4px; cursor: pointer; border: 2px solid rgba(255,255,255,0.12);
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s; flex-shrink: 0;
+}
+.swatch:hover { transform: scale(1.06); border-color: rgba(255,255,255,0.35); box-shadow: 0 0 16px rgba(255,255,255,0.12); }
+.swatch:active { transform: scale(0.95); }
+.swatch.correct { border-color: #39ff14; box-shadow: 0 0 22px rgba(57,255,20,0.55); }
+.swatch.wrong   { border-color: #ff2d7b; box-shadow: 0 0 22px rgba(255,45,123,0.55); }
+
+/* REVEAL */
+#revealScreen { background: #0a0a12; gap: 20px; }
+.reveal-label { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 4px; color: #4a4a6a; text-transform: uppercase; }
+.reveal-patches { display: flex; gap: 40px; align-items: center; }
+.reveal-patch-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.reveal-patch { width: 100px; height: 100px; border-radius: 4px; border: 2px solid rgba(255,255,255,0.15); }
+.reveal-patch-label { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; color: #8888aa; }
+.reveal-result { font-family: 'Orbitron', monospace; font-size: clamp(20px, 4vw, 32px); font-weight: 900; letter-spacing: 4px; margin-top: 4px; }
+.reveal-result.correct { color: #39ff14; text-shadow: 0 0 12px rgba(57,255,20,0.5); }
+.reveal-result.wrong   { color: #ff2d7b; text-shadow: 0 0 12px rgba(255,45,123,0.5); }
+.reveal-explanation { font-family: 'Rajdhani', sans-serif; font-size: clamp(14px, 2.5vw, 17px); font-weight: 500; color: #8888aa; text-align: center; max-width: 440px; line-height: 1.6; }
+#revealPoints { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+
+/* RESULT */
+#resultScreen {
+  background: radial-gradient(ellipse 60% 40% at 50% 20%, rgba(180,77,255,0.08) 0%, transparent 70%), #0a0a12;
+  gap: 20px;
+}
+.iq-score { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(52px, 12vw, 88px); letter-spacing: 4px; color: #b44dff; text-shadow: 0 0 10px rgba(180,77,255,0.8), 0 0 50px rgba(180,77,255,0.3); line-height: 1; }
+.iq-label { font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 400; letter-spacing: 5px; color: #4a4a6a; text-transform: uppercase; }
+.iq-title { font-family: 'Orbitron', monospace; font-size: clamp(14px, 3vw, 20px); font-weight: 700; letter-spacing: 4px; color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.4); text-align: center; }
+.round-breakdown { display: flex; gap: 10px; font-size: 24px; }
+.result-best { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 300; letter-spacing: 3px; color: #4a4a6a; text-transform: uppercase; }
+.result-buttons { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+/* PARTICLES */
+#particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+/* ANIMATIONS */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  15% { transform: translateX(-5px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+}
+.shake { animation: shake 0.35s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fadein { animation: fadeIn 0.3s ease forwards; }
+.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
+.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
+.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
+.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="brand">NEON ARCADE</div>
+  <div class="title">TRUECOLOR</div>
+  <div class="subtitle">Your eyes lie to you. How badly?</div>
+
+  <div class="illusion-demo">
+    <div class="demo-half" style="background:#000000;">
+      <div class="demo-patch"></div>
+    </div>
+    <div class="demo-half" style="background:#ffffff;">
+      <div class="demo-patch"></div>
+    </div>
+    <div class="demo-label">SAME COLOR &mdash; LOOKS DIFFERENT</div>
+  </div>
+
+  <div class="start-desc">
+    A color patch sits in the center. The background shifts to fool your brain.
+    Pick the TRUE color from 4 choices across 5 rounds.
+  </div>
+
+  <button class="btn btn-purple" id="startBtn">START</button>
+  <div class="controls-hint">Click or tap a swatch to answer &bull; 10s per round</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div id="illusionArea">
+    <div id="centerPatch"></div>
+  </div>
+  <div id="hud">
+    <div id="roundLabel">ROUND 1 / 5</div>
+    <div id="timerBar"><div id="timerFill"></div></div>
+    <div id="scoreDisplay">0</div>
+  </div>
+  <div id="illusionLabel"></div>
+  <div id="choicesPanel">
+    <div id="promptText">Which swatch is the TRUE center color?</div>
+    <div id="swatchGrid"></div>
+  </div>
+</div>
+
+<!-- REVEAL SCREEN -->
+<div id="revealScreen" class="screen">
+  <div class="reveal-label">Round Result</div>
+  <div class="reveal-result" id="revealResult"></div>
+  <div class="reveal-patches">
+    <div class="reveal-patch-wrap">
+      <div class="reveal-patch" id="revealTrue"></div>
+      <div class="reveal-patch-label">TRUE COLOR</div>
+    </div>
+    <div class="reveal-patch-wrap">
+      <div class="reveal-patch" id="revealChosen"></div>
+      <div class="reveal-patch-label">YOU PICKED</div>
+    </div>
+  </div>
+  <div class="reveal-explanation" id="revealExplanation"></div>
+  <div id="revealPoints"></div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="screen">
+  <div class="iq-label">Color IQ</div>
+  <div class="iq-score" id="iqScore">0</div>
+  <div class="iq-title" id="iqTitle"></div>
+  <div class="round-breakdown" id="roundBreakdown"></div>
+  <div class="result-best" id="resultBest"></div>
+  <div class="score-table" id="truecolorScoreTable"></div>
+  <div class="result-buttons">
+    <button class="btn" id="shareBtn">SHARE</button>
+    <button class="btn btn-purple" id="playAgainBtn">PLAY AGAIN</button>
+  </div>
+</div>
+
+<canvas id="particleCanvas"></canvas>
+
+<script>
+(() => {
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function renderScoreTable(scores) {
+    var el = document.getElementById('truecolorScoreTable');
+    if (!el) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var title = document.createElement('div');
+    title.className = 'score-table-title';
+    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    el.appendChild(title);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = String(s.score);
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      el.appendChild(row);
+    });
+  }
+
+  /* ═══ ROUND DATA ══════════════════════════════════════════ */
+  const ALL_ROUNDS = [
+    {
+      center: '#808080', bg: '#000000',
+      label: 'SIMULTANEOUS CONTRAST',
+      choices: ['#808080', '#aaaaaa', '#666666', '#b0b0b0'],
+      correct: '#808080',
+      explanation: 'Surrounded by black, gray looks much lighter than it really is.',
+    },
+    {
+      center: '#808080', bg: '#ffffff',
+      label: 'SIMULTANEOUS CONTRAST',
+      choices: ['#808080', '#555555', '#999999', '#333333'],
+      correct: '#808080',
+      explanation: 'Surrounded by white, the very same gray appears darker.',
+    },
+    {
+      center: '#ff8080', bg: '#00aa00',
+      label: 'CHROMATIC CONTRAST',
+      choices: ['#ff8080', '#ff3333', '#ffbbbb', '#ff6060'],
+      correct: '#ff8080',
+      explanation: 'Green surroundings make this soft pink look far more intensely red.',
+    },
+    {
+      center: '#80aa80', bg: '#ff4444',
+      label: 'CHROMATIC CONTRAST',
+      choices: ['#80aa80', '#40ff40', '#aaccaa', '#55bb55'],
+      correct: '#80aa80',
+      explanation: 'Red surroundings amplify the perceived saturation of this muted green.',
+    },
+    {
+      center: '#c0a080', bg: '#0040ff',
+      label: 'COLOR ASSIMILATION',
+      choices: ['#c0a080', '#ff8040', '#d4b896', '#a08060'],
+      correct: '#c0a080',
+      explanation: 'A blue background makes this warm tan appear much more orange.',
+    },
+    {
+      center: '#9999cc', bg: '#dddd00',
+      label: 'CHROMATIC CONTRAST',
+      choices: ['#9999cc', '#6666ff', '#bbbbee', '#8888bb'],
+      correct: '#9999cc',
+      explanation: 'Yellow surroundings push perception toward deeper violet.',
+    },
+    {
+      center: '#888888', bg: '#ff6600',
+      label: 'COLOR ASSIMILATION',
+      choices: ['#888888', '#8899aa', '#778877', '#998888'],
+      correct: '#888888',
+      explanation: 'Orange background gives this neutral gray a perceived blue-ish cast.',
+    },
+    {
+      center: '#aaddaa', bg: '#005500',
+      label: 'SIMULTANEOUS CONTRAST',
+      choices: ['#aaddaa', '#ddffdd', '#88bb88', '#cceecc'],
+      correct: '#aaddaa',
+      explanation: 'Deep green surroundings make this pale green look even lighter and cooler.',
+    },
+    {
+      center: '#ddcc88', bg: '#440099',
+      label: 'CHROMATIC CONTRAST',
+      choices: ['#ddcc88', '#ffee44', '#ccbb77', '#eedd99'],
+      correct: '#ddcc88',
+      explanation: 'A purple surround pushes this golden yellow to appear more saturated.',
+    },
+    {
+      center: '#aa88bb', bg: '#005500',
+      label: 'CHROMATIC CONTRAST',
+      choices: ['#aa88bb', '#cc44ee', '#bb99cc', '#8866aa'],
+      correct: '#aa88bb',
+      explanation: 'Green makes this soft purple look more vivid and pink-shifted.',
+    },
+    {
+      center: '#cc8866', bg: '#006688',
+      label: 'COLOR ASSIMILATION',
+      choices: ['#cc8866', '#ff6633', '#ddaa88', '#bb7755'],
+      correct: '#cc8866',
+      explanation: 'A teal background makes this terracotta look far more red-orange.',
+    },
+    {
+      center: '#999966', bg: '#6600cc',
+      label: 'CHROMATIC CONTRAST',
+      choices: ['#999966', '#cccc33', '#aaaa77', '#888855'],
+      correct: '#999966',
+      explanation: 'Purple surroundings make this olive tone look more saturated yellow.',
+    },
+  ];
+
+  const ROUND_COUNT     = 5;
+  const ROUND_TIME      = 10;
+  const REVEAL_DURATION = 2800;
+
+  /* DOM */
+  const startScreen   = document.getElementById('startScreen');
+  const gameScreen    = document.getElementById('gameScreen');
+  const revealScreen  = document.getElementById('revealScreen');
+  const resultScreen  = document.getElementById('resultScreen');
+  const allScreens    = [startScreen, gameScreen, revealScreen, resultScreen];
+
+  const illusionArea  = document.getElementById('illusionArea');
+  const centerPatch   = document.getElementById('centerPatch');
+  const illusionLabel = document.getElementById('illusionLabel');
+  const swatchGrid    = document.getElementById('swatchGrid');
+  const timerFill     = document.getElementById('timerFill');
+  const roundLabel    = document.getElementById('roundLabel');
+  const scoreDisplay  = document.getElementById('scoreDisplay');
+
+  const revealResultEl    = document.getElementById('revealResult');
+  const revealTrueEl      = document.getElementById('revealTrue');
+  const revealChosenEl    = document.getElementById('revealChosen');
+  const revealExplEl      = document.getElementById('revealExplanation');
+  const revealPtsEl       = document.getElementById('revealPoints');
+
+  const iqScoreEl   = document.getElementById('iqScore');
+  const iqTitleEl   = document.getElementById('iqTitle');
+  const roundBreak  = document.getElementById('roundBreakdown');
+  const resultBest  = document.getElementById('resultBest');
+
+  const pCanvas = document.getElementById('particleCanvas');
+  const pCtx    = pCanvas.getContext('2d');
+
+  /* STATE */
+  let sessionRounds = [];
+  let currentRound  = 0;
+  let score         = 0;
+  let roundResults  = [];
+  let timerStart    = 0;
+  let timerRAF      = null;
+  let answered      = false;
+  let particles     = [];
+
+  /* ─── SCREEN SWITCH ──────────────────────────────────────── */
+  function showScreen(id) {
+    allScreens.forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  /* ─── AUDIO ──────────────────────────────────────────────── */
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function tone(freq, type, dur, vol, detune) {
+    vol    = vol    !== undefined ? vol    : 0.16;
+    detune = detune !== undefined ? detune : 0;
+    try {
+      const c = getAudio();
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value    = detune;
+      g.gain.setValueAtTime(vol, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+      o.start(); o.stop(c.currentTime + dur);
+    } catch(e){}
+  }
+  function soundCorrect() {
+    tone(880, 'sine', 0.18, 0.18);
+    setTimeout(function(){ tone(1320, 'sine', 0.22, 0.14); }, 90);
+    setTimeout(function(){ tone(1760, 'sine', 0.30, 0.10); }, 190);
+  }
+  function soundWrong() {
+    tone(200, 'sawtooth', 0.20, 0.12);
+    tone(155, 'sawtooth', 0.25, 0.12, -30);
+  }
+  function soundReveal() {
+    tone(440, 'sine', 0.20, 0.09);
+    setTimeout(function(){ tone(550, 'sine', 0.20, 0.08); }, 120);
+    setTimeout(function(){ tone(660, 'sine', 0.20, 0.08); }, 240);
+    setTimeout(function(){ tone(880, 'triangle', 0.40, 0.10); }, 360);
+  }
+  function soundFinish() {
+    var freqs = [523, 659, 784, 1047];
+    freqs.forEach(function(f, i){ setTimeout(function(){ tone(f,'sine',0.3,0.12); }, i*100); });
+    setTimeout(function(){ tone(1047,'sine',0.6,0.14); }, 500);
+  }
+  function soundTimeout() { tone(180, 'square', 0.30, 0.10); }
+
+  /* ─── PARTICLES ──────────────────────────────────────────── */
+  function resizeCanvas() {
+    pCanvas.width  = window.innerWidth;
+    pCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function spawnParticles(x, y, color, n) {
+    n = n || 14;
+    for (var i = 0; i < n; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var s = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(a)*s, vy: Math.sin(a)*s - 1,
+        life: 1, decay: 0.025 + Math.random()*0.025,
+        size: 3 + Math.random()*4, color: color,
+      });
+    }
+  }
+  function tickParticles() {
+    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    particles = particles.filter(function(p){ return p.life > 0; });
+    particles.forEach(function(p) {
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.vy += 0.12;
+      p.life -= p.decay;
+      pCtx.globalAlpha = Math.max(0, p.life);
+      pCtx.fillStyle   = p.color;
+      pCtx.beginPath();
+      pCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI*2);
+      pCtx.fill();
+    });
+    pCtx.globalAlpha = 1;
+    if (particles.length > 0) requestAnimationFrame(tickParticles);
+  }
+  function burst(el, color) {
+    var r = el.getBoundingClientRect();
+    spawnParticles(r.left + r.width/2, r.top + r.height/2, color);
+    requestAnimationFrame(tickParticles);
+  }
+
+  /* ─── UTILS ──────────────────────────────────────────────── */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length-1; i > 0; i--) {
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+  function pickRounds() { return shuffle(ALL_ROUNDS).slice(0, ROUND_COUNT); }
+
+  /* ─── GAME FLOW ──────────────────────────────────────────── */
+  function startGame() {
+    sessionRounds = pickRounds();
+    currentRound  = 0;
+    score         = 0;
+    roundResults  = [];
+    scoreDisplay.textContent = '0';
+    showScreen('gameScreen');
+    loadRound();
+  }
+
+  function loadRound() {
+    answered = false;
+    var rd = sessionRounds[currentRound];
+    illusionArea.style.backgroundColor = rd.bg;
+    centerPatch.style.backgroundColor  = rd.center;
+    illusionLabel.textContent = rd.label;
+    roundLabel.textContent    = 'ROUND ' + (currentRound+1) + ' / ' + ROUND_COUNT;
+
+    /* Build swatches without innerHTML */
+    while (swatchGrid.firstChild) swatchGrid.removeChild(swatchGrid.firstChild);
+    var shuffled = shuffle(rd.choices);
+    shuffled.forEach(function(hex) {
+      var sw = document.createElement('div');
+      sw.className = 'swatch';
+      sw.style.backgroundColor = hex;
+      sw.dataset.hex = hex;
+      (function(h, el){
+        el.addEventListener('click', function(){ onPick(h, el); });
+        el.addEventListener('touchend', function(e){ e.preventDefault(); onPick(h, el); });
+      })(hex, sw);
+      swatchGrid.appendChild(sw);
+    });
+    startTimer();
+  }
+
+  function startTimer() {
+    if (timerRAF) cancelAnimationFrame(timerRAF);
+    timerStart = performance.now();
+    function tick() {
+      if (answered) return;
+      var elapsed = (performance.now() - timerStart) / 1000;
+      var ratio   = Math.max(0, 1 - elapsed / ROUND_TIME);
+      timerFill.style.width = (ratio*100) + '%';
+      if (ratio > 0.5) {
+        timerFill.style.backgroundColor = '#00f0ff';
+        timerFill.style.boxShadow = '0 0 8px rgba(0,240,255,0.6)';
+      } else if (ratio > 0.25) {
+        timerFill.style.backgroundColor = '#ff8c00';
+        timerFill.style.boxShadow = '0 0 8px rgba(255,140,0,0.6)';
+      } else {
+        timerFill.style.backgroundColor = '#ff2d7b';
+        timerFill.style.boxShadow = '0 0 8px rgba(255,45,123,0.6)';
+      }
+      if (elapsed >= ROUND_TIME) {
+        soundTimeout();
+        onPick(null, null);
+        return;
+      }
+      timerRAF = requestAnimationFrame(tick);
+    }
+    timerRAF = requestAnimationFrame(tick);
+  }
+
+  function onPick(chosenHex, swEl) {
+    if (answered) return;
+    answered = true;
+    if (timerRAF) cancelAnimationFrame(timerRAF);
+    var rd      = sessionRounds[currentRound];
+    var correct = (chosenHex === rd.correct);
+    var elapsed = (performance.now() - timerStart) / 1000;
+    var pts     = correct ? 100 + Math.round(Math.max(0, 50*(1 - elapsed/ROUND_TIME))) : 0;
+    score += pts;
+    scoreDisplay.textContent = score;
+    roundResults.push({ correct: correct, pts: pts, chosen: chosenHex });
+
+    /* mark swatches */
+    if (swEl) swEl.classList.add(correct ? 'correct' : 'wrong');
+    Array.from(swatchGrid.children).forEach(function(sw){
+      if (sw.dataset.hex === rd.correct) sw.classList.add('correct');
+    });
+
+    if (correct) {
+      soundCorrect();
+      if (swEl) burst(swEl, '#39ff14');
+    } else {
+      soundWrong();
+      gameScreen.classList.add('shake');
+      setTimeout(function(){ gameScreen.classList.remove('shake'); }, 400);
+      if (swEl) burst(swEl, '#ff2d7b');
+    }
+    setTimeout(function(){ showReveal(rd, chosenHex, correct, pts); }, 600);
+  }
+
+  function showReveal(rd, chosenHex, correct, pts) {
+    soundReveal();
+    revealResultEl.textContent  = correct ? 'CORRECT' : (chosenHex ? 'WRONG' : 'TIME UP');
+    revealResultEl.className    = 'reveal-result ' + (correct ? 'correct' : 'wrong');
+    revealTrueEl.style.backgroundColor   = rd.correct;
+    revealChosenEl.style.backgroundColor = chosenHex || '#333344';
+    revealExplEl.textContent   = rd.explanation;
+    revealPtsEl.textContent    = pts > 0
+      ? '+' + pts + ' pts' + (pts > 100 ? ' (speed bonus!)' : '')
+      : 'No points this round';
+    showScreen('revealScreen');
+    revealScreen.classList.add('fadein');
+    setTimeout(function(){
+      revealScreen.classList.remove('fadein');
+      currentRound++;
+      if (currentRound < ROUND_COUNT) {
+        showScreen('gameScreen');
+        loadRound();
+      } else {
+        showResults();
+      }
+    }, REVEAL_DURATION);
+  }
+
+  function showResults() {
+    soundFinish();
+    var maxScore = ROUND_COUNT * 150;
+    var iq       = Math.round((score / maxScore) * 750);
+    var tiers = [
+      [700, 'CHROMATIC GENIUS'],
+      [560, 'MASTER PERCEIVER'],
+      [420, 'SHARP EYE'],
+      [280, 'AVERAGE BRAIN'],
+      [140, 'EASILY FOOLED'],
+      [  0, 'COLOR BLIND'],
+    ];
+    var titleText = 'COLOR BLIND';
+    for (var t = 0; t < tiers.length; t++) {
+      if (iq >= tiers[t][0]) { titleText = tiers[t][1]; break; }
+    }
+    iqScoreEl.textContent = iq;
+    iqTitleEl.textContent = titleText;
+
+    /* breakdown via DOM */
+    while (roundBreak.firstChild) roundBreak.removeChild(roundBreak.firstChild);
+    roundResults.forEach(function(r){
+      var span = document.createElement('span');
+      span.textContent = r.correct ? '\u2705' : '\u274c';
+      roundBreak.appendChild(span);
+    });
+
+    var prev = parseInt(localStorage.getItem('truecolor_best') || '0', 10);
+    var topScores = saveScore('neonarcade_scores_truecolor', iq);
+    var best = topScores[0].score;
+    localStorage.setItem('truecolor_best', String(best));
+    if (iq > prev) {
+      resultBest.textContent = 'NEW BEST!';
+    } else {
+      resultBest.textContent = 'BEST: ' + best;
+    }
+    renderScoreTable(topScores);
+
+    document.getElementById('shareBtn').onclick    = function(){ doShare(iq, titleText); };
+    document.getElementById('playAgainBtn').onclick = startGame;
+    showScreen('resultScreen');
+
+    setTimeout(function(){
+      var cx = window.innerWidth/2, cy = window.innerHeight/3;
+      spawnParticles(cx, cy, '#b44dff', 22);
+      spawnParticles(cx, cy, '#ffd700', 18);
+      requestAnimationFrame(tickParticles);
+    }, 300);
+  }
+
+  function doShare(iq, titleText) {
+    var emojis = roundResults.map(function(r){ return r.correct ? '\u2705' : '\u274c'; }).join('');
+    var text =
+      '\uD83C\uDFA8 TRUECOLOR\n' +
+      'Color IQ: ' + iq + '\n' +
+      'Rounds: ' + emojis + '\n' +
+      titleText + '\n' +
+      'My eyes lie to me at a professional level.\n' +
+      'Can YOU beat ' + iq + '? neonarcade.verhoeks.org/truecolor.html';
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function(){ copyText(text); });
+    } else {
+      copyText(text);
+    }
+  }
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(function(){
+      var b = document.getElementById('shareBtn');
+      var orig = b.textContent;
+      b.textContent = 'COPIED!';
+      setTimeout(function(){ b.textContent = orig; }, 1800);
+    }).catch(function(){});
+  }
+
+  /* ─── INIT ───────────────────────────────────────────────── */
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('startBtn').addEventListener('touchend', function(e){
+    e.preventDefault(); startGame();
+  });
+})();
+</script>
+</body>
+</html>
