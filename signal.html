@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SIGNAL — NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+body {
+  background: radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.07) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.05) 0%, transparent 50%),
+              var(--bg-deep);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+}
+body::after {
+  content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+
+.screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 600px; padding: 20px; text-align: center; position: absolute; max-height: 100vh; overflow-y: auto; }
+.screen.active { display: flex; }
+
+#startScreen .game-icon { font-size: 64px; margin-bottom: 10px; filter: drop-shadow(0 0 20px rgba(0,240,255,0.4)); }
+#startScreen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(42px, 10vw, 64px);
+  letter-spacing: 8px; color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+#startScreen .subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 18px;
+  letter-spacing: 3px; color: var(--text-mid); text-transform: uppercase; margin-bottom: 30px;
+}
+#startScreen .desc {
+  font-size: 16px; color: var(--text-mid); line-height: 1.6; margin-bottom: 30px; max-width: 400px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.controls-hint {
+  margin-top: 20px; font-size: 13px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; font-weight: 300;
+}
+
+.best-score {
+  margin-top: 14px; font-family: 'Orbitron', monospace; font-size: 13px; color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.3);
+  letter-spacing: 2px;
+}
+
+#gameScreen { max-width: 650px; }
+.round-bar {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 16px;
+}
+.round-label {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; color: var(--neon-purple);
+  text-shadow: 0 0 10px rgba(180,77,255,0.4);
+}
+.cipher-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
+  letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+}
+.timer-bar {
+  width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-bottom: 20px; overflow: hidden;
+}
+.timer-fill {
+  height: 100%; background: var(--neon-cyan); border-radius: 2px; transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(0,240,255,0.5);
+}
+.timer-fill.warn { background: var(--neon-orange); box-shadow: 0 0 8px rgba(255,140,0,0.5); }
+.timer-fill.danger { background: var(--neon-pink); box-shadow: 0 0 8px rgba(255,45,123,0.5); }
+
+.timer-text {
+  font-family: 'Orbitron', monospace; font-weight: 400; font-size: 13px;
+  color: var(--text-mid); letter-spacing: 2px;
+}
+
+.encrypted-box {
+  width: 100%; background: var(--bg-surface); border: 1px solid rgba(0,240,255,0.15);
+  border-radius: 4px; padding: 28px 20px; margin-bottom: 20px; position: relative;
+}
+.encrypted-label {
+  position: absolute; top: -10px; left: 16px; background: var(--bg-surface);
+  padding: 0 8px; font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: 11px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase;
+}
+.encrypted-text {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: clamp(14px, 3.5vw, 20px);
+  letter-spacing: 3px; color: var(--neon-cyan); word-break: break-word; line-height: 1.6;
+  text-shadow: 0 0 10px rgba(0,240,255,0.3);
+}
+
+.hint-box {
+  width: 100%; min-height: 32px; margin-bottom: 16px; font-size: 13px;
+  color: var(--neon-orange); letter-spacing: 1px; font-weight: 300;
+  text-shadow: 0 0 8px rgba(255,140,0,0.3);
+}
+
+.input-row {
+  display: flex; width: 100%; gap: 8px; margin-bottom: 12px;
+}
+#answerInput {
+  flex: 1; font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700;
+  letter-spacing: 2px; padding: 14px 16px; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(0,240,255,0.2); border-radius: 3px; color: #fff;
+  outline: none; text-transform: uppercase;
+  -webkit-user-select: text; user-select: text; touch-action: auto;
+}
+#answerInput:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,240,255,0.15); }
+#answerInput::placeholder { color: var(--text-dim); font-weight: 300; letter-spacing: 3px; font-size: 13px; }
+
+.submit-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; padding: 14px 24px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s; white-space: nowrap;
+}
+.submit-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 16px rgba(57,255,20,0.2); }
+
+.skip-btn {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
+  letter-spacing: 2px; padding: 8px 20px;
+  border: 1px solid rgba(255,45,123,0.3); background: transparent;
+  color: var(--neon-pink); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s; opacity: 0.6;
+}
+.skip-btn:hover { opacity: 1; background: rgba(255,45,123,0.08); }
+
+.key-reveal {
+  width: 100%; margin-top: 8px; font-family: 'Rajdhani', sans-serif; font-size: 13px;
+  color: var(--text-dim); letter-spacing: 1px; min-height: 20px;
+}
+
+#transitionScreen h2 {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 28px;
+  letter-spacing: 4px; margin-bottom: 8px;
+}
+#transitionScreen .trans-result {
+  font-family: 'Rajdhani', sans-serif; font-size: 18px; color: var(--text-mid);
+  margin-bottom: 6px; letter-spacing: 1px;
+}
+#transitionScreen .trans-answer {
+  font-family: 'Orbitron', monospace; font-size: 14px; color: var(--neon-cyan);
+  letter-spacing: 2px; margin-bottom: 16px;
+  text-shadow: 0 0 8px rgba(0,240,255,0.3);
+}
+#transitionScreen .trans-score {
+  font-family: 'Orbitron', monospace; font-size: 20px; color: var(--neon-gold);
+  letter-spacing: 3px; margin-bottom: 24px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.4);
+}
+
+#resultsScreen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(28px, 7vw, 42px);
+  letter-spacing: 6px; color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 20px;
+}
+.results-grid {
+  width: 100%; max-width: 380px; margin-bottom: 20px;
+}
+.result-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.result-round {
+  font-family: 'Orbitron', monospace; font-size: 13px; color: var(--text-dim); letter-spacing: 2px;
+}
+.result-status {
+  font-family: 'Orbitron', monospace; font-size: 13px; letter-spacing: 2px;
+}
+.result-status.solved { color: var(--neon-green); text-shadow: 0 0 8px rgba(57,255,20,0.3); }
+.result-status.failed { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,45,123,0.3); }
+.result-status.skipped { color: var(--text-dim); }
+
+.total-score {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 36px;
+  color: var(--neon-gold); letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.2);
+  margin-bottom: 6px;
+}
+.score-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
+  letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 20px;
+}
+.new-best {
+  font-family: 'Orbitron', monospace; font-size: 13px; color: var(--neon-gold);
+  letter-spacing: 3px; margin-bottom: 16px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+  animation: pulse 1s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 3px; padding: 14px 32px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 16px rgba(57,255,20,0.2); }
+
+.copied-msg {
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--neon-green);
+  letter-spacing: 2px; margin-top: 10px; min-height: 20px;
+  text-shadow: 0 0 8px rgba(57,255,20,0.3);
+}
+
+.particle {
+  position: fixed; width: 4px; height: 4px; border-radius: 50%; pointer-events: none; z-index: 9998;
+}
+
+@keyframes shake {
+  0%,100%{ transform: translate(0,0); }
+  10%{ transform: translate(-3px, 1px); }
+  20%{ transform: translate(3px, -2px); }
+  30%{ transform: translate(-2px, 3px); }
+  40%{ transform: translate(2px, -1px); }
+  50%{ transform: translate(-3px, 2px); }
+  60%{ transform: translate(3px, 1px); }
+  70%{ transform: translate(-1px, -3px); }
+  80%{ transform: translate(2px, 2px); }
+  90%{ transform: translate(-2px, -1px); }
+}
+.shake { animation: shake 0.25s ease; }
+
+.daily-badge {
+  font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px;
+  color: var(--neon-gold); border: 1px solid rgba(255,215,0,0.3);
+  padding: 4px 12px; border-radius: 2px; margin-bottom: 18px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+</style>
+</head>
+<body>
+
+<div id="startScreen" class="screen active">
+  <div class="game-icon">&#x1F4E1;</div>
+  <h1>SIGNAL</h1>
+  <div class="subtitle">Crack the cipher</div>
+  <div class="daily-badge" id="dailyBadge">DAILY #1</div>
+  <div class="desc">Five encrypted messages. Decode them all. Each round gets harder. Type the hidden message before time runs out.</div>
+  <button class="play-btn" id="startBtn">INTERCEPT</button>
+  <div class="controls-hint">Type answer + Enter to submit</div>
+  <div class="best-score" id="bestScoreDisplay"></div>
+</div>
+
+<div id="gameScreen" class="screen">
+  <div class="round-bar">
+    <div class="round-label" id="roundLabel">ROUND 1/5</div>
+    <div class="cipher-label" id="cipherLabel">CAESAR SHIFT</div>
+    <div class="timer-text" id="timerText">60s</div>
+  </div>
+  <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+  <div class="encrypted-box">
+    <div class="encrypted-label">ENCRYPTED SIGNAL</div>
+    <div class="encrypted-text" id="encryptedText"></div>
+  </div>
+  <div class="hint-box" id="hintBox"></div>
+  <div class="input-row">
+    <input type="text" id="answerInput" placeholder="Decode the message..." autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <button class="submit-btn" id="submitBtn">DECODE</button>
+  </div>
+  <button class="skip-btn" id="skipBtn">SKIP ROUND</button>
+  <div class="key-reveal" id="keyReveal"></div>
+</div>
+
+<div id="transitionScreen" class="screen">
+  <h2 id="transTitle"></h2>
+  <div class="trans-result" id="transResult"></div>
+  <div class="trans-answer" id="transAnswer"></div>
+  <div class="trans-score" id="transScore"></div>
+  <button class="play-btn" id="nextRoundBtn">NEXT SIGNAL</button>
+</div>
+
+<div id="resultsScreen" class="screen">
+  <h1>DECRYPTED</h1>
+  <div class="results-grid" id="resultsGrid"></div>
+  <div class="total-score" id="totalScore">0</div>
+  <div class="score-label">TOTAL SCORE</div>
+  <div class="new-best" id="newBestMsg" style="display:none">NEW PERSONAL BEST</div>
+  <div class="best-score" id="resultsBest"></div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+  </div>
+  <div class="copied-msg" id="copiedMsg"></div>
+</div>
+
+<script>
+(() => {
+  const ROUNDS = 5;
+  const ROUND_TIMES = [60, 50, 45, 35, 30];
+  const HINT1_TIME = 15;
+  const HINT2_TIME = 30;
+  const STORAGE_KEY = 'signal_best';
+  const STORAGE_DAILY = 'signal_daily';
+
+  const EASY_MESSAGES = [
+    "CATS SECRETLY RUN THE INTERNET",
+    "PIZZA IS A BREAKFAST FOOD FIGHT ME",
+    "MY PLANT IS JUDGING ME AGAIN",
+    "SOCKS VANISH IN THE DRYER DIMENSION",
+    "BIRDS ARE GOVERNMENT DRONES OBVIOUSLY",
+    "MONDAYS SHOULD BE ILLEGAL WORLDWIDE",
+    "COFFEE IS JUST BEAN SOUP ACTUALLY",
+    "MY COUCH HAS A GRAVITY FIELD",
+    "SHARKS ARE JUST ANGRY DOLPHINS",
+    "NAPS SHOULD BE A HUMAN RIGHT",
+    "MY FRIDGE HUMS SHOW TUNES AT NIGHT",
+    "PENGUINS LOOK LIKE TINY WAITERS",
+    "CLOUDS ARE SKY COTTON CANDY",
+    "MY ALARM CLOCK IS MY ENEMY",
+    "TOAST ALWAYS LANDS BUTTER SIDE DOWN",
+    "SLOTHS HAVE IT ALL FIGURED OUT",
+    "PIGEONS RUN THIS CITY NOT US"
+  ];
+
+  const MEDIUM_MESSAGES = [
+    "MY WIFI PASSWORD IS PASSWORD",
+    "AUTOCORRECT IS MY WORST ENEMA",
+    "I PUT THE PRO IN PROCRASTINATE",
+    "MY BRAIN HAS TOO MANY TABS OPEN",
+    "ADULTING IS A SCAM I WANT A REFUND",
+    "I SPEAK FLUENT SARCASM AND EMOJI",
+    "MY DIET STARTS AGAIN ON MONDAY",
+    "SLEEP IS JUST FREE TRIAL OF DEATH",
+    "MY MEMORY IS WORSE THAN A GOLDFISH",
+    "RUNNING LATE IS MY CARDIO ROUTINE",
+    "MY SPIRIT ANIMAL IS A POTATO",
+    "I EXERCISE BY JUMPING TO CONCLUSIONS",
+    "MY BANK ACCOUNT IS A HORROR STORY",
+    "COMMON SENSE IS NOT SO COMMON",
+    "MY PATIENCE LEFT WITHOUT A NOTE",
+    "CALORIES DO NOT COUNT ON WEEKENDS",
+    "I NEED A SIX MONTH VACATION TWICE A YEAR"
+  ];
+
+  const HARD_MESSAGES = [
+    "I TOLD MY COMPUTER A JOKE AND IT CRASHED",
+    "MY DOG ATE MY HOMEWORK AND GOT AN A PLUS",
+    "THE FLOOR IS LAVA BUT THE RENT IS DUE",
+    "MY PHONE BATTERY DIES FASTER THAN MY DREAMS",
+    "I WHISPERED TO THE VOID AND IT SAID NEW PHONE WHO DIS",
+    "LIFE GAVE ME LEMONS BUT I WANTED TACOS INSTEAD",
+    "MY HOUSEPLANT AND I HAVE TRUST ISSUES NOW",
+    "TIME FLIES WHEN YOU ARE DOOM SCROLLING AT THREE AM",
+    "MY NEIGHBOR THINKS THE MOON IS A HOLOGRAM",
+    "I ACCIDENTALLY JOINED A CULT IT WAS BOOK CLUB",
+    "MY SMART FRIDGE JUST ROASTED MY EATING HABITS",
+    "PARALLEL UNIVERSES WHERE I AM A MORNING PERSON",
+    "THE SIMULATION CRASHED AND NOBODY NOTICED",
+    "MY CAT FILED A COMPLAINT WITH MANAGEMENT",
+    "GRAVITY IS JUST THE EARTH BEING CLINGY",
+    "MY TOASTER IS SMARTER THAN MY LAST DATE"
+  ];
+
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTypeClick() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(800 + Math.random() * 400, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playSuccess() {
+    ensureAudio();
+    const t = audioCtx.currentTime;
+    [523, 659, 784, 1047].forEach(function(f, i) {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(f, t + i * 0.08);
+      g.gain.setValueAtTime(0.08, t + i * 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.3);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t + i * 0.08); o.stop(t + i * 0.08 + 0.3);
+    });
+  }
+
+  function playFail() {
+    ensureAudio();
+    const t = audioCtx.currentTime;
+    const dur = 0.35;
+    const bufSize = Math.floor(audioCtx.sampleRate * dur);
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.15;
+    const src = audioCtx.createBufferSource();
+    const g = audioCtx.createGain();
+    src.buffer = buf;
+    g.gain.setValueAtTime(0.12, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(g); g.connect(audioCtx.destination);
+    src.start(t); src.stop(t + dur);
+    const o = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(180, t);
+    o.frequency.linearRampToValueAtTime(80, t + 0.3);
+    g2.gain.setValueAtTime(0.06, t);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.connect(g2); g2.connect(audioCtx.destination);
+    o.start(t); o.stop(t + 0.3);
+  }
+
+  function playTick() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(1200, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.03);
+  }
+
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 60 + Math.random() * 120;
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed;
+      const startTime = performance.now();
+      (function animP(now) {
+        const elapsed = (now - startTime) / 1000;
+        if (elapsed > 0.8) { p.remove(); return; }
+        p.style.left = (x + dx * elapsed) + 'px';
+        p.style.top = (y + dy * elapsed + 100 * elapsed * elapsed) + 'px';
+        p.style.opacity = String(1 - elapsed / 0.8);
+        requestAnimationFrame(animP);
+      })(performance.now());
+    }
+  }
+
+  function caesarEncrypt(text, shift) {
+    return text.split('').map(function(c) {
+      if (c >= 'A' && c <= 'Z') {
+        return String.fromCharCode(((c.charCodeAt(0) - 65 + shift) % 26) + 65);
+      }
+      return c;
+    }).join('');
+  }
+
+  function letterSwapEncrypt(text, pairs) {
+    var map = {};
+    pairs.forEach(function(pair) { map[pair[0]] = pair[1]; map[pair[1]] = pair[0]; });
+    return text.split('').map(function(c) { return map[c] || c; }).join('');
+  }
+
+  function symbolSubEncrypt(text, symbolMap) {
+    return text.split('').map(function(c) { return symbolMap[c] || c; }).join('');
+  }
+
+  function seededRandom(seed) {
+    var s = seed;
+    return function() {
+      s = (s * 1103515245 + 12345) & 0x7fffffff;
+      return s / 0x7fffffff;
+    };
+  }
+
+  function getDayNumber() {
+    var epoch = new Date(2026, 0, 1);
+    var now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return Math.floor((now - epoch) / 86400000) + 1;
+  }
+
+  var startScreen = document.getElementById('startScreen');
+  var gameScreen = document.getElementById('gameScreen');
+  var transitionScreen = document.getElementById('transitionScreen');
+  var resultsScreen = document.getElementById('resultsScreen');
+  var dailyBadge = document.getElementById('dailyBadge');
+  var bestScoreDisplay = document.getElementById('bestScoreDisplay');
+  var startBtn = document.getElementById('startBtn');
+  var roundLabel = document.getElementById('roundLabel');
+  var cipherLabel = document.getElementById('cipherLabel');
+  var timerText = document.getElementById('timerText');
+  var timerFill = document.getElementById('timerFill');
+  var encryptedText = document.getElementById('encryptedText');
+  var hintBox = document.getElementById('hintBox');
+  var answerInput = document.getElementById('answerInput');
+  var submitBtn = document.getElementById('submitBtn');
+  var skipBtn = document.getElementById('skipBtn');
+  var keyReveal = document.getElementById('keyReveal');
+  var transTitle = document.getElementById('transTitle');
+  var transResult = document.getElementById('transResult');
+  var transAnswer = document.getElementById('transAnswer');
+  var transScore = document.getElementById('transScore');
+  var nextRoundBtn = document.getElementById('nextRoundBtn');
+  var resultsGrid = document.getElementById('resultsGrid');
+  var totalScoreEl = document.getElementById('totalScore');
+  var newBestMsg = document.getElementById('newBestMsg');
+  var resultsBest = document.getElementById('resultsBest');
+  var shareBtn = document.getElementById('shareBtn');
+  var replayBtn = document.getElementById('replayBtn');
+  var copiedMsg = document.getElementById('copiedMsg');
+
+  var currentRound = 0;
+  var score = 0;
+  var roundResults = [];
+  var roundMessages = [];
+  var roundCiphers = [];
+  var timerInterval = null;
+  var timeLeft = 0;
+  var roundStartTime = 0;
+  var hint1Shown = false;
+  var hint2Shown = false;
+  var dayNum = getDayNumber();
+  var rng = seededRandom(dayNum * 7919);
+
+  function showScreen(screen) {
+    [startScreen, gameScreen, transitionScreen, resultsScreen].forEach(function(s) { s.classList.remove('active'); });
+    screen.classList.add('active');
+  }
+
+  function init() {
+    dayNum = getDayNumber();
+    dailyBadge.textContent = 'DAILY #' + dayNum;
+    var best = localStorage.getItem(STORAGE_KEY);
+    if (best) {
+      bestScoreDisplay.textContent = 'BEST: ' + best;
+      bestScoreDisplay.style.display = '';
+    } else {
+      bestScoreDisplay.style.display = 'none';
+    }
+    showScreen(startScreen);
+  }
+
+  function selectDailyMessages() {
+    rng = seededRandom(dayNum * 7919);
+    var e1 = EASY_MESSAGES[Math.floor(rng() * EASY_MESSAGES.length)];
+    var remaining = EASY_MESSAGES.filter(function(m) { return m !== e1; });
+    var e2 = remaining[Math.floor(rng() * remaining.length)];
+    var m1 = MEDIUM_MESSAGES[Math.floor(rng() * MEDIUM_MESSAGES.length)];
+    var h1 = HARD_MESSAGES[Math.floor(rng() * HARD_MESSAGES.length)];
+    var rem2 = HARD_MESSAGES.filter(function(m) { return m !== h1; });
+    var h2 = rem2[Math.floor(rng() * rem2.length)];
+    roundMessages = [e1, e2, m1, h1, h2];
+  }
+
+  function buildCipher(round, message) {
+    if (round <= 1) {
+      var shift = 1 + Math.floor(rng() * 5);
+      var encrypted = caesarEncrypt(message, shift);
+      return {
+        type: 'CAESAR SHIFT',
+        encrypted: encrypted,
+        key: 'Shift: +' + shift,
+        partialKey: 'Shift: +' + shift,
+        shift: shift
+      };
+    } else if (round === 2) {
+      var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      var usedLetters = [];
+      var seen = {};
+      message.replace(/[^A-Z]/g, '').split('').forEach(function(c) {
+        if (!seen[c]) { seen[c] = true; usedLetters.push(c); }
+      });
+      var pairs = [];
+      var used = {};
+      var numPairs = 2 + Math.floor(rng() * 2);
+      var attempts = 0;
+      while (pairs.length < numPairs && attempts < 50) {
+        var a = usedLetters[Math.floor(rng() * usedLetters.length)];
+        var b = usedLetters[Math.floor(rng() * usedLetters.length)];
+        if (a !== b && !used[a] && !used[b]) {
+          pairs.push([a, b]);
+          used[a] = true; used[b] = true;
+        }
+        attempts++;
+      }
+      var enc = letterSwapEncrypt(message, pairs);
+      return {
+        type: 'LETTER SWAP',
+        encrypted: enc,
+        key: pairs.map(function(p) { return p[0] + '<>' + p[1]; }).join(', '),
+        partialKey: pairs.slice(0, 1).map(function(p) { return p[0] + '<>' + p[1]; }).join('') + ', ...',
+        pairs: pairs
+      };
+    } else if (round === 3) {
+      var symbols = ['@','#','$','%','&','*','+','=','!','?','^','~','>','<','{','}'];
+      var ul = [];
+      var s2 = {};
+      message.replace(/[^A-Z]/g, '').split('').forEach(function(c) {
+        if (!s2[c]) { s2[c] = true; ul.push(c); }
+      });
+      ul.sort();
+      var symMap = {};
+      var shuffledSyms = symbols.slice().sort(function() { return rng() - 0.5; });
+      ul.forEach(function(letter, i) {
+        symMap[letter] = shuffledSyms[i % shuffledSyms.length];
+      });
+      var enc2 = symbolSubEncrypt(message, symMap);
+      var revealCount = Math.floor(ul.length / 3);
+      var partialEntries = ul.slice(0, revealCount).map(function(l) { return symMap[l] + '=' + l; });
+      return {
+        type: 'SYMBOL CODE',
+        encrypted: enc2,
+        key: ul.map(function(l) { return symMap[l] + '=' + l; }).join(' '),
+        partialKey: partialEntries.join(' ') + ' ...',
+        symMap: symMap
+      };
+    } else {
+      var sh = 2 + Math.floor(rng() * 4);
+      var shifted = caesarEncrypt(message, sh);
+      var vowelSymbols = { 'A': '@', 'E': '3', 'I': '!', 'O': '0', 'U': '^' };
+      var enc3 = shifted.split('').map(function(c) { return vowelSymbols[c] || c; }).join('');
+      return {
+        type: 'COMBO CIPHER',
+        encrypted: enc3,
+        key: 'Shift +' + sh + ', then A=@ E=3 I=! O=0 U=^',
+        partialKey: 'Shift +' + sh + ', vowels replaced...',
+        shift: sh,
+        vowelSymbols: vowelSymbols
+      };
+    }
+  }
+
+  function startGame() {
+    ensureAudio();
+    currentRound = 0;
+    score = 0;
+    roundResults = [];
+    selectDailyMessages();
+    roundCiphers = roundMessages.map(function(msg, i) { return buildCipher(i, msg); });
+    startRound();
+  }
+
+  function startRound() {
+    showScreen(gameScreen);
+    var r = currentRound;
+    roundLabel.textContent = 'ROUND ' + (r + 1) + '/' + ROUNDS;
+    cipherLabel.textContent = roundCiphers[r].type;
+    encryptedText.textContent = roundCiphers[r].encrypted;
+    timeLeft = ROUND_TIMES[r];
+    roundStartTime = Date.now();
+    hint1Shown = false;
+    hint2Shown = false;
+    hintBox.textContent = '';
+    keyReveal.textContent = '';
+    answerInput.value = '';
+    answerInput.focus();
+    updateTimer();
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tickTimer, 100);
+  }
+
+  function updateTimer() {
+    var r = currentRound;
+    var total = ROUND_TIMES[r];
+    var pct = Math.max(0, timeLeft / total * 100);
+    timerFill.style.width = pct + '%';
+    timerFill.classList.remove('warn', 'danger');
+    if (pct < 25) timerFill.classList.add('danger');
+    else if (pct < 50) timerFill.classList.add('warn');
+    timerText.textContent = Math.ceil(timeLeft) + 's';
+  }
+
+  function tickTimer() {
+    var elapsed = (Date.now() - roundStartTime) / 1000;
+    timeLeft = ROUND_TIMES[currentRound] - elapsed;
+    var r = currentRound;
+
+    if (elapsed >= HINT1_TIME && !hint1Shown) {
+      hint1Shown = true;
+      var words = roundMessages[r].split(' ');
+      var firstLetters = words.map(function(w) { return w[0]; }).join(' _ ');
+      hintBox.textContent = 'HINT: First letters: ' + firstLetters;
+      playTick();
+    }
+    if (elapsed >= HINT2_TIME && !hint2Shown) {
+      hint2Shown = true;
+      keyReveal.textContent = 'KEY: ' + roundCiphers[r].partialKey;
+      playTick();
+    }
+
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      clearInterval(timerInterval);
+      roundTimeout();
+    }
+    updateTimer();
+  }
+
+  function submitAnswer() {
+    var answer = answerInput.value.trim().toUpperCase();
+    var correct = roundMessages[currentRound];
+    if (!answer) return;
+
+    if (answer === correct) {
+      clearInterval(timerInterval);
+      var elapsed = (Date.now() - roundStartTime) / 1000;
+      var maxTime = ROUND_TIMES[currentRound];
+      var timeBonus = Math.max(0, Math.round((1 - elapsed / maxTime) * 1000));
+      var streakCount = 0;
+      for (var i = roundResults.length - 1; i >= 0; i--) {
+        if (roundResults[i].solved) streakCount++;
+        else break;
+      }
+      var streakBonus = streakCount * 100;
+      var roundScore = timeBonus + streakBonus;
+      score += roundScore;
+      playSuccess();
+
+      var rect = submitBtn.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top, '#39ff14', 15);
+
+      roundResults.push({
+        solved: true,
+        skipped: false,
+        time: elapsed,
+        score: roundScore
+      });
+
+      showTransition(true, elapsed, roundScore, false);
+    } else {
+      playFail();
+      document.body.classList.add('shake');
+      setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+      answerInput.value = '';
+      answerInput.focus();
+      var rect2 = answerInput.getBoundingClientRect();
+      spawnParticles(rect2.left + rect2.width / 2, rect2.top, '#ff2d7b', 8);
+    }
+  }
+
+  function skipRound() {
+    clearInterval(timerInterval);
+    playFail();
+    roundResults.push({ solved: false, skipped: true, time: 0, score: 0 });
+    showTransition(false, 0, 0, true);
+  }
+
+  function roundTimeout() {
+    playFail();
+    var rect = encryptedText.getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff2d7b', 12);
+    document.body.classList.add('shake');
+    setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+    roundResults.push({ solved: false, skipped: false, time: ROUND_TIMES[currentRound], score: 0 });
+    showTransition(false, ROUND_TIMES[currentRound], 0, false);
+  }
+
+  function showTransition(solved, time, roundScore, skipped) {
+    showScreen(transitionScreen);
+    if (solved) {
+      transTitle.textContent = 'DECODED';
+      transTitle.style.color = '#39ff14';
+      transTitle.style.textShadow = '0 0 10px rgba(57,255,20,0.5)';
+      transResult.textContent = 'Cracked in ' + time.toFixed(1) + 's';
+    } else if (skipped) {
+      transTitle.textContent = 'SKIPPED';
+      transTitle.style.color = '#4a4a6a';
+      transTitle.style.textShadow = 'none';
+      transResult.textContent = 'Signal lost';
+    } else {
+      transTitle.textContent = 'TIMED OUT';
+      transTitle.style.color = '#ff2d7b';
+      transTitle.style.textShadow = '0 0 10px rgba(255,45,123,0.5)';
+      transResult.textContent = 'Could not decode in time';
+    }
+    transAnswer.textContent = '"' + roundMessages[currentRound] + '"';
+    transScore.textContent = solved ? '+' + roundScore + ' pts' : '+0 pts';
+
+    if (currentRound >= ROUNDS - 1) {
+      nextRoundBtn.textContent = 'SEE RESULTS';
+    } else {
+      nextRoundBtn.textContent = 'NEXT SIGNAL';
+    }
+  }
+
+  function nextRound() {
+    currentRound++;
+    if (currentRound >= ROUNDS) {
+      showResults();
+    } else {
+      startRound();
+    }
+  }
+
+  function showResults() {
+    showScreen(resultsScreen);
+    while (resultsGrid.firstChild) resultsGrid.removeChild(resultsGrid.firstChild);
+    roundResults.forEach(function(r, i) {
+      var row = document.createElement('div');
+      row.className = 'result-row';
+      var roundNum = document.createElement('div');
+      roundNum.className = 'result-round';
+      roundNum.textContent = 'ROUND ' + (i + 1);
+      var status = document.createElement('div');
+      status.className = 'result-status';
+      if (r.solved) {
+        status.classList.add('solved');
+        var m = Math.floor(r.time / 60);
+        var s = Math.floor(r.time % 60);
+        status.textContent = m + ':' + (s < 10 ? '0' : '') + s + ' +' + r.score;
+      } else if (r.skipped) {
+        status.classList.add('skipped');
+        status.textContent = 'SKIPPED';
+      } else {
+        status.classList.add('failed');
+        status.textContent = 'TIMED OUT';
+      }
+      row.appendChild(roundNum);
+      row.appendChild(status);
+      resultsGrid.appendChild(row);
+    });
+
+    totalScoreEl.textContent = String(score);
+
+    var best = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+    if (score > best) {
+      localStorage.setItem(STORAGE_KEY, String(score));
+      newBestMsg.style.display = '';
+      resultsBest.textContent = 'BEST: ' + score;
+    } else {
+      newBestMsg.style.display = 'none';
+      resultsBest.textContent = best ? 'BEST: ' + best : '';
+    }
+
+    localStorage.setItem(STORAGE_DAILY, JSON.stringify({ day: dayNum, score: score, results: roundResults }));
+    copiedMsg.textContent = '';
+  }
+
+  function buildShareText() {
+    var text = '\u{1F4E1} SIGNAL #' + dayNum + '\n';
+    roundResults.forEach(function(r, i) {
+      var num = i + 1;
+      if (r.solved) {
+        var m = Math.floor(r.time / 60);
+        var s = Math.floor(r.time % 60);
+        text += num + ': \u{1F513} ' + m + ':' + (s < 10 ? '0' : '') + s + '\n';
+      } else if (r.skipped) {
+        text += num + ': \u{1F512} gave up\n';
+      } else {
+        text += num + ': \u{1F512} timed out\n';
+      }
+    });
+    text += 'Score: ' + score + '\nCan you crack the code?';
+    return text;
+  }
+
+  function shareResults() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      copiedMsg.textContent = 'COPIED TO CLIPBOARD';
+      setTimeout(function() { copiedMsg.textContent = ''; }, 2500);
+    }).catch(function() {
+      copiedMsg.textContent = 'COPY FAILED';
+    });
+  }
+
+  startBtn.addEventListener('click', startGame);
+  submitBtn.addEventListener('click', submitAnswer);
+  skipBtn.addEventListener('click', skipRound);
+  nextRoundBtn.addEventListener('click', nextRound);
+  shareBtn.addEventListener('click', shareResults);
+  replayBtn.addEventListener('click', function() {
+    showScreen(startScreen);
+    init();
+  });
+
+  answerInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitAnswer();
+    }
+  });
+
+  answerInput.addEventListener('input', function() {
+    playTypeClick();
+  });
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
+  var lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    if (e.target === answerInput) return;
+    var now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+
+  var dots = [];
+  var dotCanvas = document.createElement('canvas');
+  dotCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+  document.body.appendChild(dotCanvas);
+  var dctx = dotCanvas.getContext('2d');
+
+  function resizeDotCanvas() {
+    dotCanvas.width = window.innerWidth * devicePixelRatio;
+    dotCanvas.height = window.innerHeight * devicePixelRatio;
+    dctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  }
+  resizeDotCanvas();
+  window.addEventListener('resize', resizeDotCanvas);
+
+  for (var i = 0; i < 30; i++) {
+    dots.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: 1 + Math.random() * 1.5,
+      a: 0.1 + Math.random() * 0.15
+    });
+  }
+
+  function drawDots() {
+    dctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    dots.forEach(function(d) {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0) d.x = window.innerWidth;
+      if (d.x > window.innerWidth) d.x = 0;
+      if (d.y < 0) d.y = window.innerHeight;
+      if (d.y > window.innerHeight) d.y = 0;
+      dctx.beginPath();
+      dctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      dctx.fillStyle = 'rgba(0, 240, 255, ' + d.a + ')';
+      dctx.fill();
+    });
+    requestAnimationFrame(drawDots);
+  }
+  drawDots();
+
+  init();
+})();
+</script>
+</body>
+</html>

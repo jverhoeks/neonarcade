@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MINE FINDER — NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.07) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+}
+.screen.active { display: flex; }
+
+#start-screen .title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(28px, 6vw, 52px);
+  letter-spacing: 6px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+#start-screen .subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 2.5vw, 20px);
+  letter-spacing: 2px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  max-width: 400px;
+  text-align: center;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  position: relative;
+  z-index: 2;
+}
+
+#start-screen .hook {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: clamp(13px, 2vw, 17px);
+  color: var(--neon-pink);
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+  text-align: center;
+  max-width: 360px;
+  position: relative;
+  z-index: 2;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 2;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-top: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.best-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--neon-gold);
+  margin-top: 14px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.4);
+  position: relative;
+  z-index: 2;
+}
+
+#game-screen {
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 440px;
+  padding: 0 4px;
+}
+
+.phase-label {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(11px, 2vw, 14px);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.phase-place { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.5); }
+.phase-watch { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.5); }
+
+.mine-counter, .score-display {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(12px, 2vw, 15px);
+  letter-spacing: 2px;
+}
+
+.mine-counter { color: var(--neon-orange); }
+.score-display { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
+#grid-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  width: min(calc(100vw - 24px), 420px);
+  height: min(calc(100vw - 24px), 420px);
+  background: rgba(0,240,255,0.04);
+  border: 1px solid rgba(0,240,255,0.15);
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.cell {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid rgba(0,240,255,0.08);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(11px, 2.5vw, 16px);
+  overflow: hidden;
+}
+
+.cell:hover:not(.revealed):not(.flagged) {
+  border-color: rgba(0,240,255,0.3);
+  background: rgba(0,240,255,0.06);
+}
+
+.cell.mine-placed {
+  background: rgba(255,45,123,0.12);
+  border-color: rgba(255,45,123,0.3);
+}
+.cell.mine-placed .mine-dot {
+  display: block;
+}
+
+.mine-dot {
+  display: none;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: var(--neon-pink);
+  box-shadow: 0 0 6px rgba(255,45,123,0.6);
+  pointer-events: none;
+}
+
+.cell.revealed {
+  background: rgba(0,240,255,0.03);
+  border-color: rgba(0,240,255,0.05);
+  cursor: default;
+}
+
+.cell.revealed.num-0 { color: transparent; }
+.cell.revealed.num-1 { color: #00aaff; }
+.cell.revealed.num-2 { color: var(--neon-green); }
+.cell.revealed.num-3 { color: var(--neon-pink); }
+.cell.revealed.num-4 { color: var(--neon-purple); }
+.cell.revealed.num-5 { color: var(--neon-orange); }
+.cell.revealed.num-6 { color: var(--neon-cyan); }
+.cell.revealed.num-7 { color: #fff; }
+.cell.revealed.num-8 { color: var(--neon-gold); }
+
+.cell.flagged {
+  background: rgba(255,140,0,0.12);
+  border-color: rgba(255,140,0,0.3);
+  cursor: default;
+}
+.cell.flagged .flag-icon {
+  display: block;
+}
+
+.flag-icon {
+  display: none;
+  width: 0; height: 0;
+  border-left: 5px solid var(--neon-orange);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  filter: drop-shadow(0 0 4px rgba(255,140,0,0.6));
+  pointer-events: none;
+}
+
+.cell.exploded {
+  background: rgba(255,45,123,0.3);
+  border-color: var(--neon-pink);
+  animation: explodeCell 0.4s ease-out;
+}
+.cell.exploded .explode-dot {
+  display: block;
+}
+
+.explode-dot {
+  display: none;
+  width: 45%;
+  height: 45%;
+  border-radius: 50%;
+  background: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(255,45,123,0.8);
+  pointer-events: none;
+}
+
+.heat-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cell.show-heat .heat-overlay {
+  opacity: 1;
+}
+
+@keyframes explodeCell {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.cell.ai-considering {
+  animation: aiPulse 0.3s ease-in-out;
+}
+@keyframes aiPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+.action-bar {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.release-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(11px, 2vw, 13px);
+  letter-spacing: 2px;
+  padding: 10px 28px;
+  border: 1px solid var(--neon-pink);
+  background: rgba(255,45,123,0.08);
+  color: var(--neon-pink);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.release-btn:hover { background: rgba(255,45,123,0.18); box-shadow: 0 0 20px rgba(255,45,123,0.2); transform: scale(1.04); }
+.release-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+.reset-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(11px, 2vw, 13px);
+  letter-spacing: 2px;
+  padding: 10px 20px;
+  border: 1px solid var(--text-dim);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.reset-btn:hover { border-color: var(--text-mid); color: var(--text-mid); }
+
+.ai-status {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: clamp(12px, 2vw, 15px);
+  letter-spacing: 1px;
+  color: var(--text-mid);
+  height: 20px;
+  margin-top: 2px;
+}
+.ai-status.thinking { color: var(--neon-purple); }
+.ai-status.found-safe { color: var(--neon-green); }
+.ai-status.guessing { color: var(--neon-orange); }
+.ai-status.boom { color: var(--neon-pink); }
+
+#result-screen .result-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(24px, 5vw, 42px);
+  letter-spacing: 5px;
+  margin-bottom: 16px;
+}
+.result-win { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,20,0.5), 0 0 40px rgba(57,255,20,0.15); }
+.result-stumped { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.5), 0 0 40px rgba(255,45,123,0.15); }
+
+.result-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.stat-row {
+  display: flex;
+  gap: 24px;
+}
+
+.stat { text-align: center; }
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(20px, 4vw, 32px);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.final-score .stat-val {
+  font-size: clamp(28px, 6vw, 48px);
+  color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+.result-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  padding: 12px 30px;
+  border: 1px solid var(--neon-green);
+  background: rgba(57,255,20,0.08);
+  color: var(--neon-green);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.18); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+
+.share-toast {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--neon-green);
+  color: var(--neon-green);
+  border-radius: 3px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 100;
+  pointer-events: none;
+}
+.share-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.particle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+}
+.shake { animation: shake 0.25s ease-in-out; }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="start-screen" class="screen active">
+    <div class="title">MINE FINDER</div>
+    <div class="subtitle">REVERSE MINESWEEPER: YOU HIDE THE MINES, THE AI HUNTS THEM</div>
+    <div class="hook">Place 15 mines. Watch the AI try to survive. Score points for every explosion.</div>
+    <button class="play-btn" id="start-btn">START</button>
+    <div class="controls-hint">CLICK / TAP TO PLACE MINES</div>
+    <div class="best-score" id="best-score-start"></div>
+  </div>
+
+  <div id="game-screen" class="screen">
+    <div class="top-bar">
+      <div class="phase-label" id="phase-label">PLACE MINES</div>
+      <div class="mine-counter" id="mine-counter">MINES: 15</div>
+      <div class="score-display" id="score-display">SCORE: 0</div>
+    </div>
+    <div id="grid-container"></div>
+    <div class="ai-status" id="ai-status"></div>
+    <div class="action-bar">
+      <button class="release-btn" id="release-btn" disabled>RELEASE THE AI</button>
+      <button class="reset-btn" id="reset-btn">RESET</button>
+    </div>
+    <div class="legend" id="heat-legend" style="display:none">
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(57,255,20,0.5)"></div>Safe</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(255,215,0,0.5)"></div>Unsure</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(255,45,123,0.5)"></div>Mine</div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="screen">
+    <div class="result-title" id="result-title">RESULTS</div>
+    <div class="result-stats">
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-val" id="stat-clicks">0</div>
+          <div class="stat-label">AI CLICKS</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" id="stat-mines">0</div>
+          <div class="stat-label">MINES HIT</div>
+        </div>
+      </div>
+      <div class="stat final-score">
+        <div class="stat-val" id="stat-score">0</div>
+        <div class="stat-label">TOTAL SCORE</div>
+      </div>
+      <div class="best-score" id="best-score-result"></div>
+    </div>
+    <div class="result-buttons">
+      <button class="share-btn" id="share-btn">SHARE</button>
+      <button class="play-btn" id="play-again-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <div class="share-toast" id="share-toast">COPIED TO CLIPBOARD</div>
+</div>
+
+<script>
+(() => {
+  const GRID = 10;
+  const TOTAL_MINES = 15;
+  const AI_DELAY = 300;
+  const POINTS_SAFE = 10;
+  const POINTS_MINE = 100;
+  const LS_KEY = 'minefinder_best';
+
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  const startBtn = document.getElementById('start-btn');
+  const releaseBtn = document.getElementById('release-btn');
+  const resetBtn = document.getElementById('reset-btn');
+  const shareBtn = document.getElementById('share-btn');
+  const playAgainBtn = document.getElementById('play-again-btn');
+  const gridContainer = document.getElementById('grid-container');
+  const phaseLabel = document.getElementById('phase-label');
+  const mineCounter = document.getElementById('mine-counter');
+  const scoreDisplay = document.getElementById('score-display');
+  const aiStatus = document.getElementById('ai-status');
+  const heatLegend = document.getElementById('heat-legend');
+  const shareToast = document.getElementById('share-toast');
+  const bestScoreStart = document.getElementById('best-score-start');
+  const bestScoreResult = document.getElementById('best-score-result');
+  const statClicks = document.getElementById('stat-clicks');
+  const statMines = document.getElementById('stat-mines');
+  const statScore = document.getElementById('stat-score');
+  const resultTitle = document.getElementById('result-title');
+
+  // Audio
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSound(type) {
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      switch (type) {
+        case 'place':
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(now); osc.stop(now + 0.1);
+          break;
+        case 'unplace':
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.06);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now); osc.stop(now + 0.08);
+          break;
+        case 'reveal':
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(600 + Math.random() * 300, now);
+          osc.frequency.exponentialRampToValueAtTime(800 + Math.random() * 200, now + 0.06);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(now); osc.stop(now + 0.1);
+          break;
+        case 'explosion': {
+          const bufferSize = audioCtx.sampleRate * 0.3;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+          }
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+          const ng = audioCtx.createGain();
+          ng.gain.setValueAtTime(0.25, now);
+          ng.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          noise.connect(ng); ng.connect(audioCtx.destination);
+          noise.start(now);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          osc.start(now); osc.stop(now + 0.3);
+          break;
+        }
+        case 'victory':
+          osc.type = 'square';
+          gain.gain.setValueAtTime(0.1, now);
+          [523, 659, 784, 1047].forEach((f, i) => {
+            osc.frequency.setValueAtTime(f, now + i * 0.12);
+          });
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now); osc.stop(now + 0.5);
+          break;
+        case 'defeat':
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now); osc.stop(now + 0.5);
+          break;
+      }
+    } catch (e) { /* audio not available */ }
+  }
+
+  // Particles
+  function spawnParticles(x, y, color, count) {
+    count = count || 12;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      const speed = 40 + Math.random() * 80;
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed;
+      const start = performance.now();
+      function anim(t) {
+        const elapsed = (t - start) / 1000;
+        if (elapsed > 0.6) { p.remove(); return; }
+        p.style.opacity = 1 - elapsed / 0.6;
+        p.style.left = (x + dx * elapsed) + 'px';
+        p.style.top = (y + dy * elapsed + 100 * elapsed * elapsed) + 'px';
+        requestAnimationFrame(anim);
+      }
+      requestAnimationFrame(anim);
+    }
+  }
+
+  // Game state
+  let phase = 'start';
+  let mines = new Set();
+  let cellEls = [];
+  let revealed = [];
+  let flagged = [];
+  let numbers = [];
+  let minesRemaining = TOTAL_MINES;
+  let score = 0;
+  let aiClicks = 0;
+  let minesHit = 0;
+  let aiRunning = false;
+  let aiTimeouts = [];
+
+  function idx(r, c) { return r * GRID + c; }
+  function rc(i) { return [Math.floor(i / GRID), i % GRID]; }
+
+  function neighbors(r, c) {
+    const n = [];
+    for (let dr = -1; dr <= 1; dr++)
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < GRID && nc >= 0 && nc < GRID) n.push([nr, nc]);
+      }
+    return n;
+  }
+
+  function computeNumbers() {
+    numbers = new Array(GRID * GRID).fill(0);
+    for (const mi of mines) {
+      const [mr, mc] = rc(mi);
+      for (const [nr, nc] of neighbors(mr, mc)) {
+        numbers[idx(nr, nc)]++;
+      }
+    }
+  }
+
+  function showScreen(id) {
+    [startScreen, gameScreen, resultScreen].forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function updateBestDisplay() {
+    const best = localStorage.getItem(LS_KEY);
+    const text = best ? 'BEST: ' + best : '';
+    bestScoreStart.textContent = text;
+    bestScoreResult.textContent = text;
+  }
+
+  function buildGrid() {
+    while (gridContainer.firstChild) gridContainer.removeChild(gridContainer.firstChild);
+    cellEls = [];
+    revealed = new Array(GRID * GRID).fill(false);
+    flagged = new Array(GRID * GRID).fill(false);
+    mines.clear();
+    minesRemaining = TOTAL_MINES;
+    score = 0;
+    aiClicks = 0;
+    minesHit = 0;
+
+    for (let i = 0; i < GRID * GRID; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+
+      const heatOverlay = document.createElement('div');
+      heatOverlay.className = 'heat-overlay';
+      cell.appendChild(heatOverlay);
+
+      const mineDot = document.createElement('div');
+      mineDot.className = 'mine-dot';
+      cell.appendChild(mineDot);
+
+      const flagIcon = document.createElement('div');
+      flagIcon.className = 'flag-icon';
+      cell.appendChild(flagIcon);
+
+      const explodeDot = document.createElement('div');
+      explodeDot.className = 'explode-dot';
+      cell.appendChild(explodeDot);
+
+      const numSpan = document.createElement('span');
+      numSpan.className = 'num-text';
+      cell.appendChild(numSpan);
+
+      cell.addEventListener('click', function() { onCellClick(i); });
+      cell.addEventListener('touchstart', function(e) { e.preventDefault(); }, { passive: false });
+      gridContainer.appendChild(cell);
+      cellEls.push(cell);
+    }
+
+    updateUI();
+  }
+
+  function updateUI() {
+    mineCounter.textContent = 'MINES: ' + minesRemaining;
+    scoreDisplay.textContent = 'SCORE: ' + score;
+  }
+
+  // Phase 1: place mines
+  function onCellClick(i) {
+    if (phase !== 'place') return;
+
+    if (mines.has(i)) {
+      mines.delete(i);
+      minesRemaining++;
+      cellEls[i].classList.remove('mine-placed');
+      playSound('unplace');
+    } else if (minesRemaining > 0) {
+      mines.add(i);
+      minesRemaining--;
+      cellEls[i].classList.add('mine-placed');
+      playSound('place');
+      const rect = cellEls[i].getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff2d7b', 8);
+    }
+
+    releaseBtn.disabled = minesRemaining > 0;
+    updateUI();
+  }
+
+  // Phase 2: AI solver
+  function startAI() {
+    phase = 'watch';
+    aiRunning = true;
+    phaseLabel.textContent = 'AI SOLVING';
+    phaseLabel.className = 'phase-label phase-watch';
+    releaseBtn.style.display = 'none';
+    heatLegend.style.display = 'flex';
+
+    for (const mi of mines) {
+      cellEls[mi].classList.remove('mine-placed');
+    }
+
+    computeNumbers();
+    runAI();
+  }
+
+  function revealCell(i) {
+    if (revealed[i] || flagged[i]) return 'skip';
+
+    revealed[i] = true;
+    aiClicks++;
+    cellEls[i].classList.add('revealed', 'num-' + numbers[i]);
+    cellEls[i].classList.remove('show-heat');
+    cellEls[i].querySelector('.heat-overlay').style.background = 'transparent';
+
+    if (mines.has(i)) {
+      cellEls[i].classList.add('exploded');
+      minesHit++;
+      score += POINTS_MINE;
+      playSound('explosion');
+      const rect = cellEls[i].getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff2d7b', 20);
+      document.getElementById('app').classList.add('shake');
+      setTimeout(function() { document.getElementById('app').classList.remove('shake'); }, 250);
+      aiStatus.textContent = 'BOOM! MINE HIT!';
+      aiStatus.className = 'ai-status boom';
+      return 'mine';
+    } else {
+      score += POINTS_SAFE;
+      const numText = cellEls[i].querySelector('.num-text');
+      if (numText) numText.textContent = numbers[i] > 0 ? numbers[i] : '';
+      playSound('reveal');
+      return 'safe';
+    }
+  }
+
+  function flagCell(i) {
+    if (revealed[i] || flagged[i]) return;
+    flagged[i] = true;
+    cellEls[i].classList.add('flagged');
+    cellEls[i].classList.remove('show-heat');
+  }
+
+  function checkWin() {
+    for (let i = 0; i < GRID * GRID; i++) {
+      if (!mines.has(i) && !revealed[i]) return false;
+    }
+    return true;
+  }
+
+  // AI logic
+  function getAIMoves() {
+    const toReveal = new Set();
+    const toFlag = new Set();
+
+    // Work on copies of flagged for deduction
+    const tempFlagged = flagged.slice();
+
+    let changed = true;
+    while (changed) {
+      changed = false;
+
+      for (let i = 0; i < GRID * GRID; i++) {
+        if (!revealed[i] || mines.has(i)) continue;
+        const [r, c] = rc(i);
+        const nbrs = neighbors(r, c);
+        const num = numbers[i];
+
+        let unrevealed = [];
+        let flagCount = 0;
+        for (const [nr, nc] of nbrs) {
+          const ni = idx(nr, nc);
+          if (tempFlagged[ni]) flagCount++;
+          else if (!revealed[ni]) unrevealed.push(ni);
+        }
+
+        if (unrevealed.length > 0 && num - flagCount === unrevealed.length) {
+          for (const ui of unrevealed) {
+            if (!tempFlagged[ui]) {
+              toFlag.add(ui);
+              tempFlagged[ui] = true;
+              changed = true;
+            }
+          }
+        }
+
+        if (unrevealed.length > 0 && flagCount === num) {
+          for (const ui of unrevealed) {
+            if (!tempFlagged[ui]) {
+              toReveal.add(ui);
+              changed = true;
+            }
+          }
+        }
+      }
+    }
+
+    if (toReveal.size > 0 || toFlag.size > 0) {
+      return { toReveal: Array.from(toReveal), toFlag: Array.from(toFlag), guess: null };
+    }
+
+    const guess = probabilityGuess();
+    return { toReveal: [], toFlag: [], guess: guess };
+  }
+
+  function probabilityGuess() {
+    const counts = new Array(GRID * GRID).fill(0);
+    const totals = new Array(GRID * GRID).fill(0);
+
+    for (let i = 0; i < GRID * GRID; i++) {
+      if (!revealed[i] || mines.has(i)) continue;
+      const [r, c] = rc(i);
+      const nbrs = neighbors(r, c);
+      const num = numbers[i];
+
+      let unrevealed = [];
+      let flagCount = 0;
+      for (const [nr, nc] of nbrs) {
+        const ni = idx(nr, nc);
+        if (flagged[ni]) flagCount++;
+        else if (!revealed[ni]) unrevealed.push(ni);
+      }
+
+      if (unrevealed.length === 0) continue;
+      const minesLeft = num - flagCount;
+      const p = Math.max(0, Math.min(1, minesLeft / unrevealed.length));
+
+      for (const ui of unrevealed) {
+        counts[ui] += p;
+        totals[ui]++;
+      }
+    }
+
+    let bestIdx = -1;
+    let bestProb = 2;
+    const prob = new Array(GRID * GRID).fill(-1);
+
+    let remainingMinesGlobal = TOTAL_MINES;
+    for (let j = 0; j < GRID * GRID; j++) if (flagged[j]) remainingMinesGlobal--;
+    // Also subtract mines that were revealed (exploded)
+    for (let j = 0; j < GRID * GRID; j++) if (revealed[j] && mines.has(j)) remainingMinesGlobal--;
+    let remainingCells = 0;
+    for (let j = 0; j < GRID * GRID; j++) if (!revealed[j] && !flagged[j]) remainingCells++;
+    const globalP = remainingCells > 0 ? remainingMinesGlobal / remainingCells : 0.5;
+
+    for (let i = 0; i < GRID * GRID; i++) {
+      if (revealed[i] || flagged[i]) continue;
+      let p;
+      if (totals[i] > 0) {
+        p = counts[i] / totals[i];
+      } else {
+        p = globalP;
+      }
+      prob[i] = p;
+      if (p < bestProb) {
+        bestProb = p;
+        bestIdx = i;
+      }
+    }
+
+    updateHeatMap(prob);
+    return bestIdx >= 0 ? bestIdx : null;
+  }
+
+  function updateHeatMap(prob) {
+    for (let i = 0; i < GRID * GRID; i++) {
+      if (revealed[i] || flagged[i]) {
+        cellEls[i].classList.remove('show-heat');
+        continue;
+      }
+      let p = prob ? prob[i] : -1;
+      if (p < 0) {
+        let rm = TOTAL_MINES;
+        for (let j = 0; j < GRID * GRID; j++) if (flagged[j]) rm--;
+        for (let j = 0; j < GRID * GRID; j++) if (revealed[j] && mines.has(j)) rm--;
+        let rc2 = 0;
+        for (let j = 0; j < GRID * GRID; j++) if (!revealed[j] && !flagged[j]) rc2++;
+        p = rc2 > 0 ? rm / rc2 : 0.5;
+      }
+
+      let r, g, b;
+      if (p <= 0.5) {
+        const t = p / 0.5;
+        r = Math.round(57 + (255 - 57) * t);
+        g = Math.round(255 + (215 - 255) * t);
+        b = Math.round(20 + (0 - 20) * t);
+      } else {
+        const t = (p - 0.5) / 0.5;
+        r = 255;
+        g = Math.round(215 + (45 - 215) * t);
+        b = Math.round(0 + (123 - 0) * t);
+      }
+
+      const overlay = cellEls[i].querySelector('.heat-overlay');
+      if (overlay) {
+        overlay.style.background = 'rgba(' + r + ',' + g + ',' + b + ',' + (0.15 + p * 0.35) + ')';
+      }
+      cellEls[i].classList.add('show-heat');
+    }
+  }
+
+  function computeHeatMapOnly() {
+    const counts = new Array(GRID * GRID).fill(0);
+    const totals = new Array(GRID * GRID).fill(0);
+
+    for (let i = 0; i < GRID * GRID; i++) {
+      if (!revealed[i] || mines.has(i)) continue;
+      const [r, c] = rc(i);
+      const nbrs = neighbors(r, c);
+      const num = numbers[i];
+      let unrevealed = [];
+      let flagCount = 0;
+      for (const [nr, nc] of nbrs) {
+        const ni = idx(nr, nc);
+        if (flagged[ni]) flagCount++;
+        else if (!revealed[ni]) unrevealed.push(ni);
+      }
+      if (unrevealed.length === 0) continue;
+      const minesLeft = num - flagCount;
+      const p = Math.max(0, Math.min(1, minesLeft / unrevealed.length));
+      for (const ui of unrevealed) {
+        counts[ui] += p;
+        totals[ui]++;
+      }
+    }
+
+    const prob = new Array(GRID * GRID).fill(-1);
+    for (let i = 0; i < GRID * GRID; i++) {
+      if (totals[i] > 0) prob[i] = counts[i] / totals[i];
+    }
+    updateHeatMap(prob);
+  }
+
+  async function floodReveal(startIdx) {
+    const queue = [startIdx];
+    const visited = new Set([startIdx]);
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      const [cr, cc] = rc(current);
+
+      if (numbers[current] === 0) {
+        for (const [nr, nc] of neighbors(cr, cc)) {
+          const ni = idx(nr, nc);
+          if (!visited.has(ni) && !revealed[ni] && !flagged[ni] && !mines.has(ni)) {
+            visited.add(ni);
+            revealed[ni] = true;
+            aiClicks++;
+            score += POINTS_SAFE;
+            cellEls[ni].classList.add('revealed', 'num-' + numbers[ni]);
+            cellEls[ni].classList.remove('show-heat');
+            const numText = cellEls[ni].querySelector('.num-text');
+            if (numText) numText.textContent = numbers[ni] > 0 ? numbers[ni] : '';
+            if (numbers[ni] === 0) queue.push(ni);
+          }
+        }
+      }
+    }
+    updateUI();
+    await delay(50);
+  }
+
+  function delay(ms) {
+    return new Promise(function(resolve) {
+      const t = setTimeout(resolve, ms);
+      aiTimeouts.push(t);
+    });
+  }
+
+  async function runAI() {
+    const corners = [0, GRID - 1, (GRID - 1) * GRID, GRID * GRID - 1];
+    const startCorner = corners[Math.floor(Math.random() * corners.length)];
+
+    aiStatus.textContent = 'ANALYZING CORNERS...';
+    aiStatus.className = 'ai-status thinking';
+
+    await delay(AI_DELAY);
+    if (!aiRunning) return;
+
+    const result = revealCell(startCorner);
+    updateUI();
+
+    if (result === 'mine') {
+      await delay(AI_DELAY);
+    }
+
+    if (result === 'safe' && numbers[startCorner] === 0) {
+      await floodReveal(startCorner);
+    }
+
+    if (checkWin()) { aiWins(); return; }
+
+    while (aiRunning) {
+      await delay(AI_DELAY);
+      if (!aiRunning) return;
+
+      computeHeatMapOnly();
+      const moves = getAIMoves();
+
+      // Flag cells
+      for (const fi of moves.toFlag) {
+        if (!aiRunning) return;
+        flagCell(fi);
+        await delay(80);
+      }
+
+      if (moves.toReveal.length > 0) {
+        aiStatus.textContent = 'FOUND SAFE CELLS';
+        aiStatus.className = 'ai-status found-safe';
+
+        for (const ri of moves.toReveal) {
+          if (!aiRunning) return;
+          if (revealed[ri] || flagged[ri]) continue;
+
+          await delay(AI_DELAY);
+          if (!aiRunning) return;
+          const res = revealCell(ri);
+          updateUI();
+
+          if (res === 'safe' && numbers[ri] === 0) {
+            await floodReveal(ri);
+          }
+
+          if (checkWin()) { aiWins(); return; }
+        }
+      } else if (moves.guess !== null) {
+        aiStatus.textContent = 'UNCERTAIN... GUESSING';
+        aiStatus.className = 'ai-status guessing';
+
+        cellEls[moves.guess].classList.add('ai-considering');
+        await delay(AI_DELAY);
+        if (!aiRunning) return;
+        cellEls[moves.guess].classList.remove('ai-considering');
+
+        const res = revealCell(moves.guess);
+        updateUI();
+
+        if (res === 'mine') {
+          await delay(AI_DELAY * 2);
+          if (!aiRunning) return;
+        } else if (res === 'safe' && numbers[moves.guess] === 0) {
+          await floodReveal(moves.guess);
+        }
+
+        if (checkWin()) { aiWins(); return; }
+      } else {
+        // No more moves possible, flag remaining and finish
+        let allDone = true;
+        for (let i = 0; i < GRID * GRID; i++) {
+          if (!revealed[i] && !flagged[i]) {
+            if (!mines.has(i)) { allDone = false; break; }
+          }
+        }
+        if (allDone) { aiWins(); return; }
+        break;
+      }
+    }
+  }
+
+  function aiWins() {
+    aiRunning = false;
+    if (minesHit > 0) {
+      aiStatus.textContent = 'AI FINISHED — BUT YOU GOT IT!';
+      aiStatus.className = 'ai-status boom';
+    } else {
+      aiStatus.textContent = 'AI CLEARED THE BOARD!';
+      aiStatus.className = 'ai-status found-safe';
+      playSound('defeat');
+    }
+    setTimeout(function() { showResults(); }, 800);
+  }
+
+  function showResults() {
+    phase = 'result';
+    showScreen('result-screen');
+
+    if (minesHit > 0) {
+      resultTitle.textContent = 'YOU STUMPED IT!';
+      resultTitle.className = 'result-title result-stumped';
+      playSound('victory');
+    } else {
+      resultTitle.textContent = 'AI WINS';
+      resultTitle.className = 'result-title result-win';
+    }
+
+    statClicks.textContent = aiClicks;
+    statMines.textContent = minesHit;
+    statScore.textContent = score;
+
+    const best = parseInt(localStorage.getItem(LS_KEY)) || 0;
+    if (score > best) {
+      localStorage.setItem(LS_KEY, score);
+    }
+    updateBestDisplay();
+  }
+
+  // Share
+  function getShareText() {
+    return '\u{1F4A3} MINE FINDER\nAI clicks: ' + aiClicks + ' | Mines hit: ' + minesHit + '\nScore: ' + score + '\n' + (minesHit > 0 ? 'I outsmarted the machine \u{1F916}' : 'The AI beat me... this time \u{1F916}');
+  }
+
+  function shareResult() {
+    const text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() { copyToClipboard(text); });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      shareToast.classList.add('show');
+      setTimeout(function() { shareToast.classList.remove('show'); }, 2000);
+    }).catch(function() {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+      shareToast.classList.add('show');
+      setTimeout(function() { shareToast.classList.remove('show'); }, 2000);
+    });
+  }
+
+  // Events
+  startBtn.addEventListener('click', function() {
+    playSound('place');
+    phase = 'place';
+    showScreen('game-screen');
+    phaseLabel.textContent = 'PLACE MINES';
+    phaseLabel.className = 'phase-label phase-place';
+    releaseBtn.style.display = '';
+    releaseBtn.disabled = true;
+    heatLegend.style.display = 'none';
+    aiStatus.textContent = '';
+    buildGrid();
+  });
+
+  releaseBtn.addEventListener('click', function() {
+    if (minesRemaining > 0) return;
+    playSound('reveal');
+    startAI();
+  });
+
+  resetBtn.addEventListener('click', function() {
+    aiRunning = false;
+    aiTimeouts.forEach(function(t) { clearTimeout(t); });
+    aiTimeouts = [];
+    phase = 'place';
+    phaseLabel.textContent = 'PLACE MINES';
+    phaseLabel.className = 'phase-label phase-place';
+    releaseBtn.style.display = '';
+    releaseBtn.disabled = true;
+    heatLegend.style.display = 'none';
+    aiStatus.textContent = '';
+    buildGrid();
+  });
+
+  shareBtn.addEventListener('click', shareResult);
+
+  playAgainBtn.addEventListener('click', function() {
+    phase = 'place';
+    showScreen('game-screen');
+    phaseLabel.textContent = 'PLACE MINES';
+    phaseLabel.className = 'phase-label phase-place';
+    releaseBtn.style.display = '';
+    releaseBtn.disabled = true;
+    heatLegend.style.display = 'none';
+    aiStatus.textContent = '';
+    buildGrid();
+  });
+
+  // Init
+  updateBestDisplay();
+
+  // Idle animation
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+  startScreen.insertBefore(canvas, startScreen.firstChild);
+
+  const dpr = window.devicePixelRatio || 1;
+  function resizeCanvas() {
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const ctx2d = canvas.getContext('2d');
+
+  function idleLoop(ts) {
+    const idleTime = ts / 1000;
+    if (phase === 'start') {
+      ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+      ctx2d.save();
+      ctx2d.scale(dpr, dpr);
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const cellSize = Math.min(w, h) / 14;
+      const cols = Math.ceil(w / cellSize) + 1;
+      const rows = Math.ceil(h / cellSize) + 1;
+      const ox = (w - cols * cellSize) / 2;
+      const oy = (h - rows * cellSize) / 2;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = ox + c * cellSize;
+          const y = oy + r * cellSize;
+          const dist = Math.sqrt(Math.pow(x - w / 2, 2) + Math.pow(y - h / 2, 2));
+          const pulse = Math.sin(idleTime * 1.5 - dist * 0.008) * 0.5 + 0.5;
+          const alpha = 0.015 + pulse * 0.025;
+          ctx2d.strokeStyle = 'rgba(0,240,255,' + alpha + ')';
+          ctx2d.lineWidth = 0.5;
+          ctx2d.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+        }
+      }
+
+      ctx2d.restore();
+    }
+    requestAnimationFrame(idleLoop);
+  }
+  requestAnimationFrame(idleLoop);
+
+})();
+</script>
+</body>
+</html>

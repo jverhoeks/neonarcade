@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>DOODLE DROP — Neon Arcade</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+body::after {
+  content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+canvas { display: block; position: absolute; top: 0; left: 0; }
+
+/* HUD */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 12px 16px;
+  display: none; pointer-events: none;
+}
+#hud-depth {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 18px;
+  color: var(--neon-cyan); letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+}
+#hud-ink-wrap {
+  margin-top: 6px; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px;
+  overflow: hidden; border: 1px solid rgba(0,240,255,0.2); max-width: 220px;
+}
+#hud-ink-bar {
+  height: 100%; width: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+  border-radius: 4px; transition: width 0.15s;
+}
+#hud-ink-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
+  color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;
+}
+#hud-strokes {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  color: var(--text-mid); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;
+}
+
+/* Screens */
+.screen-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, rgba(0,240,255,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(255,45,123,0.04) 0%, transparent 50%),
+              var(--bg-deep);
+}
+.screen-overlay.hidden { display: none; }
+.game-title {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(28px, 7vw, 52px);
+  letter-spacing: 6px; color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 12px;
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(14px, 3vw, 20px);
+  color: var(--text-mid); letter-spacing: 3px; text-transform: uppercase;
+  max-width: 320px; text-align: center; line-height: 1.5; margin-bottom: 8px;
+}
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px;
+}
+.best-display {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px;
+  color: var(--neon-gold); letter-spacing: 2px; margin-bottom: 20px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+/* Game Over */
+#game-over-screen .game-title { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.6), 0 0 40px rgba(255,45,123,0.2); }
+.stats-box {
+  display: flex; flex-direction: column; gap: 8px; align-items: center;
+  margin: 16px 0 24px 0;
+}
+.stat-line {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 16px;
+  color: var(--text-mid); letter-spacing: 2px;
+}
+.stat-line span {
+  font-family: 'Orbitron', monospace; font-weight: 700; color: #fff;
+}
+.stat-line .best { color: var(--neon-gold); }
+.new-best {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  color: var(--neon-gold); letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.6);
+  margin-bottom: 8px;
+}
+.new-best.hidden { display: none; }
+.btn-row { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 32px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+.copied-toast {
+  position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px;
+  color: var(--neon-green); background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.3); padding: 8px 20px; border-radius: 4px;
+  z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  letter-spacing: 2px;
+}
+.copied-toast.show { opacity: 1; }
+
+/* Shake */
+@keyframes shake { 0%,100%{transform:translate(0)} 20%{transform:translate(-3px,1px)} 40%{transform:translate(2px,-2px)} 60%{transform:translate(-2px,2px)} 80%{transform:translate(3px,-1px)} }
+.shake { animation: shake 0.25s; }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="hud">
+  <div id="hud-depth">0m</div>
+  <div id="hud-ink-wrap"><div id="hud-ink-bar"></div></div>
+  <div id="hud-ink-label">INK</div>
+  <div id="hud-strokes">STROKES: 0</div>
+</div>
+
+<div id="start-screen" class="screen-overlay">
+  <div class="game-title">DOODLE DROP</div>
+  <div class="game-subtitle">Draw platforms to break your fall. Every line costs ink.</div>
+  <div class="controls-hint">DRAG TO DRAW PLATFORMS</div>
+  <div class="best-display" id="start-best"></div>
+  <button class="play-btn" id="btn-start">START</button>
+</div>
+
+<div id="game-over-screen" class="screen-overlay hidden">
+  <div class="game-title">GAME OVER</div>
+  <div class="new-best hidden" id="new-best-label">NEW BEST!</div>
+  <div class="stats-box">
+    <div class="stat-line">DEPTH: <span id="stat-depth">0m</span></div>
+    <div class="stat-line">STROKES: <span id="stat-strokes">0</span></div>
+    <div class="stat-line">BEST: <span id="stat-best" class="best">0m</span></div>
+  </div>
+  <div class="btn-row">
+    <button class="share-btn" id="btn-share">SHARE</button>
+    <button class="play-btn" id="btn-restart">PLAY AGAIN</button>
+  </div>
+</div>
+
+<div class="copied-toast" id="copied-toast">COPIED TO CLIPBOARD</div>
+
+<script>
+(() => {
+  // === CONFIG ===
+  const GRAVITY = 0.35;
+  const MAX_FALL_SPEED = 14;
+  const MIN_BOUNCE_VEL = -8;
+  const PLATFORM_LIFETIME = 2200;
+  const PLATFORM_FADE_START = 1400;
+  const MIN_LINE_LENGTH = 25;
+  const INK_MAX = 100;
+  const INK_COST_PER_PX = 0.11;
+  const INK_DROP_VALUE = 20;
+  const INK_DROP_SPAWN_INTERVAL = 1800;
+  const WALL_SPIKE_START_DEPTH = 120;
+  const WIND_START_DEPTH = 200;
+  const CRUMBLE_START_DEPTH = 350;
+  const ORB_RADIUS = 10;
+  const WORLD_WIDTH = 400;
+  const COLLISION_RADIUS = ORB_RADIUS + 3;
+
+  // === DOM ===
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const hud = document.getElementById('hud');
+  const hudDepth = document.getElementById('hud-depth');
+  const hudInkBar = document.getElementById('hud-ink-bar');
+  const hudStrokes = document.getElementById('hud-strokes');
+  const startScreen = document.getElementById('start-screen');
+  const gameOverScreen = document.getElementById('game-over-screen');
+  const statDepth = document.getElementById('stat-depth');
+  const statStrokes = document.getElementById('stat-strokes');
+  const statBest = document.getElementById('stat-best');
+  const btnStart = document.getElementById('btn-start');
+  const btnRestart = document.getElementById('btn-restart');
+  const btnShare = document.getElementById('btn-share');
+  const copiedToast = document.getElementById('copied-toast');
+  const startBest = document.getElementById('start-best');
+  const newBestLabel = document.getElementById('new-best-label');
+
+  // === SIZING ===
+  let W, H, dpr, scale, offsetX;
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    scale = Math.min(W / WORLD_WIDTH, 1);
+    offsetX = (W - WORLD_WIDTH * scale) / 2;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // === AUDIO ===
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playPencilScratch(duration) {
+    if (!audioCtx) return;
+    try {
+      const dur = Math.min(duration, 0.25);
+      const bufLen = Math.max(1, Math.floor(audioCtx.sampleRate * dur));
+      const buffer = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufLen; i++) {
+        const env = 1 - i / bufLen;
+        data[i] = (Math.random() * 2 - 1) * 0.06 * env;
+      }
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      const hp = audioCtx.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = 2500;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.25;
+      src.connect(hp).connect(gain).connect(audioCtx.destination);
+      src.start(); src.stop(audioCtx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function playBounce() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.06);
+      osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.18);
+    } catch(e) {}
+  }
+
+  function playInkCollect() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+    } catch(e) {}
+  }
+
+  function playWindWhoosh() {
+    if (!audioCtx) return;
+    try {
+      const dur = 0.4;
+      const bufLen = Math.floor(audioCtx.sampleRate * dur);
+      const buffer = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufLen; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.03 * Math.sin(Math.PI * i / bufLen);
+      }
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 600; bp.Q.value = 0.4;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.35;
+      src.connect(bp).connect(gain).connect(audioCtx.destination);
+      src.start(); src.stop(audioCtx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function playDeath() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(280, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.45);
+      gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+    } catch(e) {}
+  }
+
+  // === GAME STATE ===
+  let state = 'start';
+  let orb, camera, platforms, inkDrops, windZones, wallSpikes, particles;
+  let ink, strokeCount, depth, bestDepth, nextInkDropY, nextSpikeY, nextWindY;
+  let drawStart, drawCurrent, isDrawing;
+  let lastTime, gameStartTime;
+
+  bestDepth = parseInt(localStorage.getItem('doodledrop_best') || '0');
+  if (bestDepth > 0) startBest.textContent = 'BEST: ' + bestDepth + 'm';
+
+  function initGame() {
+    orb = { x: WORLD_WIDTH / 2, y: 60, vx: 0, vy: 0, squish: 1, squishTimer: 0, trail: [] };
+    camera = { y: 0, targetY: 0 };
+    platforms = [];
+    inkDrops = [];
+    windZones = [];
+    wallSpikes = [];
+    particles = [];
+    ink = INK_MAX;
+    strokeCount = 0;
+    depth = 0;
+    drawStart = null;
+    drawCurrent = null;
+    isDrawing = false;
+    gameStartTime = performance.now();
+
+    // Pre-seed ink drops below starting area
+    nextInkDropY = 250;
+    for (let i = 0; i < 6; i++) {
+      inkDrops.push({
+        x: 35 + Math.random() * (WORLD_WIDTH - 70),
+        y: nextInkDropY,
+        phase: Math.random() * Math.PI * 2,
+        collected: false
+      });
+      nextInkDropY += 140 + Math.random() * 120;
+    }
+
+    nextSpikeY = WALL_SPIKE_START_DEPTH * 10;
+    nextWindY = WIND_START_DEPTH * 10;
+  }
+
+  // === COORDINATE HELPERS ===
+  function screenToWorld(sx, sy) {
+    return {
+      x: (sx - offsetX) / scale,
+      y: sy / scale + camera.y
+    };
+  }
+
+  // === PLATFORM DRAWING ===
+  function getInputPos(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function onDrawStart(e) {
+    if (state !== 'playing') return;
+    ensureAudio();
+    const pos = getInputPos(e);
+    drawStart = screenToWorld(pos.x, pos.y);
+    drawCurrent = { x: drawStart.x, y: drawStart.y };
+    isDrawing = true;
+    e.preventDefault();
+  }
+
+  function onDrawMove(e) {
+    if (!isDrawing || state !== 'playing') return;
+    const pos = getInputPos(e);
+    drawCurrent = screenToWorld(pos.x, pos.y);
+    e.preventDefault();
+  }
+
+  function onDrawEnd(e) {
+    if (!isDrawing || state !== 'playing') return;
+    isDrawing = false;
+    if (drawStart && drawCurrent) {
+      const dx = drawCurrent.x - drawStart.x;
+      const dy = drawCurrent.y - drawStart.y;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      if (len >= MIN_LINE_LENGTH) {
+        const cost = len * INK_COST_PER_PX;
+        if (ink >= cost) {
+          ink -= cost;
+          strokeCount++;
+          // Generate stable sketchy offsets
+          const sketchy = [];
+          for (let j = 0; j < 3; j++) {
+            sketchy.push({
+              ox1: (Math.random() - 0.5) * 2,
+              oy1: (Math.random() - 0.5) * 2,
+              ox2: (Math.random() - 0.5) * 2,
+              oy2: (Math.random() - 0.5) * 2
+            });
+          }
+          platforms.push({
+            x1: drawStart.x, y1: drawStart.y,
+            x2: drawCurrent.x, y2: drawCurrent.y,
+            born: performance.now(),
+            crumble: false,
+            crumbleTimer: 0,
+            length: len,
+            sketchy: sketchy,
+            bounced: false
+          });
+          playPencilScratch(Math.min(len / 200, 0.25));
+        }
+      }
+    }
+    drawStart = null;
+    drawCurrent = null;
+    if (e.preventDefault) e.preventDefault();
+  }
+
+  canvas.addEventListener('mousedown', onDrawStart);
+  canvas.addEventListener('mousemove', onDrawMove);
+  canvas.addEventListener('mouseup', onDrawEnd);
+  canvas.addEventListener('mouseleave', onDrawEnd);
+  canvas.addEventListener('touchstart', onDrawStart, { passive: false });
+  canvas.addEventListener('touchmove', onDrawMove, { passive: false });
+  canvas.addEventListener('touchend', onDrawEnd, { passive: false });
+  canvas.addEventListener('touchcancel', onDrawEnd, { passive: false });
+
+  // === COLLISION: closest point on line segment to a point ===
+  function closestPointOnSegment(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return { x: x1, y: y1, t: 0 };
+    let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    return { x: x1 + t * dx, y: y1 + t * dy, t: t };
+  }
+
+  function distToSegment(px, py, x1, y1, x2, y2) {
+    const cp = closestPointOnSegment(px, py, x1, y1, x2, y2);
+    const dx = px - cp.x, dy = py - cp.y;
+    return { dist: Math.sqrt(dx * dx + dy * dy), cp: cp };
+  }
+
+  // === SPAWN LOGIC ===
+  function ensureInkDrops() {
+    const viewBottom = camera.y + H / scale + 300;
+    while (nextInkDropY < viewBottom) {
+      inkDrops.push({
+        x: 30 + Math.random() * (WORLD_WIDTH - 60),
+        y: nextInkDropY,
+        phase: Math.random() * Math.PI * 2,
+        collected: false
+      });
+      nextInkDropY += 120 + Math.random() * 160;
+    }
+  }
+
+  function ensureHazards() {
+    const viewBottom = camera.y + H / scale + 400;
+
+    // Wall spikes
+    if (depth >= WALL_SPIKE_START_DEPTH) {
+      while (nextSpikeY < viewBottom) {
+        const side = Math.random() < 0.5 ? 'left' : 'right';
+        const spikeW = 25 + Math.random() * 35;
+        const spikeH = 50 + Math.random() * 70;
+        wallSpikes.push({
+          y: nextSpikeY,
+          side: side,
+          width: spikeW,
+          height: spikeH
+        });
+        nextSpikeY += 100 + Math.random() * 180;
+      }
+    }
+
+    // Wind zones
+    if (depth >= WIND_START_DEPTH) {
+      while (nextWindY < viewBottom) {
+        const dir = Math.random() < 0.5 ? -1 : 1;
+        windZones.push({
+          x: 15 + Math.random() * (WORLD_WIDTH - 130),
+          y: nextWindY,
+          w: 80 + Math.random() * 100,
+          h: 80 + Math.random() * 60,
+          dir: dir,
+          strength: 0.12 + Math.random() * 0.18,
+          phase: Math.random() * Math.PI * 2,
+          played: false
+        });
+        nextWindY += 250 + Math.random() * 350;
+      }
+    }
+  }
+
+  // === PARTICLES ===
+  function spawnParticles(x, y, color, count, speed) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const spd = speed * (0.4 + Math.random() * 0.6);
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.02,
+        color: color,
+        size: 2 + Math.random() * 3
+      });
+    }
+  }
+
+  // === UPDATE ===
+  function update(dt, now) {
+    if (state !== 'playing') return;
+
+    // Clamp dt to prevent tunneling on tab-switch
+    if (dt > 3) dt = 3;
+
+    // Gravity
+    orb.vy += GRAVITY * dt;
+    if (orb.vy > MAX_FALL_SPEED) orb.vy = MAX_FALL_SPEED;
+
+    // Wind zones
+    for (const wz of windZones) {
+      if (orb.x > wz.x && orb.x < wz.x + wz.w && orb.y > wz.y && orb.y < wz.y + wz.h) {
+        orb.vx += wz.dir * wz.strength * dt;
+        if (!wz.played) { wz.played = true; playWindWhoosh(); }
+      }
+    }
+
+    // Move orb
+    const prevX = orb.x, prevY = orb.y;
+    orb.x += orb.vx * dt;
+    orb.y += orb.vy * dt;
+
+    // Orb trail for visual flair
+    if (orb.trail.length > 8) orb.trail.shift();
+    orb.trail.push({ x: orb.x, y: orb.y });
+
+    // Wall bounce
+    if (orb.x < ORB_RADIUS) { orb.x = ORB_RADIUS; orb.vx = Math.abs(orb.vx) * 0.5; }
+    if (orb.x > WORLD_WIDTH - ORB_RADIUS) { orb.x = WORLD_WIDTH - ORB_RADIUS; orb.vx = -Math.abs(orb.vx) * 0.5; }
+
+    // Wall spikes collision
+    for (const sp of wallSpikes) {
+      if (orb.y < sp.y || orb.y > sp.y + sp.height) continue;
+      if (sp.side === 'left') {
+        if (orb.x - ORB_RADIUS < sp.width * ((orb.y - sp.y) < sp.height / 2 ?
+          (orb.y - sp.y) / (sp.height / 2) :
+          (sp.y + sp.height - orb.y) / (sp.height / 2))) {
+          gameOver(); return;
+        }
+      } else {
+        const spikeExtent = sp.width * ((orb.y - sp.y) < sp.height / 2 ?
+          (orb.y - sp.y) / (sp.height / 2) :
+          (sp.y + sp.height - orb.y) / (sp.height / 2));
+        if (orb.x + ORB_RADIUS > WORLD_WIDTH - spikeExtent) {
+          gameOver(); return;
+        }
+      }
+    }
+
+    // Platform collisions (only when falling)
+    if (orb.vy > 0.5) {
+      for (let i = platforms.length - 1; i >= 0; i--) {
+        const p = platforms[i];
+        const age = now - p.born;
+        if (age > PLATFORM_LIFETIME) continue;
+        if (p.crumble && p.crumbleTimer <= 0) continue;
+
+        const { dist, cp } = distToSegment(orb.x, orb.y, p.x1, p.y1, p.x2, p.y2);
+
+        if (dist < COLLISION_RADIUS) {
+          // Calculate line normal
+          const ldx = p.x2 - p.x1, ldy = p.y2 - p.y1;
+          const llen = Math.sqrt(ldx * ldx + ldy * ldy);
+          let nx = -ldy / llen, ny = ldx / llen;
+          // Ensure normal points upward (toward the orb)
+          const toCenterX = orb.x - cp.x, toCenterY = orb.y - cp.y;
+          if (nx * toCenterX + ny * toCenterY < 0) { nx = -nx; ny = -ny; }
+
+          // Only bounce if moving toward the line
+          const dotVN = orb.vx * nx + orb.vy * ny;
+          if (dotVN < 0) {
+            // Reflect velocity
+            orb.vx = orb.vx - 2 * dotVN * nx;
+            orb.vy = orb.vy - 2 * dotVN * ny;
+
+            // Ensure minimum upward velocity
+            if (orb.vy > MIN_BOUNCE_VEL) orb.vy = MIN_BOUNCE_VEL;
+
+            // Apply some damping
+            orb.vx *= 0.85;
+
+            // Push orb out of collision
+            orb.x = cp.x + nx * (COLLISION_RADIUS + 1);
+            orb.y = cp.y + ny * (COLLISION_RADIUS + 1);
+
+            orb.squish = 0.5;
+            orb.squishTimer = 180;
+
+            playBounce();
+            spawnParticles(cp.x, cp.y, '#00f0ff', 12, 3);
+
+            // Crumble check
+            if (depth >= CRUMBLE_START_DEPTH && Math.random() < 0.3) {
+              p.crumble = true;
+              p.crumbleTimer = 400;
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    // Squish recovery
+    if (orb.squishTimer > 0) {
+      orb.squishTimer -= dt * 16.67;
+      orb.squish += (1 - orb.squish) * 0.08 * dt;
+    } else {
+      orb.squish += (1 - orb.squish) * 0.15 * dt;
+    }
+
+    // Ink drops
+    for (const drop of inkDrops) {
+      if (drop.collected) continue;
+      const ddx = orb.x - drop.x;
+      const ddy = orb.y - drop.y;
+      if (ddx * ddx + ddy * ddy < (ORB_RADIUS + 14) * (ORB_RADIUS + 14)) {
+        drop.collected = true;
+        ink = Math.min(INK_MAX, ink + INK_DROP_VALUE);
+        playInkCollect();
+        spawnParticles(drop.x, drop.y, '#b44dff', 10, 2.5);
+      }
+    }
+
+    // Camera follows orb downward
+    camera.targetY = orb.y - H / scale * 0.3;
+    if (camera.targetY < camera.y) camera.targetY = camera.y; // Only scrolls down
+    camera.y += (camera.targetY - camera.y) * 0.06 * dt;
+
+    // Depth
+    depth = Math.max(depth, Math.floor(orb.y / 10));
+
+    // Cleanup old platforms
+    platforms = platforms.filter(p => {
+      if (p.crumble) {
+        p.crumbleTimer -= dt * 16.67;
+        if (p.crumbleTimer <= 0) return false;
+      }
+      return (now - p.born) < PLATFORM_LIFETIME;
+    });
+
+    // Cleanup far off-screen items
+    const topCull = camera.y - 400;
+    inkDrops = inkDrops.filter(d => !d.collected || d.y > topCull);
+    inkDrops = inkDrops.filter(d => d.y > topCull);
+    wallSpikes = wallSpikes.filter(s => s.y + s.height > topCull);
+    windZones = windZones.filter(w => w.y + w.h > topCull);
+
+    // Spawn ahead
+    ensureInkDrops();
+    ensureHazards();
+
+    // Particles
+    particles = particles.filter(p => {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.life -= p.decay * dt;
+      return p.life > 0;
+    });
+
+    // Death: orb far below camera view
+    if (orb.y > camera.y + H / scale + 250) {
+      gameOver();
+    }
+
+    // HUD
+    hudDepth.textContent = depth + 'm';
+    hudInkBar.style.width = Math.max(0, (ink / INK_MAX * 100)) + '%';
+    hudStrokes.textContent = 'STROKES: ' + strokeCount;
+  }
+
+  // === DRAW ===
+  function draw(now) {
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    // Background
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle radial glow
+    const grd = ctx.createRadialGradient(W / 2, H * 0.3, 0, W / 2, H * 0.3, W * 0.8);
+    grd.addColorStop(0, 'rgba(0,240,255,0.025)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    const grd2 = ctx.createRadialGradient(W * 0.8, H * 0.8, 0, W * 0.8, H * 0.8, W * 0.5);
+    grd2.addColorStop(0, 'rgba(255,45,123,0.02)');
+    grd2.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+
+    // World transform
+    ctx.save();
+    ctx.translate(offsetX, 0);
+    ctx.scale(scale, scale);
+    ctx.translate(0, -camera.y);
+
+    const viewTop = camera.y - 50;
+    const viewBottom = camera.y + H / scale + 50;
+
+    // Depth markers
+    const startMark = Math.floor(viewTop / 100) * 100;
+    for (let d = startMark; d < viewBottom; d += 100) {
+      if (d < 0) continue;
+      ctx.globalAlpha = 0.12;
+      ctx.strokeStyle = '#4a4a6a';
+      ctx.setLineDash([4, 10]);
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(0, d);
+      ctx.lineTo(WORLD_WIDTH, d);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '10px Rajdhani, sans-serif';
+      ctx.fillStyle = '#4a4a6a';
+      ctx.fillText(Math.floor(d / 10) + 'm', 6, d - 4);
+      ctx.globalAlpha = 1;
+    }
+
+    // Wall boundaries
+    ctx.strokeStyle = 'rgba(0,240,255,0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, viewTop);
+    ctx.lineTo(0, viewBottom);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(WORLD_WIDTH, viewTop);
+    ctx.lineTo(WORLD_WIDTH, viewBottom);
+    ctx.stroke();
+
+    // Wall spikes
+    for (const sp of wallSpikes) {
+      if (sp.y + sp.height < viewTop || sp.y > viewBottom) continue;
+      ctx.fillStyle = 'rgba(255,45,123,0.5)';
+      ctx.shadowColor = '#ff2d7b';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      if (sp.side === 'left') {
+        ctx.moveTo(0, sp.y);
+        ctx.lineTo(sp.width, sp.y + sp.height / 2);
+        ctx.lineTo(0, sp.y + sp.height);
+      } else {
+        ctx.moveTo(WORLD_WIDTH, sp.y);
+        ctx.lineTo(WORLD_WIDTH - sp.width, sp.y + sp.height / 2);
+        ctx.lineTo(WORLD_WIDTH, sp.y + sp.height);
+      }
+      ctx.closePath();
+      ctx.fill();
+      // Spike edge glow
+      ctx.strokeStyle = 'rgba(255,45,123,0.8)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    // Wind zones
+    for (const wz of windZones) {
+      if (wz.y + wz.h < viewTop || wz.y > viewBottom) continue;
+      const t = now / 1000 + wz.phase;
+      ctx.globalAlpha = 0.08 + 0.04 * Math.sin(t * 3);
+      ctx.fillStyle = 'rgba(255,140,0,0.25)';
+      // Rounded rect feel
+      ctx.beginPath();
+      const rr = 8;
+      ctx.moveTo(wz.x + rr, wz.y);
+      ctx.lineTo(wz.x + wz.w - rr, wz.y);
+      ctx.quadraticCurveTo(wz.x + wz.w, wz.y, wz.x + wz.w, wz.y + rr);
+      ctx.lineTo(wz.x + wz.w, wz.y + wz.h - rr);
+      ctx.quadraticCurveTo(wz.x + wz.w, wz.y + wz.h, wz.x + wz.w - rr, wz.y + wz.h);
+      ctx.lineTo(wz.x + rr, wz.y + wz.h);
+      ctx.quadraticCurveTo(wz.x, wz.y + wz.h, wz.x, wz.y + wz.h - rr);
+      ctx.lineTo(wz.x, wz.y + rr);
+      ctx.quadraticCurveTo(wz.x, wz.y, wz.x + rr, wz.y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Animated wind arrows
+      ctx.globalAlpha = 0.35 + 0.15 * Math.sin(t * 2);
+      ctx.strokeStyle = 'rgba(255,140,0,0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      for (let row = 0; row < 3; row++) {
+        const baseY = wz.y + wz.h * (0.25 + row * 0.25);
+        const offset = ((t * 0.5 * wz.dir + row * 0.3) % 1 + 1) % 1;
+        const ax = wz.x + offset * wz.w;
+        ctx.beginPath();
+        ctx.moveTo(ax - wz.dir * 8, baseY);
+        ctx.lineTo(ax + wz.dir * 8, baseY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(ax + wz.dir * 8, baseY);
+        ctx.lineTo(ax + wz.dir * 4, baseY - 3);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(ax + wz.dir * 8, baseY);
+        ctx.lineTo(ax + wz.dir * 4, baseY + 3);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.lineCap = 'butt';
+    }
+
+    // Platforms
+    for (const p of platforms) {
+      const age = now - p.born;
+      if (age > PLATFORM_LIFETIME) continue;
+      let alpha = 1;
+      if (age > PLATFORM_FADE_START) {
+        alpha = 1 - (age - PLATFORM_FADE_START) / (PLATFORM_LIFETIME - PLATFORM_FADE_START);
+      }
+      if (p.crumble && p.crumbleTimer > 0) {
+        alpha *= Math.min(1, p.crumbleTimer / 200);
+        // Crumble jitter
+        ctx.save();
+        ctx.translate((Math.random() - 0.5) * 3 * (1 - p.crumbleTimer / 400), (Math.random() - 0.5) * 3 * (1 - p.crumbleTimer / 400));
+      }
+      alpha = Math.max(0, Math.min(1, alpha));
+
+      ctx.globalAlpha = alpha;
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 10 * alpha;
+
+      // Stable sketchy lines
+      for (let j = 0; j < p.sketchy.length; j++) {
+        const s = p.sketchy[j];
+        ctx.beginPath();
+        ctx.moveTo(p.x1 + s.ox1, p.y1 + s.oy1);
+        ctx.lineTo(p.x2 + s.ox2, p.y2 + s.oy2);
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+
+      // Endpoint dots for hand-drawn feel
+      ctx.fillStyle = '#00f0ff';
+      ctx.globalAlpha = alpha * 0.6;
+      ctx.beginPath();
+      ctx.arc(p.x1, p.y1, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x2, p.y2, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = 1;
+
+      if (p.crumble && p.crumbleTimer > 0) {
+        ctx.restore();
+      }
+    }
+
+    // Draw preview line
+    if (isDrawing && drawStart && drawCurrent) {
+      const dx = drawCurrent.x - drawStart.x;
+      const dy = drawCurrent.y - drawStart.y;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const cost = len * INK_COST_PER_PX;
+      const canAfford = ink >= cost && len >= MIN_LINE_LENGTH;
+
+      ctx.globalAlpha = 0.45;
+      ctx.setLineDash([5, 7]);
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = canAfford ? '#00f0ff' : '#ff2d7b';
+      ctx.shadowColor = canAfford ? '#00f0ff' : '#ff2d7b';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.moveTo(drawStart.x, drawStart.y);
+      ctx.lineTo(drawCurrent.x, drawCurrent.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.shadowBlur = 0;
+
+      // Show ink cost
+      if (len > 40) {
+        const midX = (drawStart.x + drawCurrent.x) / 2;
+        const midY = (drawStart.y + drawCurrent.y) / 2 - 12;
+        ctx.font = '700 11px Orbitron, monospace';
+        ctx.fillStyle = canAfford ? 'rgba(0,240,255,0.7)' : 'rgba(255,45,123,0.7)';
+        ctx.textAlign = 'center';
+        ctx.fillText('-' + Math.ceil(cost), midX, midY);
+        ctx.textAlign = 'start';
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Ink drops
+    for (const drop of inkDrops) {
+      if (drop.collected) continue;
+      if (drop.y < viewTop || drop.y > viewBottom) continue;
+      const bob = Math.sin(now / 700 + drop.phase) * 5;
+      const ix = drop.x;
+      const iy = drop.y + bob;
+
+      // Glow
+      ctx.shadowColor = '#b44dff';
+      ctx.shadowBlur = 14;
+      ctx.globalAlpha = 0.7 + 0.15 * Math.sin(now / 400 + drop.phase);
+      ctx.fillStyle = '#b44dff';
+
+      // Teardrop
+      ctx.beginPath();
+      ctx.arc(ix, iy + 3, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(ix - 4, iy + 1);
+      ctx.quadraticCurveTo(ix, iy - 10, ix + 4, iy + 1);
+      ctx.fill();
+
+      // Inner highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(ix - 1, iy, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+
+    // Orb trail
+    for (let i = 0; i < orb.trail.length; i++) {
+      const t = orb.trail[i];
+      const a = (i / orb.trail.length) * 0.15;
+      ctx.globalAlpha = a;
+      ctx.fillStyle = '#00f0ff';
+      const s = (i / orb.trail.length) * ORB_RADIUS * 0.6;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, s, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Orb
+    const sqX = 1 + (1 - orb.squish) * 0.5;
+    const sqY = orb.squish;
+    ctx.save();
+    ctx.translate(orb.x, orb.y);
+    ctx.scale(sqX, sqY);
+
+    // Outer glow
+    const orbGrd = ctx.createRadialGradient(0, 0, 0, 0, 0, ORB_RADIUS * 2.5);
+    orbGrd.addColorStop(0, 'rgba(0,240,255,0.35)');
+    orbGrd.addColorStop(0.4, 'rgba(0,240,255,0.08)');
+    orbGrd.addColorStop(1, 'transparent');
+    ctx.fillStyle = orbGrd;
+    ctx.fillRect(-ORB_RADIUS * 3, -ORB_RADIUS * 3, ORB_RADIUS * 6, ORB_RADIUS * 6);
+
+    // Core
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 22;
+    ctx.beginPath();
+    ctx.arc(0, 0, ORB_RADIUS, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner ring
+    ctx.strokeStyle = 'rgba(0,240,255,0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(0, 0, ORB_RADIUS * 0.65, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Highlight
+    ctx.fillStyle = 'rgba(0,240,255,0.25)';
+    ctx.beginPath();
+    ctx.arc(-2, -3, ORB_RADIUS * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+
+    // Particles
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+
+    ctx.restore(); // world transform
+    ctx.restore(); // dpr scale
+  }
+
+  // === IDLE DRAW (start screen) ===
+  function drawIdle(now) {
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+
+    // Gradient bg
+    const g1 = ctx.createRadialGradient(W / 2, H * 0.35, 0, W / 2, H * 0.35, W * 0.7);
+    g1.addColorStop(0, 'rgba(0,240,255,0.04)');
+    g1.addColorStop(1, 'transparent');
+    ctx.fillStyle = g1;
+    ctx.fillRect(0, 0, W, H);
+
+    // Floating orb
+    const bobY = H * 0.42 + Math.sin(now / 900) * 18;
+
+    // Trail dots
+    for (let i = 0; i < 6; i++) {
+      const prevBob = H * 0.42 + Math.sin((now - i * 60) / 900) * 18;
+      const trailX = W / 2 + Math.sin((now - i * 80) / 1200) * 3;
+      ctx.globalAlpha = 0.05 * (6 - i) / 6;
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(trailX, prevBob, 8 * (6 - i) / 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Orb glow
+    const orbGrd = ctx.createRadialGradient(W / 2, bobY, 0, W / 2, bobY, 35);
+    orbGrd.addColorStop(0, 'rgba(0,240,255,0.4)');
+    orbGrd.addColorStop(0.5, 'rgba(0,240,255,0.1)');
+    orbGrd.addColorStop(1, 'transparent');
+    ctx.fillStyle = orbGrd;
+    ctx.fillRect(W / 2 - 35, bobY - 35, 70, 70);
+
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 22;
+    ctx.beginPath();
+    ctx.arc(W / 2, bobY, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Animated sketchy platform lines
+    const t = now / 2500;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 4; i++) {
+      const phase = t + i * 1.2;
+      const fadeIn = (Math.sin(phase) * 0.5 + 0.5);
+      const lx = W * (0.15 + i * 0.2);
+      const ly = bobY + 55 + i * 28;
+
+      ctx.globalAlpha = 0.15 * fadeIn;
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.moveTo(lx - 35, ly + Math.sin(phase * 0.8) * 4);
+      ctx.lineTo(lx + 35, ly - Math.sin(phase * 0.5) * 4);
+      ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+
+    // Floating ink drops
+    for (let i = 0; i < 3; i++) {
+      const ix = W * (0.25 + i * 0.25) + Math.sin(now / 1200 + i * 2) * 15;
+      const iy = bobY + 120 + i * 25 + Math.sin(now / 800 + i) * 8;
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = '#b44dff';
+      ctx.shadowColor = '#b44dff';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(ix, iy + 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(ix - 3, iy);
+      ctx.quadraticCurveTo(ix, iy - 7, ix + 3, iy);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+
+    ctx.restore();
+  }
+
+  // === GAME OVER ===
+  function gameOver() {
+    if (state === 'over') return;
+    state = 'over';
+    playDeath();
+    document.body.classList.add('shake');
+    setTimeout(() => document.body.classList.remove('shake'), 250);
+
+    spawnParticles(orb.x, orb.y, '#ff2d7b', 20, 5);
+
+    const isNewBest = depth > bestDepth;
+    if (isNewBest) {
+      bestDepth = depth;
+      localStorage.setItem('doodledrop_best', bestDepth);
+    }
+
+    statDepth.textContent = depth + 'm';
+    statStrokes.textContent = strokeCount;
+    statBest.textContent = bestDepth + 'm';
+
+    if (isNewBest) {
+      newBestLabel.classList.remove('hidden');
+    } else {
+      newBestLabel.classList.add('hidden');
+    }
+
+    hud.style.display = 'none';
+
+    // Slight delay before showing game over to let the death feel impactful
+    setTimeout(() => {
+      if (state === 'over') gameOverScreen.classList.remove('hidden');
+    }, 400);
+  }
+
+  // === SHARE ===
+  function shareResult() {
+    const text = `\u270f\ufe0f DOODLE DROP\nDepth: ${depth}m\nInk used: ${strokeCount} strokes\nEvery platform is your creation`;
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => copyToClipboard(text));
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      copiedToast.classList.add('show');
+      setTimeout(() => copiedToast.classList.remove('show'), 2000);
+    }).catch(() => {
+      // Fallback for older browsers
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      copiedToast.classList.add('show');
+      setTimeout(() => copiedToast.classList.remove('show'), 2000);
+    });
+  }
+
+  // === START / RESTART ===
+  function startGame() {
+    ensureAudio();
+    initGame();
+    state = 'playing';
+    startScreen.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+    hud.style.display = 'block';
+    lastTime = performance.now();
+  }
+
+  btnStart.addEventListener('click', startGame);
+  btnRestart.addEventListener('click', startGame);
+  btnShare.addEventListener('click', shareResult);
+
+  // === MAIN LOOP ===
+  function loop(now) {
+    requestAnimationFrame(loop);
+
+    if (state === 'playing') {
+      if (!lastTime) lastTime = now;
+      let dt = (now - lastTime) / 16.67;
+      lastTime = now;
+      if (dt > 4) dt = 4;
+      update(dt, now);
+      draw(now);
+    } else if (state === 'start') {
+      drawIdle(now);
+    } else if (state === 'over') {
+      draw(now);
+    }
+  }
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
