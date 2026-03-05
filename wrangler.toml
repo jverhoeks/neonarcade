@@ -1,0 +1,9 @@
+name = "raspy-glade-355f"
+compatibility_date = "2026-03-05"
+
+routes = [
+  { pattern = "neonarcade.net/*", zone_name = "neonarcade.net" }
+]
+
+[assets]
+directory = "./"

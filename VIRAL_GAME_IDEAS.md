@@ -211,3 +211,111 @@ Based on: build speed × viral potential × uniqueness
 7. **PAC-MAN AMNESIA** — Strong concept, horror-meets-nostalgia hook
 
 *Build one per day. Test each for 24h. Double down on whatever gets shared.*
+
+---
+
+# WAVE 2 IDEAS — Physics, Creative, Illusion, Time, Meta
+
+### TRUECOLOR
+**Type:** Illusion / perception | **Build:** 1/5
+Match colors while the background shifts constantly, exploiting simultaneous contrast illusions. Your eyes lie. Score reveals how badly.
+**Viral:** "I have a design degree and scored 43/100. My eyes are liars."
+
+### POUR
+**Type:** Physics / fluid sim | **Build:** 2/5
+Tilt to pour colored particle-fluid into target containers. Obstacles redirect your flow. Overfill = beautiful splatter art. Every failure becomes a unique abstract painting.
+**Viral:** Splatter patterns are screenshot-worthy generative art.
+
+### RIFFLOOP
+**Type:** Creative / generative music | **Build:** 2/5
+Place colored note-pads on screen. A bouncing dot hits them to play tones. Over time, the path creates a repeating musical loop. 20 pads max.
+**Viral:** People screen-record their accidental lo-fi beats. Hypnotic visual + audio loops.
+
+### BLOOMFIELD
+**Type:** Creative / generative art | **Build:** 2/5
+Tap to plant seeds. Each grows into procedural neon flowers. Nearby taps bend stems toward each other. Limited seeds = real strategy. Score based on beauty heuristic.
+**Viral:** Every garden is unique neon art. Screenshots look like prints.
+
+### CURFEW
+**Type:** Meta / fourth-wall | **Build:** 2/5
+Game reads your system clock. Noon = bright, easy. Midnight = nightmare mode. 3AM = taunting messages. 5-6AM = mythical sunrise levels. Difficulty scales with real time of day.
+**Viral:** "Beat level 5 at 3:22 AM in nightmare mode. The game called me 'unhinged'."
+
+### RAGDOLL THRONE
+**Type:** Physics / ragdoll | **Build:** 3/5
+Floppy ragdoll character tries to reach a throne. Fling limbs independently to climb obstacle course. 30-second attempts. Comedy of control.
+**Viral:** Pretzel-pose screenshots. Gap between intent and result = comedy gold.
+
+### ECHO RUSH
+**Type:** Time manipulation / platformer | **Build:** 3/5
+Side-scroller where you drop "echoes" that replay your last 5 seconds. Echoes hold switches, distract enemies, act as platforms. 3 echoes per level.
+**Viral:** All echoes synchronized = conducting an orchestra of yourself.
+
+### HALFLIFE (Time)
+**Type:** Time manipulation / platformer | **Build:** 3/5
+Everything has a decay timer. Donate seconds from YOUR life to keep platforms/items alive. Your timer = your health. Strategic time sacrifice.
+**Viral:** "Finished with 0.3 seconds left on my life."
+
+### ESCHERLOCK
+**Type:** Illusion / impossible geometry | **Build:** 4/5
+Navigate Escher-inspired impossible geometry. Rotate 2D perspective to change platform connections. Staircases loop, doorways connect contradictory spaces.
+**Viral:** Impossible geometry screenshots. "Find the path" challenges.
+
+### WINDOWPANE
+**Type:** Meta / browser mechanic | **Build:** 4/5
+Character walks along browser window edges. Resize the window to reshape the level. Shrink to make gaps jumpable. Stretch to reach high items. Desktop only.
+**Viral:** Screen recordings of frantically resizing browser windows.
+
+---
+
+# WAVE 2 IDEAS — Social, Competitive, Daily Ritual
+
+### MIMIC
+**Type:** Social prediction | **Build:** 2/5
+Answer 10 preference questions. Send link to friend who answers AS YOU. Reveal how well they know you. Mutual scoring.
+**Viral:** "How well do you ACTUALLY know me?" — deeply personal, relationship flex/roast.
+
+### ECHO CHAMBER (Social)
+**Type:** Daily opinion game | **Build:** 2/5
+5 daily hot takes ("Cereal is soup"). Agree or disagree. See crowd percentages. Get Echo Score (how mainstream you are).
+**Viral:** Hot takes are designed for arguments. Echo/contrarian label = identity badge.
+
+### VETO
+**Type:** Bracket / async 2P | **Build:** 2/5
+16-item bracket (movies, foods, etc.). Two players independently eliminate to a winner. One VETO each. Reveal agreements/disagreements + compatibility score.
+**Viral:** "Do we have the same taste?" — bracket debates are endlessly engaging.
+
+### SPLIT SECOND
+**Type:** Daily visual memory | **Build:** 2/5
+10 neon images flashed for 0.3 seconds each. Then 5 questions about what you saw. Tests attention and visual memory. Same sequence daily.
+**Viral:** Superpower test. Streak tracking. 5/5 = brag, 1/5 = self-deprecating humor.
+
+### FREQUENCY
+**Type:** Daily audio matching | **Build:** 2/5
+Match hidden musical tones by sliding a frequency dial. 5 tones per day. Scored by Hz deviation. Musicians obsess, non-musicians shocked.
+**Viral:** "I have better ears than you." Low Hz scores = bragging rights.
+
+### CHROMASELF
+**Type:** Personality quiz / daily | **Build:** 2/5
+12 aesthetic preference questions generate a unique 4x4 color grid + poetic title. Compare % match with friends.
+**Viral:** Beautiful color grids in text messages. "What's YOUR grid?"
+
+### DRIFT
+**Type:** Daily drawing / social | **Build:** 3/5
+30 seconds to draw the daily prompt on 16x16 pixel grid. See everyone's drawings. Score by similarity to crowd consensus. Herd vs Stray.
+**Viral:** "What did YOU see when you read 'loneliness'?" Emotional prompts + tiny pixel art.
+
+### THREADWEAVE
+**Type:** Cooperative chain / async | **Build:** 3/5
+Visual telephone — draw 8x8 pixel art from a caption, write new caption. Chain through 6 players. Reveal full mutation at end.
+**Viral:** Chain REQUIRES forwarding. Reveal is always hilarious.
+
+### LIGHTHOUSE
+**Type:** Cooperative 2P real-time | **Build:** 4/5
+One player lost at sea (fog of war). Other is lighthouse (sees full map, can only pulse direction). Navigate to harbor together.
+**Viral:** "Play this WITH me." Asymmetric info = hilarious miscommunication stories.
+
+### KINGMAKER
+**Type:** Tournament / 8P async | **Build:** 4/5
+8-player bracket. Eliminated players become Kingmakers who boost remaining players. Micro-challenges per round. Full tournament in 5 min.
+**Viral:** "Get the group chat in here." Winners share crowns.

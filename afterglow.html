@@ -225,33 +225,19 @@ let lightCanvas = null, lightCtx = null;
 // ---- Audio ----
 let audioCtx = null;
 let masterGain = null;
-let humOsc = null;
-let humGain = null;
 
 function initAudio() {
   if (audioCtx) return;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     masterGain = audioCtx.createGain();
-    masterGain.gain.value = 0.25;
+    masterGain.gain.value = 0.15;
     masterGain.connect(audioCtx.destination);
-    humOsc = audioCtx.createOscillator();
-    humGain = audioCtx.createGain();
-    humOsc.type = 'sine';
-    humOsc.frequency.value = 60;
-    humGain.gain.value = 0;
-    humOsc.connect(humGain);
-    humGain.connect(masterGain);
-    humOsc.start();
   } catch(e) { audioCtx = null; }
 }
 
 function updateHum(danger) {
-  if (!humOsc || !audioCtx) return;
-  const freq = 60 + danger * 340;
-  const vol = 0.02 + danger * 0.22;
-  humOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
-  humGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
+  // No constant hum — only sound effects on events
 }
 
 function playDeathSound() {
@@ -485,7 +471,6 @@ function die() {
   deathTime = performance.now();
   state = 'dead';
   playDeathSound();
-  if (humGain && audioCtx) humGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.15);
 
   const timeStr = formatTime(elapsed);
   const pct = Math.round((visited.size / totalOpenCells) * 100);
