@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NONOGRAM - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+h1.title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,6vw,48px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:4px;text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(12px,2.5vw,16px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;margin-bottom:24px;text-align:center}
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.play-btn:active{transform:scale(0.97)}
+.diff-selector{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;justify-content:center}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:10px 20px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.diff-btn.selected{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.08);box-shadow:0 0 12px rgba(0,240,255,0.15)}
+.diff-btn:hover{border-color:#00f0ff;color:#00f0ff}
+.daily-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:10px 24px;border:2px solid #ffd700;background:rgba(255,215,0,0.06);color:#ffd700;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s;margin-bottom:20px;text-shadow:0 0 8px rgba(255,215,0,0.3)}
+.daily-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2);transform:scale(1.04)}
+.stats-row{display:flex;gap:24px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.stat-box{text-align:center}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:20px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+#startLB,#completeLB{width:100%;max-width:360px;margin-top:10px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:600px;padding:8px 0;margin-bottom:4px}
+.top-bar .back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:#8888aa;cursor:pointer;border:none;background:none;letter-spacing:1px;padding:6px 10px}
+.top-bar .back-btn:hover{color:#00f0ff}
+.top-bar .diff-label{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;color:#b44dff}
+.top-bar .timer{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.game-area{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;width:100%;overflow:hidden}
+.grid-wrapper{display:flex;position:relative}
+.col-clues-wrapper{display:flex;flex-direction:row;align-items:flex-end}
+.col-clue{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;font-family:'Rajdhani',sans-serif;font-weight:700;color:#8888aa;line-height:1.2}
+.col-clue span{display:block;text-align:center}
+.col-clue span.done{color:#4a4a6a;text-decoration:line-through}
+.col-clue span.error{color:#ff2d7b}
+.row-and-grid{display:flex;flex-direction:row}
+.row-clues-wrapper{display:flex;flex-direction:column}
+.row-clue{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;padding-right:4px;gap:3px;font-family:'Rajdhani',sans-serif;font-weight:700;color:#8888aa}
+.row-clue span.done{color:#4a4a6a;text-decoration:line-through}
+.row-clue span.error{color:#ff2d7b}
+.grid-container{display:grid;border:1px solid #4a4a6a;background:#12121f}
+.cell{background:rgba(255,255,255,0.02);border:1px solid rgba(74,74,106,0.3);cursor:pointer;position:relative;transition:background .1s}
+.cell:hover{background:rgba(0,240,255,0.06)}
+.cell.filled{background:#00f0ff;box-shadow:inset 0 0 6px rgba(0,240,255,0.4)}
+.cell.marked::after{content:'X';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Rajdhani',sans-serif;font-weight:700;color:#ff2d7b;text-shadow:0 0 4px rgba(255,45,123,0.4)}
+.cell.thick-right{border-right:2px solid #4a4a6a}
+.cell.thick-bottom{border-bottom:2px solid #4a4a6a}
+.cell.hint-flash{animation:hintPulse .6s ease}
+@keyframes hintPulse{0%{box-shadow:0 0 20px rgba(255,215,0,0.8)}100%{box-shadow:none}}
+.toolbar{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;padding:6px 14px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.tool-btn:hover{border-color:#00f0ff;color:#00f0ff}
+.tool-btn:disabled{opacity:0.3;cursor:default}
+.hint-count{font-size:10px;color:#ffd700;margin-left:2px}
+.mode-toggle{display:flex;gap:0;margin-top:8px}
+.mode-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;padding:8px 18px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.mode-btn:first-child{border-radius:3px 0 0 3px}
+.mode-btn:last-child{border-radius:0 3px 3px 0}
+.mode-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.08)}
+.mode-btn.active.mark-mode{border-color:#ff2d7b;color:#ff2d7b;background:rgba(255,45,123,0.08)}
+.complete-grid{display:grid;margin:12px 0;border:2px solid #00f0ff;box-shadow:0 0 20px rgba(0,240,255,0.2)}
+.complete-cell.filled{background:#00f0ff}
+.complete-cell.empty{background:#12121f}
+.stars{font-size:32px;margin:8px 0;letter-spacing:8px}
+.time-display{font-family:'Orbitron',monospace;font-weight:700;font-size:24px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.5);margin:8px 0}
+.penalty-note{font-family:'Rajdhani',sans-serif;font-size:12px;color:#ff8c00;margin-top:2px}
+.btn-row{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 28px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.share-btn:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 16px rgba(57,255,20,0.2);transform:scale(1.04)}
+.copied-msg{font-family:'Rajdhani',sans-serif;font-size:13px;color:#39ff14;margin-top:6px;opacity:0;transition:opacity .3s}
+.copied-msg.show{opacity:1}
+@keyframes screenShake{0%{transform:translate(-2px,1px)}25%{transform:translate(2px,-1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(1px,-2px)}100%{transform:translate(0,0)}}
+.shake{animation:screenShake .25s ease}
+@keyframes particleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(0)}}
+.particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9998;animation:particleFly .7s ease-out forwards}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+<h1 class="title">NONOGRAM</h1>
+<div class="subtitle">REVEAL THE HIDDEN PATTERN</div>
+
+<div class="diff-selector">
+<button class="diff-btn selected" data-size="5">5 x 5</button>
+<button class="diff-btn" data-size="10">10 x 10</button>
+<button class="diff-btn" data-size="15">15 x 15</button>
+</div>
+
+<button class="daily-btn" id="dailyBtn">DAILY PUZZLE</button>
+
+<div class="stats-row">
+<div class="stat-box"><div class="stat-val" id="statWins">0</div><div class="stat-label">WINS</div></div>
+<div class="stat-box"><div class="stat-val" id="statBest5">--:--</div><div class="stat-label">BEST 5x5</div></div>
+<div class="stat-box"><div class="stat-val" id="statBest10">--:--</div><div class="stat-label">BEST 10x10</div></div>
+<div class="stat-box"><div class="stat-val" id="statBest15">--:--</div><div class="stat-label">BEST 15x15</div></div>
+</div>
+
+<button class="play-btn" id="startBtn">START</button>
+<div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+<div class="top-bar">
+<button class="back-btn" id="backBtn">BACK</button>
+<span class="diff-label" id="diffLabel">5 x 5</span>
+<span class="timer" id="timer">00:00</span>
+</div>
+<div class="game-area" id="gameArea">
+<div class="col-clues-wrapper" id="colClues"></div>
+<div class="row-and-grid">
+<div class="row-clues-wrapper" id="rowClues"></div>
+<div class="grid-container" id="grid"></div>
+</div>
+</div>
+<div class="mode-toggle">
+<button class="mode-btn active" id="modeFill">FILL</button>
+<button class="mode-btn" id="modeMark">MARK X</button>
+</div>
+<div class="toolbar">
+<button class="tool-btn" id="undoBtn" disabled>UNDO</button>
+<button class="tool-btn" id="redoBtn" disabled>REDO</button>
+<button class="tool-btn" id="hintBtn">HINT <span class="hint-count" id="hintCount">3</span></button>
+<button class="tool-btn" id="clearBtn">CLEAR</button>
+</div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+<h1 class="title" style="font-size:clamp(24px,5vw,40px)">SOLVED</h1>
+<div class="stars" id="stars"></div>
+<div class="time-display" id="finalTime">00:00</div>
+<div class="penalty-note" id="penaltyNote"></div>
+<div class="complete-grid" id="completeGrid"></div>
+<div class="btn-row">
+<button class="share-btn" id="shareBtn">SHARE</button>
+<button class="play-btn" id="playAgainBtn">PLAY AGAIN</button>
+</div>
+<div class="copied-msg" id="copiedMsg">COPIED TO CLIPBOARD</div>
+<div id="completeLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ===== AUDIO =====
+var audioCtx = null;
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol){
+  try{
+    var ctx = getAudio();
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = type || 'square';
+    o.frequency.value = freq;
+    g.gain.value = vol || 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + dur);
+  }catch(e){}
+}
+function sndFill(){ playTone(440, 0.05, 'square', 0.06); }
+function sndMark(){ playTone(220, 0.03, 'triangle', 0.05); }
+function sndUndo(){ playTone(300, 0.04, 'sine', 0.04); }
+function sndRowComplete(){
+  [523, 659, 784].forEach(function(f, i){
+    setTimeout(function(){ playTone(f, 0.12, 'square', 0.06); }, i * 80);
+  });
+}
+function sndVictory(){
+  [523, 659, 784, 1047].forEach(function(f, i){
+    setTimeout(function(){ playTone(f, 0.2, 'square', 0.08); }, i * 120);
+  });
+}
+
+// ===== PARTICLES =====
+function spawnParticles(x, y, color, count){
+  for(var i = 0; i < (count || 10); i++){
+    var p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.background = color;
+    var angle = Math.random() * Math.PI * 2;
+    var dist = 30 + Math.random() * 60;
+    p.style.setProperty('--px', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--py', Math.sin(angle) * dist + 'px');
+    document.body.appendChild(p);
+    setTimeout((function(el){ return function(){ el.remove(); }; })(p), 700);
+  }
+}
+
+// ===== STATE =====
+var selectedSize = 5;
+var solution = [];
+var playerGrid = [];
+var rowClues = [];
+var colClues = [];
+var undoStack = [];
+var redoStack = [];
+var hintsLeft = 3;
+var hintPenalty = 0;
+var timerStart = 0;
+var timerInterval = null;
+var elapsedTime = 0;
+var gameActive = false;
+var inputMode = 'fill';
+var isDaily = false;
+var longPressTimer = null;
+var longPressFired = false;
+var dragMode = null;
+var dragCells = [];
+var completedRows = {};
+var completedCols = {};
+
+// ===== DOM =====
+var startScreen = document.getElementById('startScreen');
+var gameScreen = document.getElementById('gameScreen');
+var completeScreen = document.getElementById('completeScreen');
+var gridEl = document.getElementById('grid');
+var rowCluesEl = document.getElementById('rowClues');
+var colCluesEl = document.getElementById('colClues');
+var timerEl = document.getElementById('timer');
+var diffLabel = document.getElementById('diffLabel');
+var hintCountEl = document.getElementById('hintCount');
+
+// ===== NEON INIT =====
+var neonFormatScore = function(s){
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+function neonInitForSize(n){
+  if(typeof Neon !== 'undefined'){
+    Neon.init({
+      game: 'nonogram',
+      mode: 'low',
+      key: 'neonarcade_neonmind_nonogram_scores_' + n,
+      formatScore: neonFormatScore
+    });
+  }
+}
+neonInitForSize(5);
+
+// ===== SCORE STORAGE =====
+var STATS_KEY = 'neonarcade_nonogram_stats';
+function loadStats(){
+  try{ return JSON.parse(localStorage.getItem(STATS_KEY)) || { wins: 0, best: {} }; }
+  catch(e){ return { wins: 0, best: {} }; }
+}
+function saveStats(stats){ localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }
+function updateStatsDisplay(){
+  var stats = loadStats();
+  document.getElementById('statWins').textContent = stats.wins || 0;
+  [5, 10, 15].forEach(function(n){
+    var el = document.getElementById('statBest' + n);
+    if(stats.best && stats.best[n] != null){
+      el.textContent = neonFormatScore(stats.best[n]);
+    } else {
+      el.textContent = '--:--';
+    }
+  });
+}
+
+// ===== PUZZLE GENERATION =====
+function seededRandom(seed){
+  var s = seed;
+  return function(){
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+function calcClues(line){
+  var clues = [];
+  var count = 0;
+  for(var i = 0; i < line.length; i++){
+    if(line[i]){
+      count++;
+    } else {
+      if(count > 0) clues.push(count);
+      count = 0;
+    }
+  }
+  if(count > 0) clues.push(count);
+  if(clues.length === 0) clues.push(0);
+  return clues;
+}
+
+function getRowClues(sol, n){
+  var clues = [];
+  for(var r = 0; r < n; r++){
+    clues.push(calcClues(sol[r]));
+  }
+  return clues;
+}
+
+function getColClues(sol, n){
+  var clues = [];
+  for(var c = 0; c < n; c++){
+    var col = [];
+    for(var r = 0; r < n; r++) col.push(sol[r][c]);
+    clues.push(calcClues(col));
+  }
+  return clues;
+}
+
+// Line solver for uniqueness check
+function generatePermutations(clueArr, length){
+  if(clueArr.length === 1 && clueArr[0] === 0){
+    return [new Array(length).fill(0)];
+  }
+  var results = [];
+  function place(idx, pos, line){
+    if(idx === clueArr.length){
+      var l = line.slice();
+      for(var i = pos; i < length; i++) l[i] = 0;
+      results.push(l);
+      return;
+    }
+    var remaining = 0;
+    for(var k = idx; k < clueArr.length; k++){
+      remaining += clueArr[k];
+      if(k < clueArr.length - 1) remaining += 1;
+    }
+    var maxStart = length - remaining;
+    for(var start = pos; start <= maxStart; start++){
+      var l = line.slice();
+      for(var i = pos; i < start; i++) l[i] = 0;
+      for(var i = start; i < start + clueArr[idx]; i++) l[i] = 1;
+      if(start + clueArr[idx] < length && idx < clueArr.length - 1){
+        l[start + clueArr[idx]] = 0;
+        place(idx + 1, start + clueArr[idx] + 1, l);
+      } else {
+        place(idx + 1, start + clueArr[idx], l);
+      }
+    }
+  }
+  place(0, 0, new Array(length).fill(0));
+  return results;
+}
+
+function solveLine(clueArr, known){
+  var n = known.length;
+  var perms = generatePermutations(clueArr, n);
+  var valid = perms.filter(function(perm){
+    for(var i = 0; i < n; i++){
+      if(known[i] === 1 && perm[i] !== 1) return false;
+      if(known[i] === 0 && perm[i] !== 0) return false;
+    }
+    return true;
+  });
+  if(valid.length === 0) return null;
+  var result = new Array(n).fill(-1);
+  for(var i = 0; i < n; i++){
+    var allSame = true;
+    var val = valid[0][i];
+    for(var j = 1; j < valid.length; j++){
+      if(valid[j][i] !== val){ allSame = false; break; }
+    }
+    if(allSame) result[i] = val;
+  }
+  return result;
+}
+
+function solveWithLineSolver(rClues, cClues, n){
+  var grid = [];
+  for(var r = 0; r < n; r++){
+    grid.push(new Array(n).fill(-1));
+  }
+  var changed = true;
+  var iters = 0;
+  while(changed && iters < 100){
+    changed = false;
+    iters++;
+    for(var r = 0; r < n; r++){
+      var known = grid[r].slice();
+      var result = solveLine(rClues[r], known);
+      if(!result) return null;
+      for(var c = 0; c < n; c++){
+        if(grid[r][c] === -1 && result[c] !== -1){
+          grid[r][c] = result[c];
+          changed = true;
+        }
+      }
+    }
+    for(var c = 0; c < n; c++){
+      var known = [];
+      for(var r = 0; r < n; r++) known.push(grid[r][c]);
+      var result = solveLine(cClues[c], known);
+      if(!result) return null;
+      for(var r = 0; r < n; r++){
+        if(grid[r][c] === -1 && result[r] !== -1){
+          grid[r][c] = result[r];
+          changed = true;
+        }
+      }
+    }
+  }
+  return grid;
+}
+
+function isFullySolved(grid, n){
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(grid[r][c] === -1) return false;
+    }
+  }
+  return true;
+}
+
+function hasUniqueSolution(rClues, cClues, n){
+  var grid = solveWithLineSolver(rClues, cClues, n);
+  if(!grid) return false;
+  return isFullySolved(grid, n);
+}
+
+function generatePuzzle(n, rng){
+  var rand = rng || Math.random.bind(Math);
+  var maxAttempts = 200;
+  for(var attempt = 0; attempt < maxAttempts; attempt++){
+    var sol = [];
+    var targetDensity = 0.35 + rand() * 0.3;
+    for(var r = 0; r < n; r++){
+      sol.push([]);
+      for(var c = 0; c < n; c++){
+        sol[r].push(rand() < targetDensity ? 1 : 0);
+      }
+    }
+    var valid = true;
+    for(var r = 0; r < n; r++){
+      var hasCell = false;
+      for(var c = 0; c < n; c++) if(sol[r][c]) hasCell = true;
+      if(!hasCell){ valid = false; break; }
+    }
+    if(!valid) continue;
+    for(var c = 0; c < n; c++){
+      var hasCell = false;
+      for(var r = 0; r < n; r++) if(sol[r][c]) hasCell = true;
+      if(!hasCell){ valid = false; break; }
+    }
+    if(!valid) continue;
+
+    var rc = getRowClues(sol, n);
+    var cc = getColClues(sol, n);
+
+    if(n <= 10){
+      if(hasUniqueSolution(rc, cc, n)){
+        return { solution: sol, rowClues: rc, colClues: cc };
+      }
+    } else {
+      var grid = solveWithLineSolver(rc, cc, n);
+      if(grid){
+        var solved = 0;
+        for(var rr = 0; rr < n; rr++)
+          for(var cc2 = 0; cc2 < n; cc2++)
+            if(grid[rr][cc2] !== -1) solved++;
+        if(solved >= n * n * 0.7){
+          return { solution: sol, rowClues: rc, colClues: cc };
+        }
+      }
+    }
+  }
+  // Fallback
+  var sol = [];
+  for(var r = 0; r < n; r++){
+    sol.push([]);
+    for(var c = 0; c < n; c++){
+      sol[r].push(rand() < 0.45 ? 1 : 0);
+    }
+  }
+  return { solution: sol, rowClues: getRowClues(sol, n), colClues: getColClues(sol, n) };
+}
+
+function getDailySeed(){
+  var d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+// ===== RENDERING =====
+function showScreen(id){
+  [startScreen, gameScreen, completeScreen].forEach(function(s){
+    s.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  if(id === 'gameScreen'){
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = 'auto';
+  }
+}
+
+function computeSizes(n){
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  // Estimate clue area size
+  var maxClueChars = 0;
+  for(var r = 0; r < n; r++){
+    var chars = rowClues[r].join(' ').length;
+    if(chars > maxClueChars) maxClueChars = chars;
+  }
+  var clueFont = n <= 5 ? 14 : (n <= 10 ? 11 : 9);
+  var rowClueWidth = Math.max(30, maxClueChars * clueFont * 0.55 + 10);
+  rowClueWidth = Math.min(rowClueWidth, vw * 0.25);
+
+  var maxColClueLen = 0;
+  for(var c = 0; c < n; c++){
+    if(colClues[c].length > maxColClueLen) maxColClueLen = colClues[c].length;
+  }
+  var colClueHeight = maxColClueLen * (clueFont * 1.2 + 2) + 4;
+
+  var availW = vw - rowClueWidth - 24;
+  var availH = vh - colClueHeight - 140;
+  var cellSize = Math.floor(Math.min(availW / n, availH / n));
+  cellSize = Math.max(cellSize, 18);
+  cellSize = Math.min(cellSize, 50);
+  var markFont = n <= 5 ? 14 : (n <= 10 ? 10 : 8);
+  return { cellSize: cellSize, clueFont: clueFont, markFont: markFont, rowClueWidth: rowClueWidth };
+}
+
+function buildGrid(n){
+  var sizes = computeSizes(n);
+  var cs = sizes.cellSize;
+
+  // Column clues
+  while(colCluesEl.firstChild) colCluesEl.removeChild(colCluesEl.firstChild);
+  colCluesEl.style.marginLeft = sizes.rowClueWidth + 'px';
+  for(var c = 0; c < n; c++){
+    var div = document.createElement('div');
+    div.className = 'col-clue';
+    div.setAttribute('data-col', c);
+    div.style.width = cs + 'px';
+    div.style.fontSize = sizes.clueFont + 'px';
+    colClues[c].forEach(function(num){
+      var s = document.createElement('span');
+      s.textContent = num;
+      div.appendChild(s);
+    });
+    colCluesEl.appendChild(div);
+  }
+
+  // Row clues
+  while(rowCluesEl.firstChild) rowCluesEl.removeChild(rowCluesEl.firstChild);
+  rowCluesEl.style.width = sizes.rowClueWidth + 'px';
+  for(var r = 0; r < n; r++){
+    var div = document.createElement('div');
+    div.className = 'row-clue';
+    div.setAttribute('data-row', r);
+    div.style.height = cs + 'px';
+    div.style.fontSize = sizes.clueFont + 'px';
+    rowClues[r].forEach(function(num){
+      var s = document.createElement('span');
+      s.textContent = num;
+      div.appendChild(s);
+    });
+    rowCluesEl.appendChild(div);
+  }
+
+  // Grid
+  while(gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+  gridEl.style.gridTemplateColumns = 'repeat(' + n + ', ' + cs + 'px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + n + ', ' + cs + 'px)';
+
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.setAttribute('data-r', r);
+      cell.setAttribute('data-c', c);
+      cell.style.fontSize = sizes.markFont + 'px';
+      if(n >= 10 && c < n - 1 && (c + 1) % 5 === 0) cell.classList.add('thick-right');
+      if(n >= 10 && r < n - 1 && (r + 1) % 5 === 0) cell.classList.add('thick-bottom');
+      gridEl.appendChild(cell);
+    }
+  }
+}
+
+function updateCellDisplay(r, c){
+  var idx = r * selectedSize + c;
+  var cell = gridEl.children[idx];
+  if(!cell) return;
+  cell.classList.remove('filled', 'marked');
+  if(playerGrid[r][c] === 1) cell.classList.add('filled');
+  else if(playerGrid[r][c] === 2) cell.classList.add('marked');
+}
+
+function updateAllCells(){
+  for(var r = 0; r < selectedSize; r++){
+    for(var c = 0; c < selectedSize; c++){
+      updateCellDisplay(r, c);
+    }
+  }
+}
+
+function checkClues(){
+  var n = selectedSize;
+  var prevCompletedRows = Object.assign({}, completedRows);
+  var prevCompletedCols = Object.assign({}, completedCols);
+
+  // Check rows
+  for(var r = 0; r < n; r++){
+    var line = [];
+    for(var c = 0; c < n; c++) line.push(playerGrid[r][c] === 1 ? 1 : 0);
+    var actual = calcClues(line);
+    var clueEl = rowCluesEl.children[r];
+    if(!clueEl) continue;
+    var spans = clueEl.querySelectorAll('span');
+    var filledCount = 0;
+    for(var ci = 0; ci < line.length; ci++) if(line[ci] === 1) filledCount++;
+    var targetCount = 0;
+    for(var ci = 0; ci < rowClues[r].length; ci++) if(rowClues[r][ci] > 0) targetCount += rowClues[r][ci];
+
+    var matched = actual.length === rowClues[r].length;
+    if(matched){
+      for(var ci = 0; ci < actual.length; ci++){
+        if(actual[ci] !== rowClues[r][ci]){ matched = false; break; }
+      }
+    }
+    var overfilled = filledCount > targetCount;
+    var partialDone = getPartialDone(rowClues[r], line);
+
+    completedRows[r] = matched;
+
+    for(var ci = 0; ci < spans.length; ci++){
+      spans[ci].classList.remove('done', 'error');
+      if(matched){
+        spans[ci].classList.add('done');
+      } else if(overfilled){
+        spans[ci].classList.add('error');
+      } else if(partialDone[ci]){
+        spans[ci].classList.add('done');
+      }
+    }
+  }
+
+  // Check columns
+  for(var c = 0; c < n; c++){
+    var line = [];
+    for(var r = 0; r < n; r++) line.push(playerGrid[r][c] === 1 ? 1 : 0);
+    var actual = calcClues(line);
+    var clueEl = colCluesEl.children[c];
+    if(!clueEl) continue;
+    var spans = clueEl.querySelectorAll('span');
+    var filledCount = 0;
+    for(var ci = 0; ci < line.length; ci++) if(line[ci] === 1) filledCount++;
+    var targetCount = 0;
+    for(var ci = 0; ci < colClues[c].length; ci++) if(colClues[c][ci] > 0) targetCount += colClues[c][ci];
+
+    var matched = actual.length === colClues[c].length;
+    if(matched){
+      for(var ci = 0; ci < actual.length; ci++){
+        if(actual[ci] !== colClues[c][ci]){ matched = false; break; }
+      }
+    }
+    var overfilled = filledCount > targetCount;
+    var partialDone = getPartialDone(colClues[c], line);
+
+    completedCols[c] = matched;
+
+    for(var ci = 0; ci < spans.length; ci++){
+      spans[ci].classList.remove('done', 'error');
+      if(matched){
+        spans[ci].classList.add('done');
+      } else if(overfilled){
+        spans[ci].classList.add('error');
+      } else if(partialDone[ci]){
+        spans[ci].classList.add('done');
+      }
+    }
+  }
+
+  // Play sound for newly completed rows/columns
+  for(var r = 0; r < n; r++){
+    if(completedRows[r] && !prevCompletedRows[r]) sndRowComplete();
+  }
+  for(var c = 0; c < n; c++){
+    if(completedCols[c] && !prevCompletedCols[c]) sndRowComplete();
+  }
+}
+
+function getPartialDone(clueArr, line){
+  var done = new Array(clueArr.length).fill(false);
+  if(clueArr.length === 1 && clueArr[0] === 0){
+    var anyFilled = false;
+    for(var i = 0; i < line.length; i++) if(line[i] === 1){ anyFilled = true; break; }
+    if(!anyFilled) done[0] = true;
+    return done;
+  }
+  var groups = [];
+  var count = 0;
+  var start = -1;
+  for(var i = 0; i < line.length; i++){
+    if(line[i] === 1){
+      if(count === 0) start = i;
+      count++;
+    } else {
+      if(count > 0){ groups.push({ len: count, start: start, end: i - 1 }); count = 0; }
+    }
+  }
+  if(count > 0) groups.push({ len: count, start: start, end: line.length - 1 });
+
+  for(var i = 0; i < Math.min(groups.length, clueArr.length); i++){
+    if(groups[i].len === clueArr[i]){
+      if(groups[i].end === line.length - 1 || line[groups[i].end + 1] !== 1){
+        done[i] = true;
+      }
+    } else {
+      break;
+    }
+  }
+  return done;
+}
+
+function checkWin(){
+  var n = selectedSize;
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      var expected = solution[r][c];
+      var actual = playerGrid[r][c] === 1 ? 1 : 0;
+      if(expected !== actual) return false;
+    }
+  }
+  return true;
+}
+
+// ===== ACTIONS =====
+function doAction(r, c, newVal){
+  var oldVal = playerGrid[r][c];
+  if(oldVal === newVal) return;
+  undoStack.push({ r: r, c: c, oldVal: oldVal, newVal: newVal });
+  redoStack = [];
+  playerGrid[r][c] = newVal;
+  updateCellDisplay(r, c);
+  checkClues();
+  document.getElementById('undoBtn').disabled = undoStack.length === 0;
+  document.getElementById('redoBtn').disabled = true;
+
+  if(checkWin()){
+    onWin();
+  }
+}
+
+function doBatchAction(actions){
+  var undoGroup = [];
+  for(var i = 0; i < actions.length; i++){
+    var a = actions[i];
+    var oldVal = playerGrid[a.r][a.c];
+    if(oldVal !== a.newVal){
+      undoGroup.push({ r: a.r, c: a.c, oldVal: oldVal, newVal: a.newVal });
+      playerGrid[a.r][a.c] = a.newVal;
+      updateCellDisplay(a.r, a.c);
+    }
+  }
+  if(undoGroup.length > 0){
+    undoStack.push(undoGroup);
+    redoStack = [];
+    checkClues();
+    document.getElementById('undoBtn').disabled = false;
+    document.getElementById('redoBtn').disabled = true;
+    if(checkWin()) onWin();
+  }
+}
+
+function undo(){
+  if(undoStack.length === 0) return;
+  var action = undoStack.pop();
+  sndUndo();
+  if(Array.isArray(action)){
+    var redoGroup = [];
+    for(var i = 0; i < action.length; i++){
+      var a = action[i];
+      redoGroup.push({ r: a.r, c: a.c, oldVal: a.newVal, newVal: a.oldVal });
+      playerGrid[a.r][a.c] = a.oldVal;
+      updateCellDisplay(a.r, a.c);
+    }
+    redoStack.push(redoGroup);
+  } else {
+    redoStack.push({ r: action.r, c: action.c, oldVal: action.newVal, newVal: action.oldVal });
+    playerGrid[action.r][action.c] = action.oldVal;
+    updateCellDisplay(action.r, action.c);
+  }
+  checkClues();
+  document.getElementById('undoBtn').disabled = undoStack.length === 0;
+  document.getElementById('redoBtn').disabled = redoStack.length === 0;
+}
+
+function redo(){
+  if(redoStack.length === 0) return;
+  var action = redoStack.pop();
+  sndUndo();
+  if(Array.isArray(action)){
+    var undoGroup = [];
+    for(var i = 0; i < action.length; i++){
+      var a = action[i];
+      undoGroup.push({ r: a.r, c: a.c, oldVal: a.oldVal, newVal: a.newVal });
+      playerGrid[a.r][a.c] = a.newVal;
+      updateCellDisplay(a.r, a.c);
+    }
+    undoStack.push(undoGroup);
+  } else {
+    undoStack.push({ r: action.r, c: action.c, oldVal: action.newVal, newVal: action.oldVal });
+    playerGrid[action.r][action.c] = action.newVal;
+    updateCellDisplay(action.r, action.c);
+  }
+  checkClues();
+  document.getElementById('undoBtn').disabled = undoStack.length === 0;
+  document.getElementById('redoBtn').disabled = redoStack.length === 0;
+  if(checkWin()) onWin();
+}
+
+function clearGrid(){
+  var actions = [];
+  for(var r = 0; r < selectedSize; r++){
+    for(var c = 0; c < selectedSize; c++){
+      if(playerGrid[r][c] !== 0){
+        actions.push({ r: r, c: c, newVal: 0 });
+      }
+    }
+  }
+  if(actions.length > 0) doBatchAction(actions);
+}
+
+function giveHint(){
+  if(hintsLeft <= 0 || !gameActive) return;
+  var candidates = [];
+  for(var r = 0; r < selectedSize; r++){
+    for(var c = 0; c < selectedSize; c++){
+      var expected = solution[r][c] ? 1 : 2;
+      if(playerGrid[r][c] !== expected){
+        candidates.push({ r: r, c: c, val: expected });
+      }
+    }
+  }
+  if(candidates.length === 0) return;
+  var pick = candidates[Math.floor(Math.random() * candidates.length)];
+  hintsLeft--;
+  hintPenalty += 30;
+  hintCountEl.textContent = hintsLeft;
+  if(hintsLeft <= 0) document.getElementById('hintBtn').disabled = true;
+
+  doAction(pick.r, pick.c, pick.val);
+
+  var idx = pick.r * selectedSize + pick.c;
+  var cell = gridEl.children[idx];
+  if(cell){
+    cell.classList.add('hint-flash');
+    setTimeout(function(){ cell.classList.remove('hint-flash'); }, 600);
+    var rect = cell.getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ffd700', 8);
+  }
+}
+
+// ===== TIMER =====
+function startTimer(){
+  timerStart = Date.now();
+  elapsedTime = 0;
+  timerInterval = setInterval(function(){
+    elapsedTime = Math.floor((Date.now() - timerStart) / 1000);
+    timerEl.textContent = neonFormatScore(elapsedTime);
+  }, 200);
+}
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  elapsedTime = Math.floor((Date.now() - timerStart) / 1000);
+}
+
+// ===== WIN =====
+function onWin(){
+  gameActive = false;
+  stopTimer();
+  sndVictory();
+
+  var totalTime = elapsedTime + hintPenalty;
+
+  var thresholds = {
+    5: [30, 60],
+    10: [120, 240],
+    15: [300, 600]
+  };
+  var t = thresholds[selectedSize] || [120, 240];
+  var starCount = totalTime <= t[0] ? 3 : (totalTime <= t[1] ? 2 : 1);
+
+  var stats = loadStats();
+  stats.wins = (stats.wins || 0) + 1;
+  if(!stats.best) stats.best = {};
+  if(!stats.best[selectedSize] || totalTime < stats.best[selectedSize]){
+    stats.best[selectedSize] = totalTime;
+  }
+  saveStats(stats);
+
+  var gridRect = gridEl.getBoundingClientRect();
+  spawnParticles(gridRect.left + gridRect.width / 2, gridRect.top + gridRect.height / 2, '#00f0ff', 20);
+
+  setTimeout(function(){
+    showCompleteScreen(totalTime, starCount);
+  }, 800);
+}
+
+function showCompleteScreen(totalTime, starCount){
+  showScreen('completeScreen');
+
+  var starsText = '';
+  for(var i = 0; i < 3; i++){
+    starsText += i < starCount ? '\u2B50' : '\u2606';
+  }
+  document.getElementById('stars').textContent = starsText;
+
+  document.getElementById('finalTime').textContent = neonFormatScore(totalTime);
+  if(hintPenalty > 0){
+    document.getElementById('penaltyNote').textContent = '(+' + hintPenalty + 's hint penalty)';
+  } else {
+    document.getElementById('penaltyNote').textContent = '';
+  }
+
+  var n = selectedSize;
+  var compGrid = document.getElementById('completeGrid');
+  var compCellSize = Math.min(Math.floor((window.innerWidth - 60) / n), 20);
+  compCellSize = Math.max(compCellSize, 6);
+  while(compGrid.firstChild) compGrid.removeChild(compGrid.firstChild);
+  compGrid.style.gridTemplateColumns = 'repeat(' + n + ', ' + compCellSize + 'px)';
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      var cell = document.createElement('div');
+      cell.className = 'complete-cell ' + (solution[r][c] ? 'filled' : 'empty');
+      cell.style.width = compCellSize + 'px';
+      cell.style.height = compCellSize + 'px';
+      compGrid.appendChild(cell);
+    }
+  }
+
+  if(typeof Neon !== 'undefined'){
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function(){
+      return Neon.save(totalTime);
+    }).then(function(neonResult){
+      Neon.render(document.getElementById('completeLB'));
+      if(neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5){
+        Neon.showGlobalSplash(neonResult.globalRank);
+      }
+    }).catch(function(){});
+  }
+}
+
+// ===== SHARE =====
+function buildShareText(){
+  var n = selectedSize;
+  var totalTime = elapsedTime + hintPenalty;
+  var t = { 5: [30, 60], 10: [120, 240], 15: [300, 600] };
+  var th = t[selectedSize] || [120, 240];
+  var starCount = totalTime <= th[0] ? 3 : (totalTime <= th[1] ? 2 : 1);
+  var starStr = '';
+  for(var i = 0; i < starCount; i++) starStr += '\u2B50';
+
+  var text = '\uD83D\uDFE6 NONOGRAM ' + n + 'x' + n + '\n';
+  text += '\u23F1 ' + neonFormatScore(totalTime) + ' | ' + starStr + '\n';
+
+  var step = Math.max(1, Math.floor(n / 5));
+  for(var r = 0; r < n; r += step){
+    var line = '';
+    for(var c = 0; c < n; c += step){
+      line += solution[r][c] ? '\u2B1B' : '\u2B1C';
+    }
+    text += line + '\n';
+  }
+  if(isDaily) text += 'Daily Puzzle\n';
+  text += 'neonarcade.net/neonmind';
+  return text;
+}
+
+document.getElementById('shareBtn').addEventListener('click', function(){
+  var text = buildShareText();
+  if(navigator.share){
+    navigator.share({ text: text }).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(text).then(function(){
+      var msg = document.getElementById('copiedMsg');
+      msg.classList.add('show');
+      setTimeout(function(){ msg.classList.remove('show'); }, 2000);
+    }).catch(function(){});
+  }
+});
+
+// ===== INPUT HANDLING =====
+function getCellFromEvent(e){
+  var target = e.target;
+  if(!target.classList.contains('cell')) return null;
+  return { r: parseInt(target.getAttribute('data-r')), c: parseInt(target.getAttribute('data-c')) };
+}
+
+function handleCellAction(r, c, mode){
+  if(!gameActive) return;
+  if(mode === 'fill'){
+    if(playerGrid[r][c] === 1){
+      doAction(r, c, 0);
+    } else {
+      doAction(r, c, 1);
+      sndFill();
+    }
+  } else {
+    if(playerGrid[r][c] === 2){
+      doAction(r, c, 0);
+    } else {
+      doAction(r, c, 2);
+      sndMark();
+    }
+  }
+}
+
+// Mouse events
+var mouseDown = false;
+
+gridEl.addEventListener('mousedown', function(e){
+  e.preventDefault();
+  var cell = getCellFromEvent(e);
+  if(!cell || !gameActive) return;
+  mouseDown = true;
+  var r = cell.r, c = cell.c;
+  var mode = inputMode;
+
+  if(mode === 'fill'){
+    dragMode = playerGrid[r][c] === 1 ? 'unfill' : 'fill';
+  } else {
+    dragMode = playerGrid[r][c] === 2 ? 'unmark' : 'mark';
+  }
+  dragCells = [{ r: r, c: c }];
+  handleCellAction(r, c, mode);
+});
+
+gridEl.addEventListener('mousemove', function(e){
+  if(!mouseDown || !gameActive) return;
+  var cell = getCellFromEvent(e);
+  if(!cell) return;
+  for(var i = 0; i < dragCells.length; i++){
+    if(dragCells[i].r === cell.r && dragCells[i].c === cell.c) return;
+  }
+  dragCells.push(cell);
+  var r = cell.r, c = cell.c;
+  if(dragMode === 'fill' && playerGrid[r][c] !== 1){
+    doAction(r, c, 1); sndFill();
+  } else if(dragMode === 'unfill' && playerGrid[r][c] === 1){
+    doAction(r, c, 0);
+  } else if(dragMode === 'mark' && playerGrid[r][c] !== 2){
+    doAction(r, c, 2); sndMark();
+  } else if(dragMode === 'unmark' && playerGrid[r][c] === 2){
+    doAction(r, c, 0);
+  }
+});
+
+document.addEventListener('mouseup', function(){
+  mouseDown = false;
+  dragMode = null;
+  dragCells = [];
+});
+
+// Right-click to mark
+gridEl.addEventListener('contextmenu', function(e){
+  e.preventDefault();
+  var cell = getCellFromEvent(e);
+  if(!cell || !gameActive) return;
+  handleCellAction(cell.r, cell.c, 'mark');
+});
+
+// Touch events
+var touchStartCell = null;
+var touchMoved = false;
+
+gridEl.addEventListener('touchstart', function(e){
+  e.preventDefault();
+  var touch = e.touches[0];
+  var el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if(!el || !el.classList.contains('cell') || !gameActive) return;
+  var r = parseInt(el.getAttribute('data-r'));
+  var c = parseInt(el.getAttribute('data-c'));
+  touchStartCell = { r: r, c: c };
+  touchMoved = false;
+  longPressFired = false;
+  dragMode = null;
+  dragCells = [];
+
+  longPressTimer = setTimeout(function(){
+    longPressFired = true;
+    handleCellAction(r, c, 'mark');
+    if(navigator.vibrate) navigator.vibrate(30);
+  }, 300);
+}, { passive: false });
+
+gridEl.addEventListener('touchmove', function(e){
+  e.preventDefault();
+  touchMoved = true;
+  if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer = null; }
+
+  if(!gameActive) return;
+  var touch = e.touches[0];
+  var el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if(!el || !el.classList.contains('cell')) return;
+  var r = parseInt(el.getAttribute('data-r'));
+  var c = parseInt(el.getAttribute('data-c'));
+
+  if(touchStartCell && (touchStartCell.r !== r || touchStartCell.c !== c)){
+    if(!dragMode){
+      dragMode = inputMode === 'fill' ? 'fill' : 'mark';
+      handleCellAction(touchStartCell.r, touchStartCell.c, inputMode);
+      dragCells = [touchStartCell];
+    }
+    var alreadyDragged = false;
+    for(var i = 0; i < dragCells.length; i++){
+      if(dragCells[i].r === r && dragCells[i].c === c){ alreadyDragged = true; break; }
+    }
+    if(!alreadyDragged){
+      dragCells.push({ r: r, c: c });
+      if(dragMode === 'fill' && playerGrid[r][c] !== 1){
+        doAction(r, c, 1); sndFill();
+      } else if(dragMode === 'mark' && playerGrid[r][c] !== 2){
+        doAction(r, c, 2); sndMark();
+      }
+    }
+  }
+}, { passive: false });
+
+gridEl.addEventListener('touchend', function(e){
+  e.preventDefault();
+  if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer = null; }
+  if(!longPressFired && !touchMoved && touchStartCell && gameActive){
+    handleCellAction(touchStartCell.r, touchStartCell.c, inputMode);
+  }
+  touchStartCell = null;
+  dragMode = null;
+  dragCells = [];
+}, { passive: false });
+
+// ===== MODE TOGGLE =====
+document.getElementById('modeFill').addEventListener('click', function(){
+  inputMode = 'fill';
+  this.classList.add('active');
+  document.getElementById('modeMark').classList.remove('active', 'mark-mode');
+});
+document.getElementById('modeMark').addEventListener('click', function(){
+  inputMode = 'mark';
+  this.classList.add('active', 'mark-mode');
+  document.getElementById('modeFill').classList.remove('active');
+});
+
+// ===== TOOLBAR =====
+document.getElementById('undoBtn').addEventListener('click', undo);
+document.getElementById('redoBtn').addEventListener('click', redo);
+document.getElementById('hintBtn').addEventListener('click', giveHint);
+document.getElementById('clearBtn').addEventListener('click', clearGrid);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e){
+  if(!gameActive) return;
+  if(e.key === 'z' && (e.ctrlKey || e.metaKey)){
+    if(e.shiftKey) redo();
+    else undo();
+    e.preventDefault();
+  }
+});
+
+// ===== DIFFICULTY SELECTOR =====
+var diffBtns = document.querySelectorAll('.diff-btn');
+for(var i = 0; i < diffBtns.length; i++){
+  diffBtns[i].addEventListener('click', function(){
+    for(var j = 0; j < diffBtns.length; j++) diffBtns[j].classList.remove('selected');
+    this.classList.add('selected');
+    selectedSize = parseInt(this.getAttribute('data-size'));
+    neonInitForSize(selectedSize);
+    if(typeof Neon !== 'undefined'){
+      try { Neon.render(document.getElementById('startLB')); } catch(e){}
+    }
+  });
+}
+
+// ===== START GAME =====
+function startGame(daily){
+  isDaily = !!daily;
+  var n = selectedSize;
+
+  neonInitForSize(n);
+
+  var rng = null;
+  if(daily){
+    var seed = getDailySeed() + n * 1000;
+    rng = seededRandom(seed);
+  }
+
+  var puzzle = generatePuzzle(n, rng);
+  solution = puzzle.solution;
+  rowClues = puzzle.rowClues;
+  colClues = puzzle.colClues;
+
+  playerGrid = [];
+  for(var r = 0; r < n; r++){
+    playerGrid.push(new Array(n).fill(0));
+  }
+
+  undoStack = [];
+  redoStack = [];
+  hintsLeft = 3;
+  hintPenalty = 0;
+  completedRows = {};
+  completedCols = {};
+  hintCountEl.textContent = '3';
+  document.getElementById('hintBtn').disabled = false;
+  document.getElementById('undoBtn').disabled = true;
+  document.getElementById('redoBtn').disabled = true;
+
+  inputMode = 'fill';
+  document.getElementById('modeFill').classList.add('active');
+  document.getElementById('modeMark').classList.remove('active', 'mark-mode');
+
+  diffLabel.textContent = (daily ? 'DAILY ' : '') + n + ' x ' + n;
+
+  buildGrid(n);
+  checkClues();
+  showScreen('gameScreen');
+  gameActive = true;
+  startTimer();
+}
+
+document.getElementById('startBtn').addEventListener('click', function(){
+  getAudio();
+  startGame(false);
+});
+
+document.getElementById('dailyBtn').addEventListener('click', function(){
+  getAudio();
+  startGame(true);
+});
+
+document.getElementById('backBtn').addEventListener('click', function(){
+  gameActive = false;
+  stopTimer();
+  showScreen('startScreen');
+  updateStatsDisplay();
+  if(typeof Neon !== 'undefined'){
+    try { Neon.render(document.getElementById('startLB')); } catch(e){}
+  }
+});
+
+document.getElementById('playAgainBtn').addEventListener('click', function(){
+  startGame(isDaily);
+});
+
+// ===== INIT =====
+updateStatsDisplay();
+if(typeof Neon !== 'undefined'){
+  try { Neon.render(document.getElementById('startLB')); } catch(e){}
+}
+
+window.addEventListener('resize', function(){
+  if(gameActive){
+    buildGrid(selectedSize);
+    updateAllCells();
+    checkClues();
+  }
+});
+
+})();
+</script>
+</body>
+</html>

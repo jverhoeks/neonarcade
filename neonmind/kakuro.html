@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>KAKURO - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:16px}
+.game-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2)}
+.game-subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-top:-8px}
+.difficulty-selector{display:flex;gap:12px;margin:16px 0}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;transition:all 0.2s}
+.diff-btn:hover,.diff-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06);box-shadow:0 0 20px rgba(0,240,255,0.15)}
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;margin-top:8px;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.section-title{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#4a4a6a;text-transform:uppercase;margin-top:12px}
+#startLB{width:100%;max-width:340px;min-height:40px}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:8px;gap:4px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:500px;padding:4px 8px}
+.top-bar-left{display:flex;align-items:center;gap:12px}
+.back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:#8888aa;cursor:pointer;padding:4px 8px;border:none;background:none}
+.back-btn:hover{color:#00f0ff}
+.diff-label{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#b44dff}
+.timer{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hints-left{font-family:'Rajdhani',sans-serif;font-size:13px;color:#ffd700}
+
+/* GRID */
+.grid-container{display:flex;align-items:center;justify-content:center;flex:1;width:100%;overflow:hidden}
+.grid{display:grid;gap:1px;background:#1a1a2e}
+.cell{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s}
+.cell-black{background:#08080e;cursor:default}
+.cell-clue{background:#0c0c18;cursor:default;overflow:hidden}
+.cell-white{background:#14142a;font-family:'Orbitron',monospace;font-weight:700;color:#fff}
+.cell-white:hover{background:#1a1a3a}
+.cell-white.selected{background:#1a1a3a;box-shadow:inset 0 0 0 2px #00f0ff;z-index:1}
+.cell-white.run-highlight{background:#1a1a3a;box-shadow:inset 0 0 0 1px rgba(0,240,255,0.3)}
+.cell-white.error{color:#ff2d7b!important;text-shadow:0 0 8px rgba(255,45,123,0.5)}
+.cell-white.correct-flash{animation:correctFlash 0.6s ease}
+.cell-white.hint-cell{color:#ffd700!important;text-shadow:0 0 8px rgba(255,215,0,0.5)}
+@keyframes correctFlash{0%{background:rgba(57,255,20,0.2)}100%{background:#14142a}}
+
+/* Clue cell diagonal */
+.clue-diag{position:absolute;top:0;left:0;width:100%;height:100%}
+.clue-diag::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom right,transparent 49.5%,#2a2a4a 49.5%,#2a2a4a 50.5%,transparent 50.5%)}
+.clue-down{position:absolute;top:2px;right:3px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;color:#00f0ff;text-shadow:0 0 6px rgba(0,240,255,0.4);line-height:1;z-index:1}
+.clue-across{position:absolute;bottom:2px;left:3px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;color:#00f0ff;text-shadow:0 0 6px rgba(0,240,255,0.4);line-height:1;z-index:1}
+
+/* Notes mode small digits */
+.cell-notes{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:100%;height:100%;padding:1px}
+.cell-notes span{display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:500;font-size:8px;color:#8888aa;line-height:1}
+
+/* TOOLS */
+.tools-row{display:flex;gap:8px;width:100%;max-width:500px;justify-content:center;padding:4px 0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;padding:6px 14px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.tool-btn:hover{border-color:#00f0ff;color:#00f0ff}
+.tool-btn.active{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+
+/* NUMBER PAD */
+.numpad{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;width:100%;max-width:500px;padding:4px 0}
+.num-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,4vw,20px);padding:10px 0;border:1px solid #2a2a4a;background:rgba(255,255,255,0.03);color:#fff;cursor:pointer;border-radius:3px;text-align:center;transition:all 0.2s}
+.num-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.num-btn:active{transform:scale(0.95)}
+
+/* COMPLETE SCREEN */
+#completeScreen{gap:16px}
+.solved-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,9vw,60px);letter-spacing:6px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.6),0 0 40px rgba(57,255,20,0.2)}
+.stat-row{display:flex;gap:24px;align-items:center}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:24px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#4a4a6a}
+.stars{font-size:36px;letter-spacing:8px}
+#completeLB{width:100%;max-width:340px;min-height:40px}
+.btn-row{display:flex;gap:12px}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 28px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 20px rgba(57,255,20,0.2)}
+
+/* Screen shake */
+@keyframes screenShake{0%{transform:translate(-2px,1px)}25%{transform:translate(2px,-1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(1px,-2px)}100%{transform:translate(0,0)}}
+.shake{animation:screenShake 0.25s ease}
+
+/* Particles */
+.particle{position:fixed;pointer-events:none;border-radius:50%;z-index:9998}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="game-title">KAKURO</div>
+  <div class="game-subtitle">CROSS-SUM PUZZLE</div>
+  <div class="difficulty-selector">
+    <button class="diff-btn active" data-size="6" onclick="selectDiff(6)">6x6</button>
+    <button class="diff-btn" data-size="8" onclick="selectDiff(8)">8x8</button>
+    <button class="diff-btn" data-size="10" onclick="selectDiff(10)">10x10</button>
+  </div>
+  <button class="play-btn" onclick="startGame()">START</button>
+  <div class="section-title">LEADERBOARD</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <button class="back-btn" onclick="goBack()">&larr;</button>
+      <span class="diff-label" id="diffLabel">6x6</span>
+    </div>
+    <span class="timer" id="timer">00:00</span>
+    <span class="hints-left" id="hintsLeft">HINTS: 3</span>
+  </div>
+  <div class="grid-container" id="gridContainer">
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="tools-row">
+    <button class="tool-btn" id="undoBtn" onclick="doUndo()">UNDO</button>
+    <button class="tool-btn" id="pencilBtn" onclick="togglePencil()">PENCIL</button>
+    <button class="tool-btn" id="clearBtn" onclick="clearCell()">CLEAR</button>
+    <button class="tool-btn" id="hintBtn" onclick="useHint()">HINT</button>
+  </div>
+  <div class="numpad" id="numpad"></div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+  <div class="solved-title">SOLVED</div>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-val" id="finalTime">00:00</span><span class="stat-label">TIME</span></div>
+    <div class="stat"><span class="stat-val" id="finalHints">0</span><span class="stat-label">HINTS</span></div>
+  </div>
+  <div class="stars" id="stars"></div>
+  <div class="section-title">LEADERBOARD</div>
+  <div id="completeLB"></div>
+  <div class="btn-row">
+    <button class="share-btn" onclick="shareResult()">SHARE</button>
+    <button class="play-btn" onclick="startGame()">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ============================================================
+// AUDIO ENGINE
+// ============================================================
+var audioCtx = null;
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol){
+  try{
+    var a = getAudio();
+    var o = a.createOscillator();
+    var g = a.createGain();
+    o.type = type || 'square';
+    o.frequency.value = freq;
+    g.gain.value = vol || 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + dur);
+    o.connect(g);
+    g.connect(a.destination);
+    o.start(a.currentTime);
+    o.stop(a.currentTime + dur);
+  }catch(e){}
+}
+function sndPlace(){ playTone(880, 0.08, 'square', 0.06); }
+function sndClear(){ playTone(440, 0.06, 'sine', 0.04); }
+function sndError(){ playTone(150, 0.2, 'sawtooth', 0.07); }
+function sndRunComplete(){
+  playTone(523, 0.1, 'square', 0.05);
+  setTimeout(function(){ playTone(659, 0.1, 'square', 0.05); }, 80);
+  setTimeout(function(){ playTone(784, 0.15, 'square', 0.05); }, 160);
+}
+function sndVictory(){
+  var notes = [523, 659, 784, 1047];
+  notes.forEach(function(n, i){
+    setTimeout(function(){ playTone(n, 0.2, 'square', 0.06); }, i * 120);
+  });
+}
+function sndUndo(){ playTone(330, 0.05, 'triangle', 0.04); }
+
+// ============================================================
+// PARTICLES
+// ============================================================
+function spawnParticles(x, y, color, count){
+  count = count || 12;
+  for(var i = 0; i < count; i++){
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var size = 3 + Math.random() * 4;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.background = color;
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.boxShadow = '0 0 6px ' + color;
+    document.body.appendChild(p);
+    var angle = Math.random() * Math.PI * 2;
+    var speed = 40 + Math.random() * 80;
+    var dx = Math.cos(angle) * speed;
+    var dy = Math.sin(angle) * speed;
+    (function(el, ddx, ddy){
+      var sx = x, sy = y, t = 0;
+      var dur = 0.4 + Math.random() * 0.4;
+      function tick(){
+        t += 0.016;
+        if(t > dur){ el.remove(); return; }
+        sx += ddx * 0.016;
+        sy += ddy * 0.016;
+        ddy += 200 * 0.016;
+        el.style.left = sx + 'px';
+        el.style.top = sy + 'px';
+        el.style.opacity = String(1 - t / dur);
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })(p, dx, dy);
+  }
+}
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+var CELL_BLACK = 0;
+var CELL_CLUE = 1;
+var CELL_WHITE = 2;
+
+// ============================================================
+// STATE
+// ============================================================
+var currentSize = 6;
+var board = [];
+var selectedCell = null;
+var pencilMode = false;
+var hintsUsed = 0;
+var maxHints = 3;
+var timerStart = 0;
+var timerElapsed = 0;
+var timerInterval = null;
+var hintPenalty = 0;
+var undoStack = [];
+var gameActive = false;
+
+// ============================================================
+// TEMPLATES
+// ============================================================
+var TEMPLATES_6 = [
+  [
+    'BCCCCB',
+    'CWWWWC',
+    'CWWWWW',
+    'CWWWWW',
+    'CWWWWC',
+    'BCWWWB'
+  ],
+  [
+    'BCCCBB',
+    'CWWWCB',
+    'CWWWWC',
+    'CWWWWW',
+    'BCWWWW',
+    'BBCWWB'
+  ],
+  [
+    'BCCBCC',
+    'CWWCWW',
+    'CWWCWW',
+    'BCCBCC',
+    'CWWCWW',
+    'CWWCWW'
+  ],
+  [
+    'BCCCBC',
+    'CWWWCW',
+    'CWWBCW',
+    'CWBCWW',
+    'CWCWWB',
+    'BCBCWB'
+  ]
+];
+
+var TEMPLATES_8 = [
+  [
+    'BCCCCBCC',
+    'CWWWWCWW',
+    'CWWWWCWW',
+    'CWWBCCBB',
+    'CWWCWWCB',
+    'BCCWWWWC',
+    'CWWWWWWW',
+    'CWWBCWWB'
+  ],
+  [
+    'BCCCCCBB',
+    'CWWWWWCB',
+    'CWWBWWWC',
+    'CWWCBWWW',
+    'CWWWCWWB',
+    'BCWWWWCB',
+    'CWWWBWWC',
+    'CWWBCWWB'
+  ],
+  [
+    'BCCBCCCC',
+    'CWWCWWWW',
+    'CWWCWWBW',
+    'CBBCWWCB',
+    'CWCCBCCB',
+    'CWWCWWWC',
+    'CWWBWWWW',
+    'BCBCWWWB'
+  ],
+  [
+    'BCCCCCCB',
+    'CWWWWWWC',
+    'CWWBCWWW',
+    'CWBCWWWB',
+    'CWCWWWCB',
+    'CWWWBCWC',
+    'CWWWCWWW',
+    'BCWWBCWB'
+  ]
+];
+
+var TEMPLATES_10 = [
+  [
+    'BCCCBCCCBB',
+    'CWWWCWWWCB',
+    'CWWWCWWWWC',
+    'CWWBCCWWWW',
+    'BCCWWWBCCB',
+    'CWWWWBCWWC',
+    'CWWWCWWWWW',
+    'CWWBCWWBWB',
+    'BCWWCWWCWC',
+    'BCWWBCWCWB'
+  ],
+  [
+    'BCCCCBCCCC',
+    'CWWWWCWWWW',
+    'CWWWBCWWWB',
+    'CWWCCBCCCB',
+    'CWWWWCWWWC',
+    'BCCBWWCWWW',
+    'CWWCWWBCWB',
+    'CWWCWWCWWC',
+    'CWWBCWWWWW',
+    'BCBBCWWWWB'
+  ],
+  [
+    'BCCCCCCCBB',
+    'CWWWWWWWCB',
+    'CWWWBCWWWC',
+    'CWWCBCWWWW',
+    'CWBCWWWBCB',
+    'CWCWWWBCCB',
+    'CWWWWCWWWC',
+    'CWWBCWWWWW',
+    'BCWWCWWWWB',
+    'BBCWBCWWBB'
+  ]
+];
+
+// ============================================================
+// PUZZLE GENERATION
+// ============================================================
+
+function parseTemplate(tmpl){
+  var n = tmpl.length;
+  var grid = [];
+  for(var r = 0; r < n; r++){
+    grid[r] = [];
+    for(var c = 0; c < n; c++){
+      var ch = tmpl[r][c];
+      grid[r][c] = {
+        type: ch === 'B' ? CELL_BLACK : ch === 'C' ? CELL_CLUE : CELL_WHITE,
+        clueDown: 0,
+        clueAcross: 0,
+        solution: 0,
+        value: 0,
+        notes: [],
+        isHint: false
+      };
+    }
+  }
+  return grid;
+}
+
+function setupClues(grid){
+  var n = grid.length;
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(grid[r][c].type === CELL_CLUE){
+        var hasAcross = (c + 1 < n && grid[r][c+1].type === CELL_WHITE);
+        var hasDown = (r + 1 < n && grid[r+1][c].type === CELL_WHITE);
+        grid[r][c].clueAcross = hasAcross ? 0 : -1;
+        grid[r][c].clueDown = hasDown ? 0 : -1;
+      }
+    }
+  }
+}
+
+function getRuns(grid){
+  var n = grid.length;
+  var runs = [];
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(grid[r][c].type === CELL_CLUE){
+        if(grid[r][c].clueAcross !== -1){
+          var cells = [];
+          var cc = c + 1;
+          while(cc < n && grid[r][cc].type === CELL_WHITE){ cells.push({r:r, c:cc}); cc++; }
+          if(cells.length > 0) runs.push({clueR:r, clueC:c, dir:'across', cells:cells});
+        }
+        if(grid[r][c].clueDown !== -1){
+          var cells2 = [];
+          var rr = r + 1;
+          while(rr < n && grid[rr][c].type === CELL_WHITE){ cells2.push({r:rr, c:c}); rr++; }
+          if(cells2.length > 0) runs.push({clueR:r, clueC:c, dir:'down', cells:cells2});
+        }
+      }
+    }
+  }
+  return runs;
+}
+
+function shuffleArray(arr){
+  var a = arr.slice();
+  for(var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function fillSolution(grid){
+  var n = grid.length;
+  var whiteCells = [];
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(grid[r][c].type === CELL_WHITE) whiteCells.push({r:r, c:c});
+    }
+  }
+
+  setupClues(grid);
+  var runs = getRuns(grid);
+  var cellRuns = {};
+  runs.forEach(function(run){
+    run.cells.forEach(function(cell){
+      var key = cell.r + ',' + cell.c;
+      if(!cellRuns[key]) cellRuns[key] = [];
+      cellRuns[key].push(run);
+    });
+  });
+
+  function isValid(r, c, digit){
+    var key = r + ',' + c;
+    var myRuns = cellRuns[key] || [];
+    for(var i = 0; i < myRuns.length; i++){
+      var run = myRuns[i];
+      var len = run.cells.length;
+      var usedDigits = {};
+      var filled = 0;
+      var sum = 0;
+      for(var j = 0; j < len; j++){
+        var rc = run.cells[j];
+        var val = (rc.r === r && rc.c === c) ? digit : grid[rc.r][rc.c].solution;
+        if(val > 0){
+          if(usedDigits[val]) return false;
+          usedDigits[val] = true;
+          filled++;
+          sum += val;
+        }
+      }
+      var remaining = len - filled;
+      if(remaining > 0){
+        var minAdd = 0, maxAdd = 0, cnt;
+        cnt = 0;
+        for(var d = 1; d <= 9 && cnt < remaining; d++){
+          if(!usedDigits[d]){ minAdd += d; cnt++; }
+        }
+        if(cnt < remaining) return false;
+        cnt = 0;
+        for(var d2 = 9; d2 >= 1 && cnt < remaining; d2--){
+          if(!usedDigits[d2]){ maxAdd += d2; cnt++; }
+        }
+        // Sum so far + remaining must be achievable
+        if(sum + minAdd > 45) return false;
+      }
+    }
+    return true;
+  }
+
+  var digits = [1,2,3,4,5,6,7,8,9];
+  function solve(idx){
+    if(idx >= whiteCells.length) return true;
+    var cell = whiteCells[idx];
+    var order = shuffleArray(digits);
+    for(var i = 0; i < 9; i++){
+      var d = order[i];
+      if(isValid(cell.r, cell.c, d)){
+        grid[cell.r][cell.c].solution = d;
+        if(solve(idx + 1)) return true;
+        grid[cell.r][cell.c].solution = 0;
+      }
+    }
+    return false;
+  }
+
+  if(!solve(0)) return false;
+
+  runs.forEach(function(run){
+    var sum = 0;
+    run.cells.forEach(function(cell){ sum += grid[cell.r][cell.c].solution; });
+    if(run.dir === 'across') grid[run.clueR][run.clueC].clueAcross = sum;
+    else grid[run.clueR][run.clueC].clueDown = sum;
+  });
+
+  return true;
+}
+
+function hasUniqueSolution(grid){
+  var n = grid.length;
+  var whiteCells = [];
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(grid[r][c].type === CELL_WHITE) whiteCells.push({r:r, c:c});
+    }
+  }
+
+  setupClues(grid);
+  var runs = getRuns(grid);
+  var cellRuns = {};
+  runs.forEach(function(run){
+    run.cells.forEach(function(cell){
+      var key = cell.r + ',' + cell.c;
+      if(!cellRuns[key]) cellRuns[key] = [];
+      cellRuns[key].push(run);
+    });
+  });
+
+  var tempVals = [];
+  for(var rr = 0; rr < n; rr++){
+    tempVals[rr] = [];
+    for(var cc = 0; cc < n; cc++) tempVals[rr][cc] = 0;
+  }
+
+  function isValidCheck(r, c, digit){
+    var key = r + ',' + c;
+    var myRuns = cellRuns[key] || [];
+    for(var i = 0; i < myRuns.length; i++){
+      var run = myRuns[i];
+      var targetSum = run.dir === 'across' ? grid[run.clueR][run.clueC].clueAcross : grid[run.clueR][run.clueC].clueDown;
+      var len = run.cells.length;
+      var usedDigits = {};
+      var filled = 0;
+      var sum = 0;
+      for(var j = 0; j < len; j++){
+        var rc = run.cells[j];
+        var v = (rc.r === r && rc.c === c) ? digit : tempVals[rc.r][rc.c];
+        if(v > 0){
+          if(usedDigits[v]) return false;
+          usedDigits[v] = true;
+          filled++;
+          sum += v;
+        }
+      }
+      if(sum > targetSum) return false;
+      var remaining = len - filled;
+      if(remaining === 0 && sum !== targetSum) return false;
+      if(remaining > 0){
+        var need = targetSum - sum;
+        var minAdd = 0, maxAdd = 0, cnt;
+        cnt = 0;
+        for(var d = 1; d <= 9 && cnt < remaining; d++){
+          if(!usedDigits[d]){ minAdd += d; cnt++; }
+        }
+        if(cnt < remaining) return false;
+        cnt = 0;
+        for(var d2 = 9; d2 >= 1 && cnt < remaining; d2--){
+          if(!usedDigits[d2]){ maxAdd += d2; cnt++; }
+        }
+        if(need < minAdd || need > maxAdd) return false;
+      }
+    }
+    return true;
+  }
+
+  var solutionCount = 0;
+  function solveCount(idx){
+    if(solutionCount > 1) return;
+    if(idx >= whiteCells.length){ solutionCount++; return; }
+    var cell = whiteCells[idx];
+    for(var d = 1; d <= 9; d++){
+      if(isValidCheck(cell.r, cell.c, d)){
+        tempVals[cell.r][cell.c] = d;
+        solveCount(idx + 1);
+        if(solutionCount > 1) return;
+        tempVals[cell.r][cell.c] = 0;
+      }
+    }
+  }
+
+  solveCount(0);
+  return solutionCount === 1;
+}
+
+function generatePuzzle(size){
+  var templates;
+  if(size === 6) templates = TEMPLATES_6;
+  else if(size === 8) templates = TEMPLATES_8;
+  else templates = TEMPLATES_10;
+
+  var attempts = 0;
+  var maxAttempts = 60;
+  while(attempts < maxAttempts){
+    var tmplIdx = Math.floor(Math.random() * templates.length);
+    var grid = parseTemplate(templates[tmplIdx]);
+    setupClues(grid);
+    if(fillSolution(grid)){
+      if(hasUniqueSolution(grid)){
+        return grid;
+      }
+    }
+    attempts++;
+  }
+  // Fallback: return last generated (should rarely happen)
+  var grid2 = parseTemplate(templates[0]);
+  setupClues(grid2);
+  fillSolution(grid2);
+  return grid2;
+}
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id){
+  var screens = document.querySelectorAll('.screen');
+  for(var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ============================================================
+// DIFFICULTY SELECTION
+// ============================================================
+window.selectDiff = function(size){
+  currentSize = size;
+  var btns = document.querySelectorAll('.diff-btn');
+  for(var i = 0; i < btns.length; i++){
+    btns[i].classList.toggle('active', parseInt(btns[i].dataset.size) === size);
+  }
+  neonInitForSize(size);
+  setTimeout(function(){
+    if(typeof Neon !== 'undefined' && Neon.render){
+      Neon.render(document.getElementById('startLB'));
+    }
+  }, 300);
+};
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer(){
+  timerStart = Date.now();
+  timerElapsed = 0;
+  hintPenalty = 0;
+  updateTimerDisplay();
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 200);
+}
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  timerElapsed = (Date.now() - timerStart) / 1000 + hintPenalty;
+}
+function getElapsed(){
+  return (Date.now() - timerStart) / 1000 + hintPenalty;
+}
+function updateTimerDisplay(){
+  var t = getElapsed();
+  var m = Math.floor(t / 60);
+  var s = Math.floor(t % 60);
+  document.getElementById('timer').textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+function formatTime(t){
+  var m = Math.floor(t / 60);
+  var s = Math.floor(t % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+// ============================================================
+// NEON.JS INTEGRATION
+// ============================================================
+var neonFormatScore = function(s){
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+
+function neonInitForSize(n){
+  if(typeof Neon !== 'undefined'){
+    Neon.init({
+      game: 'kakuro',
+      mode: 'low',
+      key: 'neonarcade_neonmind_kakuro_scores_' + n,
+      formatScore: neonFormatScore
+    });
+  }
+}
+
+// ============================================================
+// GAME START
+// ============================================================
+window.startGame = function(){
+  board = generatePuzzle(currentSize);
+  selectedCell = null;
+  pencilMode = false;
+  hintsUsed = 0;
+  undoStack = [];
+  gameActive = true;
+
+  document.getElementById('pencilBtn').classList.remove('active');
+  document.getElementById('diffLabel').textContent = currentSize + 'x' + currentSize;
+  document.getElementById('hintsLeft').textContent = 'HINTS: ' + (maxHints - hintsUsed);
+
+  neonInitForSize(currentSize);
+  renderGrid();
+  showScreen('gameScreen');
+  startTimer();
+};
+
+// ============================================================
+// RENDER GRID
+// ============================================================
+function renderGrid(){
+  var container = document.getElementById('gridContainer');
+  var gridEl = document.getElementById('grid');
+
+  // Clear grid safely
+  while(gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+
+  var n = currentSize;
+  var maxW = container.clientWidth - 8;
+  var maxH = container.clientHeight - 8;
+  var cellSize = Math.floor(Math.min(maxW, maxH) / n);
+  cellSize = Math.max(cellSize, 28);
+  cellSize = Math.min(cellSize, 56);
+
+  gridEl.style.gridTemplateColumns = 'repeat(' + n + ',' + cellSize + 'px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + n + ',' + cellSize + 'px)';
+
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      var cell = board[r][c];
+      var div = document.createElement('div');
+      div.className = 'cell';
+      div.dataset.r = String(r);
+      div.dataset.c = String(c);
+      div.style.width = cellSize + 'px';
+      div.style.height = cellSize + 'px';
+
+      if(cell.type === CELL_BLACK){
+        div.classList.add('cell-black');
+      } else if(cell.type === CELL_CLUE){
+        div.classList.add('cell-clue');
+        var diag = document.createElement('div');
+        diag.className = 'clue-diag';
+        div.appendChild(diag);
+        var fs = (cellSize < 36 ? 9 : 11) + 'px';
+        if(cell.clueDown > 0){
+          var d = document.createElement('span');
+          d.className = 'clue-down';
+          d.textContent = String(cell.clueDown);
+          d.style.fontSize = fs;
+          div.appendChild(d);
+        }
+        if(cell.clueAcross > 0){
+          var a = document.createElement('span');
+          a.className = 'clue-across';
+          a.textContent = String(cell.clueAcross);
+          a.style.fontSize = fs;
+          div.appendChild(a);
+        }
+      } else {
+        div.classList.add('cell-white');
+        div.addEventListener('click', onCellClick);
+        updateCellDisplay(div, cell, cellSize);
+      }
+
+      gridEl.appendChild(div);
+    }
+  }
+}
+
+function updateCellDisplay(div, cell, cellSize){
+  while(div.firstChild) div.removeChild(div.firstChild);
+
+  if(cell.notes && cell.notes.length > 0 && cell.value === 0){
+    var notesDiv = document.createElement('div');
+    notesDiv.className = 'cell-notes';
+    for(var d = 1; d <= 9; d++){
+      var s = document.createElement('span');
+      s.textContent = cell.notes.indexOf(d) >= 0 ? String(d) : '';
+      s.style.fontSize = Math.max(7, Math.floor(cellSize / 5)) + 'px';
+      notesDiv.appendChild(s);
+    }
+    div.appendChild(notesDiv);
+  } else if(cell.value > 0){
+    div.textContent = String(cell.value);
+    div.style.fontSize = Math.floor(cellSize * 0.5) + 'px';
+  } else {
+    div.textContent = '';
+  }
+
+  if(cell.isHint) div.classList.add('hint-cell');
+  else div.classList.remove('hint-cell');
+}
+
+function refreshCell(r, c){
+  var n = currentSize;
+  var gridEl = document.getElementById('grid');
+  var idx = r * n + c;
+  var div = gridEl.children[idx];
+  if(!div || !div.classList.contains('cell-white')) return;
+  var cell = board[r][c];
+  var cellSize = parseInt(div.style.width);
+  updateCellDisplay(div, cell, cellSize);
+}
+
+// ============================================================
+// CELL SELECTION
+// ============================================================
+function onCellClick(e){
+  if(!gameActive) return;
+  var div = e.currentTarget;
+  var r = parseInt(div.dataset.r);
+  var c = parseInt(div.dataset.c);
+
+  var prevSelected = document.querySelectorAll('.cell-white.selected');
+  for(var i = 0; i < prevSelected.length; i++) prevSelected[i].classList.remove('selected');
+  var prevHL = document.querySelectorAll('.cell-white.run-highlight');
+  for(var j = 0; j < prevHL.length; j++) prevHL[j].classList.remove('run-highlight');
+
+  selectedCell = {r:r, c:c};
+  div.classList.add('selected');
+  highlightRuns(r, c);
+}
+
+function highlightRuns(r, c){
+  var n = currentSize;
+  var gridEl = document.getElementById('grid');
+  // Horizontal run
+  var hStart = c;
+  while(hStart > 0 && board[r][hStart-1].type === CELL_WHITE) hStart--;
+  var hEnd = c;
+  while(hEnd < n-1 && board[r][hEnd+1].type === CELL_WHITE) hEnd++;
+  if(hEnd > hStart){
+    for(var cc = hStart; cc <= hEnd; cc++){
+      if(cc !== c) gridEl.children[r*n+cc].classList.add('run-highlight');
+    }
+  }
+  // Vertical run
+  var vStart = r;
+  while(vStart > 0 && board[vStart-1][c].type === CELL_WHITE) vStart--;
+  var vEnd = r;
+  while(vEnd < n-1 && board[vEnd+1][c].type === CELL_WHITE) vEnd++;
+  if(vEnd > vStart){
+    for(var rr = vStart; rr <= vEnd; rr++){
+      if(rr !== r) gridEl.children[rr*n+c].classList.add('run-highlight');
+    }
+  }
+}
+
+// ============================================================
+// INPUT: NUMBER PLACEMENT
+// ============================================================
+function placeDigit(digit){
+  if(!selectedCell || !gameActive) return;
+  var r = selectedCell.r, c = selectedCell.c;
+  var cell = board[r][c];
+  if(cell.isHint) return;
+
+  if(pencilMode){
+    undoStack.push({r:r, c:c, value:cell.value, notes:cell.notes.slice()});
+    var idx = cell.notes.indexOf(digit);
+    if(idx >= 0) cell.notes.splice(idx, 1);
+    else cell.notes.push(digit);
+    cell.value = 0;
+    refreshCell(r, c);
+    sndPlace();
+  } else {
+    undoStack.push({r:r, c:c, value:cell.value, notes:cell.notes.slice()});
+    cell.value = digit;
+    cell.notes = [];
+    refreshCell(r, c);
+    sndPlace();
+    checkErrors();
+    checkRunsComplete(r, c);
+    checkWin();
+  }
+}
+
+// ============================================================
+// VALIDATION
+// ============================================================
+function getRunsForCell(r, c){
+  var n = currentSize;
+  var result = [];
+
+  // Horizontal run
+  var hStart = c;
+  while(hStart > 0 && board[r][hStart-1].type === CELL_WHITE) hStart--;
+  var hEnd = c;
+  while(hEnd < n-1 && board[r][hEnd+1].type === CELL_WHITE) hEnd++;
+
+  // Find clue cell for across
+  var clueCA = hStart - 1;
+  if(clueCA >= 0 && board[r][clueCA].type === CELL_CLUE && board[r][clueCA].clueAcross > 0){
+    var cells = [];
+    for(var cc = hStart; cc <= hEnd; cc++) cells.push({r:r, c:cc});
+    result.push({dir:'across', clue:board[r][clueCA].clueAcross, cells:cells});
+  }
+
+  // Vertical run
+  var vStart = r;
+  while(vStart > 0 && board[vStart-1][c].type === CELL_WHITE) vStart--;
+  var vEnd = r;
+  while(vEnd < n-1 && board[vEnd+1][c].type === CELL_WHITE) vEnd++;
+
+  var clueRD = vStart - 1;
+  if(clueRD >= 0 && board[clueRD][c].type === CELL_CLUE && board[clueRD][c].clueDown > 0){
+    var cells2 = [];
+    for(var rr = vStart; rr <= vEnd; rr++) cells2.push({r:rr, c:c});
+    result.push({dir:'down', clue:board[clueRD][c].clueDown, cells:cells2});
+  }
+
+  return result;
+}
+
+function checkErrors(){
+  var n = currentSize;
+  var gridEl = document.getElementById('grid');
+  var hasError = false;
+
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(board[r][c].type === CELL_WHITE){
+        gridEl.children[r*n+c].classList.remove('error');
+      }
+    }
+  }
+
+  for(var r2 = 0; r2 < n; r2++){
+    for(var c2 = 0; c2 < n; c2++){
+      if(board[r2][c2].type !== CELL_WHITE || board[r2][c2].value === 0) continue;
+      var runs = getRunsForCell(r2, c2);
+      for(var i = 0; i < runs.length; i++){
+        var run = runs[i];
+        // Check duplicate
+        var isDuplicate = false;
+        for(var j = 0; j < run.cells.length; j++){
+          var rc = run.cells[j];
+          if(rc.r === r2 && rc.c === c2) continue;
+          if(board[rc.r][rc.c].value === board[r2][c2].value){
+            isDuplicate = true;
+            gridEl.children[rc.r*n+rc.c].classList.add('error');
+          }
+        }
+        if(isDuplicate){
+          gridEl.children[r2*n+c2].classList.add('error');
+          hasError = true;
+        }
+        // Check sum exceeds clue
+        var allFilled = true;
+        var sum = 0;
+        for(var j2 = 0; j2 < run.cells.length; j2++){
+          var rc2 = run.cells[j2];
+          if(board[rc2.r][rc2.c].value === 0) allFilled = false;
+          else sum += board[rc2.r][rc2.c].value;
+        }
+        if(sum > run.clue){
+          for(var j3 = 0; j3 < run.cells.length; j3++){
+            var rc3 = run.cells[j3];
+            if(board[rc3.r][rc3.c].value > 0){
+              gridEl.children[rc3.r*n+rc3.c].classList.add('error');
+            }
+          }
+          hasError = true;
+        }
+      }
+    }
+  }
+
+  if(hasError){
+    sndError();
+    document.body.classList.add('shake');
+    setTimeout(function(){ document.body.classList.remove('shake'); }, 250);
+  }
+}
+
+function checkRunsComplete(r, c){
+  var runs = getRunsForCell(r, c);
+  var n = currentSize;
+  var gridEl = document.getElementById('grid');
+
+  for(var i = 0; i < runs.length; i++){
+    var run = runs[i];
+    var allFilled = true;
+    var sum = 0;
+    var digits = {};
+    var hasDup = false;
+    for(var j = 0; j < run.cells.length; j++){
+      var rc = run.cells[j];
+      var val = board[rc.r][rc.c].value;
+      if(val === 0){ allFilled = false; break; }
+      if(digits[val]) hasDup = true;
+      digits[val] = true;
+      sum += val;
+    }
+    if(allFilled && !hasDup && sum === run.clue){
+      sndRunComplete();
+      for(var k = 0; k < run.cells.length; k++){
+        (function(rc2){
+          var div = gridEl.children[rc2.r * n + rc2.c];
+          div.classList.add('correct-flash');
+          setTimeout(function(){ div.classList.remove('correct-flash'); }, 600);
+        })(run.cells[k]);
+      }
+      var firstCell = run.cells[0];
+      var rect = gridEl.children[firstCell.r * n + firstCell.c].getBoundingClientRect();
+      spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2, '#39ff14', 8);
+    }
+  }
+}
+
+function checkWin(){
+  var n = currentSize;
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(board[r][c].type === CELL_WHITE && board[r][c].value === 0) return;
+    }
+  }
+
+  var allCorrect = true;
+  for(var r2 = 0; r2 < n; r2++){
+    for(var c2 = 0; c2 < n; c2++){
+      if(board[r2][c2].type !== CELL_WHITE) continue;
+      if(board[r2][c2].value !== board[r2][c2].solution){
+        allCorrect = false;
+        break;
+      }
+    }
+    if(!allCorrect) break;
+  }
+
+  if(allCorrect){
+    gameActive = false;
+    stopTimer();
+    sndVictory();
+
+    for(var i = 0; i < 5; i++){
+      (function(idx){
+        setTimeout(function(){
+          var colors = ['#00f0ff','#39ff14','#ffd700','#ff2d7b','#b44dff'];
+          spawnParticles(
+            100 + Math.random() * (window.innerWidth - 200),
+            100 + Math.random() * (window.innerHeight - 200),
+            colors[idx % colors.length],
+            20
+          );
+        }, idx * 200);
+      })(i);
+    }
+
+    setTimeout(showComplete, 800);
+  }
+}
+
+// ============================================================
+// COMPLETE SCREEN
+// ============================================================
+function showComplete(){
+  var t = timerElapsed;
+  document.getElementById('finalTime').textContent = formatTime(t);
+  document.getElementById('finalHints').textContent = String(hintsUsed);
+
+  var starThresholds = {6:[60,120],8:[120,240],10:[180,360]};
+  var th = starThresholds[currentSize] || [120,240];
+  var starCount = 1;
+  if(t <= th[0] && hintsUsed === 0) starCount = 3;
+  else if(t <= th[1] && hintsUsed <= 1) starCount = 2;
+
+  var starsStr = '';
+  for(var i = 0; i < 3; i++) starsStr += i < starCount ? '\u2B50' : '\u2606';
+  document.getElementById('stars').textContent = starsStr;
+
+  showScreen('completeScreen');
+
+  var capturedTime = Math.round(t);
+  if(typeof Neon !== 'undefined'){
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function(){
+      return Neon.save(capturedTime);
+    }).then(function(neonResult){
+      Neon.render(document.getElementById('completeLB'));
+      if(neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5){
+        Neon.showGlobalSplash(neonResult.globalRank);
+      }
+    }).catch(function(){});
+  }
+}
+
+// ============================================================
+// TOOLS
+// ============================================================
+window.doUndo = function(){
+  if(undoStack.length === 0 || !gameActive) return;
+  var action = undoStack.pop();
+  board[action.r][action.c].value = action.value;
+  board[action.r][action.c].notes = action.notes;
+  refreshCell(action.r, action.c);
+  checkErrors();
+  sndUndo();
+};
+
+window.togglePencil = function(){
+  pencilMode = !pencilMode;
+  document.getElementById('pencilBtn').classList.toggle('active', pencilMode);
+};
+
+window.clearCell = function(){
+  if(!selectedCell || !gameActive) return;
+  var r = selectedCell.r, c = selectedCell.c;
+  var cell = board[r][c];
+  if(cell.isHint) return;
+  undoStack.push({r:r, c:c, value:cell.value, notes:cell.notes.slice()});
+  cell.value = 0;
+  cell.notes = [];
+  refreshCell(r, c);
+  checkErrors();
+  sndClear();
+};
+
+window.useHint = function(){
+  if(hintsUsed >= maxHints || !gameActive) return;
+  var emptyCells = [];
+  var n = currentSize;
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(board[r][c].type === CELL_WHITE && board[r][c].value === 0 && !board[r][c].isHint){
+        emptyCells.push({r:r, c:c});
+      }
+    }
+  }
+  if(emptyCells.length === 0) return;
+  var pick = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  var cell = board[pick.r][pick.c];
+  cell.value = cell.solution;
+  cell.notes = [];
+  cell.isHint = true;
+  hintsUsed++;
+  hintPenalty += 30;
+  document.getElementById('hintsLeft').textContent = 'HINTS: ' + (maxHints - hintsUsed);
+  refreshCell(pick.r, pick.c);
+
+  var gridEl = document.getElementById('grid');
+  var n2 = currentSize;
+  var div = gridEl.children[pick.r * n2 + pick.c];
+  var rect = div.getBoundingClientRect();
+  spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2, '#ffd700', 10);
+
+  sndRunComplete();
+  checkRunsComplete(pick.r, pick.c);
+  checkWin();
+};
+
+window.goBack = function(){
+  gameActive = false;
+  if(timerInterval) clearInterval(timerInterval);
+  showScreen('startScreen');
+  if(typeof Neon !== 'undefined' && Neon.render){
+    Neon.render(document.getElementById('startLB'));
+  }
+};
+
+// ============================================================
+// SHARE
+// ============================================================
+window.shareResult = function(){
+  var t = timerElapsed;
+  var th = {6:[60,120],8:[120,240],10:[180,360]};
+  var thresholds = th[currentSize] || [120,240];
+  var starCount = 1;
+  if(t <= thresholds[0] && hintsUsed === 0) starCount = 3;
+  else if(t <= thresholds[1] && hintsUsed <= 1) starCount = 2;
+
+  var stars = '';
+  for(var i = 0; i < starCount; i++) stars += '\u2B50';
+
+  var n = currentSize;
+  var miniRows = Math.min(5, n);
+  var miniCols = Math.min(5, n);
+  var miniGrid = '';
+  for(var r = 0; r < miniRows; r++){
+    var row = '';
+    for(var c = 0; c < miniCols; c++){
+      var cell = board[r][c];
+      if(cell.type === CELL_BLACK) row += '\uD83D\uDFEB';
+      else if(cell.type === CELL_CLUE) row += '\uD83D\uDD35';
+      else row += '\uD83D\uDFE6';
+    }
+    miniGrid += row + '\n';
+  }
+
+  var text = '\uD83D\uDD22 KAKURO ' + n + 'x' + n + '\n' +
+    '\u23F1 ' + formatTime(t) + ' | ' + stars + '\n' +
+    miniGrid +
+    'neonarcade.net/neonmind';
+
+  if(navigator.share){
+    navigator.share({text: text}).catch(function(){
+      copyToClipboard(text);
+    });
+  } else {
+    copyToClipboard(text);
+  }
+};
+
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(function(){
+    var btn = document.querySelector('.share-btn');
+    btn.textContent = 'COPIED!';
+    setTimeout(function(){ btn.textContent = 'SHARE'; }, 2000);
+  }).catch(function(){});
+}
+
+// ============================================================
+// KEYBOARD INPUT
+// ============================================================
+document.addEventListener('keydown', function(e){
+  if(!gameActive) return;
+  var key = e.key;
+  if(key >= '1' && key <= '9'){
+    placeDigit(parseInt(key));
+    e.preventDefault();
+  } else if(key === 'Backspace' || key === 'Delete'){
+    window.clearCell();
+    e.preventDefault();
+  } else if(key === 'z' && (e.ctrlKey || e.metaKey)){
+    window.doUndo();
+    e.preventDefault();
+  } else if(key === 'p'){
+    window.togglePencil();
+    e.preventDefault();
+  } else if(key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight'){
+    moveSelection(key);
+    e.preventDefault();
+  }
+});
+
+function moveSelection(dir){
+  if(!selectedCell) return;
+  var r = selectedCell.r, c = selectedCell.c;
+  var n = currentSize;
+  var dr = 0, dc = 0;
+  if(dir === 'ArrowUp') dr = -1;
+  else if(dir === 'ArrowDown') dr = 1;
+  else if(dir === 'ArrowLeft') dc = -1;
+  else if(dir === 'ArrowRight') dc = 1;
+
+  var nr = r + dr, nc = c + dc;
+  while(nr >= 0 && nr < n && nc >= 0 && nc < n){
+    if(board[nr][nc].type === CELL_WHITE){
+      var gridEl = document.getElementById('grid');
+      var div = gridEl.children[nr * n + nc];
+      div.click();
+      return;
+    }
+    nr += dr;
+    nc += dc;
+  }
+}
+
+// ============================================================
+// BUILD NUMPAD
+// ============================================================
+function buildNumpad(){
+  var pad = document.getElementById('numpad');
+  while(pad.firstChild) pad.removeChild(pad.firstChild);
+  for(var i = 1; i <= 9; i++){
+    var btn = document.createElement('button');
+    btn.className = 'num-btn';
+    btn.textContent = String(i);
+    btn.dataset.digit = String(i);
+    btn.addEventListener('click', function(e){
+      placeDigit(parseInt(e.currentTarget.dataset.digit));
+    });
+    pad.appendChild(btn);
+  }
+}
+
+// ============================================================
+// RESIZE HANDLER
+// ============================================================
+var resizeTimer;
+window.addEventListener('resize', function(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function(){
+    if(gameActive) renderGrid();
+  }, 200);
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  buildNumpad();
+  neonInitForSize(6);
+  setTimeout(function(){
+    if(typeof Neon !== 'undefined' && Neon.render){
+      Neon.render(document.getElementById('startLB'));
+    }
+  }, 500);
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
