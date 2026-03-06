@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>QUEENS - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:10px}
+.brand-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:3px;color:#b44dff;text-transform:uppercase;text-shadow:0 0 8px rgba(180,77,255,0.3)}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,9vw,60px);letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(13px,2.8vw,18px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:2px;max-width:360px;line-height:1.4}
+
+/* Difficulty grid */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;margin:6px 0}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:14px 10px;border:1px solid rgba(0,240,255,0.25);background:rgba(0,240,255,0.04);color:#00f0ff;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.2s;text-align:center}
+.diff-btn:hover{background:rgba(0,240,255,0.12);border-color:rgba(0,240,255,0.5);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+.diff-btn .diff-best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#4a4a6a;margin-top:4px;display:block}
+.diff-btn.span2{grid-column:span 2}
+
+.daily-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:16px 40px;border:2px solid #ffd700;background:rgba(255,215,0,0.06);color:#ffd700;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.2s;width:100%;max-width:340px;text-align:center;box-shadow:0 0 15px rgba(255,215,0,0.1)}
+.daily-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 25px rgba(255,215,0,0.2);transform:scale(1.02)}
+.daily-btn .daily-streak{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#8888aa;margin-top:4px;display:block}
+.daily-btn.completed{border-color:#39ff14;color:#39ff14;box-shadow:0 0 15px rgba(57,255,20,0.1)}
+
+.start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:10px;gap:0}
+
+.game-top-bar{display:flex;width:100%;max-width:500px;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:4px}
+.top-diff{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;color:#8888aa;text-transform:uppercase}
+.top-diff.daily{color:#ffd700}
+.top-timer{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(14px,3vw,18px);letter-spacing:1px;color:#8888aa}
+.top-queens{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#4a4a6a;display:flex;align-items:center;gap:4px}
+.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#4a4a6a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
+.top-back:hover{color:#00f0ff}
+
+/* GRID */
+.grid-wrap{position:relative;margin:4px 0 10px 0}
+.grid{display:grid;border:2px solid rgba(0,240,255,0.3);border-radius:4px;overflow:hidden;background:#0e0e1a}
+.cell{display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background 0.15s,box-shadow 0.15s;background:#0e0e1a}
+
+/* Region borders */
+.cell.border-top{border-top:2px solid rgba(255,255,255,0.5)!important}
+.cell.border-bottom{border-bottom:2px solid rgba(255,255,255,0.5)!important}
+.cell.border-left{border-left:2px solid rgba(255,255,255,0.5)!important}
+.cell.border-right{border-right:2px solid rgba(255,255,255,0.5)!important}
+
+.cell .queen{font-size:clamp(20px,5vw,30px);line-height:1;position:relative;z-index:2;filter:drop-shadow(0 0 6px currentColor)}
+.cell .queen.cyan{color:#00f0ff}
+.cell .queen.hint-queen{color:#ffd700;filter:drop-shadow(0 0 8px rgba(255,215,0,0.6))}
+
+.cell .x-mark{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:rgba(255,255,255,0.15);line-height:1;position:relative;z-index:2}
+
+/* Danger zone highlight */
+.cell.danger-zone::before{content:'';position:absolute;inset:0;background:rgba(255,45,123,0.05);pointer-events:none;z-index:1}
+
+/* Conflict */
+.cell.conflict{background-color:rgba(255,45,123,0.2)!important}
+.cell.conflict .queen{color:#ff2d7b!important;filter:drop-shadow(0 0 8px rgba(255,45,123,0.6))!important;animation:conflictPulse 0.4s ease-in-out}
+
+@keyframes conflictPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+
+/* Win */
+.cell.win-pulse .queen{animation:winPulse 0.6s ease-out}
+@keyframes winPulse{0%{transform:scale(1)}50%{transform:scale(1.3);filter:drop-shadow(0 0 15px rgba(57,255,20,0.8))}100%{transform:scale(1)}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:clamp(6px,1.5vw,12px);width:100%;max-width:500px;justify-content:center;margin:6px 0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(11px,2.5vw,13px);letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#8888aa;cursor:pointer;border-radius:4px;transition:all 0.15s;display:flex;align-items:center;gap:5px;flex:1;justify-content:center}
+.tool-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
+.tool-btn:active{transform:scale(0.96)}
+.tool-btn.active{border-color:rgba(0,240,255,0.4);background:rgba(0,240,255,0.1);color:#00f0ff}
+.tool-btn.disabled{opacity:0.3;pointer-events:none}
+.tool-btn .tool-icon{font-size:16px}
+
+/* COMPLETE SCREEN */
+#completeScreen{gap:12px}
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,44px);color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5),0 0 40px rgba(57,255,20,0.2);letter-spacing:6px}
+.complete-stars{font-size:clamp(32px,8vw,48px);margin:4px 0}
+.complete-stat{text-align:center;margin:2px 0}
+.complete-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(20px,5vw,30px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.complete-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+.complete-best{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;margin:2px 0}
+.complete-daily{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.complete-streak{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#8888aa;margin-top:2px}
+.complete-par{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#4a4a6a;margin:2px 0}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.play-btn.share-btn{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.share-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
+.play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:2px;text-align:center}
+
+/* LEADERBOARD */
+.leaderboard{width:100%;max-width:300px;margin:6px 0}
+.lb-title{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;text-align:center;margin-bottom:6px}
+.lb-row{display:flex;align-items:center;padding:3px 8px;gap:10px}
+.lb-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;color:#4a4a6a;width:20px;text-align:right}
+.lb-score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
+.lb-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
+
+/* Screen shake */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
+.shaking{animation:shake 0.3s ease-in-out}
+
+/* Particles */
+.particle{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:100}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:8px 20px;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* Legend */
+.legend{display:flex;gap:12px;justify-content:center;margin:4px 0;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#4a4a6a;text-transform:uppercase}
+.legend-icon{font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="brand-tag">NEON MIND</div>
+  <h1 class="main-title">QUEENS</h1>
+  <p class="subtitle">Place one queen per region, row, and column. No two queens may touch — not even diagonally.</p>
+
+  <div class="daily-btn" id="dailyBtn">
+    DAILY PUZZLE
+    <span class="daily-streak" id="dailyStreak"></span>
+  </div>
+
+  <div class="diff-grid" id="diffGrid"></div>
+
+  <div class="start-stats" id="startStats"></div>
+
+  <div class="leaderboard" id="startLB"></div>
+
+  <div class="controls-hint">TAP TO PLACE QUEEN / LONG-PRESS OR RIGHT-CLICK FOR X MARK</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="game-top-bar">
+    <button class="top-back" id="backBtn">&#x2190;</button>
+    <span class="top-diff" id="topDiff">7x7</span>
+    <span class="top-queens" id="topQueens"></span>
+    <span class="top-timer" id="topTimer">0:00</span>
+  </div>
+
+  <div class="grid-wrap" id="gridWrap">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn" id="xModeBtn">
+      <span class="tool-icon">&#x2717;</span> X-MARK
+    </button>
+    <button class="tool-btn" id="hintBtn">
+      <span class="tool-icon">&#x2605;</span> <span id="hintCount">HINT (3)</span>
+    </button>
+    <button class="tool-btn" id="clearBtn">
+      <span class="tool-icon">&#x21BA;</span> CLEAR
+    </button>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-icon" style="color:#00f0ff">&#9819;</span> Queen</span>
+    <span class="legend-item"><span class="legend-icon" style="color:rgba(255,255,255,0.15)">&#x2717;</span> Eliminated</span>
+    <span class="legend-item"><span class="legend-icon" style="color:#ffd700">&#9819;</span> Hint</span>
+  </div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div class="screen" id="completeScreen">
+  <div class="complete-title">SOLVED</div>
+  <div class="complete-stars" id="completeStars"></div>
+  <div class="complete-stat">
+    <div class="stat-val" id="completeTime"></div>
+    <div class="stat-lbl">SOLVE TIME</div>
+  </div>
+  <div class="complete-par" id="completePar"></div>
+  <div class="complete-best" id="completeBest" style="display:none">NEW PERSONAL BEST!</div>
+  <div class="complete-daily" id="completeDaily" style="display:none"></div>
+  <div class="complete-streak" id="completeStreakInfo"></div>
+
+  <div class="btn-row">
+    <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="nextBtn">NEXT PUZZLE</button>
+    <button class="play-btn menu-btn" id="menuBtn">MENU</button>
+  </div>
+
+  <div class="leaderboard" id="completeLB"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+'use strict';
+
+// ── REGION COLORS ──
+var REGION_COLORS = [
+  {name:'cyan',   hex:'#00f0ff', r:0,   g:240, b:255},
+  {name:'pink',   hex:'#ff2d7b', r:255, g:45,  b:123},
+  {name:'green',  hex:'#39ff14', r:57,  g:255, b:20},
+  {name:'gold',   hex:'#ffd700', r:255, g:215, b:0},
+  {name:'purple', hex:'#b44dff', r:180, g:77,  b:255},
+  {name:'orange', hex:'#ff8c00', r:255, g:140, b:0},
+  {name:'teal',   hex:'#00b4d8', r:0,   g:180, b:216},
+  {name:'magenta',hex:'#e040fb', r:224, g:64,  b:251},
+  {name:'red',    hex:'#ff4444', r:255, g:68,  b:68}
+];
+
+// ── PAR TIMES (seconds) ──
+var PAR_TIMES = {5:60, 6:120, 7:180, 8:300, 9:480};
+
+// ── STATE ──
+var N = 7;
+var board = [];
+var regions = [];
+var solution = [];
+var hintsLeft = 3;
+var hintsUsed = 0;
+var hintCells = {};
+var xMode = false;
+var timerStart = 0;
+var timerElapsed = 0;
+var timerInterval = null;
+var isDaily = false;
+var currentSeed = 0;
+var solved = false;
+var solveTimeSnap = 0;
+var longPressTimer = null;
+var longPressTriggered = false;
+
+// ── AUDIO ──
+var audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol) {
+  try {
+    var ctx = getAudio();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol || 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function sndPlace() { playTone(880, 0.12, 'sine', 0.12); playTone(1100, 0.08, 'sine', 0.08); }
+function sndRemove() { playTone(440, 0.1, 'triangle', 0.08); }
+function sndError() { playTone(200, 0.25, 'sawtooth', 0.1); playTone(150, 0.3, 'sawtooth', 0.08); }
+function sndHint() { playTone(660, 0.1, 'sine', 0.1); setTimeout(function(){playTone(880,0.1,'sine',0.1);}, 100); }
+function sndComplete() {
+  var notes = [523, 659, 784, 1047];
+  for (var i = 0; i < notes.length; i++) {
+    (function(f, delay) { setTimeout(function(){ playTone(f, 0.3, 'sine', 0.12); }, delay); })(notes[i], i * 120);
+  }
+}
+function sndXMark() { playTone(300, 0.06, 'triangle', 0.06); }
+
+// ── SEEDED PRNG (Mulberry32) ──
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ── STORAGE ──
+var STATS_KEY = 'neonarcade_neonmind_queens_stats';
+var CURRENT_KEY = 'neonarcade_neonmind_queens_current';
+function scoreKey(n) { return 'neonarcade_neonmind_queens_scores_' + n; }
+
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveStats(s) {
+  localStorage.setItem(STATS_KEY, JSON.stringify(s));
+}
+function saveScore(key, score) {
+  var scores = JSON.parse(localStorage.getItem(key) || '[]');
+  scores.push({ score: score, ts: Date.now() });
+  scores.sort(function(a, b) { return a.score - b.score; });
+  scores = scores.slice(0, 5);
+  localStorage.setItem(key, JSON.stringify(scores));
+  return scores;
+}
+function getScores(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+}
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  var mins = Math.floor(diff / 60000);
+  var hours = Math.floor(diff / 3600000);
+  var days = Math.floor(diff / 86400000);
+  if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
+  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+  if (mins > 0) return mins + (mins === 1 ? ' min ago' : ' mins ago');
+  return 'just now';
+}
+function formatTime(secs) {
+  var m = Math.floor(secs / 60);
+  var s = Math.floor(secs % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+function saveCurrent() {
+  var data = {
+    N: N, board: board.slice(), regions: regions.slice(), solution: solution.slice(),
+    hintsLeft: hintsLeft, hintsUsed: hintsUsed, hintCells: Object.keys(hintCells).map(Number),
+    elapsed: getElapsed(), isDaily: isDaily, seed: currentSeed
+  };
+  localStorage.setItem(CURRENT_KEY, JSON.stringify(data));
+}
+function clearCurrent() {
+  localStorage.removeItem(CURRENT_KEY);
+}
+function loadCurrent() {
+  try { return JSON.parse(localStorage.getItem(CURRENT_KEY)); } catch(e) { return null; }
+}
+
+// ── PUZZLE GENERATION ──
+
+function isSafe(queens, r, c) {
+  for (var i = 0; i < queens.length; i++) {
+    var qr = queens[i][0], qc = queens[i][1];
+    if (qr === r || qc === c) return false;
+    if (Math.abs(qr - r) <= 1 && Math.abs(qc - c) <= 1) return false;
+  }
+  return true;
+}
+
+function placeQueens(n, rng) {
+  var queens = [];
+  function solve(row) {
+    if (row === n) return true;
+    var cols = [];
+    for (var c = 0; c < n; c++) cols.push(c);
+    for (var i = cols.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = cols[i]; cols[i] = cols[j]; cols[j] = tmp;
+    }
+    for (var ci = 0; ci < cols.length; ci++) {
+      if (isSafe(queens, row, cols[ci])) {
+        queens.push([row, cols[ci]]);
+        if (solve(row + 1)) return true;
+        queens.pop();
+      }
+    }
+    return false;
+  }
+  if (solve(0)) return queens;
+  return null;
+}
+
+function generateRegions(n, queens, rng) {
+  var grid = new Array(n * n).fill(-1);
+  var frontiers = [];
+
+  for (var i = 0; i < queens.length; i++) {
+    var idx = queens[i][0] * n + queens[i][1];
+    grid[idx] = i;
+    frontiers.push([idx]);
+  }
+
+  var unclaimed = n * n - n;
+  var maxIter = n * n * 100;
+  var iter = 0;
+
+  while (unclaimed > 0 && iter < maxIter) {
+    iter++;
+    var activeRegions = [];
+    for (var ri = 0; ri < n; ri++) {
+      if (frontiers[ri].length > 0) activeRegions.push(ri);
+    }
+    if (activeRegions.length === 0) break;
+
+    var region = activeRegions[Math.floor(rng() * activeRegions.length)];
+    var frontier = frontiers[region];
+
+    var fi = Math.floor(rng() * frontier.length);
+    var cell = frontier[fi];
+    var cr = Math.floor(cell / n), cc = cell % n;
+
+    var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    for (var di = dirs.length - 1; di > 0; di--) {
+      var dj = Math.floor(rng() * (di + 1));
+      var dtmp = dirs[di]; dirs[di] = dirs[dj]; dirs[dj] = dtmp;
+    }
+
+    var expanded = false;
+    for (var d = 0; d < dirs.length; d++) {
+      var nr = cr + dirs[d][0], nc = cc + dirs[d][1];
+      if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+        var ni = nr * n + nc;
+        if (grid[ni] === -1) {
+          grid[ni] = region;
+          frontier.push(ni);
+          unclaimed--;
+          expanded = true;
+          break;
+        }
+      }
+    }
+
+    if (!expanded) {
+      frontier.splice(fi, 1);
+    }
+  }
+
+  for (var ci = 0; ci < grid.length; ci++) {
+    if (grid[ci] === -1) {
+      var cr2 = Math.floor(ci / n), cc2 = ci % n;
+      var nbrs = [[0,1],[0,-1],[1,0],[-1,0]];
+      for (var nd = 0; nd < nbrs.length; nd++) {
+        var ar = cr2 + nbrs[nd][0], ac = cc2 + nbrs[nd][1];
+        if (ar >= 0 && ar < n && ac >= 0 && ac < n && grid[ar * n + ac] !== -1) {
+          grid[ci] = grid[ar * n + ac];
+          break;
+        }
+      }
+    }
+  }
+
+  return grid;
+}
+
+function solveBoard(n, regionGrid) {
+  var solutions = [];
+  var queenPlacement = new Array(n).fill(-1);
+  var regionUsed = new Array(n).fill(false);
+  var colUsed = new Array(n).fill(false);
+
+  function canPlace(row, col) {
+    if (colUsed[col]) return false;
+    var region = regionGrid[row * n + col];
+    if (regionUsed[region]) return false;
+    if (row > 0) {
+      var pc = queenPlacement[row - 1];
+      if (pc !== -1 && Math.abs(pc - col) <= 1) return false;
+    }
+    return true;
+  }
+
+  function solve(row) {
+    if (row === n) {
+      solutions.push(queenPlacement.slice());
+      return solutions.length >= 2;
+    }
+    for (var c = 0; c < n; c++) {
+      if (canPlace(row, c)) {
+        var region = regionGrid[row * n + c];
+        queenPlacement[row] = c;
+        colUsed[c] = true;
+        regionUsed[region] = true;
+        if (solve(row + 1)) return true;
+        queenPlacement[row] = -1;
+        colUsed[c] = false;
+        regionUsed[region] = false;
+      }
+    }
+    return false;
+  }
+
+  solve(0);
+  return solutions;
+}
+
+function checkAllContiguous(n, regionGrid) {
+  for (var r = 0; r < n; r++) {
+    var cells = [];
+    for (var i = 0; i < n * n; i++) {
+      if (regionGrid[i] === r) cells.push(i);
+    }
+    if (cells.length === 0) return false;
+
+    var visited = {};
+    var queue = [cells[0]];
+    visited[cells[0]] = true;
+    var count = 0;
+
+    while (queue.length > 0) {
+      var c = queue.shift();
+      count++;
+      var cr = Math.floor(c / n), cc = c % n;
+      var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+      for (var d = 0; d < dirs.length; d++) {
+        var nrr = cr + dirs[d][0], ncc = cc + dirs[d][1];
+        if (nrr >= 0 && nrr < n && ncc >= 0 && ncc < n) {
+          var ni = nrr * n + ncc;
+          if (!visited[ni] && regionGrid[ni] === r) {
+            visited[ni] = true;
+            queue.push(ni);
+          }
+        }
+      }
+    }
+
+    if (count !== cells.length) return false;
+  }
+  return true;
+}
+
+function isRegionContiguous(n, regionGrid, regionId) {
+  var cells = [];
+  for (var i = 0; i < n * n; i++) {
+    if (regionGrid[i] === regionId) cells.push(i);
+  }
+  if (cells.length <= 1) return true;
+  var visited = {};
+  var queue = [cells[0]];
+  visited[cells[0]] = true;
+  var count = 0;
+  while (queue.length > 0) {
+    var c = queue.shift();
+    count++;
+    var cr = Math.floor(c / n), cc = c % n;
+    var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    for (var d = 0; d < dirs.length; d++) {
+      var nrr = cr + dirs[d][0], ncc = cc + dirs[d][1];
+      if (nrr >= 0 && nrr < n && ncc >= 0 && ncc < n) {
+        var ni = nrr * n + ncc;
+        if (!visited[ni] && regionGrid[ni] === regionId) {
+          visited[ni] = true;
+          queue.push(ni);
+        }
+      }
+    }
+  }
+  return count === cells.length;
+}
+
+// Try to repair regions to ensure unique solution
+function repairRegions(n, regionGrid, queens) {
+  var grid = regionGrid.slice();
+  // Build queen position lookup: row -> col
+  var queenCol = new Array(n).fill(-1);
+  for (var qi = 0; qi < queens.length; qi++) {
+    queenCol[queens[qi][0]] = queens[qi][1];
+  }
+
+  for (var repair = 0; repair < 20; repair++) {
+    var solutions = solveBoard(n, grid);
+    if (solutions.length === 1) return grid;
+    if (solutions.length === 0) return null;
+
+    // Find the intended solution
+    var intended = new Array(n);
+    for (var qi2 = 0; qi2 < queens.length; qi2++) {
+      intended[queens[qi2][0]] = queens[qi2][1];
+    }
+
+    // Find an alternate solution
+    var alt = null;
+    for (var si = 0; si < solutions.length; si++) {
+      var isIntended = true;
+      for (var ri = 0; ri < n; ri++) {
+        if (solutions[si][ri] !== intended[ri]) { isIntended = false; break; }
+      }
+      if (!isIntended) { alt = solutions[si]; break; }
+    }
+    if (!alt) return grid; // only intended solution found
+
+    // Find first row that differs
+    var diffRow = -1;
+    for (var ri2 = 0; ri2 < n; ri2++) {
+      if (alt[ri2] !== intended[ri2]) { diffRow = ri2; break; }
+    }
+    if (diffRow === -1) return grid;
+
+    // The alternate solution puts a queen at (diffRow, alt[diffRow])
+    // which is in the same region as the intended queen at (diffRow, intended[diffRow])
+    var altCell = diffRow * n + alt[diffRow];
+    var altRegion = grid[altCell];
+    var intendedCell = diffRow * n + intended[diffRow];
+    var intendedRegion = grid[intendedCell];
+
+    // We need to move altCell to a different region to break this alternate solution
+    // Try to reassign altCell to an adjacent cell's region (if different)
+    var altR = Math.floor(altCell / n), altC = altCell % n;
+    var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    var fixed = false;
+    for (var d = 0; d < dirs.length; d++) {
+      var nr = altR + dirs[d][0], nc = altC + dirs[d][1];
+      if (nr >= 0 && nr < n && nc >= 0 && nc < n) {
+        var neighborRegion = grid[nr * n + nc];
+        if (neighborRegion !== altRegion) {
+          // Try reassigning altCell to neighborRegion
+          var oldRegion = grid[altCell];
+          grid[altCell] = neighborRegion;
+          // Check both regions still contiguous and each still has a queen
+          if (isRegionContiguous(n, grid, oldRegion) &&
+              isRegionContiguous(n, grid, neighborRegion)) {
+            // Check old region still has its queen
+            var oldHasQueen = false, newHasQueen = false;
+            for (var qi3 = 0; qi3 < queens.length; qi3++) {
+              var qIdx = queens[qi3][0] * n + queens[qi3][1];
+              if (grid[qIdx] === oldRegion) oldHasQueen = true;
+              if (grid[qIdx] === neighborRegion) newHasQueen = true;
+            }
+            if (oldHasQueen && newHasQueen) {
+              fixed = true;
+              break;
+            }
+          }
+          grid[altCell] = oldRegion; // revert
+        }
+      }
+    }
+
+    if (!fixed) {
+      // Try moving more aggressively: find any border cell of altRegion
+      // that can be moved to break the ambiguity
+      var regionCells = [];
+      for (var i = 0; i < n * n; i++) {
+        if (grid[i] === altRegion && i !== intendedCell) regionCells.push(i);
+      }
+      for (var rci = 0; rci < regionCells.length; rci++) {
+        var cell = regionCells[rci];
+        var cr = Math.floor(cell / n), cc2 = cell % n;
+        for (var d2 = 0; d2 < dirs.length; d2++) {
+          var nr2 = cr + dirs[d2][0], nc2 = cc2 + dirs[d2][1];
+          if (nr2 >= 0 && nr2 < n && nc2 >= 0 && nc2 < n) {
+            var nbrReg = grid[nr2 * n + nc2];
+            if (nbrReg !== altRegion) {
+              var oldR = grid[cell];
+              grid[cell] = nbrReg;
+              if (isRegionContiguous(n, grid, oldR) && isRegionContiguous(n, grid, nbrReg)) {
+                var oHQ = false, nHQ = false;
+                for (var qi4 = 0; qi4 < queens.length; qi4++) {
+                  var qI = queens[qi4][0] * n + queens[qi4][1];
+                  if (grid[qI] === oldR) oHQ = true;
+                  if (grid[qI] === nbrReg) nHQ = true;
+                }
+                if (oHQ && nHQ) { fixed = true; break; }
+              }
+              grid[cell] = oldR;
+            }
+          }
+          if (fixed) break;
+        }
+        if (fixed) break;
+      }
+    }
+
+    if (!fixed) return null; // Can't repair
+  }
+
+  var finalSol = solveBoard(n, grid);
+  return finalSol.length === 1 ? grid : null;
+}
+
+function generatePuzzle(n, seed) {
+  var currentSeed = seed;
+  for (var seedRound = 0; seedRound < 100; seedRound++) {
+    var rng = mulberry32(currentSeed);
+    for (var attempt = 0; attempt < 100; attempt++) {
+      var queens = placeQueens(n, rng);
+      if (!queens) continue;
+
+      var regionGrid = generateRegions(n, queens, rng);
+
+      // Validate regions
+      var regionSizes = new Array(n).fill(0);
+      var regionHasQueen = new Array(n).fill(false);
+      for (var i = 0; i < n * n; i++) {
+        regionSizes[regionGrid[i]]++;
+      }
+      for (var qi = 0; qi < queens.length; qi++) {
+        var qidx = queens[qi][0] * n + queens[qi][1];
+        regionHasQueen[regionGrid[qidx]] = true;
+      }
+
+      var valid = true;
+      for (var ri = 0; ri < n; ri++) {
+        if (regionSizes[ri] < 1 || !regionHasQueen[ri]) { valid = false; break; }
+      }
+      if (!valid) continue;
+
+      if (!checkAllContiguous(n, regionGrid)) continue;
+
+      // Try to repair for unique solution
+      var repairedGrid = repairRegions(n, regionGrid, queens);
+      if (!repairedGrid) continue;
+
+      var sol = new Array(n * n).fill(0);
+      for (var si = 0; si < queens.length; si++) {
+        sol[queens[si][0] * n + queens[si][1]] = 1;
+      }
+
+      return { regions: repairedGrid, solution: sol };
+    }
+    currentSeed += 7919;
+  }
+  // Should never reach here
+  return { regions: new Array(n*n).fill(0), solution: new Array(n*n).fill(0) };
+}
+
+// ── DAILY SEED ──
+function getDailySeed() {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
+  return y * 10000 + m * 100 + d;
+}
+function getDailyKey() {
+  return 'neonarcade_neonmind_queens_daily_' + getDailySeed();
+}
+
+// ── SCREENS ──
+function showScreen(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) {
+    screens[i].classList.remove('active');
+  }
+  document.getElementById(id).classList.add('active');
+}
+
+function showStart() {
+  stopTimer();
+  clearCurrent();
+  showScreen('startScreen');
+  updateStartScreen();
+}
+
+function updateStartScreen() {
+  var stats = loadStats();
+  var played = stats.played || 0;
+  var won = stats.won || 0;
+  var streak = stats.streak || 0;
+  var bestStreak = stats.bestStreak || 0;
+
+  // Stats
+  var statsEl = document.getElementById('startStats');
+  while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
+  var statItems = [
+    {val: played, lbl: 'PLAYED'},
+    {val: won, lbl: 'WON'},
+    {val: streak, lbl: 'STREAK'},
+    {val: bestStreak, lbl: 'BEST'}
+  ];
+  for (var si = 0; si < statItems.length; si++) {
+    var wrap = document.createElement('div');
+    wrap.className = 'start-stat';
+    var valEl = document.createElement('div');
+    valEl.className = 'stat-val';
+    valEl.textContent = statItems[si].val;
+    var lblEl = document.createElement('div');
+    lblEl.className = 'stat-lbl';
+    lblEl.textContent = statItems[si].lbl;
+    wrap.appendChild(valEl);
+    wrap.appendChild(lblEl);
+    statsEl.appendChild(wrap);
+  }
+
+  // Daily button
+  var dailyBtn = document.getElementById('dailyBtn');
+  var dailyData = null;
+  try { dailyData = JSON.parse(localStorage.getItem(getDailyKey())); } catch(e) {}
+  if (dailyData && dailyData.completed) {
+    dailyBtn.classList.add('completed');
+    dailyBtn.textContent = '';
+    var txt = document.createTextNode('DAILY COMPLETE ');
+    dailyBtn.appendChild(txt);
+    var check = document.createElement('span');
+    check.textContent = '\u2713';
+    dailyBtn.appendChild(check);
+    var streakSpan = document.createElement('span');
+    streakSpan.className = 'daily-streak';
+    streakSpan.textContent = 'Streak: ' + streak + ' days';
+    dailyBtn.appendChild(streakSpan);
+  } else {
+    dailyBtn.classList.remove('completed');
+    dailyBtn.textContent = '';
+    dailyBtn.appendChild(document.createTextNode('DAILY PUZZLE'));
+    var streakSpan2 = document.createElement('span');
+    streakSpan2.className = 'daily-streak';
+    streakSpan2.textContent = 'Streak: ' + streak + ' days';
+    dailyBtn.appendChild(streakSpan2);
+  }
+
+  // Difficulty buttons
+  var grid = document.getElementById('diffGrid');
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+  var sizes = [5, 6, 7, 8, 9];
+  var labels = ['5x5 EASY', '6x6 MEDIUM', '7x7 HARD', '8x8 EXPERT', '9x9 MASTER'];
+  for (var i = 0; i < sizes.length; i++) {
+    var btn = document.createElement('div');
+    btn.className = 'diff-btn' + (i === sizes.length - 1 ? ' span2' : '');
+    var scores = getScores(scoreKey(sizes[i]));
+    var bestStr = scores.length > 0 ? 'Best: ' + formatTime(scores[0].score) : 'No record';
+    btn.appendChild(document.createTextNode(labels[i]));
+    var bestSpan = document.createElement('span');
+    bestSpan.className = 'diff-best';
+    bestSpan.textContent = bestStr;
+    btn.appendChild(bestSpan);
+    btn.setAttribute('data-size', sizes[i]);
+    btn.addEventListener('click', (function(s) { return function() { startGame(s, false); }; })(sizes[i]));
+    grid.appendChild(btn);
+  }
+
+  // Leaderboard for most recently played size
+  var lastSize = stats.lastSize || 7;
+  renderLeaderboard(document.getElementById('startLB'), lastSize);
+}
+
+function renderLeaderboard(el, n) {
+  while (el.firstChild) el.removeChild(el.firstChild);
+  var scores = getScores(scoreKey(n));
+  if (scores.length === 0) return;
+
+  var title = document.createElement('div');
+  title.className = 'lb-title';
+  title.textContent = 'TOP 5 \u2014 ' + n + 'x' + n;
+  el.appendChild(title);
+
+  for (var i = 0; i < scores.length; i++) {
+    var row = document.createElement('div');
+    row.className = 'lb-row';
+    var rank = document.createElement('span');
+    rank.className = 'lb-rank';
+    rank.textContent = (i + 1);
+    var score = document.createElement('span');
+    score.className = 'lb-score';
+    score.textContent = formatTime(scores[i].score);
+    var time = document.createElement('span');
+    time.className = 'lb-time';
+    time.textContent = timeAgo(scores[i].ts);
+    row.appendChild(rank);
+    row.appendChild(score);
+    row.appendChild(time);
+    el.appendChild(row);
+  }
+}
+
+// ── START GAME ──
+function startGame(size, daily) {
+  N = size;
+  isDaily = daily;
+  solved = false;
+  hintsLeft = 3;
+  hintsUsed = 0;
+  hintCells = {};
+  xMode = false;
+  solveTimeSnap = 0;
+
+  if (daily) {
+    currentSeed = getDailySeed();
+  } else {
+    currentSeed = Math.floor(Math.random() * 2000000000);
+  }
+
+  var puzzle = generatePuzzle(N, currentSeed);
+  regions = puzzle.regions;
+  solution = puzzle.solution;
+  board = new Array(N * N).fill(0);
+
+  showScreen('gameScreen');
+  buildGrid();
+  startTimer();
+  updateUI();
+  saveCurrent();
+}
+
+function startDaily() {
+  var dailyData = null;
+  try { dailyData = JSON.parse(localStorage.getItem(getDailyKey())); } catch(e) {}
+  if (dailyData && dailyData.completed) {
+    showToast('Daily already completed!');
+    return;
+  }
+  startGame(7, true);
+}
+
+// ── TIMER ──
+function startTimer() {
+  timerStart = Date.now();
+  timerElapsed = 0;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 200);
+  updateTimerDisplay();
+}
+function resumeTimer(elapsed) {
+  timerElapsed = elapsed;
+  timerStart = Date.now();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 200);
+  updateTimerDisplay();
+}
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+function getElapsed() {
+  return timerElapsed + (Date.now() - timerStart) / 1000;
+}
+function updateTimerDisplay() {
+  document.getElementById('topTimer').textContent = formatTime(getElapsed());
+}
+
+// ── BUILD GRID ──
+function buildGrid() {
+  var grid = document.getElementById('grid');
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+  grid.style.gridTemplateColumns = 'repeat(' + N + ', 1fr)';
+
+  var cellSize = Math.min(Math.floor((window.innerWidth - 40) / N), Math.floor((window.innerHeight - 220) / N), 64);
+  cellSize = Math.max(cellSize, 36);
+
+  for (var i = 0; i < N * N; i++) {
+    var cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.setAttribute('data-idx', i);
+    cell.style.width = cellSize + 'px';
+    cell.style.height = cellSize + 'px';
+
+    var r = Math.floor(i / N), c = i % N;
+    var region = regions[i];
+    var col = REGION_COLORS[region % REGION_COLORS.length];
+
+    // Background color
+    cell.style.backgroundColor = 'rgba(' + col.r + ',' + col.g + ',' + col.b + ',0.12)';
+    cell.style.borderWidth = '1px';
+    cell.style.borderStyle = 'solid';
+    cell.style.borderColor = 'rgba(' + col.r + ',' + col.g + ',' + col.b + ',0.08)';
+
+    // Region borders
+    if (r > 0 && regions[(r-1)*N+c] !== region) {
+      cell.classList.add('border-top');
+    }
+    if (r < N-1 && regions[(r+1)*N+c] !== region) {
+      cell.classList.add('border-bottom');
+    }
+    if (c > 0 && regions[r*N+c-1] !== region) {
+      cell.classList.add('border-left');
+    }
+    if (c < N-1 && regions[r*N+c+1] !== region) {
+      cell.classList.add('border-right');
+    }
+
+    cell.addEventListener('click', handleCellClick);
+    cell.addEventListener('contextmenu', handleCellRightClick);
+    cell.addEventListener('touchstart', handleTouchStart, {passive: false});
+    cell.addEventListener('touchend', handleTouchEnd);
+    cell.addEventListener('touchmove', handleTouchMove, {passive: false});
+
+    grid.appendChild(cell);
+  }
+
+  updateTopBar();
+}
+
+function updateTopBar() {
+  var diff = N + 'x' + N;
+  var diffEl = document.getElementById('topDiff');
+  diffEl.textContent = isDaily ? 'DAILY ' + diff : diff;
+  diffEl.className = 'top-diff' + (isDaily ? ' daily' : '');
+
+  updateQueenCount();
+  document.getElementById('hintCount').textContent = 'HINT (' + hintsLeft + ')';
+  document.getElementById('hintBtn').className = 'tool-btn' + (hintsLeft <= 0 ? ' disabled' : '');
+  document.getElementById('xModeBtn').className = 'tool-btn' + (xMode ? ' active' : '');
+}
+
+function updateQueenCount() {
+  var placed = 0;
+  for (var i = 0; i < board.length; i++) if (board[i] === 1) placed++;
+  var el = document.getElementById('topQueens');
+  el.textContent = '';
+  var icon = document.createElement('span');
+  icon.style.cssText = 'color:#00f0ff;font-size:16px';
+  icon.textContent = '\u265B';
+  el.appendChild(icon);
+  el.appendChild(document.createTextNode(' ' + placed + '/' + N));
+}
+
+// ── CELL RENDERING ──
+function renderCell(idx) {
+  var grid = document.getElementById('grid');
+  var cell = grid.children[idx];
+  if (!cell) return;
+
+  // Clear content
+  var existing = cell.querySelector('.queen');
+  if (existing) existing.remove();
+  existing = cell.querySelector('.x-mark');
+  if (existing) existing.remove();
+
+  cell.classList.remove('conflict', 'danger-zone', 'win-pulse');
+
+  if (board[idx] === 1) {
+    var q = document.createElement('span');
+    q.className = 'queen' + (hintCells[idx] ? ' hint-queen' : ' cyan');
+    q.textContent = '\u265B';
+    cell.appendChild(q);
+  } else if (board[idx] === 2) {
+    var x = document.createElement('span');
+    x.className = 'x-mark';
+    x.textContent = '\u2717';
+    cell.appendChild(x);
+  }
+}
+
+function renderAllCells() {
+  for (var i = 0; i < N * N; i++) renderCell(i);
+}
+
+function updateUI() {
+  renderAllCells();
+  updateQueenCount();
+  highlightDangerZones();
+  checkConflicts();
+}
+
+// ── HIGHLIGHT DANGER ZONES ──
+function highlightDangerZones() {
+  var cells = document.getElementById('grid').children;
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].classList.remove('danger-zone');
+  }
+
+  for (var i = 0; i < board.length; i++) {
+    if (board[i] !== 1) continue;
+    var r = Math.floor(i / N), c = i % N;
+    for (var j = 0; j < N; j++) {
+      if (j !== c) cells[r * N + j].classList.add('danger-zone');
+      if (j !== r) cells[j * N + c].classList.add('danger-zone');
+    }
+    for (var dr = -1; dr <= 1; dr++) {
+      for (var dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        var nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < N && nc >= 0 && nc < N && board[nr * N + nc] !== 1) {
+          cells[nr * N + nc].classList.add('danger-zone');
+        }
+      }
+    }
+  }
+}
+
+// ── CHECK CONFLICTS ──
+function checkConflicts() {
+  var cells = document.getElementById('grid').children;
+  var conflicting = {};
+
+  var queens = [];
+  for (var i = 0; i < board.length; i++) {
+    if (board[i] === 1) queens.push(i);
+  }
+
+  for (var a = 0; a < queens.length; a++) {
+    for (var b = a + 1; b < queens.length; b++) {
+      var ar = Math.floor(queens[a] / N), ac = queens[a] % N;
+      var br = Math.floor(queens[b] / N), bc = queens[b] % N;
+
+      var conflict = false;
+      if (ar === br) conflict = true;
+      if (ac === bc) conflict = true;
+      if (Math.abs(ar - br) <= 1 && Math.abs(ac - bc) <= 1) conflict = true;
+      if (regions[queens[a]] === regions[queens[b]]) conflict = true;
+
+      if (conflict) {
+        conflicting[queens[a]] = true;
+        conflicting[queens[b]] = true;
+      }
+    }
+  }
+
+  var hasConflict = false;
+  for (var i = 0; i < board.length; i++) {
+    if (conflicting[i]) {
+      cells[i].classList.add('conflict');
+      hasConflict = true;
+    } else {
+      cells[i].classList.remove('conflict');
+    }
+  }
+
+  return hasConflict;
+}
+
+// ── INPUT HANDLING ──
+function handleCellClick(e) {
+  if (solved) return;
+  e.preventDefault();
+  if (longPressTriggered) { longPressTriggered = false; return; }
+  var idx = parseInt(this.getAttribute('data-idx'));
+  toggleCell(idx, xMode);
+}
+
+function handleCellRightClick(e) {
+  if (solved) return;
+  e.preventDefault();
+  var idx = parseInt(this.getAttribute('data-idx'));
+  toggleCell(idx, true);
+}
+
+function handleTouchStart(e) {
+  if (solved) return;
+  e.preventDefault();
+  longPressTriggered = false;
+  var self = this;
+  longPressTimer = setTimeout(function() {
+    longPressTriggered = true;
+    var idx = parseInt(self.getAttribute('data-idx'));
+    toggleCell(idx, true);
+  }, 400);
+}
+
+function handleTouchEnd(e) {
+  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+}
+
+function handleTouchMove(e) {
+  e.preventDefault();
+  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+}
+
+function toggleCell(idx, asX) {
+  if (solved) return;
+  if (hintCells[idx]) return;
+
+  if (asX) {
+    if (board[idx] === 2) {
+      board[idx] = 0;
+      sndRemove();
+    } else if (board[idx] === 0) {
+      board[idx] = 2;
+      sndXMark();
+    } else {
+      board[idx] = 2;
+      sndXMark();
+    }
+  } else {
+    if (board[idx] === 1) {
+      board[idx] = 0;
+      sndRemove();
+    } else {
+      board[idx] = 1;
+      sndPlace();
+    }
+  }
+
+  updateUI();
+  saveCurrent();
+
+  var placed = 0;
+  for (var i = 0; i < board.length; i++) if (board[i] === 1) placed++;
+  if (placed === N) {
+    if (!checkConflicts() && checkSolution()) {
+      onPuzzleSolved();
+    } else {
+      sndError();
+      var wrap = document.getElementById('gridWrap');
+      wrap.classList.add('shaking');
+      setTimeout(function() { wrap.classList.remove('shaking'); }, 300);
+    }
+  }
+}
+
+function checkSolution() {
+  var rowCounts = new Array(N).fill(0);
+  var colCounts = new Array(N).fill(0);
+  var regionCounts = new Array(N).fill(0);
+
+  for (var i = 0; i < board.length; i++) {
+    if (board[i] === 1) {
+      var r = Math.floor(i / N), c = i % N;
+      rowCounts[r]++;
+      colCounts[c]++;
+      regionCounts[regions[i]]++;
+    }
+  }
+
+  for (var i = 0; i < N; i++) {
+    if (rowCounts[i] !== 1 || colCounts[i] !== 1 || regionCounts[i] !== 1) return false;
+  }
+
+  return true;
+}
+
+// ── TOOLS ──
+function toggleXMode() {
+  xMode = !xMode;
+  document.getElementById('xModeBtn').className = 'tool-btn' + (xMode ? ' active' : '');
+}
+
+function useHint() {
+  if (solved || hintsLeft <= 0) return;
+
+  var regionHasCorrectQueen = new Array(N).fill(false);
+  for (var i = 0; i < board.length; i++) {
+    if (board[i] === 1 && solution[i] === 1) {
+      regionHasCorrectQueen[regions[i]] = true;
+    }
+  }
+
+  var candidates = [];
+  for (var i = 0; i < solution.length; i++) {
+    if (solution[i] === 1 && !regionHasCorrectQueen[regions[i]]) {
+      candidates.push(i);
+    }
+  }
+
+  if (candidates.length === 0) return;
+
+  var idx = candidates[Math.floor(Math.random() * candidates.length)];
+
+  // Clear wrong queens in this region
+  for (var i = 0; i < board.length; i++) {
+    if (regions[i] === regions[idx] && board[i] === 1 && solution[i] !== 1) {
+      board[i] = 0;
+    }
+  }
+
+  board[idx] = 1;
+  hintCells[idx] = true;
+  hintsLeft--;
+  hintsUsed++;
+
+  sndHint();
+  updateUI();
+  updateTopBar();
+  saveCurrent();
+
+  var placed = 0;
+  for (var i = 0; i < board.length; i++) if (board[i] === 1) placed++;
+  if (placed === N && !checkConflicts() && checkSolution()) {
+    onPuzzleSolved();
+  }
+}
+
+function clearBoard() {
+  if (solved) return;
+  for (var i = 0; i < board.length; i++) {
+    if (!hintCells[i]) board[i] = 0;
+  }
+  updateUI();
+  saveCurrent();
+}
+
+function goBack() {
+  stopTimer();
+  saveCurrent();
+  showStart();
+}
+
+// ── PUZZLE SOLVED ──
+function onPuzzleSolved() {
+  solved = true;
+  solveTimeSnap = getElapsed();
+  stopTimer();
+  clearCurrent();
+
+  sndComplete();
+
+  // Win animation
+  var cells = document.getElementById('grid').children;
+  for (var i = 0; i < cells.length; i++) {
+    if (board[i] === 1) {
+      (function(cell, delay) {
+        setTimeout(function() { cell.classList.add('win-pulse'); }, delay);
+      })(cells[i], i * 50);
+    }
+  }
+
+  spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 30);
+
+  // Calculate stars
+  var stars = 1;
+  if (hintsUsed === 0) stars = 2;
+  if (hintsUsed === 0 && solveTimeSnap <= PAR_TIMES[N]) stars = 3;
+
+  // Save score
+  var scores = saveScore(scoreKey(N), Math.floor(solveTimeSnap));
+  var isBest = scores.length > 0 && scores[0].score === Math.floor(solveTimeSnap);
+
+  // Update stats
+  var stats = loadStats();
+  stats.played = (stats.played || 0) + 1;
+  stats.won = (stats.won || 0) + 1;
+  stats.lastSize = N;
+
+  if (isDaily) {
+    var dailyData = { completed: true, time: solveTimeSnap, stars: stars, date: getDailySeed() };
+    localStorage.setItem(getDailyKey(), JSON.stringify(dailyData));
+
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yKey = 'neonarcade_neonmind_queens_daily_' + (yesterday.getFullYear() * 10000 + (yesterday.getMonth()+1) * 100 + yesterday.getDate());
+    var yData = null;
+    try { yData = JSON.parse(localStorage.getItem(yKey)); } catch(e) {}
+
+    if (yData && yData.completed) {
+      stats.streak = (stats.streak || 0) + 1;
+    } else {
+      stats.streak = 1;
+    }
+    if ((stats.streak || 0) > (stats.bestStreak || 0)) {
+      stats.bestStreak = stats.streak;
+    }
+  }
+
+  saveStats(stats);
+
+  var capturedStars = stars;
+  var capturedIsBest = isBest;
+  var capturedScores = scores;
+  var capturedStats = stats;
+
+  setTimeout(function() {
+    showComplete(solveTimeSnap, capturedStars, capturedIsBest, capturedScores, capturedStats);
+  }, 800);
+}
+
+function showComplete(elapsed, stars, isBest, scores, stats) {
+  showScreen('completeScreen');
+
+  var starsEl = document.getElementById('completeStars');
+  starsEl.textContent = '';
+  for (var i = 0; i < 3; i++) {
+    var span = document.createElement('span');
+    if (i < stars) {
+      span.style.cssText = 'color:#ffd700;filter:drop-shadow(0 0 6px rgba(255,215,0,0.5))';
+      span.textContent = '\u2605';
+    } else {
+      span.style.color = '#4a4a6a';
+      span.textContent = '\u2606';
+    }
+    starsEl.appendChild(span);
+  }
+
+  document.getElementById('completeTime').textContent = formatTime(elapsed);
+
+  var parText = 'Par: ' + formatTime(PAR_TIMES[N]);
+  if (elapsed <= PAR_TIMES[N]) parText += ' \u2014 UNDER PAR!';
+  document.getElementById('completePar').textContent = parText;
+
+  document.getElementById('completeBest').style.display = isBest ? 'block' : 'none';
+
+  if (isDaily) {
+    document.getElementById('completeDaily').style.display = 'block';
+    document.getElementById('completeDaily').textContent = 'DAILY PUZZLE COMPLETE';
+    document.getElementById('completeStreakInfo').textContent = 'Streak: ' + (stats.streak || 1) + ' day' + ((stats.streak || 1) !== 1 ? 's' : '');
+  } else {
+    document.getElementById('completeDaily').style.display = 'none';
+    document.getElementById('completeStreakInfo').textContent = '';
+  }
+
+  renderLeaderboard(document.getElementById('completeLB'), N);
+}
+
+// ── SHARE ──
+function shareResult() {
+  var stats = loadStats();
+  var lines = [
+    'QUEENS [' + N + 'x' + N + ']',
+    'Solved in ' + formatTime(solveTimeSnap),
+    (hintsUsed === 0 ? 'No hints used' : hintsUsed + ' hint' + (hintsUsed !== 1 ? 's' : '') + ' used')
+  ];
+  if (isDaily) {
+    lines.push('Streak: ' + (stats.streak || 1) + ' days');
+  }
+  lines.push('neonarcade.net/neonmind/queens');
+  var text = lines.join('\n');
+
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function() {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('Copied to clipboard!');
+    });
+  }
+}
+
+function playNext() {
+  startGame(N, false);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+// ── PARTICLES ──
+function spawnParticles(x, y, count) {
+  var colors = ['#00f0ff', '#39ff14', '#ffd700', '#ff2d7b', '#b44dff', '#ff8c00'];
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var col = colors[Math.floor(Math.random() * colors.length)];
+    p.style.backgroundColor = col;
+    p.style.boxShadow = '0 0 6px ' + col;
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    var sz = (3 + Math.random() * 4) + 'px';
+    p.style.width = sz;
+    p.style.height = sz;
+    document.body.appendChild(p);
+
+    var angle = Math.random() * Math.PI * 2;
+    var speed = 80 + Math.random() * 200;
+    var dx = Math.cos(angle) * speed;
+    var dy = Math.sin(angle) * speed;
+
+    (function(el, pdx, pdy, sx, sy) {
+      var startTime = Date.now();
+      var dur = 600 + Math.random() * 600;
+      function animate() {
+        var t = (Date.now() - startTime) / dur;
+        if (t > 1) { el.remove(); return; }
+        el.style.left = (sx + pdx * t) + 'px';
+        el.style.top = (sy + pdy * t + 100 * t * t) + 'px';
+        el.style.opacity = String(1 - t);
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    })(p, dx, dy, x, y);
+  }
+}
+
+// ── RESUME ──
+function tryResume() {
+  var data = loadCurrent();
+  if (!data) return false;
+
+  if (data.isDaily && data.seed !== getDailySeed()) {
+    clearCurrent();
+    return false;
+  }
+
+  N = data.N;
+  board = data.board;
+  regions = data.regions;
+  solution = data.solution;
+  hintsLeft = data.hintsLeft;
+  hintsUsed = data.hintsUsed;
+  hintCells = {};
+  if (data.hintCells) {
+    for (var i = 0; i < data.hintCells.length; i++) hintCells[data.hintCells[i]] = true;
+  }
+  isDaily = data.isDaily;
+  currentSeed = data.seed;
+  solved = false;
+  xMode = false;
+
+  showScreen('gameScreen');
+  buildGrid();
+  resumeTimer(data.elapsed || 0);
+  updateUI();
+  return true;
+}
+
+// ── EVENT LISTENERS ──
+document.getElementById('dailyBtn').addEventListener('click', startDaily);
+document.getElementById('backBtn').addEventListener('click', goBack);
+document.getElementById('xModeBtn').addEventListener('click', toggleXMode);
+document.getElementById('hintBtn').addEventListener('click', useHint);
+document.getElementById('clearBtn').addEventListener('click', clearBoard);
+document.getElementById('shareBtn').addEventListener('click', shareResult);
+document.getElementById('nextBtn').addEventListener('click', playNext);
+document.getElementById('menuBtn').addEventListener('click', showStart);
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('gameScreen').classList.contains('active') && !solved) {
+      goBack();
+    }
+  }
+});
+
+window.addEventListener('resize', function() {
+  if (document.getElementById('gameScreen').classList.contains('active')) {
+    buildGrid();
+    updateUI();
+  }
+});
+
+// ── INIT ──
+function init() {
+  var saved = loadCurrent();
+  if (saved) {
+    tryResume();
+  } else {
+    showStart();
+  }
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>

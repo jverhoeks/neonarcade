@@ -300,120 +300,47 @@ function generateCompleteGrid(rng) {
   return grid;
 }
 
-// ============ SOLVER (with constraint propagation + backtracking) ============
+// ============ SOLVER (pure backtracking) ============
 function solvePuzzle(puzzle, maxSolutions) {
   maxSolutions = maxSolutions || 2;
   var solutions = [];
+  var g = copyGrid(puzzle);
 
-  function getCandidates(grid, r, c) {
-    var used = {};
-    var i, cells, k;
-    for (i = 0; i < 6; i++) if (grid[r][i]) used[grid[r][i]] = true;
-    for (i = 0; i < 6; i++) if (grid[i][c]) used[grid[i][c]] = true;
-    cells = getBlockCells(r, c);
-    for (k = 0; k < cells.length; k++) if (grid[cells[k][0]][cells[k][1]]) used[grid[cells[k][0]][cells[k][1]]] = true;
-    var cands = [];
-    for (var d = 1; d <= 6; d++) if (!used[d]) cands.push(d);
-    return cands;
-  }
-
-  function propagate(grid) {
-    var changed = true;
-    while (changed) {
-      changed = false;
-      var r, c, d, i;
-      // Naked singles
-      for (r = 0; r < 6; r++) {
-        for (c = 0; c < 6; c++) {
-          if (grid[r][c] !== 0) continue;
-          var cands = getCandidates(grid, r, c);
-          if (cands.length === 0) return false;
-          if (cands.length === 1) { grid[r][c] = cands[0]; changed = true; }
-        }
-      }
-      // Hidden singles in rows
-      for (r = 0; r < 6; r++) {
-        for (d = 1; d <= 6; d++) {
-          var found = false;
-          for (c = 0; c < 6; c++) if (grid[r][c] === d) { found = true; break; }
-          if (found) continue;
-          var positions = [];
-          for (c = 0; c < 6; c++) {
-            if (grid[r][c] === 0 && getCandidates(grid, r, c).indexOf(d) >= 0) positions.push(c);
-          }
-          if (positions.length === 0) return false;
-          if (positions.length === 1) { grid[r][positions[0]] = d; changed = true; }
-        }
-      }
-      // Hidden singles in columns
-      for (c = 0; c < 6; c++) {
-        for (d = 1; d <= 6; d++) {
-          var foundC = false;
-          for (r = 0; r < 6; r++) if (grid[r][c] === d) { foundC = true; break; }
-          if (foundC) continue;
-          var posC = [];
-          for (r = 0; r < 6; r++) {
-            if (grid[r][c] === 0 && getCandidates(grid, r, c).indexOf(d) >= 0) posC.push(r);
-          }
-          if (posC.length === 0) return false;
-          if (posC.length === 1) { grid[posC[0]][c] = d; changed = true; }
-        }
-      }
-      // Hidden singles in blocks
-      for (var bi = 0; bi < 6; bi++) {
-        var br = Math.floor(bi / 3) * 2;
-        var bc = (bi % 3) * 3;
-        for (d = 1; d <= 6; d++) {
-          var foundB = false;
-          var cellsB = [];
-          for (var rr = br; rr < br + 2; rr++) {
-            for (var cc = bc; cc < bc + 3; cc++) {
-              if (grid[rr][cc] === d) { foundB = true; break; }
-              if (grid[rr][cc] === 0 && getCandidates(grid, rr, cc).indexOf(d) >= 0) cellsB.push([rr, cc]);
-            }
-            if (foundB) break;
-          }
-          if (foundB) continue;
-          if (cellsB.length === 0) return false;
-          if (cellsB.length === 1) { grid[cellsB[0][0]][cellsB[0][1]] = d; changed = true; }
-        }
-      }
+  function isValid(grid, r, c, num) {
+    for (var i = 0; i < 6; i++) {
+      if (grid[r][i] === num) return false;
+      if (grid[i][c] === num) return false;
+    }
+    var cells = getBlockCells(r, c);
+    for (var k = 0; k < cells.length; k++) {
+      if (grid[cells[k][0]][cells[k][1]] === num) return false;
     }
     return true;
   }
 
-  function backtrack(grid) {
+  function solve(grid) {
     if (solutions.length >= maxSolutions) return;
-    var g = copyGrid(grid);
-    var ok = propagate(g);
-    if (!ok) return;
-
-    // Find empty cell with fewest candidates (MRV)
-    var bestR = -1, bestC = -1, bestLen = 7;
+    // Find first empty cell
     for (var r = 0; r < 6; r++) {
       for (var c = 0; c < 6; c++) {
-        if (g[r][c] === 0) {
-          var len = getCandidates(g, r, c).length;
-          if (len < bestLen) { bestLen = len; bestR = r; bestC = c; }
+        if (grid[r][c] === 0) {
+          for (var d = 1; d <= 6; d++) {
+            if (isValid(grid, r, c, d)) {
+              grid[r][c] = d;
+              solve(grid);
+              if (solutions.length >= maxSolutions) return;
+              grid[r][c] = 0;
+            }
+          }
+          return; // no valid digit = dead end
         }
       }
     }
-
-    if (bestR === -1) {
-      solutions.push(copyGrid(g));
-      return;
-    }
-
-    var cands = getCandidates(g, bestR, bestC);
-    for (var i = 0; i < cands.length; i++) {
-      var g2 = copyGrid(g);
-      g2[bestR][bestC] = cands[i];
-      backtrack(g2);
-      if (solutions.length >= maxSolutions) return;
-    }
+    // No empty cells = solved
+    solutions.push(copyGrid(grid));
   }
 
-  backtrack(puzzle);
+  solve(g);
   return solutions;
 }
 

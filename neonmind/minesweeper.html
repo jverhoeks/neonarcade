@@ -1135,7 +1135,6 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     // BFS cascade
     var rings = cascadeReveal(r, c);
     animateCascade(rings);
-    saveCurrentGame();
   }
 
   function cascadeReveal(r, c) {
@@ -1172,7 +1171,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   }
 
   function animateCascade(rings) {
-    if (rings.length === 0) { checkWin(); return; }
+    if (rings.length === 0) { saveCurrentGame(); checkWin(); return; }
 
     rings.forEach(function(ring, ringIdx) {
       setTimeout(function() {
@@ -1186,7 +1185,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
         if (ringIdx === 0) sndReveal();
         else sndCascade(ringIdx);
 
-        if (ringIdx === rings.length - 1) checkWin();
+        if (ringIdx === rings.length - 1) { saveCurrentGame(); checkWin(); }
       }, ringIdx * 45);
     });
   }
