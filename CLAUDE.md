@@ -5,22 +5,32 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 
 ## Architecture
 - Each game = 1 HTML file (HTML + CSS + JS, all inline)
-- Landing page: `landing.html` — card grid linking to all games with screenshots
+- Shared client library: `neon.js` — unified API, scores, name input, global leaderboard UI
+- 3 categories: `neonarcade/` (action), `neonmind/` (puzzles), `neongrind/` (skill/speed)
+- Hub pages: `index.html` (main), `neonarcade/index.html`, `neonmind/index.html`, `neongrind/index.html`
 - Screenshots: `screenshots/{game-name}.png` — 1280x800 viewport captures
-- Game ideas backlog: `VIRAL_GAME_IDEAS.md` — ranked list of 25+ concepts
+- Backend: Cloudflare Worker (`src/worker.js`) with KV storage at `neonarcade.net`
+- Admin dashboards: `admin/stats.html`, `admin/topscores.html`
 
 ## File Structure
 ```
-index.html                # Main landing page (NEON ARCADE hub)
-neon-snake.html           # Neon Snake (the original)
-impostor-pixel.html       # Spot the different tile
-catalyst.html             # One-touch chain reaction
-pong-both-sides.html      # Control both paddles
-afterglow.html            # Toxic trail maze
-flappy-rewind.html        # Forward + rewind with inverted gravity
-palette.html              # Color matching / Color IQ
-pacman-amnesia.html       # Invisible maze Pac-Man
-screenshots/              # PNG screenshots for landing page
+index.html                # Main hub page linking to 3 categories
+neon.js                   # Shared client library (API + scores + name + leaderboard UI)
+api.js                    # Legacy API client (backward compat)
+scores.js                 # Legacy scores (backward compat)
+src/worker.js             # Cloudflare Worker backend
+neonarcade/               # Action/arcade games
+  index.html              # NEON ARCADE hub
+  neon-snake.html, catalyst.html, pong-both-sides.html, ...
+neonmind/                 # Classic brain puzzles
+  index.html              # NEON MIND hub
+  sudoku.html, queens.html, minesweeper.html, ...
+neongrind/                # Skill/speed games
+  index.html              # NEON GRIND hub
+  mathblitz.html, reflex-chain.html, ...
+admin/                    # Admin dashboards
+  stats.html, topscores.html
+screenshots/              # PNG screenshots for landing page cards
 VIRAL_GAME_IDEAS.md       # Full ideas backlog with 25+ ranked concepts
 ```
 
@@ -77,44 +87,57 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 
 ### Required Features (EVERY game must have)
 1. **Start screen** — Game title (Orbitron 900), subtitle explaining the hook, START button, controls hint
-2. **Game over screen** — Stats, high score comparison, SHARE button, PLAY AGAIN button
+2. **Game over / completion screen** — Stats, high score comparison, SHARE button, PLAY AGAIN button
 3. **Share button** — Copies emoji-based result to clipboard via `navigator.clipboard.writeText()`. Use `navigator.share()` as primary on mobile with clipboard fallback
-4. **High scores (Top 5 with timestamps)** — Use this exact pattern in every game:
+4. **Neon.js integration (scores + leaderboard + name)** — Include shared library and use it for all score management:
+   ```html
+   <!-- Include at end of body, BEFORE your game script -->
+   <script src="/neon.js"></script>
+   ```
    ```javascript
-   // Storage key: 'neonarcade_scores_GAMENAME' (e.g. 'neonarcade_scores_snake')
-   function saveScore(key, score) {
-     var scores = JSON.parse(localStorage.getItem(key) || '[]');
-     scores.push({ score: score, ts: Date.now() });
-     scores.sort(function(a, b) { return b.score - a.score; });
-     scores = scores.slice(0, 5);
-     localStorage.setItem(key, JSON.stringify(scores));
-     return scores;
-   }
-   function timeAgo(ts) {
-     var diff = Date.now() - ts;
-     var mins  = Math.floor(diff / 60000);
-     var hours = Math.floor(diff / 3600000);
-     var days  = Math.floor(diff / 86400000);
-     if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-     if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-     if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-     return 'just now';
-   }
+   // Initialize on page load (call once)
+   Neon.init({
+     game: 'game-slug',           // Used for API + leaderboard key
+     mode: 'high',                // 'high' = higher is better, 'low' = lower is better (time puzzles)
+     key: 'neonarcade_neonmind_gamename_scores',  // localStorage key (custom per variant if needed)
+     formatScore: function(s) {   // Optional: custom display formatter
+       var m = Math.floor(s / 60);
+       var sec = Math.floor(s % 60);
+       return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+     }
+   });
+
+   // On game complete:
+   // 1. Prompt for name if not set
+   var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+   nameReady.then(function() {
+     // 2. Save score (local top 10 + global submission)
+     return Neon.save(finalScore);
+   }).then(function(result) {
+     // result = { scores, isNewBest, globalRank }
+     // 3. Render leaderboard table
+     Neon.render(document.getElementById('leaderboard-container'));
+     // 4. Show celebration if global top 5
+     if (result.globalRank >= 1 && result.globalRank <= 5) {
+       Neon.showGlobalSplash(result.globalRank);
+     }
+   });
+
+   // To show leaderboard on start screen:
+   Neon.render(document.getElementById('startLB'));
+   // To get current high score for display:
+   var best = Neon.getHighScore();
    ```
-   Call `saveScore('neonarcade_scores_GAMENAME', finalScore)` on game over.
-   On the result screen, render the top-5 list:
-   ```
-   🏆 YOUR BESTS
-    1   1240 pts   just now
-    2    980 pts   2 hours ago
-    3    740 pts   1 day ago
-   ```
-   Style: Rajdhani font, rank in dim text, score in neon cyan, timestamp in `#4a4a6a`.
+   **Important patterns:**
+   - For games with multiple difficulties/sizes: re-call `Neon.init()` with updated `key` when difficulty changes
+   - Storage key convention: `neonarcade_{category}_{game}_scores_{variant}` (e.g. `neonarcade_neonmind_queens_scores_7`)
+   - Provide a `<div id="...LB"></div>` container — Neon.js renders the full score table + global leaderboard
+   - Neon.js auto-injects its own CSS styles, no need to add leaderboard styling
 5. **Sound effects** — Web Audio API (oscillator-based, no external audio files). At minimum: action sound, success sound, fail/death sound
 6. **Mobile support** — Touch controls, `touch-action: none`, responsive canvas sizing, `user-scalable=no` in viewport meta
 7. **Desktop support** — Keyboard controls (arrows/WASD/space as appropriate)
 8. **HiDPI rendering** — Use `devicePixelRatio` for sharp canvas on Retina displays
-9. **60fps** — Use `requestAnimationFrame` with delta-time or fixed timestep
+9. **60fps** — Use `requestAnimationFrame` with delta-time or fixed timestep (for games with animation loops)
 
 ### Code Structure Pattern
 ```javascript
@@ -149,11 +172,15 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 
 ## How to Add a New Game
 
-1. Create `{game-name}.html` in project root (single file, self-contained)
+1. Create `{category}/{game-name}.html` in the appropriate category folder:
+   - `neonarcade/` — action/arcade games
+   - `neonmind/` — classic brain puzzles (sudoku, minesweeper, etc.)
+   - `neongrind/` — skill/speed challenges
 2. Follow the visual style guide above exactly
-3. Include all required features (start screen, game over, share, high score, sound, mobile)
-4. Take a screenshot at 1280x800 and save as `screenshots/{game-name}.png`
-5. Add a card to `landing.html` following the existing card pattern:
+3. Include `<script src="/neon.js"></script>` and integrate with Neon.init/save/render (see Required Features #4)
+4. Include all required features (start screen, game over, share, neon.js scores, sound, mobile)
+5. Take a screenshot at 1280x800 and save as `screenshots/{game-name}.png`
+6. Add a card to the category's `index.html` hub page following the existing card pattern:
    ```html
    <a href="{game-name}.html" class="game-card" data-accent="{color}">
      <div class="card-screenshot">
@@ -165,17 +192,22 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
        <span class="card-number">GAME XX</span>
        <h2 class="card-title">{GAME NAME}</h2>
        <p class="card-desc">{2-3 sentence description of the hook}</p>
+       <div class="card-meta">
+         <span class="meta-item"><strong>N</strong> detail</span>
+         <span class="meta-item">Category</span>
+       </div>
        <div class="card-tags">
          <span class="tag">{Tag1}</span>
          <span class="tag">{Tag2}</span>
          <span class="tag">{Tag3}</span>
        </div>
-       <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+       <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
      </div>
    </a>
    ```
-6. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
-7. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold)
+7. Update the hub page game count in the stats section
+8. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
+9. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple)
 
 ## Ideas Backlog
 See `VIRAL_GAME_IDEAS.md` for 25+ ranked game concepts organized in tiers:

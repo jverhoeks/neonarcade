@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NURIKABE - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+.title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:4px}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,18px);letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-bottom:30px}
+
+.diff-group{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.diff-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.diff-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.1);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s;margin-bottom:20px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.best-times{text-align:center;margin-bottom:20px}
+.best-times h3{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#4a4a6a;margin-bottom:8px}
+.best-row{font-family:'Rajdhani',sans-serif;font-size:15px;color:#8888aa;margin:3px 0}
+.best-row .rank{color:#4a4a6a;width:24px;display:inline-block;text-align:right;margin-right:8px}
+.best-row .score{color:#00f0ff;margin-right:10px}
+.best-row .ago{color:#4a4a6a;font-size:13px}
+
+.start-lb{width:100%;max-width:340px;margin-top:8px}
+
+/* CONTROLS HINT */
+.controls-hint{font-size:13px;color:#4a4a6a;letter-spacing:1px;margin-top:10px;text-align:center;line-height:1.6}
+
+/* GAME SCREEN */
+.game-top{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:500px;margin-bottom:10px;padding:0 4px}
+.game-top .back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#4a4a6a;background:none;border:1px solid #2a2a3a;padding:6px 14px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.game-top .back-btn:hover{color:#00f0ff;border-color:#00f0ff}
+.game-info{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;color:#8888aa}
+.timer{font-family:'Orbitron',monospace;font-size:16px;letter-spacing:2px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+
+/* GRID */
+.grid-wrap{position:relative;display:flex;align-items:center;justify-content:center;flex:1;width:100%;max-width:500px;max-height:calc(100% - 140px)}
+.grid{display:grid;gap:2px;padding:3px;border-radius:4px;background:rgba(255,255,255,0.03);border:1px solid #1a1a2e}
+
+.cell{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;transition:background .15s,box-shadow .15s,border-color .15s;border:1px solid #1a1a2e;background:#12121f;font-family:'Orbitron',monospace;font-weight:700}
+
+/* CELL STATES */
+.cell.empty{background:#12121f;border-color:#1a1a2e}
+.cell.black{background:#06060c;border-color:#0e0e18;box-shadow:inset 0 0 6px rgba(0,0,0,0.6)}
+.cell.white{background:#1a1a30;border-color:rgba(0,240,255,0.15);box-shadow:0 0 4px rgba(0,240,255,0.06)}
+.cell.numbered{background:#1a1a30;border-color:rgba(0,240,255,0.25);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.5);cursor:default;box-shadow:0 0 6px rgba(0,240,255,0.1)}
+
+/* FEEDBACK */
+.cell.satisfied{border-color:rgba(57,255,20,0.35)!important;box-shadow:0 0 8px rgba(57,255,20,0.12)!important}
+.cell.error{border-color:rgba(255,45,123,0.5)!important;box-shadow:0 0 10px rgba(255,45,123,0.2)!important;animation:cellShake .25s}
+
+@keyframes cellShake{0%,100%{transform:translate(0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,2px)}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#8888aa;background:rgba(255,255,255,0.03);border:1px solid #2a2a3a;padding:8px 16px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.tool-btn:hover{color:#00f0ff;border-color:#00f0ff;background:rgba(0,240,255,0.06)}
+.tool-btn:disabled{opacity:0.3;cursor:default;color:#4a4a6a;border-color:#1a1a2e}
+.tool-btn:disabled:hover{color:#4a4a6a;border-color:#1a1a2e;background:rgba(255,255,255,0.03)}
+
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:#4a4a6a;letter-spacing:1px;flex-wrap:wrap;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-swatch{width:16px;height:16px;border-radius:2px;border:1px solid #1a1a2e}
+.legend-swatch.sw-empty{background:#12121f}
+.legend-swatch.sw-black{background:#06060c}
+.legend-swatch.sw-white{background:#1a1a30;border-color:rgba(0,240,255,0.15)}
+
+/* COMPLETE SCREEN */
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,48px);letter-spacing:6px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.6),0 0 40px rgba(57,255,20,0.2);margin-bottom:6px}
+.complete-sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-bottom:20px}
+.stats-row{display:flex;gap:30px;margin-bottom:20px}
+.stat{text-align:center}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:24px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#4a4a6a;margin-top:2px}
+.stars{font-size:32px;margin-bottom:16px;letter-spacing:4px}
+
+.complete-grid{display:grid;gap:1px;margin-bottom:20px}
+.mini-cell{width:10px;height:10px;border-radius:1px}
+.mini-cell.mc-black{background:#06060c}
+.mini-cell.mc-white{background:rgba(0,240,255,0.2)}
+.mini-cell.mc-num{background:rgba(0,240,255,0.4)}
+
+.btn-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.08);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.share-btn:hover{background:rgba(180,77,255,0.18);box-shadow:0 0 18px rgba(180,77,255,0.2);transform:scale(1.04)}
+.copied-msg{font-size:12px;color:#39ff14;letter-spacing:2px;opacity:0;transition:opacity .3s;margin-bottom:8px}
+.copied-msg.show{opacity:1}
+
+.complete-lb{width:100%;max-width:340px;margin-top:4px}
+
+/* SCREEN SHAKE */
+.shake{animation:screenShake .25s}
+@keyframes screenShake{0%,100%{transform:translate(0)}25%{transform:translate(-3px,1px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,3px)}}
+
+/* SCROLLBAR */
+.screen::-webkit-scrollbar{width:4px}
+.screen::-webkit-scrollbar-track{background:transparent}
+.screen::-webkit-scrollbar-thumb{background:#1a1a2e;border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="title">NURIKABE</div>
+  <div class="subtitle">ISLANDS IN THE STREAM</div>
+  <div class="diff-group">
+    <button class="diff-btn active" data-size="5" onclick="selectSize(5)">5x5</button>
+    <button class="diff-btn" data-size="7" onclick="selectSize(7)">7x7</button>
+    <button class="diff-btn" data-size="9" onclick="selectSize(9)">9x9</button>
+  </div>
+  <button class="play-btn" onclick="startGame()">START</button>
+  <div class="best-times" id="bestTimes"></div>
+  <div class="start-lb" id="startLB"></div>
+  <div class="controls-hint">
+    CLICK / TAP TO CYCLE: EMPTY &rarr; WALL &rarr; ISLAND &rarr; EMPTY<br>
+    RIGHT-CLICK / LONG-PRESS: MARK ISLAND DIRECTLY
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="game-top">
+    <button class="back-btn" onclick="goBack()">&#8592; BACK</button>
+    <div class="game-info" id="gameInfo">5x5 EASY</div>
+    <div class="timer" id="timer">00:00</div>
+  </div>
+  <div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="toolbar">
+    <button class="tool-btn" id="undoBtn" onclick="doUndo()" disabled>UNDO</button>
+    <button class="tool-btn" onclick="doClear()">CLEAR</button>
+    <button class="tool-btn" id="hintBtn" onclick="doHint()">HINT (3)</button>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch sw-empty"></div> EMPTY</div>
+    <div class="legend-item"><div class="legend-swatch sw-black"></div> WALL</div>
+    <div class="legend-item"><div class="legend-swatch sw-white"></div> ISLAND</div>
+  </div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+  <div class="complete-title">SOLVED</div>
+  <div class="complete-sub" id="completeSub">PUZZLE COMPLETE</div>
+  <div id="completeGrid"></div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val" id="statTime">00:00</div><div class="stat-label">TIME</div></div>
+    <div class="stat"><div class="stat-val" id="statHints">0</div><div class="stat-label">HINTS</div></div>
+    <div class="stat"><div class="stat-val" id="statSize">5x5</div><div class="stat-label">SIZE</div></div>
+  </div>
+  <div class="stars" id="stars"></div>
+  <div class="btn-row">
+    <button class="share-btn" onclick="doShare()">SHARE</button>
+    <button class="play-btn" onclick="playAgain()">PLAY AGAIN</button>
+  </div>
+  <div class="copied-msg" id="copiedMsg">COPIED TO CLIPBOARD</div>
+  <div class="complete-lb" id="completeLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+
+// ─── AUDIO ───
+var audioCtx = null;
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol){
+  try{
+    var ctx = getAudio();
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = type||'square';
+    o.frequency.value = freq;
+    g.gain.value = vol||0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+function sndBlack(){ playTone(80, 0.12, 'triangle', 0.1); }
+function sndWhite(){ playTone(660, 0.08, 'sine', 0.07); }
+function sndClear(){ playTone(300, 0.06, 'sine', 0.05); }
+function sndIslandComplete(){
+  playTone(523, 0.15, 'sine', 0.07);
+  setTimeout(function(){ playTone(659, 0.15, 'sine', 0.07); }, 80);
+  setTimeout(function(){ playTone(784, 0.2, 'sine', 0.07); }, 160);
+}
+function sndError(){ playTone(120, 0.2, 'sawtooth', 0.06); }
+function sndUndo(){ playTone(400, 0.05, 'sine', 0.04); }
+function sndVictory(){
+  var notes = [523, 659, 784, 1047];
+  notes.forEach(function(n,i){
+    setTimeout(function(){ playTone(n, 0.25, 'sine', 0.08); }, i*120);
+  });
+}
+
+// ─── NEON INTEGRATION ───
+var neonFormatScore = function(s){
+  var m = Math.floor(s/60);
+  var sec = Math.floor(s%60);
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+};
+function neonInitForSize(n){
+  if(typeof Neon !== 'undefined'){
+    Neon.init({
+      game:'nurikabe',
+      mode:'low',
+      key:'neonarcade_neonmind_nurikabe_scores_'+n,
+      formatScore:neonFormatScore
+    });
+  }
+}
+
+// ─── STATE ───
+var currentSize = 5;
+var grid = [];       // player state: 0=empty, 1=black, 2=white. numbered cells are always 2
+var solution = [];   // 0=black, 1=island
+var numbers = [];    // -1 = no number, else the number
+var timer = 0;
+var timerInterval = null;
+var hintsUsed = 0;
+var maxHints = 3;
+var hintPenalty = 30;
+var undoStack = [];
+var gameActive = false;
+var longPressTimer = null;
+var longPressTriggered = false;
+
+// ─── SCREEN MANAGEMENT ───
+function showScreen(id){
+  var screens = document.querySelectorAll('.screen');
+  for(var i=0;i<screens.length;i++) screens[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── SIZE SELECTION ───
+window.selectSize = function(s){
+  currentSize = s;
+  var btns = document.querySelectorAll('.diff-btn');
+  for(var i=0;i<btns.length;i++){
+    btns[i].classList.toggle('active', parseInt(btns[i].getAttribute('data-size'))===s);
+  }
+  neonInitForSize(s);
+  renderBestTimes();
+  renderStartLB();
+};
+
+function renderBestTimes(){
+  var key = 'neonarcade_neonmind_nurikabe_scores_' + currentSize;
+  var scores = JSON.parse(localStorage.getItem(key)||'[]');
+  var el = document.getElementById('bestTimes');
+  if(!scores.length){ el.textContent=''; return; }
+  // Build with DOM methods
+  el.textContent = '';
+  var h3 = document.createElement('h3');
+  h3.textContent = 'YOUR BESTS (' + currentSize + 'x' + currentSize + ')';
+  el.appendChild(h3);
+  scores.slice(0,5).forEach(function(s,i){
+    var row = document.createElement('div');
+    row.className = 'best-row';
+    var rankSpan = document.createElement('span');
+    rankSpan.className = 'rank';
+    rankSpan.textContent = (i+1);
+    var scoreSpan = document.createElement('span');
+    scoreSpan.className = 'score';
+    scoreSpan.textContent = neonFormatScore(s.score);
+    var agoSpan = document.createElement('span');
+    agoSpan.className = 'ago';
+    agoSpan.textContent = timeAgo(s.ts);
+    row.appendChild(rankSpan);
+    row.appendChild(scoreSpan);
+    row.appendChild(agoSpan);
+    el.appendChild(row);
+  });
+}
+
+function renderStartLB(){
+  if(typeof Neon !== 'undefined'){
+    try{ Neon.render(document.getElementById('startLB')); }catch(e){}
+  }
+}
+
+function timeAgo(ts){
+  var diff = Date.now()-ts;
+  var mins=Math.floor(diff/60000), hours=Math.floor(diff/3600000), days=Math.floor(diff/86400000);
+  if(days>0) return days+(days===1?' day ago':' days ago');
+  if(hours>0) return hours+(hours===1?' hour ago':' hours ago');
+  if(mins>0) return mins+(mins===1?' min ago':' mins ago');
+  return 'just now';
+}
+
+function saveScore(key, score){
+  var scores = JSON.parse(localStorage.getItem(key)||'[]');
+  scores.push({score:score, ts:Date.now()});
+  scores.sort(function(a,b){ return a.score-b.score; }); // lower is better for time
+  scores = scores.slice(0,5);
+  localStorage.setItem(key, JSON.stringify(scores));
+  return scores;
+}
+
+// ─── PUZZLE GENERATION ───
+// Strategy: place islands on the grid, fill rest with black, verify constraints.
+
+function generatePuzzle(size){
+  var maxAttempts = 300;
+  for(var attempt=0; attempt<maxAttempts; attempt++){
+    var result = tryGenerate(size);
+    if(result) return result;
+  }
+  return fallbackPuzzle(size);
+}
+
+function tryGenerate(size){
+  var total = size*size;
+  var sol = new Array(total).fill(0); // 0=black
+  var nums = new Array(total).fill(-1);
+
+  // Determine how many islands and their sizes
+  var islandSizes = [];
+  var totalIsland = 0;
+  var targetIsland = Math.floor(total * (0.35 + Math.random()*0.15));
+
+  while(totalIsland < targetIsland - 3){
+    var maxS = Math.min(size, targetIsland - totalIsland);
+    if(maxS < 1) break;
+    var s;
+    if(size <= 5) s = 1 + Math.floor(Math.random()*Math.min(3, maxS));
+    else if(size <= 7) s = 1 + Math.floor(Math.random()*Math.min(4, maxS));
+    else s = 1 + Math.floor(Math.random()*Math.min(5, maxS));
+    islandSizes.push(s);
+    totalIsland += s;
+  }
+  if(totalIsland < targetIsland){
+    islandSizes.push(targetIsland - totalIsland);
+    totalIsland = targetIsland;
+  }
+
+  // Shuffle island sizes
+  shuffle(islandSizes);
+
+  var used = new Array(total).fill(false);
+
+  function neighbors(idx){
+    var r=Math.floor(idx/size), c=idx%size, res=[];
+    if(r>0) res.push(idx-size);
+    if(r<size-1) res.push(idx+size);
+    if(c>0) res.push(idx-1);
+    if(c<size-1) res.push(idx+1);
+    return res;
+  }
+
+  // Place each island
+  for(var ii=0; ii<islandSizes.length; ii++){
+    var isz = islandSizes[ii];
+    var placed = false;
+
+    var starts = [];
+    for(var s=0;s<total;s++) starts.push(s);
+    shuffle(starts);
+
+    for(var si=0; si<starts.length && !placed; si++){
+      var start = starts[si];
+      if(used[start]) continue;
+
+      var adj = neighbors(start);
+      var touchesIsland = false;
+      for(var a=0;a<adj.length;a++){
+        if(used[adj[a]]){ touchesIsland=true; break; }
+      }
+      if(touchesIsland) continue;
+
+      var island = [start];
+      var frontier = [];
+      var nbrs = neighbors(start);
+      for(var n=0;n<nbrs.length;n++){
+        if(!used[nbrs[n]]) frontier.push(nbrs[n]);
+      }
+
+      while(island.length < isz && frontier.length > 0){
+        shuffle(frontier);
+        var found = false;
+        for(var fi=0; fi<frontier.length; fi++){
+          var cand = frontier[fi];
+          if(used[cand]) continue;
+
+          var candAdj = neighbors(cand);
+          var ok = true;
+          for(var ca=0;ca<candAdj.length;ca++){
+            if(used[candAdj[ca]] && island.indexOf(candAdj[ca])===-1){
+              ok = false; break;
+            }
+          }
+          if(!ok) continue;
+
+          island.push(cand);
+          frontier.splice(fi,1);
+
+          var newNbrs = neighbors(cand);
+          for(var nn=0;nn<newNbrs.length;nn++){
+            if(!used[newNbrs[nn]] && island.indexOf(newNbrs[nn])===-1 && frontier.indexOf(newNbrs[nn])===-1){
+              frontier.push(newNbrs[nn]);
+            }
+          }
+          found = true;
+          break;
+        }
+        if(!found) break;
+      }
+
+      if(island.length === isz){
+        for(var k=0;k<island.length;k++){
+          used[island[k]] = true;
+          sol[island[k]] = 1;
+        }
+        var numIdx = island[Math.floor(Math.random()*island.length)];
+        nums[numIdx] = isz;
+        placed = true;
+      }
+    }
+
+    if(!placed) return null;
+  }
+
+  // Verify: black cells connected
+  var blackCells = [];
+  for(var i=0;i<total;i++){
+    if(sol[i]===0) blackCells.push(i);
+  }
+  if(blackCells.length === 0) return null;
+  if(!isConnected(blackCells, size)) return null;
+
+  // Verify: no 2x2 black square
+  if(has2x2Black(sol, size)) return null;
+
+  // Verify each island
+  var visited = new Array(total).fill(false);
+  for(var i=0;i<total;i++){
+    if(sol[i]===1 && !visited[i]){
+      var comp = floodFill(i, sol, size, 1);
+      var numCount = 0;
+      var numVal = 0;
+      for(var c=0;c<comp.length;c++){
+        visited[comp[c]] = true;
+        if(nums[comp[c]]>=0){ numCount++; numVal=nums[comp[c]]; }
+      }
+      if(numCount!==1) return null;
+      if(comp.length!==numVal) return null;
+    }
+  }
+
+  return {solution:sol, numbers:nums};
+}
+
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+}
+
+function floodFill(start, g, size, val){
+  var visited = {};
+  var queue = [start];
+  visited[start] = true;
+  var result = [start];
+  while(queue.length>0){
+    var cur = queue.shift();
+    var r=Math.floor(cur/size), c=cur%size;
+    var nbrs = [];
+    if(r>0) nbrs.push(cur-size);
+    if(r<size-1) nbrs.push(cur+size);
+    if(c>0) nbrs.push(cur-1);
+    if(c<size-1) nbrs.push(cur+1);
+    for(var i=0;i<nbrs.length;i++){
+      if(!visited[nbrs[i]] && g[nbrs[i]]===val){
+        visited[nbrs[i]] = true;
+        result.push(nbrs[i]);
+        queue.push(nbrs[i]);
+      }
+    }
+  }
+  return result;
+}
+
+function isConnected(cells, size){
+  if(cells.length<=1) return true;
+  var set = {};
+  for(var i=0;i<cells.length;i++) set[cells[i]]=true;
+  var visited = {};
+  var queue = [cells[0]];
+  visited[cells[0]]=true;
+  var count=1;
+  while(queue.length>0){
+    var cur=queue.shift();
+    var r=Math.floor(cur/size), c=cur%size;
+    var nbrs=[];
+    if(r>0) nbrs.push(cur-size);
+    if(r<size-1) nbrs.push(cur+size);
+    if(c>0) nbrs.push(cur-1);
+    if(c<size-1) nbrs.push(cur+1);
+    for(var i=0;i<nbrs.length;i++){
+      if(set[nbrs[i]]&&!visited[nbrs[i]]){
+        visited[nbrs[i]]=true;
+        count++;
+        queue.push(nbrs[i]);
+      }
+    }
+  }
+  return count===cells.length;
+}
+
+function has2x2Black(sol, size){
+  for(var r=0;r<size-1;r++){
+    for(var c=0;c<size-1;c++){
+      var i=r*size+c;
+      if(sol[i]===0 && sol[i+1]===0 && sol[i+size]===0 && sol[i+size+1]===0) return true;
+    }
+  }
+  return false;
+}
+
+// Fallback puzzles with known valid solutions
+function fallbackPuzzle(size){
+  if(size===5) return fallback5();
+  if(size===7) return fallback7();
+  return fallback9();
+}
+
+function fallback5(){
+  // Handcrafted valid 5x5 puzzles
+  var puzzles = [
+    {
+      //  W  W  W  B  B
+      //  B  B  W  B  W
+      //  B  W  B  B  W
+      //  W  B  W  B  B
+      //  W  W  B  W  W
+      sol:[1,1,1,0,0, 0,0,1,0,1, 0,1,0,0,1, 1,0,1,0,0, 1,1,0,1,1],
+      nums:[-1,3,-1,-1,-1, -1,-1,-1,-1,2, -1,1,-1,-1,-1, -1,-1,1,-1,-1, 3,-1,-1,-1,2]
+    },
+    {
+      //  B  W  B  B  B
+      //  B  W  B  W  W
+      //  W  B  B  B  W
+      //  W  W  B  W  B
+      //  B  B  B  W  B
+      sol:[0,1,0,0,0, 0,1,0,1,1, 1,0,0,0,1, 1,1,0,1,0, 0,0,0,1,0],
+      nums:[-1,2,-1,-1,-1, -1,-1,-1,-1,3, 1,-1,-1,-1,-1, -1,3,-1,1,-1, -1,-1,-1,1,-1]
+    },
+    {
+      //  W  B  W  B  B
+      //  B  B  W  W  B
+      //  W  B  B  W  B
+      //  W  B  W  B  B
+      //  W  B  W  W  B
+      sol:[1,0,1,0,0, 0,0,1,1,0, 1,0,0,1,0, 1,0,1,0,0, 1,0,1,1,0],
+      nums:[1,-1,-1,-1,-1, -1,-1,-1,4,-1, -1,-1,-1,-1,-1, 4,-1,1,-1,-1, -1,-1,-1,2,-1]
+    }
+  ];
+  return puzzles[Math.floor(Math.random()*puzzles.length)];
+}
+
+function fallback7(){
+  var puzzles = [
+    {
+      sol:[
+        1,0,0,1,0,0,0,
+        1,0,1,1,0,1,0,
+        0,0,1,0,0,1,0,
+        0,1,0,0,1,1,1,
+        0,1,1,0,0,0,1,
+        0,0,1,0,1,0,0,
+        1,0,0,0,1,1,0
+      ],
+      nums:[
+        2,-1,-1,-1,-1,-1,-1,
+        -1,-1,3,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,2,-1,
+        -1,-1,-1,-1,-1,-1,4,
+        -1,3,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,1,-1,-1,
+        1,-1,-1,-1,-1,2,-1
+      ]
+    },
+    {
+      sol:[
+        0,0,1,1,0,1,0,
+        1,0,0,1,0,1,0,
+        1,1,0,0,0,0,0,
+        0,1,0,1,1,1,0,
+        0,0,0,0,1,0,0,
+        0,1,1,0,0,0,1,
+        0,0,1,0,0,0,1
+      ],
+      nums:[
+        -1,-1,-1,3,-1,1,-1,
+        -1,-1,-1,-1,-1,-1,-1,
+        -1,3,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,3,-1,
+        -1,-1,-1,-1,-1,-1,-1,
+        -1,2,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,2
+      ]
+    }
+  ];
+  return puzzles[Math.floor(Math.random()*puzzles.length)];
+}
+
+function fallback9(){
+  var puzzles = [
+    {
+      sol:[
+        1,0,0,1,1,0,0,0,1,
+        1,0,1,0,1,0,1,0,1,
+        0,0,1,0,0,0,1,0,0,
+        0,1,0,0,1,0,1,1,0,
+        0,1,1,0,1,0,0,0,0,
+        0,0,1,0,0,0,1,1,0,
+        1,0,0,0,1,0,0,1,0,
+        1,0,1,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,1,1
+      ],
+      nums:[
+        2,-1,-1,-1,2,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,3,-1,2,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,1,-1,-1,1,-1,-1,2,-1,
+        -1,-1,3,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,2,-1,
+        1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,1,-1,-1,3,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,2
+      ]
+    }
+  ];
+  return puzzles[Math.floor(Math.random()*puzzles.length)];
+}
+
+// ─── GAME LOGIC ───
+
+window.startGame = function(){
+  var size = currentSize;
+  neonInitForSize(size);
+
+  var puzzle = generatePuzzle(size);
+  solution = puzzle.sol || puzzle.solution;
+  numbers = puzzle.nums || puzzle.numbers;
+
+  var total = size*size;
+  grid = new Array(total).fill(0);
+  for(var i=0;i<total;i++){
+    if(numbers[i]>=0) grid[i]=2;
+  }
+
+  hintsUsed = 0;
+  undoStack = [];
+  timer = 0;
+  gameActive = true;
+
+  var labels = {5:'5x5 EASY', 7:'7x7 MEDIUM', 9:'9x9 HARD'};
+  document.getElementById('gameInfo').textContent = labels[size]||size+'x'+size;
+
+  buildGrid(size);
+  updateTimer();
+  updateToolbar();
+  startTimer();
+  showScreen('gameScreen');
+};
+
+function buildGrid(size){
+  var gridEl = document.getElementById('grid');
+  // Clear using DOM
+  while(gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+
+  var maxW = Math.min(window.innerWidth - 40, 500);
+  var maxH = window.innerHeight - 200;
+  var maxGrid = Math.min(maxW, maxH);
+  var cellSize = Math.floor((maxGrid - (size+1)*2) / size);
+  cellSize = Math.max(32, Math.min(60, cellSize));
+
+  gridEl.style.gridTemplateColumns = 'repeat('+size+', '+cellSize+'px)';
+  gridEl.style.gridTemplateRows = 'repeat('+size+', '+cellSize+'px)';
+
+  var total = size*size;
+  for(var i=0;i<total;i++){
+    var cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.setAttribute('data-idx', i);
+
+    var fontSize = Math.max(12, Math.floor(cellSize * 0.45));
+    cell.style.fontSize = fontSize + 'px';
+
+    if(numbers[i]>=0){
+      cell.textContent = numbers[i];
+      cell.classList.add('numbered','white');
+    } else {
+      cell.classList.add('empty');
+    }
+
+    (function(idx){
+      cell.addEventListener('click', function(e){
+        e.preventDefault();
+        if(!gameActive) return;
+        if(numbers[idx]>=0) return;
+        if(longPressTriggered){ longPressTriggered=false; return; }
+        cycleCell(idx);
+      });
+
+      cell.addEventListener('contextmenu', function(e){
+        e.preventDefault();
+        if(!gameActive) return;
+        if(numbers[idx]>=0) return;
+        setCell(idx, grid[idx]===2 ? 0 : 2);
+      });
+
+      cell.addEventListener('touchstart', function(e){
+        longPressTriggered = false;
+        longPressTimer = setTimeout(function(){
+          longPressTriggered = true;
+          if(!gameActive) return;
+          if(numbers[idx]>=0) return;
+          setCell(idx, grid[idx]===2 ? 0 : 2);
+        }, 400);
+      }, {passive:true});
+
+      cell.addEventListener('touchend', function(){
+        clearTimeout(longPressTimer);
+      }, {passive:true});
+
+      cell.addEventListener('touchmove', function(){
+        clearTimeout(longPressTimer);
+      }, {passive:true});
+    })(i);
+
+    gridEl.appendChild(cell);
+  }
+
+  validate();
+}
+
+function cycleCell(idx){
+  var old = grid[idx];
+  var newVal;
+  if(old===0) newVal=1;
+  else if(old===1) newVal=2;
+  else newVal=0;
+
+  undoStack.push({idx:idx, from:old, to:newVal});
+  grid[idx] = newVal;
+  updateCellDisplay(idx);
+  validate();
+  updateToolbar();
+
+  if(newVal===1) sndBlack();
+  else if(newVal===2) sndWhite();
+  else sndClear();
+}
+
+function setCell(idx, val){
+  var old = grid[idx];
+  if(old===val) return;
+  undoStack.push({idx:idx, from:old, to:val});
+  grid[idx] = val;
+  updateCellDisplay(idx);
+  validate();
+  updateToolbar();
+
+  if(val===1) sndBlack();
+  else if(val===2) sndWhite();
+  else sndClear();
+}
+
+function updateCellDisplay(idx){
+  var cells = document.querySelectorAll('.cell');
+  var cell = cells[idx];
+  cell.classList.remove('empty','black','white','numbered','satisfied','error');
+
+  if(numbers[idx]>=0){
+    cell.classList.add('numbered','white');
+    cell.textContent = numbers[idx];
+  } else if(grid[idx]===0){
+    cell.classList.add('empty');
+    cell.textContent = '';
+  } else if(grid[idx]===1){
+    cell.classList.add('black');
+    cell.textContent = '';
+  } else {
+    cell.classList.add('white');
+    cell.textContent = '';
+  }
+}
+
+// ─── VALIDATION ───
+function validate(){
+  var size = currentSize;
+  var total = size*size;
+  var cells = document.querySelectorAll('.cell');
+
+  for(var i=0;i<cells.length;i++){
+    cells[i].classList.remove('satisfied','error');
+  }
+
+  var errors = {};
+  var satisfied = {};
+
+  // Check 2x2 black squares
+  for(var r=0;r<size-1;r++){
+    for(var c=0;c<size-1;c++){
+      var idx=r*size+c;
+      if(grid[idx]===1 && grid[idx+1]===1 && grid[idx+size]===1 && grid[idx+size+1]===1){
+        errors[idx]=true; errors[idx+1]=true; errors[idx+size]=true; errors[idx+size+1]=true;
+      }
+    }
+  }
+
+  // Check island components
+  var visited = new Array(total).fill(false);
+  for(var i=0;i<total;i++){
+    if((grid[i]===2) && !visited[i]){
+      var comp = [];
+      var queue = [i];
+      visited[i] = true;
+      while(queue.length>0){
+        var cur = queue.shift();
+        comp.push(cur);
+        var cr=Math.floor(cur/size), cc=cur%size;
+        var nbrs=[];
+        if(cr>0) nbrs.push(cur-size);
+        if(cr<size-1) nbrs.push(cur+size);
+        if(cc>0) nbrs.push(cur-1);
+        if(cc<size-1) nbrs.push(cur+1);
+        for(var ni=0;ni<nbrs.length;ni++){
+          if(!visited[nbrs[ni]] && grid[nbrs[ni]]===2){
+            visited[nbrs[ni]]=true;
+            queue.push(nbrs[ni]);
+          }
+        }
+      }
+
+      var numCount=0, numVal=0;
+      for(var ci=0;ci<comp.length;ci++){
+        if(numbers[comp[ci]]>=0){ numCount++; numVal=numbers[comp[ci]]; }
+      }
+
+      if(numCount>1){
+        for(var ci=0;ci<comp.length;ci++) errors[comp[ci]]=true;
+      } else if(numCount===1){
+        if(comp.length>numVal){
+          for(var ci=0;ci<comp.length;ci++) errors[comp[ci]]=true;
+        } else if(comp.length===numVal){
+          // Check if island is sealed (no adjacent empty cells)
+          var canGrow = false;
+          for(var ci=0;ci<comp.length;ci++){
+            var cr2=Math.floor(comp[ci]/size), cc2=comp[ci]%size;
+            var nbrs2=[];
+            if(cr2>0) nbrs2.push(comp[ci]-size);
+            if(cr2<size-1) nbrs2.push(comp[ci]+size);
+            if(cc2>0) nbrs2.push(comp[ci]-1);
+            if(cc2<size-1) nbrs2.push(comp[ci]+1);
+            for(var ni2=0;ni2<nbrs2.length;ni2++){
+              var nb = nbrs2[ni2];
+              if(grid[nb]===0){
+                canGrow = true; break;
+              }
+              // Also check if adjacent white cell is not in our component
+              if(grid[nb]===2 && comp.indexOf(nb)===-1){
+                canGrow = true; break;
+              }
+            }
+            if(canGrow) break;
+          }
+          for(var ci=0;ci<comp.length;ci++) satisfied[comp[ci]]=true;
+          if(!canGrow) sndIslandComplete();
+        }
+      }
+    }
+  }
+
+  for(var i=0;i<total;i++){
+    if(errors[i]) cells[i].classList.add('error');
+    else if(satisfied[i]) cells[i].classList.add('satisfied');
+  }
+
+  checkComplete();
+}
+
+function checkComplete(){
+  var size = currentSize;
+  var total = size*size;
+
+  for(var i=0;i<total;i++){
+    if(grid[i]===0 && numbers[i]<0) return;
+  }
+
+  var playerSol = new Array(total);
+  for(var i=0;i<total;i++){
+    playerSol[i] = (grid[i]===2) ? 1 : 0;
+  }
+
+  if(validateSolution(playerSol, numbers, size)){
+    gameActive = false;
+    clearInterval(timerInterval);
+    sndVictory();
+    setTimeout(function(){ showComplete(); }, 500);
+  }
+}
+
+function validateSolution(sol, nums, size){
+  var total = size*size;
+  if(has2x2Black(sol, size)) return false;
+
+  var blacks = [];
+  for(var i=0;i<total;i++) if(sol[i]===0) blacks.push(i);
+  if(blacks.length>0 && !isConnected(blacks, size)) return false;
+
+  var visited = new Array(total).fill(false);
+  for(var i=0;i<total;i++){
+    if(sol[i]===1 && !visited[i]){
+      var comp = floodFill(i, sol, size, 1);
+      var nc=0, nv=0;
+      for(var c=0;c<comp.length;c++){
+        visited[comp[c]]=true;
+        if(nums[comp[c]]>=0){ nc++; nv=nums[comp[c]]; }
+      }
+      if(nc!==1) return false;
+      if(comp.length!==nv) return false;
+    }
+  }
+
+  return true;
+}
+
+// ─── TOOLBAR ───
+function updateToolbar(){
+  document.getElementById('undoBtn').disabled = undoStack.length===0;
+  document.getElementById('hintBtn').textContent = 'HINT (' + (maxHints - hintsUsed) + ')';
+  document.getElementById('hintBtn').disabled = hintsUsed >= maxHints;
+}
+
+window.doUndo = function(){
+  if(undoStack.length===0) return;
+  var action = undoStack.pop();
+  grid[action.idx] = action.from;
+  updateCellDisplay(action.idx);
+  validate();
+  updateToolbar();
+  sndUndo();
+};
+
+window.doClear = function(){
+  var total = currentSize * currentSize;
+  var hasChanges = false;
+  for(var i=0;i<total;i++){
+    if(numbers[i]<0 && grid[i]!==0){
+      hasChanges = true;
+      break;
+    }
+  }
+  if(!hasChanges) return;
+
+  undoStack = [];
+  for(var i=0;i<total;i++){
+    if(numbers[i]<0) grid[i]=0;
+  }
+  buildGrid(currentSize);
+  sndClear();
+};
+
+window.doHint = function(){
+  if(hintsUsed >= maxHints || !gameActive) return;
+
+  var size = currentSize;
+  var total = size*size;
+
+  var candidates = [];
+  for(var i=0;i<total;i++){
+    if(numbers[i]>=0) continue;
+    var correctVal = solution[i]===0 ? 1 : 2;
+    if(grid[i]!==correctVal) candidates.push(i);
+  }
+
+  if(candidates.length===0) return;
+
+  var idx = candidates[Math.floor(Math.random()*candidates.length)];
+  var correctVal = solution[idx]===0 ? 1 : 2;
+
+  undoStack.push({idx:idx, from:grid[idx], to:correctVal});
+  grid[idx] = correctVal;
+  updateCellDisplay(idx);
+
+  hintsUsed++;
+  timer += hintPenalty;
+  updateTimer();
+  validate();
+  updateToolbar();
+
+  var cells = document.querySelectorAll('.cell');
+  cells[idx].style.transition = 'box-shadow 0.3s';
+  cells[idx].style.boxShadow = '0 0 20px rgba(180,77,255,0.6)';
+  setTimeout(function(){
+    cells[idx].style.boxShadow = '';
+  }, 800);
+
+  if(correctVal===1) sndBlack();
+  else sndWhite();
+};
+
+// ─── TIMER ───
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval = setInterval(function(){
+    if(!gameActive) return;
+    timer++;
+    updateTimer();
+  }, 1000);
+}
+
+function updateTimer(){
+  document.getElementById('timer').textContent = neonFormatScore(timer);
+}
+
+// ─── COMPLETE SCREEN ───
+function showComplete(){
+  var size = currentSize;
+  var capturedTime = timer;
+
+  var thresholds = {
+    5: [60, 120, 180],
+    7: [180, 300, 420],
+    9: [360, 540, 720]
+  };
+  var t = thresholds[size] || [120, 240, 360];
+  var starCount = 3;
+  if(capturedTime > t[0]) starCount = 2;
+  if(capturedTime > t[1]) starCount = 1;
+  if(capturedTime > t[2]) starCount = 0;
+
+  if(hintsUsed > 0 && starCount > 1) starCount = Math.max(1, starCount - 1);
+
+  document.getElementById('statTime').textContent = neonFormatScore(capturedTime);
+  document.getElementById('statHints').textContent = hintsUsed + '';
+  document.getElementById('statSize').textContent = size + 'x' + size;
+
+  var starStr = '';
+  for(var i=0;i<3;i++) starStr += i<starCount ? '\u2B50' : '\u2606';
+  document.getElementById('stars').textContent = starStr;
+
+  var diffNames = {5:'EASY', 7:'MEDIUM', 9:'HARD'};
+  document.getElementById('completeSub').textContent = size + 'x' + size + ' ' + (diffNames[size]||'') + ' COMPLETE';
+
+  // Mini grid using DOM
+  var miniEl = document.getElementById('completeGrid');
+  while(miniEl.firstChild) miniEl.removeChild(miniEl.firstChild);
+  miniEl.className = 'complete-grid';
+  miniEl.style.gridTemplateColumns = 'repeat('+size+', 10px)';
+  for(var i=0;i<size*size;i++){
+    var mc = document.createElement('div');
+    mc.className = 'mini-cell';
+    if(numbers[i]>=0) mc.classList.add('mc-num');
+    else if(grid[i]===1) mc.classList.add('mc-black');
+    else mc.classList.add('mc-white');
+    miniEl.appendChild(mc);
+  }
+
+  var key = 'neonarcade_neonmind_nurikabe_scores_' + size;
+  saveScore(key, capturedTime);
+
+  showScreen('completeScreen');
+
+  if(typeof Neon !== 'undefined'){
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function(){
+      return Neon.save(capturedTime);
+    }).then(function(neonResult){
+      Neon.render(document.getElementById('completeLB'));
+      if(neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5){
+        Neon.showGlobalSplash(neonResult.globalRank);
+      }
+    }).catch(function(){
+      try{ Neon.render(document.getElementById('completeLB')); }catch(e){}
+    });
+  }
+
+  window._shareData = {
+    size: size,
+    time: capturedTime,
+    stars: starCount,
+    grid: grid.slice(),
+    numbers: numbers.slice()
+  };
+}
+
+window.doShare = function(){
+  var d = window._shareData;
+  if(!d) return;
+
+  var size = d.size;
+  var starEmoji = '';
+  for(var i=0;i<d.stars;i++) starEmoji += '\u2B50';
+  if(d.stars===0) starEmoji = '\u2606';
+
+  var rows = Math.min(size, 5);
+  var gridStr = '';
+  for(var r=0;r<rows;r++){
+    for(var c=0;c<size;c++){
+      var idx = r*size+c;
+      if(d.numbers[idx]>=0) gridStr += d.numbers[idx] + '\uFE0F\u20E3';
+      else if(d.grid[idx]===1) gridStr += '\u2B1B';
+      else gridStr += '\u2B1C';
+    }
+    gridStr += '\n';
+  }
+  if(rows < size) gridStr += '...\n';
+
+  var text = '\uD83C\uDFDD\uFE0F NURIKABE ' + size + 'x' + size + '\n'
+    + '\u23F1 ' + neonFormatScore(d.time) + ' | ' + starEmoji + '\n'
+    + gridStr
+    + 'neonarcade.net/neonmind';
+
+  if(navigator.share){
+    navigator.share({text:text}).catch(function(){
+      copyToClipboard(text);
+    });
+  } else {
+    copyToClipboard(text);
+  }
+};
+
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(function(){
+    var msg = document.getElementById('copiedMsg');
+    msg.classList.add('show');
+    setTimeout(function(){ msg.classList.remove('show'); }, 2000);
+  }).catch(function(){});
+}
+
+window.playAgain = function(){
+  showScreen('startScreen');
+  renderBestTimes();
+  renderStartLB();
+};
+
+window.goBack = function(){
+  gameActive = false;
+  clearInterval(timerInterval);
+  showScreen('startScreen');
+  renderBestTimes();
+  renderStartLB();
+};
+
+// ─── INIT ───
+neonInitForSize(5);
+renderBestTimes();
+setTimeout(renderStartLB, 500);
+
+document.addEventListener('keydown', function(e){
+  if((e.key==='z' || e.key==='Z') && (e.ctrlKey || e.metaKey)){
+    e.preventDefault();
+    if(gameActive) doUndo();
+  }
+});
+
+window.addEventListener('resize', function(){
+  if(gameActive) buildGrid(currentSize);
+});
+
+})();
+</script>
+</body>
+</html>

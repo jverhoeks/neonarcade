@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>BRIDGES - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+.title{font-family:'Orbitron',monospace;font-weight:900;font-size:48px;letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:6px}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-bottom:36px}
+
+.diff-selector{display:flex;gap:12px;margin-bottom:30px;flex-wrap:wrap;justify-content:center}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.diff-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.diff-btn.selected{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.1);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:10px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.best-times{margin-top:30px;text-align:center}
+.best-times h3{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;margin-bottom:12px}
+.best-row{font-family:'Rajdhani',sans-serif;font-size:15px;color:#8888aa;margin:4px 0;display:flex;gap:12px;justify-content:center}
+.best-row .rank{color:#4a4a6a;width:20px;text-align:right}
+.best-row .score{color:#00f0ff;width:60px;text-align:right}
+.best-row .ago{color:#4a4a6a;width:90px;text-align:left}
+
+/* Game screen */
+#gameScreen{padding:0;justify-content:flex-start}
+.top-bar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(18,18,31,0.9);border-bottom:1px solid rgba(0,240,255,0.1);z-index:10;flex-shrink:0}
+.top-bar .back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:#8888aa;cursor:pointer;border:none;background:none;padding:6px 10px;letter-spacing:1px}
+.top-bar .back-btn:hover{color:#00f0ff}
+.top-bar .info{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;color:#8888aa}
+.top-bar .timer{font-family:'Orbitron',monospace;font-size:16px;letter-spacing:2px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;width:100%;position:relative;overflow:hidden}
+#gameCanvas{cursor:pointer}
+
+.toolbar{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 16px;background:rgba(18,18,31,0.9);border-top:1px solid rgba(0,240,255,0.1);flex-shrink:0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8888aa;background:none;border:1px solid rgba(255,255,255,0.1);padding:8px 16px;cursor:pointer;border-radius:3px;transition:all 0.2s}
+.tool-btn:hover{border-color:#00f0ff;color:#00f0ff}
+.tool-btn.disabled{opacity:0.3;pointer-events:none}
+.hint-count{font-size:11px;color:#ffd700;margin-left:4px}
+
+/* Complete screen */
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:36px;letter-spacing:6px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.6),0 0 40px rgba(57,255,20,0.2);margin-bottom:6px}
+.complete-sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;letter-spacing:2px;color:#8888aa;text-transform:uppercase;margin-bottom:24px}
+.stat-row{display:flex;gap:30px;margin-bottom:20px;flex-wrap:wrap;justify-content:center}
+.stat{text-align:center}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:28px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#4a4a6a}
+.stars{font-size:32px;margin-bottom:20px;letter-spacing:4px}
+.btn-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.08);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(180,77,255,0.18);box-shadow:0 0 15px rgba(180,77,255,0.2)}
+
+#completeLB{width:100%;max-width:360px;margin-top:16px}
+
+.screen-shake{animation:shake 0.25s ease}
+@keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,3px)}}
+
+/* Particles */
+.particle{position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:9998}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="title">BRIDGES</div>
+  <div class="subtitle">CONNECT THE ISLANDS</div>
+  <div class="diff-selector">
+    <button class="diff-btn selected" data-size="7">7 x 7</button>
+    <button class="diff-btn" data-size="9">9 x 9</button>
+    <button class="diff-btn" data-size="11">11 x 11</button>
+  </div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="best-times" id="bestTimes"></div>
+  <div id="startLB" style="width:100%;max-width:360px;margin-top:16px"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" id="backBtn">&lt; BACK</button>
+    <div class="info" id="diffLabel">7x7</div>
+    <div class="timer" id="timer">00:00</div>
+  </div>
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+  <div class="toolbar">
+    <button class="tool-btn" id="undoBtn">UNDO</button>
+    <button class="tool-btn" id="clearBtn">CLEAR</button>
+    <button class="tool-btn" id="hintBtn">HINT <span class="hint-count" id="hintCount">3</span></button>
+  </div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+  <div class="complete-title">CONNECTED</div>
+  <div class="complete-sub">ALL ISLANDS LINKED</div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-val" id="cTime">00:00</div><div class="stat-label">TIME</div></div>
+    <div class="stat"><div class="stat-val" id="cSize">7x7</div><div class="stat-label">SIZE</div></div>
+    <div class="stat"><div class="stat-val" id="cHints">0</div><div class="stat-label">HINTS</div></div>
+  </div>
+  <div class="stars" id="cStars"></div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="playAgainBtn">PLAY AGAIN</button>
+  </div>
+  <div id="completeLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ====== AUDIO ======
+var audioCtx = null;
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol){
+  try{
+    var ctx = getAudio();
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = type||'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol||0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g);g.connect(ctx.destination);
+    o.start(ctx.currentTime);o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+function sndPlace(){playTone(800,0.08,'square',0.06);playTone(1200,0.06,'sine',0.04);}
+function sndRemove(){playTone(400,0.1,'sine',0.04);}
+function sndSatisfy(){playTone(1000,0.1,'sine',0.06);setTimeout(function(){playTone(1400,0.15,'sine',0.05);},80);}
+function sndError(){playTone(200,0.2,'sawtooth',0.06);playTone(160,0.25,'sawtooth',0.04);}
+function sndComplete(){
+  playTone(523,0.15,'sine',0.07);
+  setTimeout(function(){playTone(659,0.15,'sine',0.07);},120);
+  setTimeout(function(){playTone(784,0.15,'sine',0.07);},240);
+  setTimeout(function(){playTone(1047,0.3,'sine',0.08);},360);
+}
+
+// ====== NEON INTEGRATION ======
+var neonFormatScore = function(s){
+  var m = Math.floor(s/60);
+  var sec = Math.floor(s%60);
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+};
+function neonInitForSize(n){
+  if(typeof Neon!=='undefined'){
+    Neon.init({game:'bridges',mode:'low',key:'neonarcade_neonmind_bridges_scores_'+n,formatScore:neonFormatScore});
+  }
+}
+neonInitForSize(7);
+
+// ====== SCORES ======
+function saveScore(key,score){
+  var scores=JSON.parse(localStorage.getItem(key)||'[]');
+  scores.push({score:score,ts:Date.now()});
+  scores.sort(function(a,b){return a.score-b.score;});
+  scores=scores.slice(0,5);
+  localStorage.setItem(key,JSON.stringify(scores));
+  return scores;
+}
+function timeAgo(ts){
+  var diff=Date.now()-ts;
+  var mins=Math.floor(diff/60000);
+  var hours=Math.floor(diff/3600000);
+  var days=Math.floor(diff/86400000);
+  if(days>0) return days+(days===1?' day ago':' days ago');
+  if(hours>0) return hours+(hours===1?' hour ago':' hours ago');
+  if(mins>0) return mins+(mins===1?' min ago':' mins ago');
+  return 'just now';
+}
+function fmtTime(s){
+  var m=Math.floor(s/60);var sec=Math.floor(s%60);
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+
+// ====== DOM REFS ======
+var $=function(id){return document.getElementById(id);};
+var startScreen=$('startScreen'),gameScreen=$('gameScreen'),completeScreen=$('completeScreen');
+var canvas=$('gameCanvas'),ctx=canvas.getContext('2d');
+var canvasWrap=$('canvasWrap');
+var timerEl=$('timer'),diffLabel=$('diffLabel');
+var undoBtn=$('undoBtn'),clearBtn=$('clearBtn'),hintBtn=$('hintBtn'),hintCountEl=$('hintCount');
+
+// ====== STATE ======
+var gridSize=7;
+var islands=[];
+var bridges=[];
+var solution=[];
+var selectedIsland=null;
+var historyStack=[];
+var hintsLeft=3;
+var hintPenalty=0;
+var timerStart=0;
+var timerVal=0;
+var timerInterval=null;
+var gameActive=false;
+var completed=false;
+var dpr=window.devicePixelRatio||1;
+var cellSize=50;
+var canvasW=0,canvasH=0;
+var offsetX=0,offsetY=0;
+
+// ====== DIFFICULTY SELECTOR ======
+var diffBtns=document.querySelectorAll('.diff-btn');
+for(var di=0;di<diffBtns.length;di++){
+  (function(btn){
+    btn.addEventListener('click',function(){
+      for(var j=0;j<diffBtns.length;j++) diffBtns[j].classList.remove('selected');
+      btn.classList.add('selected');
+      gridSize=parseInt(btn.dataset.size);
+      neonInitForSize(gridSize);
+      renderBestTimes();
+      renderStartLB();
+    });
+  })(diffBtns[di]);
+}
+
+function renderBestTimes(){
+  var key='neonarcade_neonmind_bridges_scores_'+gridSize;
+  var scores=JSON.parse(localStorage.getItem(key)||'[]');
+  var el=$('bestTimes');
+  if(!scores.length){el.textContent='';return;}
+  // Build using DOM methods
+  el.textContent='';
+  var h3=document.createElement('h3');
+  h3.textContent='YOUR BESTS ('+gridSize+'x'+gridSize+')';
+  el.appendChild(h3);
+  for(var i=0;i<scores.length;i++){
+    var row=document.createElement('div');
+    row.className='best-row';
+    var rk=document.createElement('span');rk.className='rank';rk.textContent=(i+1);
+    var sc=document.createElement('span');sc.className='score';sc.textContent=fmtTime(scores[i].score);
+    var ag=document.createElement('span');ag.className='ago';ag.textContent=timeAgo(scores[i].ts);
+    row.appendChild(rk);row.appendChild(sc);row.appendChild(ag);
+    el.appendChild(row);
+  }
+}
+function renderStartLB(){
+  if(typeof Neon!=='undefined'){
+    try{Neon.render($('startLB'));}catch(e){}
+  }
+}
+renderBestTimes();
+setTimeout(renderStartLB,500);
+
+// ====== SCREENS ======
+function showScreen(sc){
+  startScreen.classList.remove('active');
+  gameScreen.classList.remove('active');
+  completeScreen.classList.remove('active');
+  sc.classList.add('active');
+}
+
+// ====== PUZZLE GENERATION ======
+function generatePuzzle(size){
+  var attempts=0;
+  while(attempts<300){
+    attempts++;
+    var result=tryGenerate(size);
+    if(result){
+      if(validatePuzzle(result.islands,result.bridges)){
+        return result;
+      }
+    }
+  }
+  return generateTemplate(size);
+}
+
+function tryGenerate(size){
+  var numIslands;
+  if(size<=7) numIslands=8+Math.floor(Math.random()*5);
+  else if(size<=9) numIslands=14+Math.floor(Math.random()*6);
+  else numIslands=20+Math.floor(Math.random()*8);
+
+  var grid=[];
+  for(var r=0;r<size;r++){grid[r]=[];for(var c=0;c<size;c++) grid[r][c]=0;}
+
+  var isls=[];
+  var positions=[];
+  for(var r=0;r<size;r++) for(var c=0;c<size;c++) positions.push({r:r,c:c});
+  shuffle(positions);
+
+  for(var i=0;i<positions.length&&isls.length<numIslands;i++){
+    var p=positions[i];
+    var ok=true;
+    for(var j=0;j<isls.length;j++){
+      if(isls[j].r===p.r&&Math.abs(isls[j].c-p.c)<2){ok=false;break;}
+      if(isls[j].c===p.c&&Math.abs(isls[j].r-p.r)<2){ok=false;break;}
+    }
+    if(ok){
+      isls.push({r:p.r,c:p.c,num:0});
+      grid[p.r][p.c]=1;
+    }
+  }
+
+  if(isls.length<6) return null;
+
+  var pairs=findPairs(isls,grid,size);
+  if(pairs.length<isls.length-1) return null;
+
+  shuffle(pairs);
+  var uf=new UnionFind(isls.length);
+  var solBridges=[];
+  var bridgeMap={};
+
+  for(var i=0;i<pairs.length;i++){
+    var pa=pairs[i];
+    if(!uf.connected(pa.a,pa.b)){
+      var cnt=Math.random()<0.35?2:1;
+      var br={r1:isls[pa.a].r,c1:isls[pa.a].c,r2:isls[pa.b].r,c2:isls[pa.b].c,count:cnt};
+      if(!crossesAny(br,solBridges)){
+        solBridges.push(br);
+        bridgeMap[pa.a+','+pa.b]=cnt;
+        uf.union(pa.a,pa.b);
+        isls[pa.a].num+=cnt;
+        isls[pa.b].num+=cnt;
+      }
+    }
+  }
+
+  for(var i=1;i<isls.length;i++){
+    if(!uf.connected(0,i)) return null;
+  }
+
+  shuffle(pairs);
+  for(var i=0;i<pairs.length;i++){
+    var pa=pairs[i];
+    var k=pa.a+','+pa.b;
+    var existing=bridgeMap[k]||0;
+    if(existing>=2) continue;
+    if(Math.random()<0.5) continue;
+    var add=existing===0?(Math.random()<0.4?2:1):(2-existing);
+    if(add<=0) continue;
+    if(isls[pa.a].num+add>8||isls[pa.b].num+add>8) continue;
+    var br={r1:isls[pa.a].r,c1:isls[pa.a].c,r2:isls[pa.b].r,c2:isls[pa.b].c,count:existing+add};
+    var tempBridges=[];
+    for(var j=0;j<solBridges.length;j++){
+      var sb=solBridges[j];
+      if(!(sb.r1===br.r1&&sb.c1===br.c1&&sb.r2===br.r2&&sb.c2===br.c2)){
+        tempBridges.push(sb);
+      }
+    }
+    if(!crossesAny(br,tempBridges)){
+      if(existing>0){
+        for(var j=0;j<solBridges.length;j++){
+          if(solBridges[j].r1===br.r1&&solBridges[j].c1===br.c1&&solBridges[j].r2===br.r2&&solBridges[j].c2===br.c2){
+            solBridges[j].count=existing+add;break;
+          }
+        }
+      }else{
+        solBridges.push(br);
+      }
+      bridgeMap[k]=existing+add;
+      isls[pa.a].num+=add;
+      isls[pa.b].num+=add;
+    }
+  }
+
+  for(var i=0;i<isls.length;i++){
+    if(isls[i].num<1||isls[i].num>8) return null;
+  }
+
+  return {islands:isls,bridges:solBridges};
+}
+
+function findPairs(isls,grid,size){
+  var pairs=[];
+  var islMap={};
+  for(var i=0;i<isls.length;i++) islMap[isls[i].r+','+isls[i].c]=i;
+
+  for(var i=0;i<isls.length;i++){
+    var a=isls[i];
+    for(var c=a.c+1;c<size;c++){
+      if(grid[a.r][c]){
+        var j=islMap[a.r+','+c];
+        if(i<j) pairs.push({a:i,b:j});
+        break;
+      }
+    }
+    for(var r=a.r+1;r<size;r++){
+      if(grid[r][a.c]){
+        var j=islMap[r+','+a.c];
+        if(i<j) pairs.push({a:i,b:j});
+        break;
+      }
+    }
+  }
+  return pairs;
+}
+
+function crossesAny(br,existingBridges){
+  for(var i=0;i<existingBridges.length;i++){
+    if(bridgesCross(br,existingBridges[i])) return true;
+  }
+  return false;
+}
+
+function bridgesCross(b1,b2){
+  var h1=b1.r1===b1.r2, v1=b1.c1===b1.c2;
+  var h2=b2.r1===b2.r2, v2=b2.c1===b2.c2;
+  if(h1&&v2){
+    var row=b1.r1;
+    var c1min=Math.min(b1.c1,b1.c2),c1max=Math.max(b1.c1,b1.c2);
+    var col=b2.c1;
+    var r2min=Math.min(b2.r1,b2.r2),r2max=Math.max(b2.r1,b2.r2);
+    if(col>c1min&&col<c1max&&row>r2min&&row<r2max) return true;
+  }
+  if(v1&&h2){
+    var col2=b1.c1;
+    var r1min=Math.min(b1.r1,b1.r2),r1max=Math.max(b1.r1,b1.r2);
+    var row2=b2.r1;
+    var c2min=Math.min(b2.c1,b2.c2),c2max=Math.max(b2.c1,b2.c2);
+    if(row2>r1min&&row2<r1max&&col2>c2min&&col2<c2max) return true;
+  }
+  return false;
+}
+
+function UnionFind(n){
+  this.parent=[];this.rank=[];
+  for(var i=0;i<n;i++){this.parent[i]=i;this.rank[i]=0;}
+}
+UnionFind.prototype.find=function(x){
+  if(this.parent[x]!==x) this.parent[x]=this.find(this.parent[x]);
+  return this.parent[x];
+};
+UnionFind.prototype.union=function(a,b){
+  var ra=this.find(a),rb=this.find(b);
+  if(ra===rb) return;
+  if(this.rank[ra]<this.rank[rb]){var t=ra;ra=rb;rb=t;}
+  this.parent[rb]=ra;
+  if(this.rank[ra]===this.rank[rb]) this.rank[ra]++;
+};
+UnionFind.prototype.connected=function(a,b){return this.find(a)===this.find(b);};
+
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i];arr[i]=arr[j];arr[j]=t;
+  }
+}
+
+function validatePuzzle(isls,solBridges){
+  var numMap={};
+  for(var i=0;i<isls.length;i++) numMap[isls[i].r+','+isls[i].c]=0;
+  for(var i=0;i<solBridges.length;i++){
+    var b=solBridges[i];
+    numMap[b.r1+','+b.c1]+=b.count;
+    numMap[b.r2+','+b.c2]+=b.count;
+  }
+  for(var i=0;i<isls.length;i++){
+    if(numMap[isls[i].r+','+isls[i].c]!==isls[i].num) return false;
+  }
+  if(isls.length<2) return true;
+  var adj={};
+  for(var i=0;i<isls.length;i++) adj[isls[i].r+','+isls[i].c]=[];
+  for(var i=0;i<solBridges.length;i++){
+    var b=solBridges[i];
+    if(b.count>0){
+      adj[b.r1+','+b.c1].push(b.r2+','+b.c2);
+      adj[b.r2+','+b.c2].push(b.r1+','+b.c1);
+    }
+  }
+  var visited={};
+  var q=[isls[0].r+','+isls[0].c];
+  visited[q[0]]=true;
+  while(q.length){
+    var cur=q.shift();
+    var nb=adj[cur]||[];
+    for(var i=0;i<nb.length;i++){
+      if(!visited[nb[i]]){visited[nb[i]]=true;q.push(nb[i]);}
+    }
+  }
+  for(var i=0;i<isls.length;i++){
+    if(!visited[isls[i].r+','+isls[i].c]) return false;
+  }
+  return true;
+}
+
+// ====== TEMPLATE PUZZLES (fallback) ======
+function generateTemplate(size){
+  if(size<=7) return pickTemplate(templates7);
+  if(size<=9) return pickTemplate(templates9);
+  return pickTemplate(templates11);
+}
+
+function pickTemplate(list){
+  var t=list[Math.floor(Math.random()*list.length)];
+  // Deep copy
+  var isls=[];
+  for(var i=0;i<t.islands.length;i++){
+    isls.push({r:t.islands[i].r,c:t.islands[i].c,num:t.islands[i].num});
+  }
+  var brs=[];
+  for(var i=0;i<t.bridges.length;i++){
+    brs.push({r1:t.bridges[i].r1,c1:t.bridges[i].c1,r2:t.bridges[i].r2,c2:t.bridges[i].c2,count:t.bridges[i].count});
+  }
+  return {islands:isls,bridges:brs};
+}
+
+// Handcrafted templates — verified solvable and connected
+var templates7=[
+  {islands:[{r:0,c:0,num:2},{r:0,c:2,num:4},{r:0,c:4,num:2},{r:0,c:6,num:1},
+            {r:2,c:0,num:2},{r:2,c:2,num:3},{r:2,c:6,num:3},
+            {r:4,c:0,num:3},{r:4,c:2,num:5},{r:4,c:4,num:3},{r:4,c:6,num:2},
+            {r:6,c:0,num:1},{r:6,c:2,num:2},{r:6,c:4,num:2},{r:6,c:6,num:2}],
+   bridges:[{r1:0,c1:0,r2:0,c2:2,count:1},{r1:0,c1:0,r2:2,c2:0,count:1},
+            {r1:0,c1:2,r2:0,c2:4,count:1},{r1:0,c1:2,r2:2,c2:2,count:2},
+            {r1:0,c1:4,r2:0,c2:6,count:1},{r1:0,c1:4,r2:4,c2:4,count:1},
+            {r1:2,c1:0,r2:2,c2:2,count:1},{r1:2,c1:0,r2:4,c2:0,count:1},
+            {r1:2,c1:6,r2:4,c2:6,count:2},{r1:2,c1:6,r2:0,c2:6,count:0},
+            {r1:2,c1:2,r2:4,c2:2,count:0},
+            {r1:4,c1:0,r2:4,c2:2,count:2},{r1:4,c1:2,r2:4,c2:4,count:1},
+            {r1:4,c1:2,r2:6,c2:2,count:2},{r1:4,c1:4,r2:6,c2:4,count:2},
+            {r1:4,c1:0,r2:6,c2:0,count:0},
+            {r1:6,c1:0,r2:6,c2:2,count:0},{r1:6,c1:4,r2:6,c2:6,count:0}]},
+  {islands:[{r:0,c:0,num:3},{r:0,c:3,num:5},{r:0,c:6,num:2},
+            {r:2,c:0,num:1},{r:2,c:3,num:2},{r:2,c:6,num:3},
+            {r:4,c:0,num:3},{r:4,c:2,num:3},{r:4,c:4,num:1},{r:4,c:6,num:3},
+            {r:6,c:0,num:2},{r:6,c:2,num:2},{r:6,c:6,num:1}],
+   bridges:[{r1:0,c1:0,r2:0,c2:3,count:2},{r1:0,c1:0,r2:2,c2:0,count:1},
+            {r1:0,c1:3,r2:0,c2:6,count:1},{r1:0,c1:3,r2:2,c2:3,count:2},
+            {r1:0,c1:6,r2:2,c2:6,count:1},
+            {r1:2,c1:6,r2:4,c2:6,count:2},
+            {r1:4,c1:0,r2:4,c2:2,count:1},{r1:4,c1:0,r2:6,c2:0,count:2},
+            {r1:4,c1:2,r2:4,c2:4,count:1},{r1:4,c1:2,r2:6,c2:2,count:1},
+            {r1:4,c1:6,r2:6,c2:6,count:1},
+            {r1:6,c1:0,r2:6,c2:2,count:0}]},
+  {islands:[{r:0,c:1,num:2},{r:0,c:4,num:2},{r:0,c:6,num:2},
+            {r:2,c:1,num:4},{r:2,c:4,num:4},{r:2,c:6,num:2},
+            {r:4,c:0,num:2},{r:4,c:3,num:4},{r:4,c:6,num:2},
+            {r:6,c:0,num:1},{r:6,c:3,num:3},{r:6,c:6,num:1}],
+   bridges:[{r1:0,c1:1,r2:0,c2:4,count:1},{r1:0,c1:1,r2:2,c2:1,count:1},
+            {r1:0,c1:4,r2:0,c2:6,count:1},{r1:0,c1:4,r2:2,c2:4,count:0},
+            {r1:0,c1:6,r2:2,c2:6,count:1},
+            {r1:2,c1:1,r2:2,c2:4,count:2},{r1:2,c1:1,r2:4,c2:1,count:0},
+            {r1:2,c1:4,r2:2,c2:6,count:1},{r1:2,c1:4,r2:4,c2:4,count:0},
+            {r1:4,c1:0,r2:4,c2:3,count:2},{r1:4,c1:3,r2:4,c2:6,count:1},
+            {r1:4,c1:3,r2:6,c2:3,count:1},{r1:4,c1:6,r2:6,c2:6,count:1},
+            {r1:6,c1:0,r2:6,c2:3,count:1},{r1:6,c1:3,r2:6,c2:6,count:0}]}
+];
+
+var templates9=[
+  {islands:[{r:0,c:0,num:2},{r:0,c:3,num:3},{r:0,c:6,num:3},{r:0,c:8,num:1},
+            {r:2,c:0,num:3},{r:2,c:3,num:3},{r:2,c:6,num:2},{r:2,c:8,num:2},
+            {r:4,c:0,num:2},{r:4,c:2,num:4},{r:4,c:5,num:4},{r:4,c:8,num:2},
+            {r:6,c:0,num:3},{r:6,c:2,num:2},{r:6,c:5,num:3},{r:6,c:8,num:3},
+            {r:8,c:0,num:2},{r:8,c:3,num:2},{r:8,c:6,num:2},{r:8,c:8,num:1}],
+   bridges:[{r1:0,c1:0,r2:0,c2:3,count:1},{r1:0,c1:0,r2:2,c2:0,count:1},
+            {r1:0,c1:3,r2:0,c2:6,count:1},{r1:0,c1:3,r2:2,c2:3,count:1},
+            {r1:0,c1:6,r2:0,c2:8,count:1},{r1:0,c1:6,r2:2,c2:6,count:1},
+            {r1:0,c1:8,r2:2,c2:8,count:0},
+            {r1:2,c1:0,r2:2,c2:3,count:1},{r1:2,c1:0,r2:4,c2:0,count:1},
+            {r1:2,c1:3,r2:4,c2:3,count:0},{r1:2,c1:3,r2:2,c2:6,count:1},
+            {r1:2,c1:6,r2:4,c2:6,count:0},{r1:2,c1:8,r2:4,c2:8,count:2},
+            {r1:4,c1:0,r2:4,c2:2,count:1},{r1:4,c1:0,r2:6,c2:0,count:1},
+            {r1:4,c1:2,r2:4,c2:5,count:2},{r1:4,c1:2,r2:6,c2:2,count:1},
+            {r1:4,c1:5,r2:6,c2:5,count:2},
+            {r1:6,c1:0,r2:6,c2:2,count:1},{r1:6,c1:0,r2:8,c2:0,count:1},
+            {r1:6,c1:5,r2:6,c2:8,count:1},{r1:6,c1:8,r2:8,c2:8,count:1},
+            {r1:8,c1:0,r2:8,c2:3,count:1},{r1:8,c1:3,r2:8,c2:6,count:1},
+            {r1:8,c1:6,r2:8,c2:8,count:0},{r1:6,c1:8,r2:4,c2:8,count:0}]},
+  {islands:[{r:0,c:0,num:3},{r:0,c:4,num:4},{r:0,c:8,num:2},
+            {r:2,c:0,num:3},{r:2,c:2,num:2},{r:2,c:4,num:1},{r:2,c:8,num:3},
+            {r:4,c:0,num:2},{r:4,c:2,num:4},{r:4,c:5,num:3},{r:4,c:8,num:3},
+            {r:6,c:0,num:2},{r:6,c:2,num:2},{r:6,c:5,num:4},{r:6,c:8,num:2},
+            {r:8,c:0,num:1},{r:8,c:3,num:2},{r:8,c:5,num:2},{r:8,c:8,num:2}],
+   bridges:[{r1:0,c1:0,r2:0,c2:4,count:2},{r1:0,c1:0,r2:2,c2:0,count:1},
+            {r1:0,c1:4,r2:0,c2:8,count:1},{r1:0,c1:4,r2:2,c2:4,count:1},
+            {r1:0,c1:8,r2:2,c2:8,count:1},
+            {r1:2,c1:0,r2:2,c2:2,count:1},{r1:2,c1:0,r2:4,c2:0,count:1},
+            {r1:2,c1:2,r2:4,c2:2,count:1},
+            {r1:2,c1:8,r2:4,c2:8,count:2},
+            {r1:4,c1:0,r2:4,c2:2,count:1},{r1:4,c1:2,r2:4,c2:5,count:2},
+            {r1:4,c1:5,r2:6,c2:5,count:1},{r1:4,c1:8,r2:6,c2:8,count:1},
+            {r1:6,c1:0,r2:6,c2:2,count:1},{r1:6,c1:0,r2:8,c2:0,count:1},
+            {r1:6,c1:2,r2:8,c2:2,count:0},{r1:6,c1:5,r2:6,c2:8,count:1},
+            {r1:6,c1:5,r2:8,c2:5,count:2},
+            {r1:8,c1:0,r2:8,c2:3,count:0},{r1:8,c1:3,r2:8,c2:5,count:0},
+            {r1:8,c1:5,r2:8,c2:8,count:0}]}
+];
+
+var templates11=[
+  {islands:[{r:0,c:0,num:3},{r:0,c:3,num:3},{r:0,c:6,num:3},{r:0,c:10,num:1},
+            {r:2,c:0,num:4},{r:2,c:3,num:3},{r:2,c:6,num:2},{r:2,c:10,num:3},
+            {r:4,c:0,num:2},{r:4,c:3,num:4},{r:4,c:6,num:3},{r:4,c:8,num:2},{r:4,c:10,num:2},
+            {r:6,c:0,num:3},{r:6,c:3,num:4},{r:6,c:6,num:2},{r:6,c:10,num:3},
+            {r:8,c:0,num:3},{r:8,c:3,num:3},{r:8,c:6,num:4},{r:8,c:10,num:2},
+            {r:10,c:0,num:2},{r:10,c:3,num:2},{r:10,c:6,num:2},{r:10,c:10,num:1}],
+   bridges:[{r1:0,c1:0,r2:0,c2:3,count:2},{r1:0,c1:0,r2:2,c2:0,count:1},
+            {r1:0,c1:3,r2:2,c2:3,count:1},{r1:0,c1:6,r2:0,c2:10,count:1},
+            {r1:0,c1:6,r2:2,c2:6,count:2},
+            {r1:2,c1:0,r2:2,c2:3,count:2},{r1:2,c1:0,r2:4,c2:0,count:1},
+            {r1:2,c1:3,r2:4,c2:3,count:1},{r1:2,c1:10,r2:4,c2:10,count:2},
+            {r1:2,c1:10,r2:0,c2:10,count:0},
+            {r1:4,c1:0,r2:4,c2:3,count:1},{r1:4,c1:3,r2:4,c2:6,count:1},
+            {r1:4,c1:3,r2:6,c2:3,count:2},{r1:4,c1:6,r2:4,c2:8,count:1},
+            {r1:4,c1:6,r2:6,c2:6,count:1},{r1:4,c1:8,r2:6,c2:8,count:0},
+            {r1:4,c1:10,r2:6,c2:10,count:0},
+            {r1:6,c1:0,r2:6,c2:3,count:2},{r1:6,c1:0,r2:8,c2:0,count:1},
+            {r1:6,c1:6,r2:8,c2:6,count:1},{r1:6,c1:10,r2:8,c2:10,count:2},
+            {r1:6,c1:10,r2:4,c2:10,count:0},
+            {r1:8,c1:0,r2:8,c2:3,count:1},{r1:8,c1:0,r2:10,c2:0,count:2},
+            {r1:8,c1:3,r2:8,c2:6,count:1},{r1:8,c1:3,r2:10,c2:3,count:2},
+            {r1:8,c1:6,r2:8,c2:10,count:0},{r1:8,c1:6,r2:10,c2:6,count:2},
+            {r1:10,c1:6,r2:10,c2:10,count:0}]},
+  {islands:[{r:0,c:0,num:2},{r:0,c:4,num:4},{r:0,c:7,num:2},{r:0,c:10,num:2},
+            {r:2,c:0,num:3},{r:2,c:2,num:2},{r:2,c:4,num:2},{r:2,c:7,num:4},{r:2,c:10,num:2},
+            {r:4,c:0,num:2},{r:4,c:2,num:3},{r:4,c:5,num:2},{r:4,c:7,num:2},{r:4,c:10,num:3},
+            {r:6,c:0,num:2},{r:6,c:2,num:3},{r:6,c:5,num:4},{r:6,c:10,num:2},
+            {r:8,c:0,num:2},{r:8,c:2,num:2},{r:8,c:5,num:2},{r:8,c:7,num:2},{r:8,c:10,num:3},
+            {r:10,c:0,num:1},{r:10,c:5,num:2},{r:10,c:10,num:1}],
+   bridges:[{r1:0,c1:0,r2:0,c2:4,count:1},{r1:0,c1:0,r2:2,c2:0,count:1},
+            {r1:0,c1:4,r2:0,c2:7,count:1},{r1:0,c1:4,r2:2,c2:4,count:2},
+            {r1:0,c1:7,r2:0,c2:10,count:1},{r1:0,c1:7,r2:2,c2:7,count:0},
+            {r1:0,c1:10,r2:2,c2:10,count:1},
+            {r1:2,c1:0,r2:2,c2:2,count:1},{r1:2,c1:0,r2:4,c2:0,count:2},
+            {r1:2,c1:2,r2:4,c2:2,count:1},{r1:2,c1:7,r2:2,c2:10,count:1},
+            {r1:2,c1:7,r2:4,c2:7,count:2},
+            {r1:4,c1:2,r2:4,c2:5,count:1},{r1:4,c1:2,r2:6,c2:2,count:1},
+            {r1:4,c1:5,r2:6,c2:5,count:1},{r1:4,c1:10,r2:6,c2:10,count:2},
+            {r1:4,c1:10,r2:2,c2:10,count:0},
+            {r1:6,c1:0,r2:6,c2:2,count:1},{r1:6,c1:0,r2:8,c2:0,count:1},
+            {r1:6,c1:2,r2:8,c2:2,count:1},{r1:6,c1:5,r2:6,c2:10,count:0},
+            {r1:6,c1:5,r2:8,c2:5,count:2},
+            {r1:8,c1:0,r2:8,c2:2,count:1},{r1:8,c1:0,r2:10,c2:0,count:1},
+            {r1:8,c1:2,r2:10,c2:2,count:0},{r1:8,c1:5,r2:8,c2:7,count:1},
+            {r1:8,c1:5,r2:10,c2:5,count:1},{r1:8,c1:7,r2:8,c2:10,count:1},
+            {r1:8,c1:10,r2:10,c2:10,count:1},{r1:10,c1:5,r2:10,c2:10,count:0}]}
+];
+
+// Fix templates: recalculate numbers from bridge counts, remove 0-count bridges
+(function fixAllTemplates(){
+  var allSets=[templates7,templates9,templates11];
+  for(var s=0;s<allSets.length;s++){
+    for(var t=0;t<allSets[s].length;t++){
+      var tmpl=allSets[s][t];
+      // Filter to only bridges with count>0
+      var liveBridges=[];
+      for(var i=0;i<tmpl.bridges.length;i++){
+        if(tmpl.bridges[i].count>0) liveBridges.push(tmpl.bridges[i]);
+      }
+      tmpl.bridges=liveBridges;
+      // Recalculate island numbers
+      var numMap={};
+      for(var i=0;i<tmpl.islands.length;i++){
+        numMap[tmpl.islands[i].r+','+tmpl.islands[i].c]=0;
+      }
+      for(var i=0;i<tmpl.bridges.length;i++){
+        var b=tmpl.bridges[i];
+        numMap[b.r1+','+b.c1]=(numMap[b.r1+','+b.c1]||0)+b.count;
+        numMap[b.r2+','+b.c2]=(numMap[b.r2+','+b.c2]||0)+b.count;
+      }
+      // Remove islands with no bridges and update numbers
+      var newIslands=[];
+      for(var i=0;i<tmpl.islands.length;i++){
+        var key=tmpl.islands[i].r+','+tmpl.islands[i].c;
+        if(numMap[key]>0){
+          tmpl.islands[i].num=numMap[key];
+          newIslands.push(tmpl.islands[i]);
+        }
+      }
+      tmpl.islands=newIslands;
+    }
+  }
+})();
+
+// ====== GAME INIT ======
+function startGame(){
+  completed=false;
+  selectedIsland=null;
+  historyStack=[];
+  hintsLeft=3;
+  hintPenalty=0;
+  hintCountEl.textContent='3';
+  hintBtn.classList.remove('disabled');
+
+  diffLabel.textContent=gridSize+'x'+gridSize;
+  showScreen(gameScreen);
+
+  var puzzle=generatePuzzle(gridSize);
+  islands=puzzle.islands;
+  solution=[];
+  for(var i=0;i<puzzle.bridges.length;i++){
+    var b=puzzle.bridges[i];
+    solution.push({r1:b.r1,c1:b.c1,r2:b.r2,c2:b.c2,count:b.count});
+  }
+
+  bridges=[];
+  for(var i=0;i<solution.length;i++){
+    bridges.push({r1:solution[i].r1,c1:solution[i].c1,r2:solution[i].r2,c2:solution[i].c2,count:0});
+  }
+
+  sizeCanvas();
+  draw();
+
+  timerStart=Date.now();
+  timerVal=0;
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval=setInterval(function(){
+    if(!gameActive) return;
+    timerVal=Math.floor((Date.now()-timerStart)/1000);
+    timerEl.textContent=fmtTime(timerVal);
+  },250);
+  gameActive=true;
+}
+
+// ====== CANVAS SIZING ======
+function sizeCanvas(){
+  var wrapW=canvasWrap.clientWidth;
+  var wrapH=canvasWrap.clientHeight;
+  var totalCells=gridSize+1;
+  cellSize=Math.floor(Math.min(wrapW,wrapH)/totalCells);
+  cellSize=Math.max(cellSize,28);
+  cellSize=Math.min(cellSize,60);
+  canvasW=cellSize*(gridSize-1)+cellSize*2;
+  canvasH=canvasW;
+  canvas.style.width=canvasW+'px';
+  canvas.style.height=canvasH+'px';
+  canvas.width=Math.round(canvasW*dpr);
+  canvas.height=Math.round(canvasH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  offsetX=cellSize;
+  offsetY=cellSize;
+}
+
+function gridToCanvas(r,c){
+  return {x:offsetX+c*cellSize,y:offsetY+r*cellSize};
+}
+
+// ====== DRAWING ======
+function draw(){
+  ctx.clearRect(0,0,canvasW,canvasH);
+
+  // Subtle grid dots
+  ctx.fillStyle='rgba(255,255,255,0.03)';
+  for(var r=0;r<gridSize;r++){
+    for(var c=0;c<gridSize;c++){
+      var p=gridToCanvas(r,c);
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // Draw bridges
+  for(var i=0;i<bridges.length;i++){
+    if(bridges[i].count>0) drawBridge(bridges[i]);
+  }
+
+  // Draw islands
+  for(var i=0;i<islands.length;i++){
+    drawIsland(islands[i],i);
+  }
+}
+
+function drawBridge(b){
+  var p1=gridToCanvas(b.r1,b.c1);
+  var p2=gridToCanvas(b.r2,b.c2);
+  var isHoriz=b.r1===b.r2;
+  var gap=3;
+
+  ctx.lineCap='round';
+  ctx.shadowColor='rgba(0,240,255,0.3)';
+  ctx.shadowBlur=6;
+
+  if(b.count===1){
+    ctx.strokeStyle='rgba(0,240,255,0.5)';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(p1.x,p1.y);
+    ctx.lineTo(p2.x,p2.y);
+    ctx.stroke();
+  }else if(b.count===2){
+    ctx.strokeStyle='rgba(0,240,255,0.65)';
+    ctx.lineWidth=2;
+    if(isHoriz){
+      ctx.beginPath();ctx.moveTo(p1.x,p1.y-gap);ctx.lineTo(p2.x,p2.y-gap);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p1.x,p1.y+gap);ctx.lineTo(p2.x,p2.y+gap);ctx.stroke();
+    }else{
+      ctx.beginPath();ctx.moveTo(p1.x-gap,p1.y);ctx.lineTo(p2.x-gap,p2.y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p1.x+gap,p1.y);ctx.lineTo(p2.x+gap,p2.y);ctx.stroke();
+    }
+  }
+  ctx.shadowBlur=0;
+}
+
+function drawIsland(isl,idx){
+  var p=gridToCanvas(isl.r,isl.c);
+  var radius=Math.max(14,cellSize*0.32);
+  var total=getBridgeCount(isl);
+  var satisfied=total===isl.num;
+  var over=total>isl.num;
+  var isSelected=selectedIsland===idx;
+
+  var borderColor='#00f0ff';
+  var glowColor='rgba(0,240,255,0.4)';
+  var bgColor='rgba(0,240,255,0.08)';
+  var textColor='#fff';
+
+  if(satisfied){
+    borderColor='#39ff14';
+    glowColor='rgba(57,255,20,0.5)';
+    bgColor='rgba(57,255,20,0.1)';
+    textColor='#39ff14';
+  }
+  if(over){
+    borderColor='#ff2d7b';
+    glowColor='rgba(255,45,123,0.5)';
+    bgColor='rgba(255,45,123,0.1)';
+    textColor='#ff2d7b';
+  }
+  if(isSelected){
+    radius+=3;
+    glowColor=satisfied?'rgba(57,255,20,0.7)':over?'rgba(255,45,123,0.7)':'rgba(0,240,255,0.7)';
+  }
+
+  ctx.shadowColor=glowColor;
+  ctx.shadowBlur=isSelected?18:10;
+
+  ctx.fillStyle=bgColor;
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.strokeStyle=borderColor;
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+  ctx.stroke();
+
+  ctx.shadowBlur=0;
+
+  var fontSize=Math.max(12,cellSize*0.28);
+  ctx.fillStyle=textColor;
+  ctx.font='700 '+fontSize+'px Orbitron,monospace';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(isl.num,p.x,p.y+1);
+}
+
+function getBridgeCount(isl){
+  var total=0;
+  for(var i=0;i<bridges.length;i++){
+    var b=bridges[i];
+    if((b.r1===isl.r&&b.c1===isl.c)||(b.r2===isl.r&&b.c2===isl.c)){
+      total+=b.count;
+    }
+  }
+  return total;
+}
+
+// ====== INPUT ======
+function getCanvasPos(e){
+  var rect=canvas.getBoundingClientRect();
+  var x,y;
+  if(e.touches&&e.touches.length>0){
+    x=e.touches[0].clientX-rect.left;
+    y=e.touches[0].clientY-rect.top;
+  }else{
+    x=e.clientX-rect.left;
+    y=e.clientY-rect.top;
+  }
+  return {x:x,y:y};
+}
+
+function findIslandAt(px,py){
+  var hitRadius=Math.max(20,cellSize*0.5);
+  for(var i=0;i<islands.length;i++){
+    var p=gridToCanvas(islands[i].r,islands[i].c);
+    var dx=px-p.x,dy=py-p.y;
+    if(Math.sqrt(dx*dx+dy*dy)<=hitRadius) return i;
+  }
+  return -1;
+}
+
+function handleClick(e){
+  if(!gameActive||completed) return;
+  e.preventDefault();
+  var pos=getCanvasPos(e);
+  var idx=findIslandAt(pos.x,pos.y);
+
+  if(idx===-1){
+    if(selectedIsland!==null){
+      selectedIsland=null;
+      draw();
+    }
+    return;
+  }
+
+  if(selectedIsland===null){
+    selectedIsland=idx;
+    draw();
+    return;
+  }
+
+  if(selectedIsland===idx){
+    selectedIsland=null;
+    draw();
+    return;
+  }
+
+  var a=islands[selectedIsland];
+  var b=islands[idx];
+
+  if(a.r!==b.r&&a.c!==b.c){
+    selectedIsland=idx;
+    draw();
+    return;
+  }
+
+  var bridgeIdx=findBridgeBetween(selectedIsland,idx);
+  if(bridgeIdx===-1){
+    selectedIsland=idx;
+    draw();
+    return;
+  }
+
+  var br=bridges[bridgeIdx];
+  var oldCount=br.count;
+  var newCount=(oldCount+1)%3;
+
+  if(newCount>0){
+    var testBr={r1:br.r1,c1:br.c1,r2:br.r2,c2:br.c2,count:newCount};
+    var otherBridges=[];
+    for(var i=0;i<bridges.length;i++){
+      if(i!==bridgeIdx&&bridges[i].count>0) otherBridges.push(bridges[i]);
+    }
+    if(crossesAny(testBr,otherBridges)){
+      sndError();
+      gameScreen.classList.add('screen-shake');
+      setTimeout(function(){gameScreen.classList.remove('screen-shake');},300);
+      selectedIsland=null;
+      draw();
+      return;
+    }
+  }
+
+  historyStack.push({bridgeIdx:bridgeIdx,oldCount:oldCount});
+  br.count=newCount;
+
+  if(newCount>oldCount) sndPlace();
+  else if(newCount===0) sndRemove();
+  else sndPlace();
+
+  var ia=islands[selectedIsland];
+  var ib=islands[idx];
+  if(getBridgeCount(ia)===ia.num||getBridgeCount(ib)===ib.num) sndSatisfy();
+
+  selectedIsland=null;
+  draw();
+  checkComplete();
+}
+
+function findBridgeBetween(idxA,idxB){
+  var a=islands[idxA];
+  var b=islands[idxB];
+  var r1,c1,r2,c2;
+  if(a.r===b.r){
+    if(a.c<b.c){r1=a.r;c1=a.c;r2=b.r;c2=b.c;}
+    else{r1=b.r;c1=b.c;r2=a.r;c2=a.c;}
+  }else{
+    if(a.r<b.r){r1=a.r;c1=a.c;r2=b.r;c2=b.c;}
+    else{r1=b.r;c1=b.c;r2=a.r;c2=a.c;}
+  }
+
+  // Check no island between them
+  for(var i=0;i<islands.length;i++){
+    if(i===idxA||i===idxB) continue;
+    var isl=islands[i];
+    if(r1===r2&&isl.r===r1){
+      if(isl.c>Math.min(c1,c2)&&isl.c<Math.max(c1,c2)) return -1;
+    }
+    if(c1===c2&&isl.c===c1){
+      if(isl.r>Math.min(r1,r2)&&isl.r<Math.max(r1,r2)) return -1;
+    }
+  }
+
+  for(var i=0;i<bridges.length;i++){
+    if(bridges[i].r1===r1&&bridges[i].c1===c1&&bridges[i].r2===r2&&bridges[i].c2===c2) return i;
+  }
+
+  // Not in list, add it
+  bridges.push({r1:r1,c1:c1,r2:r2,c2:c2,count:0});
+  solution.push({r1:r1,c1:c1,r2:r2,c2:c2,count:0});
+  return bridges.length-1;
+}
+
+canvas.addEventListener('click',handleClick);
+canvas.addEventListener('touchstart',function(e){
+  e.preventDefault();
+  handleClick(e);
+},{passive:false});
+
+// ====== COMPLETION CHECK ======
+function checkComplete(){
+  for(var i=0;i<islands.length;i++){
+    if(getBridgeCount(islands[i])!==islands[i].num) return;
+  }
+
+  if(islands.length<2) return;
+  var adj={};
+  for(var i=0;i<islands.length;i++) adj[islands[i].r+','+islands[i].c]=[];
+  for(var i=0;i<bridges.length;i++){
+    var b=bridges[i];
+    if(b.count>0){
+      adj[b.r1+','+b.c1].push(b.r2+','+b.c2);
+      adj[b.r2+','+b.c2].push(b.r1+','+b.c1);
+    }
+  }
+  var visited={};
+  var q=[islands[0].r+','+islands[0].c];
+  visited[q[0]]=true;
+  var cnt=1;
+  while(q.length){
+    var cur=q.shift();
+    var nb=adj[cur]||[];
+    for(var i=0;i<nb.length;i++){
+      if(!visited[nb[i]]){visited[nb[i]]=true;cnt++;q.push(nb[i]);}
+    }
+  }
+  if(cnt!==islands.length) return;
+
+  var activeBridges=[];
+  for(var i=0;i<bridges.length;i++){
+    if(bridges[i].count>0) activeBridges.push(bridges[i]);
+  }
+  for(var i=0;i<activeBridges.length;i++){
+    for(var j=i+1;j<activeBridges.length;j++){
+      if(bridgesCross(activeBridges[i],activeBridges[j])) return;
+    }
+  }
+
+  onComplete();
+}
+
+function onComplete(){
+  completed=true;
+  gameActive=false;
+  if(timerInterval) clearInterval(timerInterval);
+  sndComplete();
+  spawnParticles(canvasWrap,20,'#39ff14');
+
+  var capturedTime=timerVal+hintPenalty;
+
+  var stars=3;
+  var baseTime=gridSize===7?120:gridSize===9?240:420;
+  if(capturedTime>baseTime*1.5) stars=2;
+  if(capturedTime>baseTime*2.5) stars=1;
+  if(3-hintsLeft>=2) stars=Math.min(stars,2);
+  if(3-hintsLeft>=3) stars=Math.min(stars,1);
+
+  var key='neonarcade_neonmind_bridges_scores_'+gridSize;
+  saveScore(key,capturedTime);
+
+  setTimeout(function(){
+    $('cTime').textContent=fmtTime(capturedTime);
+    $('cSize').textContent=gridSize+'x'+gridSize;
+    $('cHints').textContent=String(3-hintsLeft);
+
+    var starStr='';
+    for(var i=0;i<3;i++) starStr+=(i<stars?'\u2B50':'\u2606');
+    $('cStars').textContent=starStr;
+
+    showScreen(completeScreen);
+
+    if(typeof Neon!=='undefined'){
+      var nameReady=Neon.getName()?Promise.resolve():Neon.promptName();
+      nameReady.then(function(){
+        return Neon.save(capturedTime);
+      }).then(function(neonResult){
+        Neon.render($('completeLB'));
+        if(neonResult&&neonResult.globalRank>=1&&neonResult.globalRank<=5){
+          Neon.showGlobalSplash(neonResult.globalRank);
+        }
+      }).catch(function(){});
+    }
+  },800);
+}
+
+// ====== TOOLBAR ======
+undoBtn.addEventListener('click',function(){
+  if(!gameActive||!historyStack.length) return;
+  var last=historyStack.pop();
+  bridges[last.bridgeIdx].count=last.oldCount;
+  draw();
+});
+
+clearBtn.addEventListener('click',function(){
+  if(!gameActive) return;
+  for(var i=0;i<bridges.length;i++) bridges[i].count=0;
+  historyStack=[];
+  selectedIsland=null;
+  draw();
+});
+
+hintBtn.addEventListener('click',function(){
+  if(!gameActive||hintsLeft<=0) return;
+
+  var candidates=[];
+  for(var i=0;i<solution.length;i++){
+    if(solution[i].count>0&&bridges[i].count!==solution[i].count){
+      candidates.push(i);
+    }
+  }
+  if(!candidates.length) return;
+
+  var pick=candidates[Math.floor(Math.random()*candidates.length)];
+  historyStack.push({bridgeIdx:pick,oldCount:bridges[pick].count});
+  bridges[pick].count=solution[pick].count;
+
+  hintsLeft--;
+  hintPenalty+=30;
+  hintCountEl.textContent=String(hintsLeft);
+  if(hintsLeft<=0) hintBtn.classList.add('disabled');
+
+  sndSatisfy();
+  draw();
+  checkComplete();
+});
+
+// ====== NAVIGATION ======
+$('backBtn').addEventListener('click',function(){
+  gameActive=false;
+  if(timerInterval) clearInterval(timerInterval);
+  showScreen(startScreen);
+  renderBestTimes();
+  renderStartLB();
+});
+
+$('startBtn').addEventListener('click',function(){
+  getAudio();
+  startGame();
+});
+
+$('playAgainBtn').addEventListener('click',function(){
+  startGame();
+});
+
+// ====== SHARE ======
+$('shareBtn').addEventListener('click',function(){
+  var capturedTime=timerVal+hintPenalty;
+  var stars=3;
+  var baseTime=gridSize===7?120:gridSize===9?240:420;
+  if(capturedTime>baseTime*1.5) stars=2;
+  if(capturedTime>baseTime*2.5) stars=1;
+  if(3-hintsLeft>=2) stars=Math.min(stars,2);
+  if(3-hintsLeft>=3) stars=Math.min(stars,1);
+
+  var starStr='';
+  for(var i=0;i<stars;i++) starStr+='\u2B50';
+
+  var text='\uD83C\uDF09 BRIDGES '+gridSize+'x'+gridSize+'\n';
+  text+='\u23F1 '+fmtTime(capturedTime)+' | '+starStr+'\n';
+  text+='\u25CB\u2500\u25CB\u2550\u25CB\n';
+  text+='\u2502   \u2551\n';
+  text+='\u25CB\u2550\u2550\u2550\u25CB\n';
+  text+='neonarcade.net/neonmind';
+
+  if(navigator.share){
+    navigator.share({text:text}).catch(function(){});
+  }else{
+    navigator.clipboard.writeText(text).then(function(){
+      var btn=$('shareBtn');
+      btn.textContent='COPIED!';
+      setTimeout(function(){btn.textContent='SHARE';},1500);
+    }).catch(function(){});
+  }
+});
+
+// ====== PARTICLES ======
+function spawnParticles(parent,count,color){
+  for(var i=0;i<count;i++){
+    var p=document.createElement('div');
+    p.className='particle';
+    p.style.background=color;
+    p.style.left=Math.random()*100+'%';
+    p.style.top=Math.random()*100+'%';
+    p.style.boxShadow='0 0 6px '+color;
+    parent.appendChild(p);
+    var angle=Math.random()*Math.PI*2;
+    var speed=40+Math.random()*60;
+    var dx=Math.cos(angle)*speed;
+    var dy=Math.sin(angle)*speed;
+    (function(el,ddx,ddy){
+      var start=performance.now();
+      function animate(t){
+        var elapsed=(t-start)/1000;
+        if(elapsed>1){el.remove();return;}
+        el.style.transform='translate('+ddx*elapsed+'px,'+ddy*elapsed+'px)';
+        el.style.opacity=String(1-elapsed);
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    })(p,dx,dy);
+  }
+}
+
+// ====== RESIZE ======
+window.addEventListener('resize',function(){
+  if(gameScreen.classList.contains('active')){
+    dpr=window.devicePixelRatio||1;
+    sizeCanvas();
+    draw();
+  }
+});
+
+// ====== KEYBOARD SHORTCUTS ======
+document.addEventListener('keydown',function(e){
+  if(e.key==='z'&&(e.ctrlKey||e.metaKey)){
+    e.preventDefault();
+    undoBtn.click();
+  }
+});
+
+})();
+</script>
+</body>
+</html>
