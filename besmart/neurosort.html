@@ -31,8 +31,10 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 .hud-lives{display:flex;gap:4px}
 .hud-heart{width:14px;height:14px;display:inline-block;background:#ff2d7b;clip-path:path('M7 2.5C5.5 0 2 0 1 2.5C0 5 2.5 8 7 12C11.5 8 14 5 13 2.5C12 0 8.5 0 7 2.5Z');filter:drop-shadow(0 0 4px rgba(255,45,123,0.6));transition:transform 0.2s}
 .hud-heart.lost{background:#333;filter:none}
-#rule-bar{position:absolute;z-index:20;width:100%;text-align:center;font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(10px,2.5vw,14px);letter-spacing:2px;color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.4);padding:6px 10px;background:rgba(10,10,18,0.8);border-bottom:1px solid rgba(180,77,255,0.15)}
+#rule-bar{position:absolute;z-index:20;width:100%;text-align:center;font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(10px,2.5vw,14px);letter-spacing:2px;color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.4);padding:6px 10px;background:rgba(10,10,18,0.8);border-bottom:1px solid rgba(180,77,255,0.15);transition:background 0.3s,border-color 0.3s,color 0.3s}
 #rule-bar.hidden{display:none}
+#rule-bar.warn-flash{background:rgba(180,77,255,0.2);border-bottom-color:rgba(180,77,255,0.5);color:#e088ff;animation:ruleWarn 0.5s infinite}
+@keyframes ruleWarn{0%,100%{opacity:1}50%{opacity:0.6}}
 #bins-container{position:absolute;bottom:0;left:0;width:100%;z-index:20;display:flex;justify-content:center;gap:6px;padding:0 8px 12px;pointer-events:all}
 #bins-container.hidden{display:none}
 .bin{flex:1;max-width:120px;height:clamp(70px,18vh,100px);border:2px solid #333;border-radius:6px;background:rgba(18,18,31,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color 0.2s,box-shadow 0.2s,transform 0.1s;overflow:hidden}
@@ -48,10 +50,13 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 .bin.glow-purple{border-color:#b44dff;box-shadow:0 0 15px rgba(180,77,255,0.3)}
 .bin.correct{animation:binCorrect 0.3s}
 .bin.wrong{animation:binWrong 0.3s}
+.bin.pulse-match{animation:binPulse 0.6s ease-in-out infinite}
 @keyframes binCorrect{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
 @keyframes binWrong{0%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+@keyframes binPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 #inversion-flash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.15s}
 #inversion-flash .text{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,7vw,48px);letter-spacing:6px;text-shadow:0 0 20px rgba(180,77,255,0.8),0 0 60px rgba(180,77,255,0.3)}
+#inversion-warning{position:fixed;top:0;left:0;width:100%;height:100%;z-index:49;pointer-events:none;opacity:0;border:4px solid #b44dff;box-sizing:border-box;transition:opacity 0.15s}
 .screen-shake{animation:shake 0.25s}
 @keyframes shake{0%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,3px)}80%{transform:translate(2px,-3px)}100%{transform:translate(0)}}
 .zone-label{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,3vw,18px);letter-spacing:4px;text-transform:uppercase;margin-bottom:4px}
@@ -90,6 +95,16 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 .bin-preview-item{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border:1px solid #333;border-radius:4px;background:rgba(18,18,31,0.5)}
 .bin-preview-icon{width:24px;height:24px;margin-bottom:4px}
 .bin-preview-label{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:10px;color:#8888aa;letter-spacing:1px;text-transform:uppercase}
+#combo-display{position:absolute;top:78px;left:50%;transform:translateX(-50%);z-index:25;pointer-events:none;font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(20px,5vw,32px);letter-spacing:4px;text-shadow:0 0 15px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);opacity:0;transition:opacity 0.2s,transform 0.2s}
+#combo-display.visible{opacity:1}
+#combo-display.gold{color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.6),0 0 40px rgba(255,215,0,0.2)}
+#turbo-text{position:absolute;top:110px;left:50%;transform:translateX(-50%);z-index:25;pointer-events:none;font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(14px,3.5vw,20px);letter-spacing:6px;color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,0.8);opacity:0;transition:opacity 0.3s}
+#turbo-text.visible{opacity:1}
+#gold-border{position:fixed;top:0;left:0;width:100%;height:100%;z-index:48;pointer-events:none;border:3px solid transparent;box-sizing:border-box;transition:border-color 0.3s}
+#gold-border.active{border-color:rgba(255,215,0,0.3);animation:goldPulse 1.5s ease-in-out infinite}
+@keyframes goldPulse{0%,100%{border-color:rgba(255,215,0,0.15)}50%{border-color:rgba(255,215,0,0.4)}}
+#screen-dim{position:fixed;top:0;left:0;width:100%;height:100%;z-index:47;pointer-events:none;background:rgba(0,0,0,0);transition:background 0.3s}
+#screen-dim.active{background:rgba(0,0,0,0.15)}
 </style>
 </head>
 <body>
@@ -100,9 +115,14 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   <div class="hud-item"><span class="hud-label">Lives</span><div class="hud-lives" id="hud-lives"></div></div>
   <div class="hud-item"><span class="hud-label">Combo</span><span class="hud-value" id="hud-combo">0</span></div>
 </div>
+<div id="combo-display"></div>
+<div id="turbo-text">TURBO!</div>
 <div id="rule-bar" class="hidden"></div>
 <div id="bins-container" class="hidden"></div>
 <div id="inversion-flash"><span class="text">RULES INVERTED!</span></div>
+<div id="inversion-warning"></div>
+<div id="gold-border"></div>
+<div id="screen-dim"></div>
 
 <div id="screen-start" class="screen">
   <div class="game-title">NEUROSORT</div>
@@ -184,61 +204,70 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   function getZone(level) { return Math.floor((level - 1) / 5); }
   function getZoneLevel(level) { return ((level - 1) % 5) + 1; }
 
+  // --- Zone item sizes ---
+  var ZONE_ITEM_SIZES = [20, 18, 16, 15, 14];
+
+  // --- Zone preview times (ms) ---
+  var ZONE_PREVIEW_TIMES = [500, 300, 200, 150, 150];
+
   function getLevelConfig(level) {
     var zone = getZone(level);
     var zl = getZoneLevel(level);
-    var binCount, itemCount, baseSpeed, gapBase, sortMode, invertInterval, hasWild;
+    var binCount, itemCount, baseSpeed, gapBase, sortMode, invertInterval, hasWild, itemSize, previewTime;
+
+    itemSize = ZONE_ITEM_SIZES[zone] || 20;
+    previewTime = ZONE_PREVIEW_TIMES[zone] || 300;
 
     switch (zone) {
-      case 0:
+      case 0: // Zone 1 (levels 1-5): speed 2.0 -> 3.0, gap 1200 -> 800, 18 items
         binCount = zl <= 3 ? 2 : 3;
-        itemCount = 15;
-        baseSpeed = 1.2 + zl * 0.25;
-        gapBase = 1500 - zl * 100;
+        itemCount = 18;
+        baseSpeed = 2.0 + (zl - 1) * 0.25; // 2.0, 2.25, 2.5, 2.75, 3.0
+        gapBase = 1200 - (zl - 1) * 100;    // 1200, 1100, 1000, 900, 800
         sortMode = 'color';
         invertInterval = 0;
         hasWild = false;
         break;
-      case 1:
+      case 1: // Zone 2 (levels 6-10): speed 2.8 -> 4.0, gap 1000 -> 600, 22 items
         binCount = zl <= 2 ? 3 : 4;
-        itemCount = 18;
-        baseSpeed = 1.8 + zl * 0.25;
-        gapBase = 1300 - zl * 100;
+        itemCount = 22;
+        baseSpeed = 2.8 + (zl - 1) * 0.3;   // 2.8, 3.1, 3.4, 3.7, 4.0
+        gapBase = 1000 - (zl - 1) * 100;     // 1000, 900, 800, 700, 600
         sortMode = 'shape';
         invertInterval = 0;
         hasWild = false;
         break;
-      case 2:
+      case 2: // Zone 3 (levels 11-15): speed 3.5 -> 5.0, gap 800 -> 500, 25 items
         binCount = 4;
-        itemCount = 20;
-        baseSpeed = 2.2 + zl * 0.2;
-        gapBase = 1200 - zl * 80;
+        itemCount = 25;
+        baseSpeed = 3.5 + (zl - 1) * 0.375;  // 3.5, 3.875, 4.25, 4.625, 5.0
+        gapBase = 800 - (zl - 1) * 75;        // 800, 725, 650, 575, 500
         sortMode = 'colorshape';
         invertInterval = 0;
         hasWild = false;
         break;
-      case 3:
+      case 3: // Zone 4 (levels 16-20): speed 4.0 -> 5.5, gap 700 -> 400, 28 items, invert every 6s
         binCount = 4;
-        itemCount = 20;
-        baseSpeed = 2.5 + zl * 0.2;
-        gapBase = 1100 - zl * 80;
-        sortMode = 'colorshape';
-        invertInterval = 8000;
-        hasWild = false;
-        break;
-      case 4:
-        binCount = 5;
-        itemCount = 22;
-        baseSpeed = 3.0 + zl * 0.15;
-        gapBase = 900 - zl * 60;
+        itemCount = 28;
+        baseSpeed = 4.0 + (zl - 1) * 0.375;   // 4.0, 4.375, 4.75, 5.125, 5.5
+        gapBase = 700 - (zl - 1) * 75;         // 700, 625, 550, 475, 400
         sortMode = 'colorshape';
         invertInterval = 6000;
+        hasWild = false;
+        break;
+      case 4: // Zone 5 (levels 21-25): speed 4.5 -> 6.5, gap 600 -> 350, 30 items, invert every 4s
+        binCount = 5;
+        itemCount = 30;
+        baseSpeed = 4.5 + (zl - 1) * 0.5;     // 4.5, 5.0, 5.5, 6.0, 6.5
+        gapBase = 600 - (zl - 1) * 62.5;       // 600, 537, 475, 412, 350
+        sortMode = 'colorshape';
+        invertInterval = 4000;
         hasWild = true;
         break;
       default:
-        binCount = 2; itemCount = 15; baseSpeed = 1.5; gapBase = 1400; sortMode = 'color'; invertInterval = 0; hasWild = false;
+        binCount = 2; itemCount = 18; baseSpeed = 2.0; gapBase = 1200; sortMode = 'color'; invertInterval = 0; hasWild = false;
     }
-    return { zone: zone, zl: zl, binCount: binCount, itemCount: itemCount, baseSpeed: baseSpeed, gapBase: gapBase, sortMode: sortMode, invertInterval: invertInterval, hasWild: hasWild };
+    return { zone: zone, zl: zl, binCount: binCount, itemCount: itemCount, baseSpeed: baseSpeed, gapBase: gapBase, sortMode: sortMode, invertInterval: invertInterval, hasWild: hasWild, itemSize: itemSize, previewTime: previewTime };
   }
 
   function generateBins(config) {
@@ -313,10 +342,15 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   var ruleBar = document.getElementById('rule-bar');
   var binsContainer = document.getElementById('bins-container');
   var inversionFlash = document.getElementById('inversion-flash');
+  var inversionWarning = document.getElementById('inversion-warning');
   var hudScore = document.getElementById('hud-score');
   var hudLevel = document.getElementById('hud-level');
   var hudLives = document.getElementById('hud-lives');
   var hudCombo = document.getElementById('hud-combo');
+  var comboDisplay = document.getElementById('combo-display');
+  var turboText = document.getElementById('turbo-text');
+  var goldBorder = document.getElementById('gold-border');
+  var screenDim = document.getElementById('screen-dim');
 
   // ============================================================
   // SIZING
@@ -435,6 +469,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   var correctCount = 0;
   var totalSorted = 0;
   var totalSortTime = 0;
+  var droppedCount = 0;
   var levelConfig = null;
   var binDefs = [];
   var binCounts = [];
@@ -465,10 +500,83 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   var sortAnimStartY = 0;
   var sortAnimCorrect = false;
 
+  // --- Adaptive difficulty state ---
+  var recentResults = []; // rolling window of last 15: true=correct, false=wrong/dropped
+  var adaptiveSlowdown = 0; // count of items to slow down for
+  var turboActive = false;
+  var turboShowTimer = 0;
+
+  // --- Inversion warning state ---
+  var inversionWarnShown = false;
+
+  // --- Combo break dim ---
+  var comboDimTimer = 0;
+
+  // --- Whoosh entrance state ---
+  var itemEntrancePhase = 0; // 0 = not animating, 1 = animating in
+  var itemEntranceStart = 0;
+  var ENTRANCE_DUR = 150; // ms for whoosh
+
   function getFallArea() {
     var top = 78;
     var bottom = H - (binsContainer.offsetHeight || 100) - 8;
     return { top: top, bottom: bottom, height: bottom - top };
+  }
+
+  // ============================================================
+  // ADAPTIVE DIFFICULTY
+  // ============================================================
+  function recordResult(correct) {
+    recentResults.push(correct);
+    if (recentResults.length > 15) recentResults.shift();
+  }
+
+  function getRollingAccuracy() {
+    if (recentResults.length < 5) return 0.75; // not enough data
+    var correct = 0;
+    for (var i = 0; i < recentResults.length; i++) {
+      if (recentResults[i]) correct++;
+    }
+    return correct / recentResults.length;
+  }
+
+  function getAdaptiveSpeedMultiplier() {
+    if (adaptiveSlowdown > 0) {
+      return 0.85; // secretly 15% slower
+    }
+    if (turboActive) {
+      return 1.10; // 10% faster
+    }
+    return 1.0;
+  }
+
+  function checkAdaptiveDifficulty() {
+    if (recentResults.length < 15) return;
+    var acc = getRollingAccuracy();
+    if (acc < 0.5 && adaptiveSlowdown <= 0) {
+      adaptiveSlowdown = 5;
+    }
+    if (acc > 0.95 && !turboActive) {
+      turboActive = true;
+      turboShowTimer = 60; // frames to show TURBO text
+      turboText.classList.add('visible');
+    }
+  }
+
+  // ============================================================
+  // WITHIN-LEVEL SPEED RAMP
+  // ============================================================
+  function getWithinLevelSpeedMultiplier() {
+    if (!levelConfig || levelConfig.itemCount <= 1) return 1.0;
+    var progress = Math.max(0, (itemIdx - 1)) / levelConfig.itemCount;
+    return 1.0 + 0.3 * progress;
+  }
+
+  function getEffectiveFallSpeed() {
+    var base = levelConfig.baseSpeed;
+    var withinLevel = getWithinLevelSpeedMultiplier();
+    var adaptive = getAdaptiveSpeedMultiplier();
+    return base * withinLevel * adaptive;
   }
 
   // ============================================================
@@ -519,10 +627,10 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   }
 
   // ============================================================
-  // TRAILS
+  // TRAILS (motion blur)
   // ============================================================
-  function addTrail(x, y, color) {
-    trails.push({ x: x, y: y, color: color, life: 1, decay: 0.04 });
+  function addTrail(x, y, color, size) {
+    trails.push({ x: x, y: y, color: color, life: 1, decay: 0.06, size: size || 4 });
   }
 
   function updateTrails() {
@@ -535,12 +643,12 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   function drawTrails() {
     for (var i = 0; i < trails.length; i++) {
       var t = trails[i];
-      ctx.globalAlpha = t.life * 0.4;
+      ctx.globalAlpha = t.life * 0.5;
       ctx.fillStyle = t.color;
       ctx.shadowColor = t.color;
       ctx.shadowBlur = 6;
       ctx.beginPath();
-      ctx.arc(t.x, t.y, 4 * t.life, 0, Math.PI * 2);
+      ctx.arc(t.x, t.y, t.size * t.life, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
@@ -562,9 +670,20 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     cx.quadraticCurveTo(x, y, x + r, y);
   }
 
-  function drawShape(x, y, shape, colorKey, size, alpha) {
+  function drawShape(x, y, shape, colorKey, size, alpha, glowGold) {
     var c = COLORS[colorKey] || COLORS.cyan;
     ctx.globalAlpha = alpha || 1;
+
+    // Gold glow for 5x combo
+    if (glowGold) {
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = 'rgba(255,215,0,0.12)';
+      ctx.beginPath();
+      ctx.arc(x, y, size + 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     ctx.strokeStyle = c.hex;
     ctx.fillStyle = 'rgba(' + c.rgb[0] + ',' + c.rgb[1] + ',' + c.rgb[2] + ',0.15)';
     ctx.lineWidth = 2.5;
@@ -606,7 +725,6 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     cx.lineWidth = 1.5;
     var s = size || 10;
 
-    // Parse hex to create fill
     cx.fillStyle = colorHex;
     cx.globalAlpha = 0.15;
     cx.beginPath();
@@ -649,6 +767,21 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   }
 
   // ============================================================
+  // MOTION BLUR (draw faded trailing copies of falling item)
+  // ============================================================
+  function drawMotionBlur(x, y, shape, colorKey, size, speed) {
+    var numTrails = Math.min(6, Math.floor(speed * 1.2));
+    for (var i = 1; i <= numTrails; i++) {
+      var trailY = y - i * (speed * 1.5);
+      var alpha = 0.15 * (1 - i / (numTrails + 1));
+      var trailSize = size * (1 - i * 0.04);
+      if (alpha > 0.01 && trailSize > 2) {
+        drawShape(x, trailY, shape, colorKey, trailSize, alpha);
+      }
+    }
+  }
+
+  // ============================================================
   // SCREEN MANAGEMENT
   // ============================================================
   function showScreen(name) {
@@ -659,6 +792,13 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     hud.classList.toggle('hidden', !gameUI);
     ruleBar.classList.toggle('hidden', !gameUI);
     binsContainer.classList.toggle('hidden', !gameUI);
+
+    if (!gameUI) {
+      comboDisplay.classList.remove('visible');
+      turboText.classList.remove('visible');
+      goldBorder.classList.remove('active');
+      screenDim.classList.remove('active');
+    }
 
     switch (name) {
       case 'start': screenStart.classList.remove('hidden'); break;
@@ -740,6 +880,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     correctCount = 0;
     totalSorted = 0;
     totalSortTime = 0;
+    droppedCount = 0;
     inverted = false;
     lastInvertTime = 0;
     invertedMapping = null;
@@ -747,6 +888,13 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     trails = [];
     levelStartScore = score;
     sortAnimating = false;
+    recentResults = [];
+    adaptiveSlowdown = 0;
+    turboActive = false;
+    turboShowTimer = 0;
+    inversionWarnShown = false;
+    comboDimTimer = 0;
+    itemEntrancePhase = 0;
 
     var zone = levelConfig.zone;
     var introZone = document.getElementById('intro-zone');
@@ -938,6 +1086,28 @@ canvas{position:absolute;top:0;left:0;z-index:1}
       h.className = 'hud-heart' + (i >= lives ? ' lost' : '');
       hudLives.appendChild(h);
     }
+
+    // Update prominent combo display
+    if (combo >= 3) {
+      comboDisplay.textContent = combo + 'x COMBO';
+      comboDisplay.classList.add('visible');
+      if (combo >= 5) {
+        comboDisplay.classList.add('gold');
+      } else {
+        comboDisplay.classList.remove('gold');
+        comboDisplay.style.color = '#00f0ff';
+      }
+    } else {
+      comboDisplay.classList.remove('visible');
+      comboDisplay.classList.remove('gold');
+    }
+
+    // Gold border at 10x combo
+    if (combo >= 10) {
+      goldBorder.classList.add('active');
+    } else {
+      goldBorder.classList.remove('active');
+    }
   }
 
   function updateRuleBar() {
@@ -950,6 +1120,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     ruleBar.style.color = inverted ? '#ff2d7b' : '#b44dff';
     ruleBar.style.borderBottomColor = inverted ? 'rgba(255,45,123,0.3)' : 'rgba(180,77,255,0.15)';
     ruleBar.style.background = inverted ? 'rgba(255,45,123,0.08)' : 'rgba(10,10,18,0.8)';
+    ruleBar.classList.remove('warn-flash');
   }
 
   function spawnNextItem() {
@@ -960,15 +1131,17 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     currentItem = itemQueue[itemIdx];
     itemIdx++;
     itemX = W / 2;
-    itemY = getFallArea().top + 20;
-    itemState = 'preview';
+    itemY = getFallArea().top - 20; // start offscreen for whoosh
+    itemState = 'entrance';
+    itemEntrancePhase = 1;
+    itemEntranceStart = performance.now();
     itemSpawnTime = performance.now();
     sortStartTime = performance.now();
     sortAnimating = false;
   }
 
   function checkMatch(bin, item) {
-    if (item.isWild) return false; // handled separately
+    if (item.isWild) return false;
     if (levelConfig.sortMode === 'color') return bin.acceptColor === item.color;
     if (levelConfig.sortMode === 'shape') return bin.acceptShape === item.shape;
     return bin.acceptColor === item.color && bin.acceptShape === item.shape;
@@ -976,7 +1149,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 
   function sortToBin(binIdx) {
     if (state !== 'playing') return;
-    if (itemState !== 'falling' && itemState !== 'preview') return;
+    if (itemState !== 'falling' && itemState !== 'preview' && itemState !== 'entrance') return;
     if (sortAnimating) return;
     ensureAudio();
 
@@ -1005,6 +1178,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     }
 
     itemState = 'sorting';
+    itemEntrancePhase = 0;
     sortAnimating = true;
     sortAnimStart = performance.now();
     sortAnimStartX = itemX;
@@ -1021,16 +1195,25 @@ canvas{position:absolute;top:0;left:0;z-index:1}
       combo++;
       if (combo > maxCombo) maxCombo = combo;
       correctCount++;
-      var pts = 100 + (combo - 1) * 25;
+      // Points: base 100 + combo bonus. At 5x combo, items are worth 2x
+      var comboMultiplier = combo >= 5 ? 2 : 1;
+      var pts = (100 + (combo - 1) * 25) * comboMultiplier;
       score += pts;
       sndCorrect(binIdx);
       if (combo > 1) sndCombo(combo);
       spawnParticles(itemX, itemY, COLORS[currentItem.color].hex, 12, 3);
       var binEl = binsContainer.querySelectorAll('.bin')[binIdx];
       if (binEl) { binEl.classList.add('correct'); setTimeout(function() { binEl.classList.remove('correct'); }, 300); }
+      recordResult(true);
       updateBinsDOM();
       updateHUD();
+      // Adaptive: if turbo was active and they keep getting correct, stay turbo
     } else {
+      // Combo broken - trigger dim effect
+      if (combo >= 3) {
+        comboDimTimer = 20; // frames
+        screenDim.classList.add('active');
+      }
       combo = 0;
       lives--;
       sndWrong();
@@ -1041,8 +1224,16 @@ canvas{position:absolute;top:0;left:0;z-index:1}
       shakeIntensity = 4;
       var binEl = binsContainer.querySelectorAll('.bin')[binIdx];
       if (binEl) { binEl.classList.add('wrong'); setTimeout(function() { binEl.classList.remove('wrong'); }, 300); }
+      recordResult(false);
+      // End turbo on miss
+      turboActive = false;
+      turboText.classList.remove('visible');
       updateHUD();
     }
+
+    // Adaptive difficulty check
+    if (adaptiveSlowdown > 0) adaptiveSlowdown--;
+    checkAdaptiveDifficulty();
   }
 
   function finishSortAnimation() {
@@ -1064,7 +1255,10 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   }
 
   function scheduleNextItem() {
-    var gap = Math.max(300, levelConfig.gapBase - (itemIdx * 15));
+    // Gap decreases within level too
+    var baseGap = levelConfig.gapBase;
+    var withinLevelReduction = (itemIdx / levelConfig.itemCount) * 0.2; // up to 20% shorter at end
+    var gap = Math.max(200, baseGap * (1 - withinLevelReduction));
     setTimeout(function() {
       if (state === 'playing' && itemState === 'none') {
         spawnNextItem();
@@ -1076,16 +1270,29 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     if (state !== 'playing') return;
     sndDrop();
     lives--;
+    // Combo broken on drop
+    if (combo >= 3) {
+      comboDimTimer = 20;
+      screenDim.classList.add('active');
+    }
     combo = 0;
+    droppedCount++;
     totalSorted++;
     totalSortTime += performance.now() - sortStartTime;
     spawnShatter(itemX, itemY, COLORS[currentItem.color].hex);
     shakeTimer = 10;
     shakeIntensity = 3;
+    recordResult(false);
+    // End turbo on drop
+    turboActive = false;
+    turboText.classList.remove('visible');
+    if (adaptiveSlowdown > 0) adaptiveSlowdown--;
+    checkAdaptiveDifficulty();
     updateHUD();
 
     currentItem = null;
     itemState = 'none';
+    itemEntrancePhase = 0;
     lastItemTime = performance.now();
 
     if (lives <= 0) {
@@ -1100,9 +1307,29 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   // ============================================================
   function checkInversion(now) {
     if (!levelConfig || levelConfig.invertInterval <= 0) return;
-    if (now - lastInvertTime >= levelConfig.invertInterval) {
+
+    var timeSinceLast = now - lastInvertTime;
+    var timeToInvert = levelConfig.invertInterval;
+
+    // Warning flash 2 seconds before inversion
+    if (timeSinceLast >= timeToInvert - 2000 && !inversionWarnShown) {
+      inversionWarnShown = true;
+      ruleBar.classList.add('warn-flash');
+    }
+
+    // Purple border flash 0.5 seconds before
+    if (timeSinceLast >= timeToInvert - 500 && timeSinceLast < timeToInvert) {
+      inversionWarning.style.opacity = '1';
+      inversionWarning.style.borderColor = '#b44dff';
+    } else {
+      inversionWarning.style.opacity = '0';
+    }
+
+    if (timeSinceLast >= timeToInvert) {
       inverted = !inverted;
       lastInvertTime = now;
+      inversionWarnShown = false;
+      inversionWarning.style.opacity = '0';
 
       if (inverted) {
         invertedMapping = [];
@@ -1125,7 +1352,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
       sndInvert();
       updateRuleBar();
       updateBinsDOM();
-      createBinsDOM(); // Rebuild bins with new labels
+      createBinsDOM();
 
       inversionFlash.style.opacity = '1';
       inversionFlash.style.background = inverted ? 'rgba(180,77,255,0.15)' : 'rgba(57,255,20,0.1)';
@@ -1144,9 +1371,13 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     var avgTime = totalSorted > 0 ? totalSortTime / totalSorted / 1000 : 0;
     var levelScore = score - levelStartScore;
 
+    // Star rating: harder thresholds
+    // 1 star: complete the level
+    // 2 stars: 85%+ accuracy
+    // 3 stars: 95%+ accuracy AND avg sort time under 0.8s AND no items dropped
     var stars = 1;
-    if (accuracy >= 90) stars = 2;
-    if (accuracy >= 95 && avgTime < 1) stars = 3;
+    if (accuracy >= 85) stars = 2;
+    if (accuracy >= 95 && avgTime < 0.8 && droppedCount === 0) stars = 3;
 
     progress = loadProgress();
     if (!progress.stars) progress.stars = {};
@@ -1365,7 +1596,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     var dx = t.clientX - touchStartX;
     var dist = Math.abs(dx);
 
-    if (dist >= SWIPE_THRESHOLD && state === 'playing' && (itemState === 'falling' || itemState === 'preview')) {
+    if (dist >= SWIPE_THRESHOLD && state === 'playing' && (itemState === 'falling' || itemState === 'preview' || itemState === 'entrance')) {
       var numBins = binDefs.length;
       if (numBins === 2) {
         sortToBin(dx < 0 ? 0 : 1);
@@ -1388,7 +1619,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     isSwiping = false;
     var dx = e.clientX - touchStartX;
     var dist = Math.abs(dx);
-    if (dist >= SWIPE_THRESHOLD && state === 'playing' && (itemState === 'falling' || itemState === 'preview')) {
+    if (dist >= SWIPE_THRESHOLD && state === 'playing' && (itemState === 'falling' || itemState === 'preview' || itemState === 'entrance')) {
       var numBins = binDefs.length;
       if (numBins === 2) {
         sortToBin(dx < 0 ? 0 : 1);
@@ -1406,7 +1637,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   // ============================================================
   document.addEventListener('keydown', function(e) {
     if (state !== 'playing') return;
-    if (itemState !== 'falling' && itemState !== 'preview') return;
+    if (itemState !== 'falling' && itemState !== 'preview' && itemState !== 'entrance') return;
 
     var numBins = binDefs.length;
     var binIdx = -1;
@@ -1519,6 +1750,25 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 
       checkInversion(now);
 
+      // Combo dim timer
+      if (comboDimTimer > 0) {
+        comboDimTimer--;
+        if (comboDimTimer <= 0) {
+          screenDim.classList.remove('active');
+        }
+      }
+
+      // Turbo text timer
+      if (turboShowTimer > 0) {
+        turboShowTimer--;
+        if (turboShowTimer <= 0 && !turboActive) {
+          turboText.classList.remove('visible');
+        }
+      }
+
+      var currentItemSize = levelConfig.itemSize;
+      var effectiveSpeed = getEffectiveFallSpeed();
+
       // Sort animation
       if (sortAnimating && currentItem) {
         var elapsed = now - sortAnimStart;
@@ -1529,18 +1779,52 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 
         var scale = sortAnimCorrect ? (1 - t * 0.4) : (1 - t * 0.7);
         var alpha = 1 - t * 0.5;
-        drawShape(itemX, itemY, currentItem.shape, currentItem.color, 20 * scale, alpha);
+        var glowGold = combo >= 5;
+        drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize * scale, alpha, glowGold);
 
         if (t >= 1) {
           finishSortAnimation();
         }
+      } else if (itemState === 'entrance') {
+        // Whoosh entrance animation
+        if (currentItem) {
+          var entranceElapsed = now - itemEntranceStart;
+          var entranceT = Math.min(1, entranceElapsed / ENTRANCE_DUR);
+          var entranceEase = 1 - Math.pow(1 - entranceT, 3); // ease out
+          var targetY = fallArea.top + 20;
+          var startY = fallArea.top - 40;
+          itemY = startY + (targetY - startY) * entranceEase;
+
+          // Scale from 0.3 to 1
+          var entranceScale = 0.3 + 0.7 * entranceEase;
+          var entranceAlpha = 0.3 + 0.7 * entranceEase;
+          var glowGold = combo >= 5;
+          drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize * entranceScale, entranceAlpha, glowGold);
+
+          // Whoosh trail during entrance
+          if (entranceT < 0.8) {
+            for (var ti = 1; ti <= 4; ti++) {
+              var trailAlpha = 0.1 * (1 - ti / 5) * (1 - entranceT);
+              drawShape(itemX, itemY - ti * 8, currentItem.shape, currentItem.color, currentItemSize * 0.6, trailAlpha);
+            }
+          }
+
+          if (entranceT >= 1) {
+            itemEntrancePhase = 0;
+            itemState = 'preview';
+            itemSpawnTime = now;
+            itemY = targetY;
+          }
+        }
       } else if (itemState === 'preview') {
-        if (now - itemSpawnTime > 300) {
+        // Adaptive preview time based on zone
+        if (now - itemSpawnTime > levelConfig.previewTime) {
           itemState = 'falling';
         }
         if (currentItem) {
           var pulse = 1 + Math.sin(now * 0.01) * 0.1;
-          drawShape(itemX, itemY, currentItem.shape, currentItem.color, 20 * pulse, 0.8);
+          var glowGold = combo >= 5;
+          drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize * pulse, 0.8, glowGold);
 
           // Subtle guide line to correct bin
           var effectiveBins = getEffectiveBins();
@@ -1561,7 +1845,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
               ctx.lineWidth = 1;
               ctx.setLineDash([4, 8]);
               ctx.beginPath();
-              ctx.moveTo(itemX, itemY + 22);
+              ctx.moveTo(itemX, itemY + currentItemSize + 2);
               ctx.lineTo(binRects[bi].cx, binRects[bi].y);
               ctx.stroke();
               ctx.setLineDash([]);
@@ -1571,27 +1855,34 @@ canvas{position:absolute;top:0;left:0;z-index:1}
           }
         }
       } else if (itemState === 'falling') {
-        var speed = levelConfig.baseSpeed * (dt / 16.67);
+        var speed = effectiveSpeed * (dt / 16.67);
         itemY += speed;
 
-        if (currentItem && Math.random() < 0.4) {
-          addTrail(itemX + (Math.random() - 0.5) * 10, itemY - 8, COLORS[currentItem.color].hex);
-        }
-
+        // Motion blur trail behind fast-falling items
         if (currentItem) {
-          drawShape(itemX, itemY, currentItem.shape, currentItem.color, 20);
+          var blurIntensity = effectiveSpeed;
+          if (blurIntensity > 2.5 && Math.random() < 0.6) {
+            addTrail(itemX + (Math.random() - 0.5) * 8, itemY - currentItemSize * 0.5, COLORS[currentItem.color].hex, currentItemSize * 0.4);
+          }
+
+          // Draw motion blur (faded copies above)
+          drawMotionBlur(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize, effectiveSpeed);
+
+          // Draw the actual item
+          var glowGold = combo >= 5;
+          drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize, 1, glowGold);
         }
 
         if (itemY > fallArea.bottom + 10) {
           itemMissed();
         }
 
-        // Highlight matching bins
+        // Highlight and pulse matching bins
         if (currentItem && binRects.length > 0) {
           var binEls = binsContainer.querySelectorAll('.bin');
           var effectiveBins = getEffectiveBins();
           for (var bi = 0; bi < binEls.length; bi++) {
-            binEls[bi].classList.remove('glow-cyan','glow-pink','glow-green','glow-orange','glow-gold','glow-purple');
+            binEls[bi].classList.remove('glow-cyan','glow-pink','glow-green','glow-orange','glow-gold','glow-purple','pulse-match');
             if (bi < effectiveBins.length) {
               var b = effectiveBins[bi];
               var matches = false;
@@ -1603,8 +1894,12 @@ canvas{position:absolute;top:0;left:0;z-index:1}
               } else {
                 matches = checkMatch(b, currentItem);
               }
-              if (matches && itemY > fallArea.top + fallArea.height * 0.35) {
+              if (matches && itemY > fallArea.top + fallArea.height * 0.25) {
                 binEls[bi].classList.add(b.glowClass || 'glow-cyan');
+                // Pulse matching bins when item is past 50% of fall area
+                if (itemY > fallArea.top + fallArea.height * 0.5) {
+                  binEls[bi].classList.add('pulse-match');
+                }
               }
             }
           }

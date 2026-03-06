@@ -15,22 +15,34 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .screen.active{display:flex}
 
 /* START SCREEN */
-#startScreen{gap:16px}
+#startScreen{gap:14px}
 .main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,8vw,64px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
-.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(16px,3.5vw,22px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:8px}
-.zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:360px;margin:10px 0}
-.zone-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:10px 6px;border:1px solid #1a1a2e;background:rgba(255,255,255,0.02);color:#4a4a6a;border-radius:4px;cursor:pointer;text-align:center;transition:all 0.2s}
-.zone-btn.unlocked{border-color:#00f0ff33;color:#8888aa;background:rgba(0,240,255,0.03)}
-.zone-btn.unlocked:hover{background:rgba(0,240,255,0.08);border-color:#00f0ff66}
-.zone-btn.current{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.08);box-shadow:0 0 12px rgba(0,240,255,0.15)}
-.zone-btn .zone-label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;margin-bottom:2px}
-.zone-btn .zone-stars{font-size:12px;margin-top:3px;display:block}
-.zone-btn.locked{opacity:0.3;cursor:default}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(16px,3.5vw,22px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:4px}
 
-.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:10px}
+/* Progress Track */
+.progress-track{width:100%;max-width:440px;margin:8px 0 4px 0}
+.progress-labels{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:6px}
+.progress-label{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#4a4a6a;text-align:center;flex:1}
+.progress-label.active{color:#00f0ff}
+.progress-dots{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;padding:0 2px}
+.progress-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid #1a1a2e;background:rgba(255,255,255,0.02);transition:all 0.2s;cursor:default}
+.progress-dot.star3{background:#39ff14;border-color:#39ff14;box-shadow:0 0 4px rgba(57,255,20,0.4)}
+.progress-dot.star2{background:#00f0ff;border-color:#00f0ff;box-shadow:0 0 4px rgba(0,240,255,0.4)}
+.progress-dot.star1{background:#ffd700;border-color:#ffd700;box-shadow:0 0 4px rgba(255,215,0,0.4)}
+.progress-dot.current{border-color:#00f0ff;box-shadow:0 0 8px rgba(0,240,255,0.5);animation:dotPulse 1.2s ease-in-out infinite}
+.progress-dot.unlocked{border-color:#4a4a6a;cursor:pointer}
+.progress-dot.unlocked:hover{border-color:#00f0ff;background:rgba(0,240,255,0.1)}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 6px rgba(0,240,255,0.4)}50%{box-shadow:0 0 14px rgba(0,240,255,0.8)}}
+
+.start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:8px}
 .play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
 
-.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:8px}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:6px}
 
 /* LEVEL INTRO */
 #introScreen{gap:20px}
@@ -83,6 +95,10 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 #levelCompleteScreen{gap:14px}
 .lc-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,32px);color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5);letter-spacing:4px}
 .lc-stars{font-size:clamp(36px,8vw,56px);margin:6px 0}
+.lc-adaptive{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,2.5vw,15px);letter-spacing:2px;margin:4px 0;text-align:center}
+.lc-adaptive.msg-faster{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.lc-adaptive.msg-new{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
+.lc-adaptive.msg-same{color:#ff8c00;text-shadow:0 0 8px rgba(255,140,0,0.4)}
 .lc-stats{text-align:center;line-height:1.8}
 .lc-stats .stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
 .lc-stats .stat-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#00f0ff;margin-left:8px}
@@ -107,6 +123,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .play-btn.secondary{border-color:#b44dff;color:#b44dff;background:rgba(180,77,255,0.06)}
 .play-btn.secondary:hover{background:rgba(180,77,255,0.15);box-shadow:0 0 20px rgba(180,77,255,0.2)}
+.play-btn.retry-current{border-color:#ff8c00;color:#ff8c00;background:rgba(255,140,0,0.06)}
+.play-btn.retry-current:hover{background:rgba(255,140,0,0.15);box-shadow:0 0 20px rgba(255,140,0,0.2)}
 .play-btn.share{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
 .play-btn.share:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
 .play-btn.small{padding:10px 24px;font-size:12px;letter-spacing:2px}
@@ -114,13 +132,12 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .share-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:2px;color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:8px 20px;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none}
 .share-toast.show{opacity:1}
 
-/* Zone colors */
-.zone-1{color:#00f0ff}
-.zone-2{color:#39ff14}
-.zone-3{color:#ffd700}
-.zone-4{color:#ff8c00}
-.zone-5{color:#b44dff}
-.zone-6{color:#ff2d7b}
+/* Zone label colors */
+.zone-warmup{color:#00f0ff}
+.zone-addition{color:#39ff14}
+.zone-multiply{color:#ffd700}
+.zone-advanced{color:#ff8c00}
+.zone-master{color:#b44dff}
 </style>
 </head>
 <body>
@@ -129,7 +146,11 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 <div id="startScreen" class="screen active">
   <div class="main-title">MATHBLITZ</div>
   <div class="subtitle">How fast is your brain?</div>
-  <div class="zone-grid" id="zoneGrid"></div>
+  <div class="progress-track" id="progressTrack">
+    <div class="progress-labels" id="progressLabels"></div>
+    <div class="progress-dots" id="progressDots"></div>
+  </div>
+  <div class="start-stats" id="startStats"></div>
   <button class="play-btn" id="startBtn">START</button>
   <div class="controls-hint">TAP or keys 1-2-3-4</div>
 </div>
@@ -146,22 +167,22 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 <div id="gameScreen" class="screen">
   <div class="game-hud">
     <div class="hud-score" id="hudScore">0</div>
-    <div class="hud-level" id="hudLevel">Z1 - L1</div>
+    <div class="hud-level" id="hudLevel">L1</div>
     <div class="hud-lives" id="hudLives"></div>
   </div>
   <div class="question-area">
     <div class="question-number" id="questionNumber">Q 1/5</div>
     <div class="question-sub" id="questionSub"></div>
-    <div class="question-text" id="questionText">12 + 7</div>
+    <div class="question-text" id="questionText">3 + 0</div>
   </div>
   <div class="timer-bar-container">
     <div class="timer-bar" id="timerBar"></div>
   </div>
   <div class="answers-grid" id="answersGrid">
-    <button class="answer-btn" data-idx="0"><span class="key-hint">1</span><span class="answer-text">19</span></button>
-    <button class="answer-btn" data-idx="1"><span class="key-hint">2</span><span class="answer-text">21</span></button>
-    <button class="answer-btn" data-idx="2"><span class="key-hint">3</span><span class="answer-text">17</span></button>
-    <button class="answer-btn" data-idx="3"><span class="key-hint">4</span><span class="answer-text">20</span></button>
+    <button class="answer-btn" data-idx="0"><span class="key-hint">1</span><span class="answer-text">3</span></button>
+    <button class="answer-btn" data-idx="1"><span class="key-hint">2</span><span class="answer-text">5</span></button>
+    <button class="answer-btn" data-idx="2"><span class="key-hint">3</span><span class="answer-text">2</span></button>
+    <button class="answer-btn" data-idx="3"><span class="key-hint">4</span><span class="answer-text">4</span></button>
   </div>
 </div>
 
@@ -169,6 +190,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 <div id="levelCompleteScreen" class="screen">
   <div class="lc-title">LEVEL COMPLETE</div>
   <div class="lc-stars" id="lcStars"></div>
+  <div id="lcAdaptive" class="lc-adaptive" style="display:none"></div>
   <div id="lcFaster" class="lc-faster" style="display:none"></div>
   <div class="lc-stats" id="lcStats"></div>
   <button class="play-btn" id="nextLevelBtn">NEXT LEVEL</button>
@@ -180,8 +202,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   <div class="go-subtitle" id="goSubtitle"></div>
   <div class="go-stats" id="goStats"></div>
   <div class="leaderboard" id="leaderboard"></div>
-  <div class="btn-row">
-    <button class="play-btn small secondary" id="retryBtn">RETRY</button>
+  <div class="btn-row" id="goBtnRow">
+    <button class="play-btn small retry-current" id="retryCurrentBtn">RETRY LEVEL</button>
+    <button class="play-btn small secondary" id="retryCheckpointBtn">CHECKPOINT</button>
     <button class="play-btn small share" id="shareBtn">SHARE</button>
   </div>
   <button class="play-btn small" id="homeBtn" style="margin-top:6px">HOME</button>
@@ -197,19 +220,61 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   // ============================================================
   // CONFIG
   // ============================================================
-  var ZONES = [
-    { name: 'BASICS', desc: 'Single-digit add & subtract', color: '#00f0ff', timePerQ: 5, questionsPerLevel: 5 },
-    { name: 'DOUBLE UP', desc: 'Two-digit add & subtract', color: '#39ff14', timePerQ: 4, questionsPerLevel: 6 },
-    { name: 'MULTIPLY', desc: 'Multiplication up to 12x12', color: '#ffd700', timePerQ: 3.5, questionsPerLevel: 7 },
-    { name: 'CHAIN OPS', desc: 'Multi-step operations', color: '#ff8c00', timePerQ: 5, questionsPerLevel: 6 },
-    { name: 'COMPARE', desc: 'Which is bigger?', color: '#b44dff', timePerQ: 4, questionsPerLevel: 7 },
-    { name: 'BLITZ MIX', desc: 'All types, max speed', color: '#ff2d7b', timePerQ: 3, questionsPerLevel: 8 }
-  ];
-  var LEVELS_PER_ZONE = 5;
   var TOTAL_LEVELS = 30;
   var LIVES_PER_LEVEL = 3;
   var SCORE_KEY = 'neonarcade_besmart_mathblitz';
   var PROGRESS_KEY = 'neonarcade_besmart_mathblitz_progress';
+
+  // Zone definitions for display
+  var ZONE_DEFS = [
+    { name: 'WARMUP', label: 'Getting Started', color: '#00f0ff', levels: [1, 6] },
+    { name: 'ADDITION', label: 'Adding Up', color: '#39ff14', levels: [7, 12] },
+    { name: 'MULTIPLY', label: 'Times Tables', color: '#ffd700', levels: [13, 18] },
+    { name: 'ADVANCED', label: 'Getting Serious', color: '#ff8c00', levels: [19, 24] },
+    { name: 'MASTER', label: 'Math Master', color: '#b44dff', levels: [25, 30] }
+  ];
+
+  // Level configs: define the base question type and parameters for each level
+  // Each level has: questionsPerLevel, baseTimer, opType description
+  var LEVEL_CONFIGS = [];
+  // Levels 1-3: Addition with 0
+  for (var i = 1; i <= 3; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 4, baseTimer: 8, opType: 'add_zero' });
+  // Levels 4-6: Simple addition (result < 10)
+  for (var i = 4; i <= 6; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 5, baseTimer: 7, opType: 'add_simple' });
+  // Levels 7-9: Addition bigger (any single digits)
+  for (var i = 7; i <= 9; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 5, baseTimer: 6, opType: 'add_bigger' });
+  // Levels 10-12: Subtraction intro (mix add + easy subtract)
+  for (var i = 10; i <= 12; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 6, baseTimer: 6, opType: 'sub_intro' });
+  // Levels 13-15: Multiplication intro (x2, x3, x5, x10)
+  for (var i = 13; i <= 15; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 6, baseTimer: 6, opType: 'mult_easy' });
+  // Levels 16-18: Two-digit add/subtract
+  for (var i = 16; i <= 18; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 6, baseTimer: 6, opType: 'two_digit' });
+  // Levels 19-21: Full multiplication (up to 12x12)
+  for (var i = 19; i <= 21; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 7, baseTimer: 5, opType: 'mult_full' });
+  // Levels 22-24: Division intro (clean division)
+  for (var i = 22; i <= 24; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 7, baseTimer: 5, opType: 'div_clean' });
+  // Levels 25-27: Mixed operations
+  for (var i = 25; i <= 27; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 7, baseTimer: 4.5, opType: 'mixed' });
+  // Levels 28-30: Chained operations
+  for (var i = 28; i <= 30; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 8, baseTimer: 5, opType: 'chained' });
+
+  function getLevelConfig(level) {
+    return LEVEL_CONFIGS[Math.max(0, Math.min(level - 1, LEVEL_CONFIGS.length - 1))];
+  }
+
+  function getZoneForLevel(level) {
+    for (var i = 0; i < ZONE_DEFS.length; i++) {
+      if (level >= ZONE_DEFS[i].levels[0] && level <= ZONE_DEFS[i].levels[1]) return ZONE_DEFS[i];
+    }
+    return ZONE_DEFS[ZONE_DEFS.length - 1];
+  }
+
+  function getZoneIndex(level) {
+    for (var i = 0; i < ZONE_DEFS.length; i++) {
+      if (level >= ZONE_DEFS[i].levels[0] && level <= ZONE_DEFS[i].levels[1]) return i;
+    }
+    return ZONE_DEFS.length - 1;
+  }
 
   // ============================================================
   // DOM REFS
@@ -221,7 +286,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     levelComplete: document.getElementById('levelCompleteScreen'),
     gameOver: document.getElementById('gameOverScreen')
   };
-  var zoneGrid = document.getElementById('zoneGrid');
+  var progressLabels = document.getElementById('progressLabels');
+  var progressDots = document.getElementById('progressDots');
+  var startStats = document.getElementById('startStats');
   var startBtn = document.getElementById('startBtn');
   var introZone = document.getElementById('introZone');
   var introLevel = document.getElementById('introLevel');
@@ -235,15 +302,16 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   var questionText = document.getElementById('questionText');
   var timerBar = document.getElementById('timerBar');
   var answersGrid = document.getElementById('answersGrid');
-  var answerBtns = answersGrid.querySelectorAll('.answer-btn');
   var lcStars = document.getElementById('lcStars');
+  var lcAdaptive = document.getElementById('lcAdaptive');
   var lcFaster = document.getElementById('lcFaster');
   var lcStats = document.getElementById('lcStats');
   var nextLevelBtn = document.getElementById('nextLevelBtn');
   var goSubtitle = document.getElementById('goSubtitle');
   var goStats = document.getElementById('goStats');
   var leaderboardEl = document.getElementById('leaderboard');
-  var retryBtn = document.getElementById('retryBtn');
+  var retryCurrentBtn = document.getElementById('retryCurrentBtn');
+  var retryCheckpointBtn = document.getElementById('retryCheckpointBtn');
   var shareBtn = document.getElementById('shareBtn');
   var homeBtn = document.getElementById('homeBtn');
   var feedbackEl = document.getElementById('feedback');
@@ -253,6 +321,13 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   // STATE
   // ============================================================
   var progress = { levelsCleared: 0, stars: [], checkpoint: 0, bestTimes: {} };
+  var adaptive = {
+    recentCorrect: [],    // rolling window of last 10 answers (true/false)
+    recentTimes: [],      // rolling window of last 10 response times
+    lowAccuracyStreak: 0, // consecutive levels with <60% accuracy
+    timerAdjust: 0,       // cumulative timer adjustment from adaptive system
+    effectiveOpLevel: 0   // the actual operation complexity level being served
+  };
   var state = {
     level: 1,
     score: 0,
@@ -262,7 +337,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     correctCount: 0,
     wrongCount: 0,
     consecutiveWrong: 0,
+    streak: 0,
     responseTimes: [],
+    allResponseTimes: [],
     timerStart: 0,
     timerDuration: 0,
     timerExtra: 0,
@@ -270,7 +347,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     answered: false,
     currentQuestion: null,
     maxLevelReached: 1,
-    starStreak: 0
+    totalCorrect: 0,
+    totalAnswered: 0,
+    adaptiveMsg: ''       // message to show on level complete
   };
 
   // ============================================================
@@ -343,6 +422,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       if (d && typeof d.levelsCleared === 'number') {
         progress = d;
         if (!progress.bestTimes) progress.bestTimes = {};
+        if (!progress.stars) progress.stars = [];
       }
     } catch(e) {}
   }
@@ -387,53 +467,94 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   }
 
   // ============================================================
-  // ZONE GRID (START SCREEN)
+  // PROGRESS TRACK (START SCREEN)
   // ============================================================
-  function buildZoneGrid() {
-    while (zoneGrid.firstChild) zoneGrid.removeChild(zoneGrid.firstChild);
-    for (var z = 0; z < 6; z++) {
-      var firstLevel = z * LEVELS_PER_ZONE + 1;
-      var lastLevel = (z + 1) * LEVELS_PER_ZONE;
-      var unlocked = firstLevel <= progress.levelsCleared + 1;
-      var isCurrent = state.level >= firstLevel && state.level <= lastLevel;
-
-      var btn = document.createElement('div');
-      btn.className = 'zone-btn' + (unlocked ? (isCurrent ? ' current' : ' unlocked') : ' locked');
-      if (unlocked) btn.style.borderColor = ZONES[z].color + '55';
-      if (isCurrent) {
-        btn.style.borderColor = ZONES[z].color;
-        btn.style.color = ZONES[z].color;
+  function buildProgressTrack() {
+    // Labels
+    while (progressLabels.firstChild) progressLabels.removeChild(progressLabels.firstChild);
+    ZONE_DEFS.forEach(function(z) {
+      var lbl = document.createElement('div');
+      lbl.className = 'progress-label';
+      lbl.textContent = z.name;
+      lbl.style.color = z.color;
+      if (state.level >= z.levels[0] && state.level <= z.levels[1]) {
+        lbl.classList.add('active');
+        lbl.style.fontWeight = '700';
       }
+      progressLabels.appendChild(lbl);
+    });
 
-      var starsEarned = 0;
-      var maxStars = LEVELS_PER_ZONE * 3;
-      for (var l = firstLevel - 1; l < lastLevel && l < progress.stars.length; l++) {
-        starsEarned += progress.stars[l] || 0;
-      }
+    // Dots
+    while (progressDots.firstChild) progressDots.removeChild(progressDots.firstChild);
+    for (var lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+      var dot = document.createElement('div');
+      dot.className = 'progress-dot';
 
-      var labelSpan = document.createElement('span');
-      labelSpan.className = 'zone-label';
-      labelSpan.textContent = 'ZONE ' + (z + 1);
-      btn.appendChild(labelSpan);
+      var starCount = progress.stars[lvl - 1] || 0;
+      var isUnlocked = lvl <= progress.levelsCleared + 1;
+      var isCurrent = lvl === state.level;
 
-      var nameText = document.createTextNode(ZONES[z].name);
-      btn.appendChild(nameText);
+      if (starCount >= 3) dot.classList.add('star3');
+      else if (starCount >= 2) dot.classList.add('star2');
+      else if (starCount >= 1) dot.classList.add('star1');
 
-      var starsSpan = document.createElement('span');
-      starsSpan.className = 'zone-stars';
-      starsSpan.textContent = unlocked ? starsEarned + '/' + maxStars + ' \u2605' : '\uD83D\uDD12';
-      btn.appendChild(starsSpan);
-
-      if (unlocked) {
-        (function(fl) {
-          btn.addEventListener('click', function() {
-            state.level = fl;
-            buildZoneGrid();
+      if (isCurrent) dot.classList.add('current');
+      if (isUnlocked && !isCurrent) {
+        dot.classList.add('unlocked');
+        (function(l) {
+          dot.addEventListener('click', function() {
+            state.level = l;
+            buildProgressTrack();
+            updateStartStats();
           });
-        })(firstLevel);
+        })(lvl);
       }
-      zoneGrid.appendChild(btn);
+
+      progressDots.appendChild(dot);
     }
+
+    updateStartStats();
+  }
+
+  function updateStartStats() {
+    while (startStats.firstChild) startStats.removeChild(startStats.firstChild);
+
+    // Compute average speed from all saved best times
+    var times = [];
+    Object.keys(progress.bestTimes).forEach(function(k) {
+      times.push(progress.bestTimes[k]);
+    });
+    var avgSpeed = 0;
+    if (times.length > 0) {
+      var sum = 0;
+      for (var i = 0; i < times.length; i++) sum += times[i];
+      avgSpeed = sum / times.length;
+    }
+
+    var totalStars = 0;
+    for (var i = 0; i < progress.stars.length; i++) totalStars += (progress.stars[i] || 0);
+
+    var stats = [
+      { val: 'L' + state.level, lbl: 'CURRENT' },
+      { val: totalStars + '/' + (TOTAL_LEVELS * 3), lbl: 'STARS' }
+    ];
+    if (avgSpeed > 0) {
+      stats.push({ val: avgSpeed.toFixed(1) + 's', lbl: 'MATH SPEED' });
+    }
+
+    stats.forEach(function(s) {
+      var div = document.createElement('div');
+      div.className = 'start-stat';
+      var valEl = document.createElement('div');
+      valEl.className = 'stat-val';
+      valEl.textContent = s.val;
+      var lblEl = document.createElement('div');
+      lblEl.className = 'stat-lbl';
+      lblEl.textContent = s.lbl;
+      div.appendChild(valEl);
+      div.appendChild(lblEl);
+      startStats.appendChild(div);
+    });
   }
 
   // ============================================================
@@ -469,7 +590,6 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
         distractors.push(d);
       }
     }
-    // Fallback: ensure we have enough
     var offset = 1;
     while (distractors.length < count) {
       if (!used[correct + offset]) {
@@ -484,185 +604,249 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     return distractors;
   }
 
-  // Zone 1: Single-digit add/subtract
-  function genZone1() {
-    var op = Math.random() < 0.5 ? '+' : '-';
-    var a, b, answer;
-    if (op === '+') {
+  // Addition with 0
+  function genAddZero() {
+    var a, b;
+    if (Math.random() < 0.5) {
       a = randInt(1, 9);
-      b = randInt(1, 9);
-      answer = a + b;
+      b = 0;
     } else {
-      a = randInt(2, 9);
-      b = randInt(1, a);
-      answer = a - b;
+      a = 0;
+      b = randInt(1, 9);
     }
-    var text = a + ' ' + op + ' ' + b;
-    var wrong = generateDistractors(answer, 3, 1, 4, 0);
-    return { text: text, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)), type: 'number' };
+    var answer = a + b;
+    var wrong = generateDistractors(answer, 3, 1, 3, 0);
+    return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
   }
 
-  // Zone 2: Two-digit add/subtract
-  function genZone2() {
+  // Simple addition (result < 10)
+  function genAddSimple() {
+    var a = randInt(1, 8);
+    var b = randInt(1, 9 - a);
+    var answer = a + b;
+    var wrong = generateDistractors(answer, 3, 1, 3, 0);
+    return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Addition bigger (any single digits)
+  function genAddBigger() {
+    var a = randInt(2, 9);
+    var b = randInt(2, 9);
+    var answer = a + b;
+    var wrong = generateDistractors(answer, 3, 1, 4, 0);
+    return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Subtraction intro (mix of addition and easy subtraction)
+  function genSubIntro() {
+    if (Math.random() < 0.4) {
+      // Easy addition
+      var a = randInt(3, 9);
+      var b = randInt(1, 6);
+      var answer = a + b;
+      var wrong = generateDistractors(answer, 3, 1, 3, 0);
+      return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+    } else {
+      // Easy subtraction
+      var a = randInt(4, 9);
+      var b = randInt(1, a - 1);
+      var answer = a - b;
+      var wrong = generateDistractors(answer, 3, 1, 3, 0);
+      return { text: a + ' - ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+    }
+  }
+
+  // Multiplication intro (x2, x3, x5, x10 only)
+  function genMultEasy() {
+    var easyMultipliers = [2, 3, 5, 10];
+    var m = easyMultipliers[randInt(0, easyMultipliers.length - 1)];
+    var a = randInt(1, 9);
+    var answer = a * m;
+    var magnitude = Math.max(2, Math.floor(answer * 0.2));
+    var wrong = generateDistractors(answer, 3, 1, magnitude, 0);
+    return { text: a + ' \u00D7 ' + m, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Two-digit add/subtract
+  function genTwoDigit() {
     var op = Math.random() < 0.5 ? '+' : '-';
     var a, b, answer;
     if (op === '+') {
-      a = randInt(10, 99);
-      b = randInt(10, 99);
+      a = randInt(10, 69);
+      b = randInt(10, 39);
       answer = a + b;
     } else {
-      a = randInt(20, 99);
-      b = randInt(10, a);
+      a = randInt(20, 79);
+      b = randInt(10, Math.min(a - 1, 39));
       answer = a - b;
     }
-    var text = a + ' ' + op + ' ' + b;
-    var magnitude = Math.max(5, Math.floor(Math.abs(answer) * 0.15));
+    var magnitude = Math.max(3, Math.floor(Math.abs(answer) * 0.15));
     var wrong = generateDistractors(answer, 3, 1, magnitude, 0);
-    return { text: text, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)), type: 'number' };
+    return { text: a + ' ' + op + ' ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
   }
 
-  // Zone 3: Multiplication
-  function genZone3() {
+  // Full multiplication (up to 12x12)
+  function genMultFull() {
     var a = randInt(2, 12);
     var b = randInt(2, 12);
     var answer = a * b;
-    var text = a + ' \u00D7 ' + b;
     var magnitude = Math.max(3, Math.floor(answer * 0.2));
     var wrong = generateDistractors(answer, 3, 1, magnitude, 1);
-    return { text: text, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)), type: 'number' };
+    return { text: a + ' \u00D7 ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
   }
 
-  // Zone 4: Chained operations (respecting order of operations)
-  function genZone4() {
+  // Clean division (no remainders)
+  function genDivClean() {
+    var divisor = randInt(2, 12);
+    var quotient = randInt(2, 12);
+    var dividend = divisor * quotient;
+    var answer = quotient;
+    var wrong = generateDistractors(answer, 3, 1, 3, 1);
+    return { text: dividend + ' \u00F7 ' + divisor, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Mixed operations
+  function genMixed() {
+    var generators = [genAddBigger, genSubIntro, genMultFull, genDivClean, genTwoDigit];
+    return generators[randInt(0, generators.length - 1)]();
+  }
+
+  // Chained operations (two operations, evaluated left-to-right with standard order of operations)
+  function genChained() {
     var patterns = [
       function() {
-        var b = randInt(2, 9), c = randInt(2, 9), a = randInt(1, 20);
+        // a + b x c
+        var b = randInt(2, 6), c = randInt(2, 6), a = randInt(1, 15);
         return { text: a + ' + ' + b + ' \u00D7 ' + c, answer: a + b * c };
       },
       function() {
-        var a = randInt(2, 9), b = randInt(2, 9), c = randInt(1, a * b - 1);
+        // a x b - c (result > 0)
+        var a = randInt(2, 6), b = randInt(2, 6), c = randInt(1, a * b - 1);
         return { text: a + ' \u00D7 ' + b + ' - ' + c, answer: a * b - c };
       },
       function() {
-        var a = randInt(10, 50), b = randInt(5, 30), c = randInt(1, a + b - 1);
+        // a + b - c (result > 0)
+        var a = randInt(10, 40), b = randInt(5, 20);
+        var c = randInt(1, a + b - 1);
         return { text: a + ' + ' + b + ' - ' + c, answer: a + b - c };
       },
       function() {
-        var a = randInt(2, 6), b = randInt(2, 6), c = randInt(2, 6), d = randInt(2, 6);
-        return { text: a + ' \u00D7 ' + b + ' + ' + c + ' \u00D7 ' + d, answer: a * b + c * d };
+        // a - b + c
+        var a = randInt(10, 30), b = randInt(1, a - 1), c = randInt(1, 15);
+        return { text: a + ' - ' + b + ' + ' + c, answer: a - b + c };
       },
       function() {
-        var c = randInt(2, 6), d = randInt(2, 6);
-        var a = randInt(c * d, 50);
-        var b = randInt(1, a);
-        return { text: a + ' - ' + b + ' + ' + c + ' \u00D7 ' + d, answer: a - b + c * d };
+        // a x b + c x d
+        var a = randInt(2, 5), b = randInt(2, 5), c = randInt(2, 5), d = randInt(2, 5);
+        return { text: a + ' \u00D7 ' + b + ' + ' + c + ' \u00D7 ' + d, answer: a * b + c * d };
       }
     ];
     var p = patterns[randInt(0, patterns.length - 1)]();
     var answer = p.answer;
     var magnitude = Math.max(3, Math.floor(Math.abs(answer) * 0.2));
     var wrong = generateDistractors(answer, 3, 1, magnitude, 0);
-    return { text: p.text, sub: 'ORDER OF OPS', correct: answer, answers: shuffle([answer].concat(wrong)), type: 'number' };
+    return { text: p.text, sub: 'ORDER OF OPS', correct: answer, answers: shuffle([answer].concat(wrong)) };
   }
 
-  // Zone 5: "Which is bigger?" comparisons
-  function genZone5() {
-    var templates = [
-      // Fraction vs decimal
-      function() {
-        var pairs = [
-          { left: '1/2', leftVal: 0.5, right: '0.6', rightVal: 0.6 },
-          { left: '3/4', leftVal: 0.75, right: '0.7', rightVal: 0.7 },
-          { left: '2/3', leftVal: 2/3, right: '0.65', rightVal: 0.65 },
-          { left: '1/3', leftVal: 1/3, right: '0.3', rightVal: 0.3 },
-          { left: '5/8', leftVal: 5/8, right: '0.6', rightVal: 0.6 },
-          { left: '3/5', leftVal: 3/5, right: '0.55', rightVal: 0.55 },
-          { left: '7/10', leftVal: 0.7, right: '0.72', rightVal: 0.72 },
-          { left: '4/7', leftVal: 4/7, right: '0.58', rightVal: 0.58 },
-          { left: '5/6', leftVal: 5/6, right: '0.8', rightVal: 0.8 },
-          { left: '2/5', leftVal: 0.4, right: '0.45', rightVal: 0.45 }
-        ];
-        return pairs[randInt(0, pairs.length - 1)];
-      },
-      // Percentage vs fraction
-      function() {
-        var pairs = [
-          { left: '40%', leftVal: 0.4, right: '3/8', rightVal: 3/8 },
-          { left: '75%', leftVal: 0.75, right: '4/5', rightVal: 0.8 },
-          { left: '60%', leftVal: 0.6, right: '5/8', rightVal: 5/8 },
-          { left: '25%', leftVal: 0.25, right: '1/3', rightVal: 1/3 },
-          { left: '80%', leftVal: 0.8, right: '7/9', rightVal: 7/9 },
-          { left: '33%', leftVal: 0.33, right: '1/3', rightVal: 1/3 },
-          { left: '66%', leftVal: 0.66, right: '2/3', rightVal: 2/3 },
-          { left: '90%', leftVal: 0.9, right: '8/9', rightVal: 8/9 },
-          { left: '15%', leftVal: 0.15, right: '1/6', rightVal: 1/6 },
-          { left: '45%', leftVal: 0.45, right: '4/9', rightVal: 4/9 }
-        ];
-        return pairs[randInt(0, pairs.length - 1)];
-      },
-      // Fraction vs fraction
-      function() {
-        var a1 = randInt(1, 7), b1 = randInt(a1 + 1, 12);
-        var a2 = randInt(1, 7), b2 = randInt(a2 + 1, 12);
-        if (a1 * b2 === a2 * b1) { a2 = Math.min(a2 + 1, b2 - 1); if (a2 < 1) a2 = 1; }
-        return { left: a1 + '/' + b1, leftVal: a1/b1, right: a2 + '/' + b2, rightVal: a2/b2 };
-      },
-      // Percentage of different bases
-      function() {
-        var pairs = [
-          { left: '30% of 80', leftVal: 24, right: '40% of 50', rightVal: 20 },
-          { left: '25% of 60', leftVal: 15, right: '15% of 80', rightVal: 12 },
-          { left: '50% of 30', leftVal: 15, right: '20% of 80', rightVal: 16 },
-          { left: '10% of 200', leftVal: 20, right: '25% of 90', rightVal: 22.5 },
-          { left: '75% of 20', leftVal: 15, right: '60% of 30', rightVal: 18 },
-          { left: '20% of 45', leftVal: 9, right: '15% of 70', rightVal: 10.5 }
-        ];
-        return pairs[randInt(0, pairs.length - 1)];
-      }
-    ];
+  // Maps opType string to generator function
+  var OP_GENERATORS = {
+    'add_zero': genAddZero,
+    'add_simple': genAddSimple,
+    'add_bigger': genAddBigger,
+    'sub_intro': genSubIntro,
+    'mult_easy': genMultEasy,
+    'two_digit': genTwoDigit,
+    'mult_full': genMultFull,
+    'div_clean': genDivClean,
+    'mixed': genMixed,
+    'chained': genChained
+  };
 
-    var pair = templates[randInt(0, templates.length - 1)]();
-    var diff = pair.leftVal - pair.rightVal;
-    var correctAnswer;
-    if (Math.abs(diff) < 0.001) {
-      correctAnswer = 'EQUAL';
-    } else if (diff > 0) {
-      correctAnswer = 'LEFT';
+  // Generate a question for a given level, respecting adaptive system
+  function generateQuestion(level) {
+    // The adaptive system may hold back the operation type
+    // effective level determines which operation type to use
+    var effectiveLevel = Math.min(level, adaptive.effectiveOpLevel);
+    var config = getLevelConfig(effectiveLevel);
+    var gen = OP_GENERATORS[config.opType];
+    if (!gen) gen = genAddZero;
+    return gen();
+  }
+
+  // ============================================================
+  // ADAPTIVE DIFFICULTY SYSTEM
+  // ============================================================
+  function getAdaptiveAccuracy() {
+    if (adaptive.recentCorrect.length === 0) return 1;
+    var correct = 0;
+    for (var i = 0; i < adaptive.recentCorrect.length; i++) {
+      if (adaptive.recentCorrect[i]) correct++;
+    }
+    return correct / adaptive.recentCorrect.length;
+  }
+
+  function getAdaptiveAvgTime() {
+    if (adaptive.recentTimes.length === 0) return 0;
+    var sum = 0;
+    for (var i = 0; i < adaptive.recentTimes.length; i++) sum += adaptive.recentTimes[i];
+    return sum / adaptive.recentTimes.length;
+  }
+
+  function pushAdaptiveResult(isCorrect, responseTime) {
+    adaptive.recentCorrect.push(isCorrect);
+    adaptive.recentTimes.push(responseTime);
+    // Keep rolling window of 10
+    if (adaptive.recentCorrect.length > 10) adaptive.recentCorrect.shift();
+    if (adaptive.recentTimes.length > 10) adaptive.recentTimes.shift();
+  }
+
+  // Called after each level to decide what happens next
+  function evaluateAdaptive(levelAccuracy) {
+    var accuracy = getAdaptiveAccuracy();
+
+    // Case 1: Accuracy below 60% for 2 consecutive levels
+    if (levelAccuracy < 0.6) {
+      adaptive.lowAccuracyStreak++;
     } else {
-      correctAnswer = 'RIGHT';
+      adaptive.lowAccuracyStreak = 0;
     }
 
-    // Build 4 options: LEFT, RIGHT, EQUAL, and CAN'T TELL
-    var answerSet = shuffle(['LEFT', 'RIGHT', 'EQUAL', "CAN'T TELL"]);
+    if (adaptive.lowAccuracyStreak >= 2) {
+      // Don't advance operation complexity, give more time
+      adaptive.timerAdjust += 1;
+      // Hold back effective operation level
+      // (don't let it increase past current)
+      state.adaptiveMsg = 'SAME_OPS';
+      return;
+    }
 
-    return {
-      text: pair.left + '  vs  ' + pair.right,
-      sub: 'WHICH IS BIGGER?',
-      correct: correctAnswer,
-      answers: answerSet,
-      type: 'compare'
-    };
+    if (accuracy >= 0.9 && adaptive.recentCorrect.length >= 5) {
+      // Player is comfortable - advance to next operation type
+      adaptive.effectiveOpLevel = state.level + 1;
+      // Reset timer adjustment when advancing ops
+      adaptive.timerAdjust = Math.max(0, adaptive.timerAdjust - 0.5);
+      state.adaptiveMsg = 'NEW_CHALLENGE';
+      return;
+    }
+
+    if (accuracy >= 0.6 && accuracy < 0.9) {
+      // Sweetspot - gradually speed up
+      adaptive.effectiveOpLevel = state.level + 1;
+      adaptive.timerAdjust = Math.max(-2, adaptive.timerAdjust - 0.3);
+      state.adaptiveMsg = 'GETTING_FASTER';
+      return;
+    }
+
+    // Default: normal progression
+    adaptive.effectiveOpLevel = state.level + 1;
+    state.adaptiveMsg = '';
   }
 
-  // Zone 6: Mixed mode
-  function genZone6() {
-    var generators = [genZone1, genZone2, genZone3, genZone4, genZone5];
-    return generators[randInt(0, generators.length - 1)]();
-  }
-
-  var generators = [genZone1, genZone2, genZone3, genZone4, genZone5, genZone6];
-
-  function getZoneIndex(level) {
-    return Math.floor((level - 1) / LEVELS_PER_ZONE);
-  }
-
-  function getZoneConfig(level) {
-    return ZONES[getZoneIndex(level)];
-  }
-
-  function generateQuestion(level) {
-    var zi = getZoneIndex(level);
-    return generators[zi]();
+  function getEffectiveTimer(level) {
+    var config = getLevelConfig(level);
+    var timer = config.baseTimer + adaptive.timerAdjust + state.timerExtra;
+    // Never go below 2 seconds or above 12 seconds
+    return Math.max(2, Math.min(12, timer));
   }
 
   // ============================================================
@@ -762,7 +946,6 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     stopTimer();
     sndTimeout();
 
-    // Highlight correct answer
     var btns = answersGrid.querySelectorAll('.answer-btn');
     var correctVal = String(state.currentQuestion.correct);
     btns.forEach(function(btn) {
@@ -774,14 +957,21 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     });
 
     state.wrongCount++;
+    state.totalAnswered++;
     state.consecutiveWrong++;
+    state.streak = 0;
     state.lives--;
     showFeedback('TIME UP!', 'wrong-fb', 600);
     shakeScreen();
     updateLives();
 
+    // Push to adaptive tracker
+    pushAdaptiveResult(false, getEffectiveTimer(state.level));
+
+    // Anti-frustration: after 3 wrong in a row, secretly add 1 second
     if (state.consecutiveWrong >= 3) {
-      state.timerExtra += 0.5;
+      state.timerExtra += 1;
+      state.consecutiveWrong = 0; // reset so it can trigger again
     }
 
     setTimeout(function() {
@@ -812,19 +1002,42 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     state.correctCount = 0;
     state.wrongCount = 0;
     state.consecutiveWrong = 0;
+    state.streak = 0;
     state.responseTimes = [];
     state.timerExtra = 0;
+    state.adaptiveMsg = '';
 
-    var zi = getZoneIndex(level);
-    var zone = ZONES[zi];
-    state.totalQuestions = zone.questionsPerLevel;
+    // Make sure adaptive effective op level is at least at current level
+    if (adaptive.effectiveOpLevel < level) {
+      adaptive.effectiveOpLevel = level;
+    }
+
+    var config = getLevelConfig(level);
+    state.totalQuestions = config.questionsPerLevel;
+
+    var zone = getZoneForLevel(level);
 
     // Show intro
     showScreen('intro');
-    introZone.textContent = 'ZONE ' + (zi + 1) + ' \u2014 ' + zone.name;
+    introZone.textContent = zone.name + ' \u2014 ' + zone.label;
     introZone.style.color = zone.color;
     introLevel.textContent = 'LEVEL ' + level;
-    introDesc.textContent = zone.desc;
+
+    // Build description from operation type
+    var descriptions = {
+      'add_zero': 'Addition with zero',
+      'add_simple': 'Simple addition',
+      'add_bigger': 'Single-digit addition',
+      'sub_intro': 'Addition & subtraction',
+      'mult_easy': 'Easy times tables',
+      'two_digit': 'Two-digit math',
+      'mult_full': 'Full multiplication',
+      'div_clean': 'Clean division',
+      'mixed': 'Mixed operations',
+      'chained': 'Multi-step operations'
+    };
+    var effectiveConfig = getLevelConfig(Math.min(level, adaptive.effectiveOpLevel));
+    introDesc.textContent = descriptions[effectiveConfig.opType] || 'Math challenge';
 
     // Countdown
     var count = 3;
@@ -858,12 +1071,10 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
   function showQuestion() {
     state.answered = false;
-    var zone = getZoneConfig(state.level);
-    var zi = getZoneIndex(state.level);
-    var levelInZone = ((state.level - 1) % LEVELS_PER_ZONE) + 1;
+    var zone = getZoneForLevel(state.level);
 
     hudScore.textContent = String(state.score);
-    hudLevel.textContent = 'Z' + (zi + 1) + ' - L' + levelInZone;
+    hudLevel.textContent = 'L' + state.level;
     updateLives();
     questionNumber.textContent = 'Q ' + (state.questionIdx + 1) + '/' + state.totalQuestions;
 
@@ -885,18 +1096,12 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       btn.className = 'answer-btn';
       var txt = btn.querySelector('.answer-text');
       txt.textContent = String(q.answers[i]);
-      // For compare questions, style answer text smaller
-      if (q.type === 'compare') {
-        txt.style.fontSize = 'clamp(14px,3.5vw,20px)';
-        txt.style.letterSpacing = '1px';
-      } else {
-        txt.style.fontSize = '';
-        txt.style.letterSpacing = '';
-      }
+      txt.style.fontSize = '';
+      txt.style.letterSpacing = '';
     });
 
-    // Start timer with anti-frustration bonus
-    var timeLim = zone.timePerQ + state.timerExtra;
+    // Start timer with adaptive + anti-frustration adjustments
+    var timeLim = getEffectiveTimer(state.level);
     startTimer(timeLim);
   }
 
@@ -908,6 +1113,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     var elapsed = performance.now() - state.timerStart;
     var responseTime = elapsed / 1000;
     state.responseTimes.push(responseTime);
+    state.allResponseTimes.push(responseTime);
+    state.totalAnswered++;
 
     var selectedBtn = answersGrid.querySelectorAll('.answer-btn')[idx];
     var selectedAnswer = selectedBtn.querySelector('.answer-text').textContent;
@@ -924,15 +1131,16 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
     if (isCorrect) {
       state.correctCount++;
+      state.totalCorrect++;
       state.consecutiveWrong = 0;
+      state.streak++;
 
-      // Score: base 100, speed bonus up to 2x
-      var zone = getZoneConfig(state.level);
-      var timeLim = zone.timePerQ + state.timerExtra;
-      var speedFrac = 1 - (responseTime / timeLim);
+      // Score: base 100, speed bonus up to 2x, streak bonus
+      var timeLim = getEffectiveTimer(state.level);
+      var speedFrac = Math.max(0, 1 - (responseTime / timeLim));
       var speedBonus = 1 + speedFrac;
-      var zoneMultiplier = getZoneIndex(state.level) + 1;
-      var points = Math.round(100 * speedBonus * zoneMultiplier);
+      var streakBonus = Math.max(0, (state.streak - 1)) * 10;
+      var points = Math.round(100 * speedBonus) + streakBonus;
       state.score += points;
 
       sndCorrect();
@@ -941,9 +1149,13 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       // Particles from button position
       var rect = selectedBtn.getBoundingClientRect();
       spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#39ff14', 10);
+
+      // Push to adaptive tracker
+      pushAdaptiveResult(true, responseTime);
     } else {
       state.wrongCount++;
       state.consecutiveWrong++;
+      state.streak = 0;
       state.lives--;
       sndWrong();
       showFeedback('WRONG', 'wrong-fb', 500);
@@ -951,8 +1163,13 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       selectedBtn.classList.add('wrong');
       updateLives();
 
+      // Push to adaptive tracker
+      pushAdaptiveResult(false, responseTime);
+
+      // Anti-frustration: after 3 wrong in a row, secretly add 1 second
       if (state.consecutiveWrong >= 3) {
-        state.timerExtra += 0.5;
+        state.timerExtra += 1;
+        state.consecutiveWrong = 0;
       }
     }
 
@@ -989,8 +1206,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       avgTime = sum / state.responseTimes.length;
     }
 
-    var zone = getZoneConfig(state.level);
-    var timeLim = zone.timePerQ;
+    var config = getLevelConfig(state.level);
+    var timeLim = config.baseTimer;
 
     // Star calculation
     var stars = 1;
@@ -1006,9 +1223,13 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     if (state.level > progress.levelsCleared) {
       progress.levelsCleared = state.level;
     }
-    progress.checkpoint = Math.floor((state.level - 1) / LEVELS_PER_ZONE) * LEVELS_PER_ZONE;
+    // Checkpoint every 5 levels
+    var newCheckpoint = Math.floor((state.level - 1) / 5) * 5;
+    if (newCheckpoint > (progress.checkpoint || 0)) {
+      progress.checkpoint = newCheckpoint;
+    }
 
-    // Check if faster than best time
+    // Best time tracking
     var isFaster = false;
     var bestKey = 'level_' + state.level;
     if (!progress.bestTimes[bestKey] || avgTime < progress.bestTimes[bestKey]) {
@@ -1017,11 +1238,11 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     }
     saveProgressData();
 
-    // Track star streak
-    if (stars === 3) state.starStreak++;
-    else state.starStreak = 0;
-
     state.maxLevelReached = state.level;
+
+    // Evaluate adaptive system
+    var levelAccuracy = state.totalQuestions > 0 ? state.correctCount / state.totalQuestions : 1;
+    evaluateAdaptive(levelAccuracy);
 
     // Show level complete
     showScreen('levelComplete');
@@ -1031,6 +1252,23 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     }
     lcStars.textContent = starEmoji;
 
+    // Show adaptive message
+    lcAdaptive.style.display = 'none';
+    lcAdaptive.className = 'lc-adaptive';
+    if (state.adaptiveMsg === 'GETTING_FASTER') {
+      lcAdaptive.textContent = 'GETTING FASTER...';
+      lcAdaptive.classList.add('msg-faster');
+      lcAdaptive.style.display = 'block';
+    } else if (state.adaptiveMsg === 'NEW_CHALLENGE') {
+      lcAdaptive.textContent = 'NEW CHALLENGE!';
+      lcAdaptive.classList.add('msg-new');
+      lcAdaptive.style.display = 'block';
+    } else if (state.adaptiveMsg === 'SAME_OPS') {
+      lcAdaptive.textContent = 'SAME OPERATIONS \u2014 MORE TIME';
+      lcAdaptive.classList.add('msg-same');
+      lcAdaptive.style.display = 'block';
+    }
+
     var accuracy = state.totalQuestions > 0 ? Math.round((state.correctCount / state.totalQuestions) * 100) : 0;
 
     // Build stats with DOM
@@ -1038,7 +1276,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     var statsData = [
       { label: 'ACCURACY', value: accuracy + '%' },
       { label: 'AVG SPEED', value: avgTime.toFixed(1) + 's' },
-      { label: 'SCORE', value: String(state.score) }
+      { label: 'SCORE', value: String(state.score) },
+      { label: 'STREAK', value: String(state.streak) }
     ];
     statsData.forEach(function(s) {
       var row = document.createElement('div');
@@ -1094,21 +1333,24 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
     showScreen('gameOver');
 
-    var zi = getZoneIndex(state.level);
-    goSubtitle.textContent = 'Reached Zone ' + (zi + 1) + ' \u2014 Level ' + state.level;
+    var zone = getZoneForLevel(state.level);
+    goSubtitle.textContent = 'Reached ' + zone.name + ' \u2014 Level ' + state.level;
 
     var avgTime = 0;
-    if (state.responseTimes.length > 0) {
+    if (state.allResponseTimes.length > 0) {
       var sum = 0;
-      for (var i = 0; i < state.responseTimes.length; i++) sum += state.responseTimes[i];
-      avgTime = sum / state.responseTimes.length;
+      for (var i = 0; i < state.allResponseTimes.length; i++) sum += state.allResponseTimes[i];
+      avgTime = sum / state.allResponseTimes.length;
     }
+
+    var overallAccuracy = state.totalAnswered > 0 ? Math.round((state.totalCorrect / state.totalAnswered) * 100) : 0;
 
     // Build stats with DOM
     while (goStats.firstChild) goStats.removeChild(goStats.firstChild);
     var statsData = [
       { label: 'SCORE', value: String(state.score) },
       { label: 'LEVEL', value: state.level + '/30' },
+      { label: 'ACCURACY', value: overallAccuracy + '%' },
       { label: 'AVG SPEED', value: avgTime.toFixed(1) + 's' }
     ];
     statsData.forEach(function(s) {
@@ -1158,25 +1400,40 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       leaderboardEl.appendChild(row);
     });
 
-    // Checkpoint for retry
-    var checkpoint = progress.checkpoint || 0;
-    var retryLevel = checkpoint + 1;
-    if (retryLevel > state.level) retryLevel = 1;
-    retryBtn.textContent = retryLevel > 1 ? 'RETRY (L' + retryLevel + ')' : 'RETRY';
-    retryBtn.onclick = function() {
+    // Retry current level button
+    retryCurrentBtn.textContent = 'RETRY L' + state.level;
+    retryCurrentBtn.onclick = function() {
       state.score = 0;
-      state.starStreak = 0;
-      startLevel(retryLevel);
+      state.totalCorrect = 0;
+      state.totalAnswered = 0;
+      state.allResponseTimes = [];
+      startLevel(state.level);
     };
+
+    // Checkpoint retry button
+    var checkpoint = progress.checkpoint || 0;
+    var checkpointLevel = checkpoint + 1;
+    if (checkpointLevel >= state.level || checkpointLevel > TOTAL_LEVELS) {
+      retryCheckpointBtn.style.display = 'none';
+    } else {
+      retryCheckpointBtn.style.display = '';
+      retryCheckpointBtn.textContent = 'FROM L' + checkpointLevel;
+      retryCheckpointBtn.onclick = function() {
+        state.score = 0;
+        state.totalCorrect = 0;
+        state.totalAnswered = 0;
+        state.allResponseTimes = [];
+        adaptive.timerAdjust = 0;
+        adaptive.lowAccuracyStreak = 0;
+        startLevel(checkpointLevel);
+      };
+    }
   }
 
   // ============================================================
   // SHARING
   // ============================================================
   function buildShareText() {
-    var totalStars = 0;
-    for (var i = 0; i < progress.stars.length; i++) totalStars += (progress.stars[i] || 0);
-
     var level = state.maxLevelReached || progress.levelsCleared || 1;
     var barLen = 30;
     var filled = Math.round((level / TOTAL_LEVELS) * barLen);
@@ -1184,16 +1441,18 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     for (var i = 0; i < barLen; i++) bar += i < filled ? '\u2588' : '\u2591';
 
     var avgTime = 0;
-    if (state.responseTimes.length > 0) {
+    if (state.allResponseTimes.length > 0) {
       var sum = 0;
-      for (var j = 0; j < state.responseTimes.length; j++) sum += state.responseTimes[j];
-      avgTime = sum / state.responseTimes.length;
+      for (var j = 0; j < state.allResponseTimes.length; j++) sum += state.allResponseTimes[j];
+      avgTime = sum / state.allResponseTimes.length;
     }
 
+    var overallAccuracy = state.totalAnswered > 0 ? Math.round((state.totalCorrect / state.totalAnswered) * 100) : 0;
+
     return '\uD83E\uDDE0 MATHBLITZ\n' +
-      'Level ' + level + '/30 | \u2B50 ' + totalStars + ' | Streak: ' + state.starStreak + '\n' +
+      'Level ' + level + '/30 | Score: ' + state.score.toLocaleString() + '\n' +
       bar + '\n' +
-      'Avg speed: ' + avgTime.toFixed(1) + 's\n' +
+      'Speed: ' + avgTime.toFixed(1) + 's avg | Accuracy: ' + overallAccuracy + '%\n' +
       'Can you beat level ' + level + '?';
   }
 
@@ -1241,14 +1500,24 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   // ============================================================
   function showStartScreen() {
     state.level = Math.min(progress.levelsCleared + 1, TOTAL_LEVELS);
-    buildZoneGrid();
+    state.score = 0;
+    state.totalCorrect = 0;
+    state.totalAnswered = 0;
+    state.allResponseTimes = [];
+    state.streak = 0;
+    // Reset adaptive for a new run
+    adaptive.recentCorrect = [];
+    adaptive.recentTimes = [];
+    adaptive.lowAccuracyStreak = 0;
+    adaptive.timerAdjust = 0;
+    adaptive.effectiveOpLevel = state.level;
+    buildProgressTrack();
     showScreen('start');
   }
 
   // ============================================================
   // INPUT HANDLERS
   // ============================================================
-  // Touch/click on answer buttons
   var answerBtnsList = answersGrid.querySelectorAll('.answer-btn');
   for (var bi = 0; bi < answerBtnsList.length; bi++) {
     (function(idx) {
@@ -1273,7 +1542,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       } else if (screens.levelComplete.classList.contains('active')) {
         nextLevelBtn.click();
       } else if (screens.gameOver.classList.contains('active')) {
-        retryBtn.click();
+        retryCurrentBtn.click();
       }
     }
   });
@@ -1281,7 +1550,15 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   // Button handlers
   startBtn.addEventListener('click', function() {
     state.score = 0;
-    state.starStreak = 0;
+    state.totalCorrect = 0;
+    state.totalAnswered = 0;
+    state.allResponseTimes = [];
+    state.streak = 0;
+    adaptive.recentCorrect = [];
+    adaptive.recentTimes = [];
+    adaptive.lowAccuracyStreak = 0;
+    adaptive.timerAdjust = 0;
+    adaptive.effectiveOpLevel = state.level;
     startLevel(state.level);
   });
 
