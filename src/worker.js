@@ -1,17 +1,22 @@
 // NEON ARCADE — API Worker
 // Handles /api/* routes, falls through to static assets for everything else
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+const ALLOWED_ORIGINS = [
+  'https://neonarcade.net',
+  'https://www.neonarcade.net',
+  'http://localhost:8777',
+  'http://127.0.0.1:8777',
+];
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
-  });
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin') || '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin',
+  };
 }
 
 // Sanitize game slug: only allow lowercase alphanumeric + hyphens
@@ -35,10 +40,15 @@ async function increment(kv, key) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const corsHeaders = getCorsHeaders(request);
+    const json = (data, status = 200) => new Response(JSON.stringify(data), {
+      status,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
+      return new Response(null, { status: 204, headers: corsHeaders });
     }
 
     // Only handle /api/ routes
