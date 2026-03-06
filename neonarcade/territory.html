@@ -183,11 +183,6 @@ body::before {
 .daily-label { font-family: 'Orbitron', monospace; font-weight: 400; font-size: 11px; letter-spacing: 2px; color: var(--neon-purple); text-shadow: 0 0 8px rgba(180,77,255,0.3); }
 
 .score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
-.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
-.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
-.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
-.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
 </style>
 </head>
 <body>
@@ -244,8 +239,11 @@ body::before {
 </div>
 <div class="particles" id="particles"></div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
+  Neon.init({ game: 'territory', mode: 'high' });
+
   // === CONFIG ===
   const GRID = 8;
   const TOTAL = GRID * GRID;
@@ -253,52 +251,6 @@ body::before {
   const COLOR_EMOJI = { blue: '\u{1F7E6}', red: '\u{1F7E5}', green: '\u{1F7E9}', yellow: '\u{1F7E8}' };
   const COLOR_HEX = { blue: '#3b82f6', red: '#ef4444', green: '#22c55e', yellow: '#eab308' };
   const EMPTY_EMOJI = '\u2B1B';
-
-  // === LEADERBOARD ===
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
-  function renderScoreTable(scores) {
-    var el = document.getElementById('score-table');
-    if (!el) return;
-    el.textContent = '';
-    var title = document.createElement('div');
-    title.className = 'score-table-title';
-    title.textContent = '\u{1F3C6} YOUR BESTS';
-    el.appendChild(title);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'score-row';
-      var rank = document.createElement('span');
-      rank.className = 'score-rank';
-      rank.textContent = i + 1;
-      var val = document.createElement('span');
-      val.className = 'score-val';
-      val.textContent = s.score;
-      var time = document.createElement('span');
-      time.className = 'score-time';
-      time.textContent = timeAgo(s.ts);
-      row.appendChild(rank);
-      row.appendChild(val);
-      row.appendChild(time);
-      el.appendChild(row);
-    });
-  }
 
   // === DOM ===
   const startScreen = document.getElementById('start-screen');
@@ -662,28 +614,34 @@ body::before {
 
     totalScoreEl.textContent = score + '/64';
 
-    var topScores = saveScore('neonarcade_scores_territory', score);
-    var best = topScores[0].score;
-    if (score >= best && topScores.filter(function(s) { return s.score === score; }).length === 1) {
-      bestScoreEl.textContent = 'NEW BEST!';
-      bestScoreEl.className = 'best-score new-best';
-    } else {
-      bestScoreEl.textContent = 'BEST: ' + best;
-      bestScoreEl.className = 'best-score';
-    }
-    renderScoreTable(topScores);
-
-    showScreen('over-screen');
-
-    setTimeout(function() {
-      for (let ci = 0; ci < COLORS.length; ci++) {
-        spawnParticles(
-          window.innerWidth * (0.2 + Math.random() * 0.6),
-          window.innerHeight * (0.3 + Math.random() * 0.3),
-          COLOR_HEX[COLORS[ci]], 15
-        );
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      if (result.isNewBest) {
+        bestScoreEl.textContent = 'NEW BEST!';
+        bestScoreEl.className = 'best-score new-best';
+      } else {
+        bestScoreEl.textContent = 'BEST: ' + Neon.getHighScore();
+        bestScoreEl.className = 'best-score';
       }
-    }, 300);
+      Neon.render(document.getElementById('score-table'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+
+      showScreen('over-screen');
+
+      setTimeout(function() {
+        for (let ci = 0; ci < COLORS.length; ci++) {
+          spawnParticles(
+            window.innerWidth * (0.2 + Math.random() * 0.6),
+            window.innerHeight * (0.3 + Math.random() * 0.3),
+            COLOR_HEX[COLORS[ci]], 15
+          );
+        }
+      }, 300);
+    });
   }
 
   // === SHARE ===

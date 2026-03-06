@@ -127,11 +127,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 /* LEADERBOARD */
 .leaderboard{width:100%;max-width:300px;margin:6px 0}
-.lb-title{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;text-align:center;margin-bottom:6px}
-.lb-row{display:flex;align-items:center;padding:3px 8px;gap:10px}
-.lb-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;color:#4a4a6a;width:20px;text-align:right}
-.lb-score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
-.lb-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
+/* Leaderboard row styles now provided by neon.js */
 
 /* Screen shake */
 @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
@@ -207,9 +203,26 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 <div class="toast" id="toast"></div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
 'use strict';
+
+// ============ NEON INIT ============
+var neonFormatScore = function(s) {
+  var m = Math.floor(s / 60);
+  var sec = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+function neonInitForDifficulty(diff) {
+  Neon.init({
+    game: 'minisudoku',
+    mode: 'low',
+    key: 'neonarcade_neonmind_minisudoku_scores_' + diff,
+    formatScore: neonFormatScore
+  });
+}
+neonInitForDifficulty('easy');
 
 // ============ PRNG (Seeded LCG) ============
 function createPRNG(seed) {
@@ -300,120 +313,47 @@ function generateCompleteGrid(rng) {
   return grid;
 }
 
-// ============ SOLVER (with constraint propagation + backtracking) ============
+// ============ SOLVER (pure backtracking) ============
 function solvePuzzle(puzzle, maxSolutions) {
   maxSolutions = maxSolutions || 2;
   var solutions = [];
+  var g = copyGrid(puzzle);
 
-  function getCandidates(grid, r, c) {
-    var used = {};
-    var i, cells, k;
-    for (i = 0; i < 6; i++) if (grid[r][i]) used[grid[r][i]] = true;
-    for (i = 0; i < 6; i++) if (grid[i][c]) used[grid[i][c]] = true;
-    cells = getBlockCells(r, c);
-    for (k = 0; k < cells.length; k++) if (grid[cells[k][0]][cells[k][1]]) used[grid[cells[k][0]][cells[k][1]]] = true;
-    var cands = [];
-    for (var d = 1; d <= 6; d++) if (!used[d]) cands.push(d);
-    return cands;
-  }
-
-  function propagate(grid) {
-    var changed = true;
-    while (changed) {
-      changed = false;
-      var r, c, d, i;
-      // Naked singles
-      for (r = 0; r < 6; r++) {
-        for (c = 0; c < 6; c++) {
-          if (grid[r][c] !== 0) continue;
-          var cands = getCandidates(grid, r, c);
-          if (cands.length === 0) return false;
-          if (cands.length === 1) { grid[r][c] = cands[0]; changed = true; }
-        }
-      }
-      // Hidden singles in rows
-      for (r = 0; r < 6; r++) {
-        for (d = 1; d <= 6; d++) {
-          var found = false;
-          for (c = 0; c < 6; c++) if (grid[r][c] === d) { found = true; break; }
-          if (found) continue;
-          var positions = [];
-          for (c = 0; c < 6; c++) {
-            if (grid[r][c] === 0 && getCandidates(grid, r, c).indexOf(d) >= 0) positions.push(c);
-          }
-          if (positions.length === 0) return false;
-          if (positions.length === 1) { grid[r][positions[0]] = d; changed = true; }
-        }
-      }
-      // Hidden singles in columns
-      for (c = 0; c < 6; c++) {
-        for (d = 1; d <= 6; d++) {
-          var foundC = false;
-          for (r = 0; r < 6; r++) if (grid[r][c] === d) { foundC = true; break; }
-          if (foundC) continue;
-          var posC = [];
-          for (r = 0; r < 6; r++) {
-            if (grid[r][c] === 0 && getCandidates(grid, r, c).indexOf(d) >= 0) posC.push(r);
-          }
-          if (posC.length === 0) return false;
-          if (posC.length === 1) { grid[posC[0]][c] = d; changed = true; }
-        }
-      }
-      // Hidden singles in blocks
-      for (var bi = 0; bi < 6; bi++) {
-        var br = Math.floor(bi / 3) * 2;
-        var bc = (bi % 3) * 3;
-        for (d = 1; d <= 6; d++) {
-          var foundB = false;
-          var cellsB = [];
-          for (var rr = br; rr < br + 2; rr++) {
-            for (var cc = bc; cc < bc + 3; cc++) {
-              if (grid[rr][cc] === d) { foundB = true; break; }
-              if (grid[rr][cc] === 0 && getCandidates(grid, rr, cc).indexOf(d) >= 0) cellsB.push([rr, cc]);
-            }
-            if (foundB) break;
-          }
-          if (foundB) continue;
-          if (cellsB.length === 0) return false;
-          if (cellsB.length === 1) { grid[cellsB[0][0]][cellsB[0][1]] = d; changed = true; }
-        }
-      }
+  function isValid(grid, r, c, num) {
+    for (var i = 0; i < 6; i++) {
+      if (grid[r][i] === num) return false;
+      if (grid[i][c] === num) return false;
+    }
+    var cells = getBlockCells(r, c);
+    for (var k = 0; k < cells.length; k++) {
+      if (grid[cells[k][0]][cells[k][1]] === num) return false;
     }
     return true;
   }
 
-  function backtrack(grid) {
+  function solve(grid) {
     if (solutions.length >= maxSolutions) return;
-    var g = copyGrid(grid);
-    var ok = propagate(g);
-    if (!ok) return;
-
-    // Find empty cell with fewest candidates (MRV)
-    var bestR = -1, bestC = -1, bestLen = 7;
+    // Find first empty cell
     for (var r = 0; r < 6; r++) {
       for (var c = 0; c < 6; c++) {
-        if (g[r][c] === 0) {
-          var len = getCandidates(g, r, c).length;
-          if (len < bestLen) { bestLen = len; bestR = r; bestC = c; }
+        if (grid[r][c] === 0) {
+          for (var d = 1; d <= 6; d++) {
+            if (isValid(grid, r, c, d)) {
+              grid[r][c] = d;
+              solve(grid);
+              if (solutions.length >= maxSolutions) return;
+              grid[r][c] = 0;
+            }
+          }
+          return; // no valid digit = dead end
         }
       }
     }
-
-    if (bestR === -1) {
-      solutions.push(copyGrid(g));
-      return;
-    }
-
-    var cands = getCandidates(g, bestR, bestC);
-    for (var i = 0; i < cands.length; i++) {
-      var g2 = copyGrid(g);
-      g2[bestR][bestC] = cands[i];
-      backtrack(g2);
-      if (solutions.length >= maxSolutions) return;
-    }
+    // No empty cells = solved
+    solutions.push(copyGrid(grid));
   }
 
-  backtrack(puzzle);
+  solve(g);
   return solutions;
 }
 
@@ -542,29 +482,7 @@ function saveStats(s) {
   try { localStorage.setItem(STORAGE_STATS, JSON.stringify(s)); } catch(e) {}
 }
 
-function saveScore(key, score) {
-  var scores = JSON.parse(localStorage.getItem(key) || '[]');
-  scores.push({ score: score, ts: Date.now() });
-  scores.sort(function(a, b) { return a.score - b.score; }); // Lower time = better
-  scores = scores.slice(0, 5);
-  localStorage.setItem(key, JSON.stringify(scores));
-  return scores;
-}
-
-function getScores(key) {
-  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
-}
-
-function timeAgo(ts) {
-  var diff = Date.now() - ts;
-  var mins  = Math.floor(diff / 60000);
-  var hours = Math.floor(diff / 3600000);
-  var days  = Math.floor(diff / 86400000);
-  if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-  if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-  return 'just now';
-}
+// saveScore, getScores, timeAgo now provided by neon.js
 
 function formatTime(secs) {
   var m = Math.floor(secs / 60);
@@ -670,40 +588,14 @@ function updateStartScreen() {
 
   // Leaderboard for most recent difficulty played, default easy
   var lastDiff = (saved && saved.difficulty) || 'easy';
-  renderLeaderboard('startLB', scoreKey(lastDiff), lastDiff.toUpperCase());
-}
-
-function renderLeaderboard(elId, key, label) {
-  var scores = getScores(key);
-  var el = document.getElementById(elId);
-  el.textContent = '';
-  if (!scores.length) return;
-  var title = document.createElement('div');
-  title.className = 'lb-title';
-  title.textContent = 'YOUR BESTS' + (label ? ' (' + label + ')' : '');
-  el.appendChild(title);
-  scores.forEach(function(s, i) {
-    var row = document.createElement('div');
-    row.className = 'lb-row';
-    var rank = document.createElement('span');
-    rank.className = 'lb-rank';
-    rank.textContent = i + 1;
-    var score = document.createElement('span');
-    score.className = 'lb-score';
-    score.textContent = formatTime(s.score);
-    var time = document.createElement('span');
-    time.className = 'lb-time';
-    time.textContent = timeAgo(s.ts);
-    row.appendChild(rank);
-    row.appendChild(score);
-    row.appendChild(time);
-    el.appendChild(row);
-  });
+  neonInitForDifficulty(lastDiff);
+  Neon.render(document.getElementById('startLB'));
 }
 
 // ============ START GAME ============
 function startGame(difficulty, isDaily, dailyRng) {
   getAudioCtx(); // Unlock audio context
+  neonInitForDifficulty(difficulty);
 
   state.difficulty = difficulty;
   state.isDaily = !!isDaily;
@@ -758,6 +650,7 @@ function startDaily() {
 
 function restoreGame(data) {
   getAudioCtx();
+  neonInitForDifficulty(data.difficulty);
 
   state.puzzle = data.puzzle;
   state.solution = data.solution;
@@ -1306,14 +1199,22 @@ function onPuzzleSolved() {
 
   saveStats(stats);
 
-  var scores = saveScore(scoreKey(state.difficulty), state.timerSeconds);
-
   try { localStorage.removeItem(STORAGE_CURRENT); } catch(e) {}
 
-  setTimeout(function() { showCompleteScreen(scores); }, 1200);
+  neonInitForDifficulty(state.difficulty);
+  var capturedTimer = state.timerSeconds;
+
+  setTimeout(function() {
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(capturedTimer);
+    }).then(function(result) {
+      showCompleteScreen(result);
+    });
+  }, 1200);
 }
 
-function showCompleteScreen(scores) {
+function showCompleteScreen(neonResult) {
   // Star rating: 1=completed, 2=no hints, 3=no hints + under par
   var par = PAR_TIMES[state.difficulty] || 300;
   var stars = 1;
@@ -1356,8 +1257,12 @@ function showCompleteScreen(scores) {
     streakInfoEl.style.display = 'none';
   }
 
-  // Leaderboard
-  renderLeaderboard('completeLB', scoreKey(state.difficulty), state.difficulty.toUpperCase());
+  // Leaderboard via neon.js
+  Neon.render(document.getElementById('completeLB'));
+
+  if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
+    Neon.showGlobalSplash(neonResult.globalRank);
+  }
 
   // Buttons
   var btnsEl = document.getElementById('completeBtns');

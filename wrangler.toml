@@ -1,5 +1,6 @@
 name = "raspy-glade-355f"
 compatibility_date = "2026-03-05"
+main = "src/worker.js"
 
 routes = [
   { pattern = "neonarcade.net/*", zone_name = "neonarcade.net" }
@@ -7,3 +8,8 @@ routes = [
 
 [assets]
 directory = "./"
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "GAME_DATA"
+id = "1a83accd339440ebab05563fea7335e0"

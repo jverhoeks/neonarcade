@@ -113,12 +113,6 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .go-stats .stat-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff;margin-left:8px}
 
 .leaderboard{width:100%;max-width:320px;margin:6px 0}
-.lb-title{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:3px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.3);margin-bottom:8px;text-align:center}
-.lb-row{display:flex;align-items:center;padding:4px 0;gap:10px}
-.lb-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#4a4a6a;width:24px;text-align:right}
-.lb-score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
-.lb-level{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa}
-.lb-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
 
 .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .play-btn.secondary{border-color:#b44dff;color:#b44dff;background:rgba(180,77,255,0.06)}
@@ -215,11 +209,14 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 <!-- Share toast -->
 <div class="share-toast" id="shareToast">Copied to clipboard!</div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
   // ============================================================
   // CONFIG
   // ============================================================
+  Neon.init({ game: 'mathblitz', mode: 'high', key: 'neonarcade_neongrind_mathblitz' });
+
   var TOTAL_LEVELS = 30;
   var LIVES_PER_LEVEL = 3;
   var SCORE_KEY = 'neonarcade_neongrind_mathblitz';
@@ -433,30 +430,6 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     } catch(e) {}
   }
 
-  function saveScore(score, level) {
-    var scores = [];
-    try { scores = JSON.parse(localStorage.getItem(SCORE_KEY) || '[]'); } catch(e) {}
-    scores.push({ score: score, level: level, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    try { localStorage.setItem(SCORE_KEY, JSON.stringify(scores)); } catch(e) {}
-    return scores;
-  }
-
-  function getScores() {
-    try { return JSON.parse(localStorage.getItem(SCORE_KEY) || '[]'); } catch(e) { return []; }
-  }
-
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days = Math.floor(diff / 86400000);
-    if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins > 0) return mins + (mins === 1 ? ' min ago' : ' mins ago');
-    return 'just now';
-  }
 
   // ============================================================
   // SCREEN MANAGEMENT
@@ -1329,12 +1302,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     sndGameOver();
 
     state.maxLevelReached = state.level;
-    var scores = saveScore(state.score, state.level);
-
-    showScreen('gameOver');
 
     var zone = getZoneForLevel(state.level);
-    goSubtitle.textContent = 'Reached ' + zone.name + ' \u2014 Level ' + state.level;
 
     var avgTime = 0;
     if (state.allResponseTimes.length > 0) {
@@ -1366,68 +1335,47 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       goStats.appendChild(row);
     });
 
-    // Build leaderboard with DOM
-    while (leaderboardEl.firstChild) leaderboardEl.removeChild(leaderboardEl.firstChild);
-    var lbTitle = document.createElement('div');
-    lbTitle.className = 'lb-title';
-    lbTitle.textContent = '\uD83C\uDFC6 YOUR BESTS';
-    leaderboardEl.appendChild(lbTitle);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(state.score);
+    }).then(function(result) {
+      Neon.render(leaderboardEl);
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+      showScreen('gameOver');
 
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'lb-row';
+      goSubtitle.textContent = 'Reached ' + zone.name + ' \u2014 Level ' + state.level;
 
-      var rank = document.createElement('span');
-      rank.className = 'lb-rank';
-      rank.textContent = String(i + 1);
-
-      var sc = document.createElement('span');
-      sc.className = 'lb-score';
-      sc.textContent = s.score + ' pts';
-
-      var lv = document.createElement('span');
-      lv.className = 'lb-level';
-      lv.textContent = 'L' + (s.level || '?');
-
-      var tm = document.createElement('span');
-      tm.className = 'lb-time';
-      tm.textContent = timeAgo(s.ts);
-
-      row.appendChild(rank);
-      row.appendChild(sc);
-      row.appendChild(lv);
-      row.appendChild(tm);
-      leaderboardEl.appendChild(row);
-    });
-
-    // Retry current level button
-    retryCurrentBtn.textContent = 'RETRY L' + state.level;
-    retryCurrentBtn.onclick = function() {
-      state.score = 0;
-      state.totalCorrect = 0;
-      state.totalAnswered = 0;
-      state.allResponseTimes = [];
-      startLevel(state.level);
-    };
-
-    // Checkpoint retry button
-    var checkpoint = progress.checkpoint || 0;
-    var checkpointLevel = checkpoint + 1;
-    if (checkpointLevel >= state.level || checkpointLevel > TOTAL_LEVELS) {
-      retryCheckpointBtn.style.display = 'none';
-    } else {
-      retryCheckpointBtn.style.display = '';
-      retryCheckpointBtn.textContent = 'FROM L' + checkpointLevel;
-      retryCheckpointBtn.onclick = function() {
+      // Retry current level button
+      retryCurrentBtn.textContent = 'RETRY L' + state.level;
+      retryCurrentBtn.onclick = function() {
         state.score = 0;
         state.totalCorrect = 0;
         state.totalAnswered = 0;
         state.allResponseTimes = [];
-        adaptive.timerAdjust = 0;
-        adaptive.lowAccuracyStreak = 0;
-        startLevel(checkpointLevel);
+        startLevel(state.level);
       };
-    }
+
+      // Checkpoint retry button
+      var checkpoint = progress.checkpoint || 0;
+      var checkpointLevel = checkpoint + 1;
+      if (checkpointLevel >= state.level || checkpointLevel > TOTAL_LEVELS) {
+        retryCheckpointBtn.style.display = 'none';
+      } else {
+        retryCheckpointBtn.style.display = '';
+        retryCheckpointBtn.textContent = 'FROM L' + checkpointLevel;
+        retryCheckpointBtn.onclick = function() {
+          state.score = 0;
+          state.totalCorrect = 0;
+          state.totalAnswered = 0;
+          state.allResponseTimes = [];
+          adaptive.timerAdjust = 0;
+          adaptive.lowAccuracyStreak = 0;
+          startLevel(checkpointLevel);
+        };
+      }
+    });
   }
 
   // ============================================================

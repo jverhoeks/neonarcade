@@ -792,9 +792,12 @@
   <div class="share-confirm" id="share-confirm"></div>
 </div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
   'use strict';
+
+  Neon.init({ game: 'wordchain', mode: 'high' });
 
   // ─── WORD LIST ───
   const WORDS = new Set([
@@ -1047,42 +1050,6 @@
   let gameActive = false;
   let longestWord = '';
 
-  const LS_KEY = 'wordchain_best';
-  function getBest() { return parseInt(localStorage.getItem(LS_KEY) || '0', 10); }
-  function setBest(v) { localStorage.setItem(LS_KEY, String(v)); }
-
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
-  function renderScoreTable(scores) {
-    var el = document.querySelector('.score-table');
-    if (!el) return;
-    var html = '<div class="score-table-title">🏆 YOUR BESTS</div>';
-    scores.forEach(function(s, i) {
-      html += '<div class="score-row">'
-        + '<span class="score-rank">' + (i+1) + '</span>'
-        + '<span class="score-val">' + s.score + '</span>'
-        + '<span class="score-time">' + timeAgo(s.ts) + '</span>'
-        + '</div>';
-    });
-    el.innerHTML = html;
-  }
-
   // ─── DOM ───
   const startScreen = document.getElementById('start-screen');
   const gameScreen = document.getElementById('game-screen');
@@ -1114,7 +1081,7 @@
 
   // ─── INIT START SCREEN ───
   function initStartScreen() {
-    const b = getBest();
+    const b = Neon.getHighScore();
     startBest.textContent = b > 0 ? `Best: ${b} words` : '';
     showScreen(startScreen);
   }
@@ -1214,7 +1181,7 @@
 
   // ─── HUD BEST ───
   function updateHudBest() {
-    const b = getBest();
+    const b = Neon.getHighScore();
     hudBestGame.textContent = b > 0 ? `Best: ${b}` : '';
   }
 
@@ -1343,29 +1310,34 @@
   // ─── END GAME ───
   function endGame() {
     soundGameOver();
-    const prev = getBest();
-    const isNewBest = score > prev;
-    if (isNewBest) setBest(score);
-    const topScores = saveScore('neonarcade_scores_wordchain', score);
 
     resultChain.textContent = String(score);
-    const bestNow = getBest();
-    resultBest.textContent = String(bestNow);
-    renderScoreTable(topScores);
-
-    if (isNewBest && score > 0) {
-      resultChain.classList.add('new-best');
-      newRecordBadge.classList.add('show');
-    } else {
-      resultChain.classList.remove('new-best');
-      newRecordBadge.classList.remove('show');
-    }
 
     // Render chain snippet
     renderBestChain();
     shareConfirm.textContent = '';
 
-    setTimeout(() => showScreen(resultScreen), 400);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      resultBest.textContent = String(Neon.getHighScore());
+      Neon.render(document.querySelector('.score-table'));
+
+      if (result.isNewBest && score > 0) {
+        resultChain.classList.add('new-best');
+        newRecordBadge.classList.add('show');
+      } else {
+        resultChain.classList.remove('new-best');
+        newRecordBadge.classList.remove('show');
+      }
+
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+
+      setTimeout(() => showScreen(resultScreen), 400);
+    });
   }
 
   function renderBestChain() {

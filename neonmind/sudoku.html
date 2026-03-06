@@ -458,37 +458,7 @@ body::before {
   width: 100%; max-width: 300px;
   margin: 4px 0;
 }
-.lb-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: #4a4a6a;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.lb-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 0;
-}
-.lb-rank {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 14px;
-  color: #4a4a6a;
-  width: 24px;
-}
-.lb-score {
-  font-family: 'Orbitron', monospace;
-  font-size: 13px;
-  color: #00f0ff;
-  flex: 1;
-}
-.lb-time-ago {
-  font-size: 12px;
-  color: #4a4a6a;
-}
+/* Leaderboard styles now provided by neon.js */
 
 .action-row {
   display: flex; gap: 10px;
@@ -705,9 +675,26 @@ body::before {
 
 <div class="share-toast" id="shareToast">COPIED TO CLIPBOARD</div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
   'use strict';
+
+  // ==================== NEON INIT ====================
+  var neonFormatScore = function(s) {
+    var m = Math.floor(s / 60);
+    var sec = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  };
+  function neonInitForDifficulty(diff) {
+    Neon.init({
+      game: 'sudoku',
+      mode: 'low',
+      key: 'neonarcade_scores_sudoku_' + diff,
+      formatScore: neonFormatScore
+    });
+  }
+  neonInitForDifficulty('easy');
 
   // ==================== SEEDED PRNG ====================
   function SeededRNG(seed) {
@@ -947,25 +934,7 @@ body::before {
   }
   function saveStats(stats) { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }
 
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return a.score - b.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
+  // saveScore and timeAgo now provided by neon.js (Neon.save / Neon.timeAgo)
 
   function saveCurrent() {
     if (state.completed) { localStorage.removeItem(CURRENT_KEY); return; }
@@ -1509,9 +1478,6 @@ body::before {
     if (stats.streak > stats.bestStreak) stats.bestStreak = stats.streak;
     saveStats(stats);
 
-    var scoreKey = SCORES_KEY + '_' + state.difficulty;
-    var scores = saveScore(scoreKey, state.timer);
-
     if (state.isDaily) {
       var daily = loadDaily();
       var yesterday = new Date();
@@ -1530,7 +1496,19 @@ body::before {
 
     localStorage.removeItem(CURRENT_KEY);
 
-    setTimeout(function() { showCompleteScreen(stars, scores, isNewBest); }, 800);
+    neonInitForDifficulty(state.difficulty);
+    var capturedStars = stars;
+    var capturedIsNewBest = isNewBest;
+    var capturedTimer = state.timer;
+
+    setTimeout(function() {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(capturedTimer);
+      }).then(function(result) {
+        showCompleteScreen(capturedStars, capturedIsNewBest, result);
+      });
+    }, 800);
   }
 
   function spawnConfetti() {
@@ -1600,7 +1578,7 @@ body::before {
     }
   }
 
-  function showCompleteScreen(stars, scores, isNewBest) {
+  function showCompleteScreen(stars, isNewBest, neonResult) {
     showScreen('completeScreen');
 
     document.getElementById('completeTime').textContent = formatTime(state.timer);
@@ -1620,36 +1598,12 @@ body::before {
       bestEl.classList.add('hidden');
     }
 
-    // Rebuild leaderboard using DOM methods
+    // Render leaderboard via neon.js
     var lbContainer = document.getElementById('completeLB');
-    while (lbContainer.firstChild) lbContainer.removeChild(lbContainer.firstChild);
-    var titleDiv = document.createElement('div');
-    titleDiv.className = 'lb-title';
-    titleDiv.textContent = 'YOUR BESTS';
-    lbContainer.appendChild(titleDiv);
+    Neon.render(lbContainer);
 
-    if (scores && scores.length > 0) {
-      scores.forEach(function(entry, idx) {
-        var row = document.createElement('div');
-        row.className = 'lb-row';
-
-        var rankSpan = document.createElement('span');
-        rankSpan.className = 'lb-rank';
-        rankSpan.textContent = String(idx + 1);
-
-        var scoreSpan = document.createElement('span');
-        scoreSpan.className = 'lb-score';
-        scoreSpan.textContent = formatTime(entry.score);
-
-        var timeSpan = document.createElement('span');
-        timeSpan.className = 'lb-time-ago';
-        timeSpan.textContent = timeAgo(entry.ts);
-
-        row.appendChild(rankSpan);
-        row.appendChild(scoreSpan);
-        row.appendChild(timeSpan);
-        lbContainer.appendChild(row);
-      });
+    if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
+      Neon.showGlobalSplash(neonResult.globalRank);
     }
   }
 
@@ -1657,6 +1611,7 @@ body::before {
   function startNewGame(difficulty, isDaily) {
     state.difficulty = difficulty;
     state.isDaily = isDaily;
+    neonInitForDifficulty(isDaily ? 'medium' : difficulty);
     state.selectedCell = -1;
     state.notesMode = false;
     state.completed = false;
@@ -1718,6 +1673,7 @@ body::before {
     state.timer = data.timer;
     state.difficulty = data.difficulty;
     state.isDaily = data.isDaily;
+    neonInitForDifficulty(data.difficulty);
     state.hintsUsed = data.hintsUsed;
     state.hintsLeft = data.hintsLeft;
     state.errors = data.errors || 0;

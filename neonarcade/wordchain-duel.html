@@ -171,11 +171,6 @@ body::before {
 .result-buttons { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
 
 .score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
-.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
-.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
-.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
-.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
 
 .share-btn {
   font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
@@ -319,53 +314,10 @@ body::before {
   Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks + Mr Claude</a>
 </div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
-  // ===================== LEADERBOARD UTILITIES =====================
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
-  function renderScoreTable(scores) {
-    var el = document.querySelector('.score-table');
-    if (!el) return;
-    while (el.firstChild) el.removeChild(el.firstChild);
-    var title = document.createElement('div');
-    title.className = 'score-table-title';
-    title.textContent = '\u{1F3C6} YOUR BESTS';
-    el.appendChild(title);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'score-row';
-      var rank = document.createElement('span');
-      rank.className = 'score-rank';
-      rank.textContent = String(i + 1);
-      var val = document.createElement('span');
-      val.className = 'score-val';
-      val.textContent = String(s.score);
-      var time = document.createElement('span');
-      time.className = 'score-time';
-      time.textContent = timeAgo(s.ts);
-      row.appendChild(rank);
-      row.appendChild(val);
-      row.appendChild(time);
-      el.appendChild(row);
-    });
-  }
+  Neon.init({ game: 'wordchain-duel', mode: 'high' });
 
   // ===================== WORD LISTS =====================
   const WORDS_RAW = "able about above abuse acid acre acted actor added admit adult after again agent aging agree ahead aimed alarm album alert alien align alike alive allay allot allow alone along alter among ample amuse angel anger angle angry annoy apart apple apply arena argue arise armor army arose array arrow aside asset atlas attic audio audit avoid awake award aware awful bacon badge badly bands banks baron based basic basin batch beach beams beans bears beast began begin being belly below bench berry bible birth black blade blame blank blast blaze bleed blend bless blind block blood bloom blown blues board boats bolts bombs bonds bones bonus books boost booth boots bound boxer brain brand brass brave bread break breed brick bride brief bring broad broke brown brush buddy budge build built bunch burst buyer cabin cable camel candy cards cargo carry cases catch cause cedar cease chain chair chaos charm chart chase cheap check cheek cheer chess chest chief child china chips chose chunk cigar civic civil claim clash class clean clear clerk click cliff climb cling clock clone close cloth cloud clubs coach coast codes coils color comic coral costs couch could count court cover crack craft crane crash crazy cream creek creep crime crops cross crowd crown cruel crush cubic curve cycle daily dance dared deals death debut decay decks decor delay delta dense depot depth derby desks devil diary digit dirty disco dodge doing donor doors doses doubt dough draft drain drama drank drawn dream dress dried drift drink drive drops drove drunk dryer dummy dunce dusty dutch dying eager eagle early earth eased easel eight elbow elder elect elite email ember emoji empty ended enemy enjoy enter entry equal error essay evade event every exact exams exile exist extra fable faced facts fairy faith falls false fancy fatal fault feast fence ferry fever fiber field fifth fight files final finds fired fires first fixed flags flame flash flesh flies float flock flood floor flora flour flows fluid flush focal focus fonts force forge forth forum found frame frank fraud fresh front froze fruit fully funds funny fuzzy gains gamma gangs gates gauge genes genre ghost giant given gives gland glass gleam glide globe gloom glory gloss glove going goods grace grade grain grand grant grape grasp grass grave great green greet grief grill grind grips gross group grove grown guard guess guide guild guilt guise gusts habit halls hands handy happy harsh haste haven heads heard heart heavy hedge heels hello hence herbs hired holes homes honey honor hooks hoped horse hosts hotel hours house hover human humor hurry ideal ideas image imply inbox index indie infer inner input inter intro issue items ivory jewel jimmy joint jones joust judge juice jumbo jumps keeps kicks kinds knack kneel knelt knife knock knots known label lacks lakes lands lanes large laser lasts later laugh layer leads learn lease least leave legal lemon level lever light liked limit lined linen liner links lions lists liter lived liver lives loads lobby local locks lodge logic login looks loops loose lotus lover lower loyal lucky lunar lunch lying macro magic major maker manor maple march marks marsh masks match mayor meals media meets melon mercy merit metal meter midst might minds minor minus mixed model modes money monks month moral motor mount mouse mouth moved movie music naive named nasty naval nerve never newly night noble nodes noise north noted notes novel nurse oasis occur ocean offer often olive onset opens opted orbit order organ other ought outer owned oxide ozone packs pages paint pairs panel panic paper parks parts party paste patch pause peace peach pearl peers penny phase phone photo piano piece pilot pinch pitch pixel place plain plane plans plant plate plaza plead pleas plots plumb plume plush poems point polar polls poppy porch ports posed posts pouch pound power press price pride prime print prior prize probe prong prone proof proud prove proxy psalm pulls pulse pumps punch pupil purse quest queue quick quiet quota quote races radar rails raise rally ranch range ranks rapid rated ratio razor reach react reads realm rebel recap refer reign relax relay remit renew repay repel reset resin retro rider ridge right rigid rings riots risen risks risky rival river roads robot rocks roles rooms roots rouge rough round route rover royal rugby ruins ruler rules rural sadly saint salad sales salon sauce saved saved scale scare scene scent scope score scout scrap seals seems seize sense serve seven shade shake shall shame shape share sharp shelf shell shift shine ships shirt shock shoot shore short shout shown sides siege sight sigma signs silly since sixth sixty sized skate skill skull slate slave sleep slice slide slope smart smell smile smoke snake solar solid solve songs sorry souls sound south space spare spark spawn speak speed spend spent spice spike spine split spoke spoon sport spray squad stack staff stage stake stall stamp stand stark start state stays steal steam steel steep steer stems steps stern stick stiff still stock stole stone stood store storm story stove strap straw strip stuck stuff style sugar suite sunny super surge swamp swear sweet swept swift swing sword sworn syrup table taken tales tanks tapes taste taxes teach teams tears tempo tends terms tests thank theme thick thing think third those three threw throw thumb tidal tiger tight tiles timer tired tires title today token tools topic torch total touch tough towel tower towns toxic trace track trade trail train trait traps trash tread treat trend trial tribe trick tried trips troop truck truly trump trunk trust truth tumor tunes turns tutor twice twist types ultra uncle under unify union unite unity until upper upset urban usage users using usual utter valid value valve vapor vault verse video views vigor vinyl viral virus visit vista vital vivid vocal vodka voice voted voter wages wants waste watch water waves wears weave wells whale wheat wheel where which while white whole whose wider width witch woman women words works world worry worse worst worth would wound wrath write wrote yacht yards years yield young youth zones absorb accent accept access accord action active actual adjust admire advent advice aerial afford agenda allows almost always amazon amount animal annual answer appeal appear arrive artist aspect assist assume attach attack autumn avenue barely basket battle beauty become before behalf behind belong beyond bishop borrow bottom breath bridge bright broken bronze budget burden butter camera campus cancel carbon career castle caught center chapel charge chosen circle circus client closer coffee colony column comedy coming commit common comply convey corner costly cotton couple course cousin create crisis cruise custom damage dancer danger debate decade decent defeat defend degree demand denial depart desert design desire detail device devote differ dinner direct divide domain donate double dozens driven easily editor effect effort eighth employ enable endure engage engine enough ensure entire escape estate evolve exceed except excite excuse exempt expand expect expert export extend extent fabric facing factor fairly fallen family famous farmer father female figure filter finale finger fiscal flavor flower follow forced forest forget formal former fossil fourth freely frozen future galaxy garden gather gender gentle global golden govern gravel ground growth guitar hardly heaven hidden highly honest horror impose income indeed indoor inform injury inland insect inside insist intact intend invest island itself jungle junior justice kernel kidney ladder lately launch lawyer league length lesson letter lifted lively locate lonely lovely luxury mainly manage manner marble margin marine marker master matter medium member memory mental mentor merely method middle mighty mirror mobile modern modest moment mostly motion moving murder museum mutual namely narrow nation nature nearby needle nickel nobody normal notice notify number object obtain occupy offend oppose option orange origin outfit output palace parade parent partly patrol patron pencil people period permit phrase planet plasma player please plenty pocket poetry police policy poorly portal poster potato prayer prefer prince prison profit prompt proper public pursue puzzle rabbit racing random rarely rather reason recall recent recipe record reduce reform regard region reject relate relief remain remind remote remove rental repair repeat report rescue resign resist resort result retail retain retire reveal ribbon rising robust rocket romantic sacred safety sample scheme school screen search season secret sector secure select senior series settle severe shadow signal silent silver simple sketch soccer socket solely sought source speech spirit spoken spread square stable stolen strain strand stream street stress strict strike string strong struck studio submit sudden suffer summer summit supply surely survey switch symbol system tablet tackle talent target temple tender terror threat throne tissue tongue toward travel treaty tribal tunnel unfair unique unless unlike update upward urgent valley vendor verbal victim violet virtue vision volume walker wealth weekly weight window winner winter wisdom within wonder wooden worker worthy yellow";
@@ -844,8 +796,7 @@ body::before {
   }
 
   function updateBestDisplay() {
-    var storedScores = JSON.parse(localStorage.getItem('neonarcade_scores_wordchain') || '[]');
-    var best = storedScores.length > 0 ? storedScores[0].score : 0;
+    var best = Neon.getHighScore();
     if (best > 0) {
       bestDisplay.textContent = 'BEST: ' + best + ' PTS';
       bestDisplay.style.display = 'block';
@@ -1095,16 +1046,6 @@ body::before {
     rScore.textContent = score;
     rLongest.textContent = longestWord.length;
 
-    var topScores = saveScore('neonarcade_scores_wordchain', score);
-    var displayBest = topScores[0].score;
-    rBest.textContent = displayBest;
-
-    if (score >= displayBest) {
-      newBestEl.style.display = 'block';
-    } else {
-      newBestEl.style.display = 'none';
-    }
-
     if (isChallenge) {
       beatChallengeEl.style.display = 'block';
       if (score > challengeScore) {
@@ -1165,8 +1106,19 @@ body::before {
       }
     }, 300);
 
-    showScreen('result');
-    renderScoreTable(topScores);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      var displayBest = Neon.getHighScore();
+      rBest.textContent = displayBest;
+      newBestEl.style.display = result.isNewBest ? 'block' : 'none';
+      Neon.render(document.querySelector('.score-table'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+      showScreen('result');
+    });
   }
 
   // ===================== SHARING =====================

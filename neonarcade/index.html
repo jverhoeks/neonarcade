@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON ARCADE — Viral Web Games</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #4a4a6a;
+    --text-mid: #8888aa;
+    --text-bright: #cccce0;
+    --border: rgba(0,240,255,0.1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* --- SCANLINES --- */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.06) 2px,
+      rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* --- ANIMATED BG --- */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- HEADER --- */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 40px;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 72px);
+    letter-spacing: 8px;
+    color: var(--neon-cyan);
+    text-shadow:
+      0 0 10px rgba(0,240,255,0.6),
+      0 0 40px rgba(0,240,255,0.2),
+      0 0 80px rgba(0,240,255,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-pink);
+    text-shadow:
+      0 0 10px rgba(255,45,123,0.6),
+      0 0 40px rgba(255,45,123,0.2);
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    margin: 30px auto 0;
+  }
+
+  /* --- GAME GRID --- */
+  .games-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  /* --- GAME CARD --- */
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(0,240,255,0.25);
+    transform: translateY(-4px);
+    box-shadow:
+      0 8px 32px rgba(0,240,255,0.08),
+      0 0 0 1px rgba(0,240,255,0.1);
+  }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-screenshot img {
+    transform: scale(1.03);
+  }
+
+  .card-screenshot .placeholder {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-new {
+    background: rgba(57,255,20,0.15);
+    color: var(--neon-green);
+    border: 1px solid rgba(57,255,20,0.3);
+  }
+
+  .badge-hot {
+    background: rgba(255,45,123,0.15);
+    color: var(--neon-pink);
+    border: 1px solid rgba(255,45,123,0.3);
+  }
+
+  .badge-classic {
+    background: rgba(255,215,0,0.15);
+    color: var(--neon-gold);
+    border: 1px solid rgba(255,215,0,0.3);
+  }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--neon-cyan);
+    transition: all 0.2s;
+  }
+
+  .game-card:hover .card-play {
+    letter-spacing: 4px;
+  }
+
+  .play-arrow {
+    font-size: 16px;
+    transition: transform 0.2s;
+  }
+
+  .game-card:hover .play-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Per-game accent colors */
+  .game-card[data-accent="cyan"] .card-title { color: var(--neon-cyan); }
+  .game-card[data-accent="cyan"]:hover { border-color: rgba(0,240,255,0.3); }
+
+  .game-card[data-accent="pink"] .card-title { color: var(--neon-pink); }
+  .game-card[data-accent="pink"]:hover { border-color: rgba(255,45,123,0.3); box-shadow: 0 8px 32px rgba(255,45,123,0.08); }
+
+  .game-card[data-accent="green"] .card-title { color: var(--neon-green); }
+  .game-card[data-accent="green"]:hover { border-color: rgba(57,255,20,0.3); box-shadow: 0 8px 32px rgba(57,255,20,0.08); }
+
+  .game-card[data-accent="gold"] .card-title { color: var(--neon-gold); }
+  .game-card[data-accent="gold"]:hover { border-color: rgba(255,215,0,0.3); box-shadow: 0 8px 32px rgba(255,215,0,0.08); }
+
+  .game-card[data-accent="purple"] .card-title { color: var(--neon-purple); }
+  .game-card[data-accent="purple"]:hover { border-color: rgba(180,77,255,0.3); box-shadow: 0 8px 32px rgba(180,77,255,0.08); }
+
+  .game-card[data-accent="orange"] .card-title { color: var(--neon-orange); }
+  .game-card[data-accent="orange"]:hover { border-color: rgba(255,140,0,0.3); box-shadow: 0 8px 32px rgba(255,140,0,0.08); }
+
+  .game-card[data-accent="white"] .card-title { color: #e0e0f0; }
+  .game-card[data-accent="white"]:hover { border-color: rgba(224,224,240,0.3); box-shadow: 0 8px 32px rgba(224,224,240,0.06); }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #6a6a8a;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover {
+    color: var(--neon-cyan);
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover {
+    color: var(--neon-cyan);
+  }
+
+  /* --- SORT BAR --- */
+  .sort-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .sort-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .sort-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .sort-btn:hover { border-color: rgba(0,240,255,0.2); color: var(--text-mid); }
+  .sort-btn.active { border-color: rgba(0,240,255,0.4); color: var(--neon-cyan); background: rgba(0,240,255,0.06); }
+
+  /* --- CARD STATS ROW --- */
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .card-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-stat .stat-icon {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .card-stat .stat-val {
+    color: var(--text-mid);
+    font-weight: 500;
+  }
+
+  /* --- LIKE / ISSUE BUTTONS (inside card) --- */
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .card-action-btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .card-action-btn:hover { border-color: rgba(0,240,255,0.2); color: var(--text-mid); }
+  .card-action-btn.liked { border-color: rgba(255,45,123,0.3); color: var(--neon-pink); background: rgba(255,45,123,0.06); }
+  .card-action-btn.reported { border-color: rgba(255,140,0,0.3); color: var(--neon-orange); background: rgba(255,140,0,0.06); }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 700px) {
+    .games-grid {
+      grid-template-columns: 1fr;
+      padding: 12px 16px 60px;
+      gap: 16px;
+    }
+    header {
+      padding: 40px 16px 28px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <a href="../index.html" class="back-link">&larr; NEON ARCADE HUB</a>
+  <div class="logo">NEON<span>ARCADE</span></div>
+  <p class="tagline">Viral web games — zero install, pure chaos</p>
+  <div class="header-line"></div>
+</header>
+
+<div class="sort-bar">
+  <span class="sort-label">Sort by:</span>
+  <button class="sort-btn active" data-sort="default">Default</button>
+  <button class="sort-btn" data-sort="popular">Most Played</button>
+  <button class="sort-btn" data-sort="liked">Most Liked</button>
+  <button class="sort-btn" data-sort="name">A-Z</button>
+</div>
+
+<div class="games-grid" id="games-grid">
+
+  <!-- 1. NEON SNAKE (existing) -->
+  <a href="neon-snake.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/neon-snake.png" alt="Neon Snake" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🐍</div>
+      <span class="card-badge badge-classic">OG</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 01</span>
+      <h2 class="card-title">NEON SNAKE</h2>
+      <p class="card-desc">The classic snake with a risk vs reward twist. Easy food is safe in the center. Gold food near the walls is worth 5x — but one wrong move and you're dead.</p>
+      <div class="card-tags">
+        <span class="tag">Arcade</span>
+        <span class="tag">Risk / Reward</span>
+        <span class="tag">Mobile</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 2. IMPOSTOR PIXEL -->
+  <a href="impostor-pixel.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img src="screenshots/impostor-pixel.png" alt="Impostor Pixel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">👁️</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 02</span>
+      <h2 class="card-title">IMPOSTOR PIXEL</h2>
+      <p class="card-desc">A grid of identical tiles. One is slightly different. Can you spot it? Each round the difference shrinks. How sharp are your eyes really?</p>
+      <div class="card-tags">
+        <span class="tag">Perception</span>
+        <span class="tag">Daily Challenge</span>
+        <span class="tag">Shareable</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 3. CATALYST -->
+  <a href="catalyst.html" class="game-card" data-accent="orange">
+    <div class="card-screenshot">
+      <img src="screenshots/catalyst.png" alt="Catalyst" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">⚡</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 03</span>
+      <h2 class="card-title">CATALYST</h2>
+      <p class="card-desc">One touch. Infinite chaos. Flick a spark into a field of hidden particles and watch the chain reaction unfold. Exploders, multipliers, attractors — every reaction is unique.</p>
+      <div class="card-tags">
+        <span class="tag">Chain Reaction</span>
+        <span class="tag">One Touch</span>
+        <span class="tag">Satisfying</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 4. PONG: BOTH SIDES -->
+  <a href="pong-both-sides.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img src="screenshots/pong-both-sides.png" alt="Pong Both Sides" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🏓</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 04</span>
+      <h2 class="card-title">PONG: BOTH SIDES</h2>
+      <p class="card-desc">You control BOTH paddles. Left thumb, right thumb. The ball speeds up. How long can you rally with yourself before your brain short-circuits?</p>
+      <div class="card-tags">
+        <span class="tag">Dexterity</span>
+        <span class="tag">Split Brain</span>
+        <span class="tag">Two Thumbs</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 5. AFTERGLOW -->
+  <a href="afterglow.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img src="screenshots/afterglow.png" alt="Afterglow" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">✨</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 05</span>
+      <h2 class="card-title">AFTERGLOW</h2>
+      <p class="card-desc">Navigate a dark maze. Your trail glows behind you — but touch it and you die. Your light is your only guide and your greatest enemy. Every run is a light painting.</p>
+      <div class="card-tags">
+        <span class="tag">Maze</span>
+        <span class="tag">Light Painting</span>
+        <span class="tag">Atmospheric</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 6. FLAPPY REWIND -->
+  <a href="flappy-rewind.html" class="game-card" data-accent="pink">
+    <div class="card-screenshot">
+      <img src="screenshots/flappy-rewind.png" alt="Flappy Rewind" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🐤</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 06</span>
+      <h2 class="card-title">FLAPPY REWIND</h2>
+      <p class="card-desc">Fly forward through pipes. Then the game REWINDS and you fly backward with inverted gravity. Score only counts if you survive both ways. How far do you dare?</p>
+      <div class="card-tags">
+        <span class="tag">Risk / Reward</span>
+        <span class="tag">Rewind</span>
+        <span class="tag">Greed Kills</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 7. PALETTE -->
+  <a href="palette.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/palette.png" alt="Palette" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🎨</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 07</span>
+      <h2 class="card-title">PALETTE</h2>
+      <p class="card-desc">Match the target color using three sliders. Sounds easy? Five rounds. Same colors for everyone today. Discover your Color IQ and find out if your eyes betray you.</p>
+      <div class="card-tags">
+        <span class="tag">Daily</span>
+        <span class="tag">Color IQ</span>
+        <span class="tag">Self-Discovery</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 8. PAC-MAN AMNESIA -->
+  <a href="pacman-amnesia.html" class="game-card" data-accent="white">
+    <div class="card-screenshot">
+      <img src="screenshots/pacman-amnesia.png" alt="Pac-Man Amnesia" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">👻</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 08</span>
+      <h2 class="card-title">PAC-MAN AMNESIA</h2>
+      <p class="card-desc">Pac-Man, but the maze is invisible. You see only a tiny radius around you. The ghosts can see everything. Every 50 dots the maze flashes for 2 seconds — memorize fast.</p>
+      <div class="card-tags">
+        <span class="tag">Horror</span>
+        <span class="tag">Fog of War</span>
+        <span class="tag">Memory</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 9. TERRITORY -->
+  <a href="territory.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/territory.png" alt="Territory" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🗺️</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 09</span>
+      <h2 class="card-title">TERRITORY</h2>
+      <p class="card-desc">Claim a daily grid cell by cell. Build the biggest connected territory. Same puzzle for everyone — who made smarter color choices?</p>
+      <div class="card-tags">
+        <span class="tag">Strategy</span>
+        <span class="tag">Daily</span>
+        <span class="tag">Puzzle</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 10. TETRIS BETRAYAL -->
+  <a href="tetris-betrayal.html" class="game-card" data-accent="pink">
+    <div class="card-screenshot">
+      <img src="screenshots/tetris-betrayal.png" alt="Tetris Betrayal" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🧱</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 10</span>
+      <h2 class="card-title">TETRIS BETRAYAL</h2>
+      <p class="card-desc">Two boards. Play your best on one — and deliberately trash the other. Your messy board becomes someone else's nightmare. Sabotage is an art form.</p>
+      <div class="card-tags">
+        <span class="tag">Dual Board</span>
+        <span class="tag">Sabotage</span>
+        <span class="tag">Mind Games</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 11. SIGNAL -->
+  <a href="signal.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/signal.png" alt="Signal" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">📡</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 11</span>
+      <h2 class="card-title">SIGNAL</h2>
+      <p class="card-desc">Five encrypted messages. Crack the cipher before time runs out. Each round the encryption gets harder. Daily puzzles — same codes for everyone.</p>
+      <div class="card-tags">
+        <span class="tag">Cipher</span>
+        <span class="tag">Daily</span>
+        <span class="tag">Brain Teaser</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 12. FAULTLINE -->
+  <a href="faultline.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/faultline.png" alt="Faultline" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🔍</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 12</span>
+      <h2 class="card-title">FAULTLINE</h2>
+      <p class="card-desc">One pixel row is shifted. Find it. Five rounds. The shift gets smaller and the patterns get trickier. A daily visual acuity test for pixel perfectionists.</p>
+      <div class="card-tags">
+        <span class="tag">Perception</span>
+        <span class="tag">Daily</span>
+        <span class="tag">Pixel Hunt</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 13. DOODLE DROP -->
+  <a href="doodle-drop.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img src="screenshots/doodle-drop.png" alt="Doodle Drop" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">✏️</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 13</span>
+      <h2 class="card-title">DOODLE DROP</h2>
+      <p class="card-desc">Draw platforms to break your fall. Every line costs ink. Fall too far and you splat. A creative physics puzzle where your drawings determine survival.</p>
+      <div class="card-tags">
+        <span class="tag">Drawing</span>
+        <span class="tag">Physics</span>
+        <span class="tag">Creative</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 14. PRIORSELF -->
+  <a href="priorself.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img src="screenshots/priorself.png" alt="Priorself" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">👻</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 14</span>
+      <h2 class="card-title">PRIORSELF</h2>
+      <p class="card-desc">Your past selves become ghosts with physical form. Use them as platforms, switches, and shields. Each death makes the next attempt possible. Fail forward.</p>
+      <div class="card-tags">
+        <span class="tag">Platformer</span>
+        <span class="tag">Ghost Coop</span>
+        <span class="tag">Mind Bending</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 15. BURNDOWN -->
+  <a href="burndown.html" class="game-card" data-accent="orange">
+    <div class="card-screenshot">
+      <img src="screenshots/burndown.png" alt="Burndown" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🔥</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 15</span>
+      <h2 class="card-title">BURNDOWN</h2>
+      <p class="card-desc">Race through 20 micro-tasks — math, tapping, typing, memory. Wrong answers cost 3 seconds. Burn the tower down as fast as you can. Daily leaderboard.</p>
+      <div class="card-tags">
+        <span class="tag">Speedrun</span>
+        <span class="tag">Daily</span>
+        <span class="tag">Micro-Tasks</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 16. MINE FINDER -->
+  <a href="mine-finder.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img src="screenshots/mine-finder.png" alt="Mine Finder" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">💣</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 16</span>
+      <h2 class="card-title">MINE FINDER</h2>
+      <p class="card-desc">Reverse Minesweeper: YOU hide the mines, the AI hunts them. Place 15 mines strategically. Watch the AI try to survive. Score points for every explosion.</p>
+      <div class="card-tags">
+        <span class="tag">Reverse</span>
+        <span class="tag">Strategy</span>
+        <span class="tag">vs AI</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 17. WORDCHAIN DUEL -->
+  <a href="wordchain-duel.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/wordchain-duel.png" alt="Wordchain Duel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🔗</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 17</span>
+      <h2 class="card-title">WORDCHAIN</h2>
+      <p class="card-desc">Build the longest word chain in 60 seconds. Each word must start with the last two letters of the previous one. Challenge friends to beat your chain.</p>
+      <div class="card-tags">
+        <span class="tag">Words</span>
+        <span class="tag">Speed</span>
+        <span class="tag">Challenge</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 19. GRIDLOCK -->
+  <a href="gridlock.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img src="screenshots/gridlock.png" alt="Gridlock" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🔒</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 19</span>
+      <h2 class="card-title">GRIDLOCK</h2>
+      <p class="card-desc">Guide colored blocks to their goals using the fewest wall segments possible. Same daily puzzle for everyone — fewer walls, higher score.</p>
+      <div class="card-tags">
+        <span class="tag">Logic</span>
+        <span class="tag">Daily</span>
+        <span class="tag">Puzzle</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 20. TRUECOLOR -->
+  <a href="truecolor.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img src="screenshots/truecolor.png" alt="TrueColor" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🎨</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 20</span>
+      <h2 class="card-title">TRUECOLOR</h2>
+      <p class="card-desc">Your eyes lie. Identify the TRUE color of a patch as the background shifts to fool you. Simultaneous contrast illusions expose how badly your brain cheats.</p>
+      <div class="card-tags">
+        <span class="tag">Perception</span>
+        <span class="tag">Illusion</span>
+        <span class="tag">Brain</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <!-- 18. BREAKOUT ARCHITECT -->
+  <a href="breakout-architect.html" class="game-card" data-accent="pink">
+    <div class="card-screenshot">
+      <img src="screenshots/breakout-architect.png" alt="Breakout Architect" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🏗️</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 18</span>
+      <h2 class="card-title">BREAKOUT ARCHITECT</h2>
+      <p class="card-desc">Design fiendish breakout levels, then challenge friends to beat them. Build with special bricks, test your creation, and share via link. Create or destroy.</p>
+      <div class="card-tags">
+        <span class="tag">Level Editor</span>
+        <span class="tag">Share</span>
+        <span class="tag">Creative</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <a href="split-second.html" class="game-card" data-accent="pink">
+    <div class="card-screenshot">
+      <img src="screenshots/split-second.png" alt="Split Second" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">👁️</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 21</span>
+      <h2 class="card-title">SPLIT SECOND</h2>
+      <p class="card-desc">10 images. 300ms each. Then answer questions about what you saw. Tests your visual memory against the same daily sequence as everyone else.</p>
+      <div class="card-tags">
+        <span class="tag">Memory</span>
+        <span class="tag">Daily</span>
+        <span class="tag">Visual</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <a href="wordchain.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img src="screenshots/wordchain.png" alt="Wordchain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🔗</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 22</span>
+      <h2 class="card-title">WORDCHAIN</h2>
+      <p class="card-desc">Each word must start with the last 2 letters of the previous one. 90 seconds to build the longest chain. One wrong letter and you're stuck.</p>
+      <div class="card-tags">
+        <span class="tag">Words</span>
+        <span class="tag">Chain</span>
+        <span class="tag">Speed</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <a href="curfew.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img src="screenshots/curfew.png" alt="Curfew" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🌙</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 23</span>
+      <h2 class="card-title">CURFEW</h2>
+      <p class="card-desc">The game reads your clock. Morning is forgiving. Midnight is hostile. 3AM? The game calls you unhinged. Same mechanic, infinite moods.</p>
+      <div class="card-tags">
+        <span class="tag">Time-Based</span>
+        <span class="tag">Dodge</span>
+        <span class="tag">Meta</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+  <a href="chromaself.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img src="screenshots/chromaself.png" alt="Chromaself" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">🎨</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 24</span>
+      <h2 class="card-title">CHROMASELF</h2>
+      <p class="card-desc">12 questions reveal your inner color palette. A unique 4x4 neon grid that captures your aesthetic soul. Share it. Find your match.</p>
+      <div class="card-tags">
+        <span class="tag">Personality</span>
+        <span class="tag">Color</span>
+        <span class="tag">Shareable</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">→</span></div>
+    </div>
+  </a>
+
+</div>
+
+<footer>
+  <p>ALL GAMES RUN IN YOUR BROWSER — NO INSTALL — NO SIGNUP — JUST PLAY</p>
+  <p class="credit">Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  var grid = document.getElementById('games-grid');
+  var cards = Array.from(grid.querySelectorAll('.game-card'));
+  var statsData = {};
+
+  function getSlug(card) {
+    var href = card.getAttribute('href') || '';
+    return href.replace('.html', '').replace(/^\.\//, '');
+  }
+
+  function makeEl(tag, cls, text) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text) el.textContent = text;
+    return el;
+  }
+
+  cards.forEach(function(card, idx) {
+    var slug = getSlug(card);
+    card.setAttribute('data-game', slug);
+    card.setAttribute('data-order', idx);
+
+    var body = card.querySelector('.card-body');
+    if (!body) return;
+
+    var statsRow = makeEl('div', 'card-stats');
+    var playStat = makeEl('span', 'card-stat');
+    playStat.appendChild(makeEl('span', 'stat-icon', '\u25B6'));
+    playStat.appendChild(document.createTextNode(' '));
+    playStat.appendChild(makeEl('span', 'stat-val plays-val', '-'));
+    statsRow.appendChild(playStat);
+    var likeStat = makeEl('span', 'card-stat');
+    likeStat.appendChild(makeEl('span', 'stat-icon', '\u2665'));
+    likeStat.appendChild(document.createTextNode(' '));
+    likeStat.appendChild(makeEl('span', 'stat-val likes-val', '-'));
+    statsRow.appendChild(likeStat);
+    body.appendChild(statsRow);
+
+    var actions = makeEl('div', 'card-actions');
+    var likeBtn = makeEl('button', 'card-action-btn like-btn', '\u2665 LIKE');
+    likeBtn.setAttribute('data-game', slug);
+    var issueBtn = makeEl('button', 'card-action-btn issue-btn', '\u26A0 REPORT');
+    issueBtn.setAttribute('data-game', slug);
+    actions.appendChild(likeBtn);
+    actions.appendChild(issueBtn);
+    body.appendChild(actions);
+
+    actions.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
+  document.querySelectorAll('.like-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var game = btn.dataset.game;
+      var liked = JSON.parse(localStorage.getItem('neonarcade_liked') || '{}');
+      if (liked[game]) return;
+      liked[game] = true;
+      localStorage.setItem('neonarcade_liked', JSON.stringify(liked));
+      btn.classList.add('liked');
+      btn.textContent = '\u2665 LIKED';
+      NeonAPI.like(game).then(function(r) {
+        if (r && r.likes != null) updateCardStat(game, 'likes', r.likes);
+      });
+    });
+  });
+
+  document.querySelectorAll('.issue-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var game = btn.dataset.game;
+      var rep = JSON.parse(localStorage.getItem('neonarcade_reported') || '{}');
+      if (rep[game]) return;
+      rep[game] = true;
+      localStorage.setItem('neonarcade_reported', JSON.stringify(rep));
+      btn.classList.add('reported');
+      btn.textContent = '\u26A0 REPORTED';
+      NeonAPI.issue(game);
+    });
+  });
+
+  var liked = JSON.parse(localStorage.getItem('neonarcade_liked') || '{}');
+  var reported = JSON.parse(localStorage.getItem('neonarcade_reported') || '{}');
+  Object.keys(liked).forEach(function(g) {
+    var btn = document.querySelector('.like-btn[data-game="' + g + '"]');
+    if (btn) { btn.classList.add('liked'); btn.textContent = '\u2665 LIKED'; }
+  });
+  Object.keys(reported).forEach(function(g) {
+    var btn = document.querySelector('.issue-btn[data-game="' + g + '"]');
+    if (btn) { btn.classList.add('reported'); btn.textContent = '\u26A0 REPORTED'; }
+  });
+
+  function updateCardStat(game, type, val) {
+    var card = document.querySelector('.game-card[data-game="' + game + '"]');
+    if (!card) return;
+    var el = card.querySelector('.' + type + '-val');
+    if (el) el.textContent = formatNum(val);
+  }
+
+  function formatNum(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return String(n);
+  }
+
+  NeonAPI.allStats().then(function(data) {
+    if (!data || !data.games) return;
+    statsData = data.games;
+    Object.keys(statsData).forEach(function(game) {
+      var s = statsData[game];
+      updateCardStat(game, 'plays', s.plays);
+      updateCardStat(game, 'likes', s.likes);
+    });
+  });
+
+  var sortBtns = document.querySelectorAll('.sort-btn');
+  sortBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      sortBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      sortCards(btn.dataset.sort);
+    });
+  });
+
+  function sortCards(mode) {
+    var sorted = cards.slice();
+    if (mode === 'popular') {
+      sorted.sort(function(a, b) {
+        return ((statsData[getSlug(b)] || {}).plays || 0) - ((statsData[getSlug(a)] || {}).plays || 0);
+      });
+    } else if (mode === 'liked') {
+      sorted.sort(function(a, b) {
+        return ((statsData[getSlug(b)] || {}).likes || 0) - ((statsData[getSlug(a)] || {}).likes || 0);
+      });
+    } else if (mode === 'name') {
+      sorted.sort(function(a, b) {
+        var na = (a.querySelector('.card-title') || {}).textContent || '';
+        var nb = (b.querySelector('.card-title') || {}).textContent || '';
+        return na.localeCompare(nb);
+      });
+    } else {
+      sorted.sort(function(a, b) { return a.dataset.order - b.dataset.order; });
+    }
+    sorted.forEach(function(card) { grid.appendChild(card); });
+  }
+})();
+</script>
+</body>
+</html>
