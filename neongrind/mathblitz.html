@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>MATHBLITZ - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:14px}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,8vw,64px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(16px,3.5vw,22px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:4px}
+
+/* Progress Track */
+.progress-track{width:100%;max-width:440px;margin:8px 0 4px 0}
+.progress-labels{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:6px}
+.progress-label{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#4a4a6a;text-align:center;flex:1}
+.progress-label.active{color:#00f0ff}
+.progress-dots{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;padding:0 2px}
+.progress-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid #1a1a2e;background:rgba(255,255,255,0.02);transition:all 0.2s;cursor:default}
+.progress-dot.star3{background:#39ff14;border-color:#39ff14;box-shadow:0 0 4px rgba(57,255,20,0.4)}
+.progress-dot.star2{background:#00f0ff;border-color:#00f0ff;box-shadow:0 0 4px rgba(0,240,255,0.4)}
+.progress-dot.star1{background:#ffd700;border-color:#ffd700;box-shadow:0 0 4px rgba(255,215,0,0.4)}
+.progress-dot.current{border-color:#00f0ff;box-shadow:0 0 8px rgba(0,240,255,0.5);animation:dotPulse 1.2s ease-in-out infinite}
+.progress-dot.unlocked{border-color:#4a4a6a;cursor:pointer}
+.progress-dot.unlocked:hover{border-color:#00f0ff;background:rgba(0,240,255,0.1)}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 6px rgba(0,240,255,0.4)}50%{box-shadow:0 0 14px rgba(0,240,255,0.8)}}
+
+.start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:8px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:6px}
+
+/* LEVEL INTRO */
+#introScreen{gap:20px}
+.intro-zone{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);letter-spacing:4px;text-transform:uppercase}
+.intro-level{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,7vw,52px);letter-spacing:4px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2)}
+.intro-desc{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;letter-spacing:2px;color:#8888aa;text-transform:uppercase;text-align:center;max-width:300px}
+.intro-countdown{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(48px,12vw,80px);color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.5);transition:transform 0.15s}
+
+/* GAMEPLAY */
+#gameScreen{justify-content:flex-start;padding:12px}
+.game-hud{display:flex;width:100%;max-width:500px;justify-content:space-between;align-items:center;padding:4px 0;margin-bottom:8px}
+.hud-score{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-level{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;color:#8888aa}
+.hud-lives{font-size:clamp(18px,4vw,24px)}
+
+.question-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:500px;gap:12px;min-height:0}
+.question-text{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,52px);color:#fff;text-shadow:0 0 8px rgba(255,255,255,0.3);text-align:center;line-height:1.2;padding:10px;word-break:break-word}
+.question-sub{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(14px,3vw,18px);color:#8888aa;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.question-number{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+
+.timer-bar-container{width:100%;max-width:500px;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin:8px 0}
+.timer-bar{height:100%;background:linear-gradient(90deg,#00f0ff,#39ff14);border-radius:3px;transition:width 0.05s linear;box-shadow:0 0 8px rgba(0,240,255,0.4)}
+.timer-bar.danger{background:linear-gradient(90deg,#ff2d7b,#ff8c00)}
+.timer-bar.warning{background:linear-gradient(90deg,#ff8c00,#ffd700)}
+
+.answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:500px;padding-bottom:env(safe-area-inset-bottom,10px)}
+.answer-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(18px,4.5vw,28px);padding:clamp(14px,4vw,24px) 10px;border:1px solid rgba(0,240,255,0.25);background:rgba(0,240,255,0.04);color:#fff;border-radius:6px;cursor:pointer;transition:all 0.15s;text-align:center;min-height:clamp(50px,12vw,80px);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.answer-btn:hover{background:rgba(0,240,255,0.1);border-color:rgba(0,240,255,0.5)}
+.answer-btn:active{transform:scale(0.96)}
+.answer-btn.correct{background:rgba(57,255,20,0.2)!important;border-color:#39ff14!important;color:#39ff14!important;box-shadow:0 0 20px rgba(57,255,20,0.3)}
+.answer-btn.wrong{background:rgba(255,45,123,0.2)!important;border-color:#ff2d7b!important;color:#ff2d7b!important}
+.answer-btn.disabled{pointer-events:none;opacity:0.5}
+.answer-btn .key-hint{position:absolute;top:4px;left:8px;font-size:10px;color:#4a4a6a;font-weight:400;letter-spacing:1px}
+
+/* Feedback overlay */
+.feedback{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,6vw,40px);pointer-events:none;z-index:100;opacity:0;transition:all 0.3s}
+.feedback.show{opacity:1}
+.feedback.correct-fb{color:#39ff14;text-shadow:0 0 20px rgba(57,255,20,0.6)}
+.feedback.wrong-fb{color:#ff2d7b;text-shadow:0 0 20px rgba(255,45,123,0.6)}
+.feedback.speed-fb{color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.6);font-size:clamp(16px,4vw,24px)}
+
+/* Particles */
+.particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:100}
+
+/* Screen shake */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-3px,1px)}20%{transform:translate(3px,-2px)}30%{transform:translate(-2px,3px)}40%{transform:translate(2px,-1px)}50%{transform:translate(-3px,2px)}60%{transform:translate(3px,1px)}70%{transform:translate(-1px,-3px)}80%{transform:translate(2px,2px)}90%{transform:translate(-2px,-1px)}}
+.shaking{animation:shake 0.25s ease-in-out}
+
+/* LEVEL COMPLETE */
+#levelCompleteScreen{gap:14px}
+.lc-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,32px);color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5);letter-spacing:4px}
+.lc-stars{font-size:clamp(36px,8vw,56px);margin:6px 0}
+.lc-adaptive{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,2.5vw,15px);letter-spacing:2px;margin:4px 0;text-align:center}
+.lc-adaptive.msg-faster{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.lc-adaptive.msg-new{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
+.lc-adaptive.msg-same{color:#ff8c00;text-shadow:0 0 8px rgba(255,140,0,0.4)}
+.lc-stats{text-align:center;line-height:1.8}
+.lc-stats .stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+.lc-stats .stat-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#00f0ff;margin-left:8px}
+.lc-faster{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4);letter-spacing:2px;margin:4px 0}
+
+/* GAME OVER */
+#gameOverScreen{gap:12px}
+.go-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,6vw,44px);color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.5);letter-spacing:4px}
+.go-subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;letter-spacing:2px;color:#8888aa;text-transform:uppercase}
+.go-stats{text-align:center;line-height:1.8;margin:6px 0}
+.go-stats .stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+.go-stats .stat-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff;margin-left:8px}
+
+.leaderboard{width:100%;max-width:320px;margin:6px 0}
+.lb-title{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:3px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.3);margin-bottom:8px;text-align:center}
+.lb-row{display:flex;align-items:center;padding:4px 0;gap:10px}
+.lb-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#4a4a6a;width:24px;text-align:right}
+.lb-score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
+.lb-level{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa}
+.lb-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
+
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.play-btn.secondary{border-color:#b44dff;color:#b44dff;background:rgba(180,77,255,0.06)}
+.play-btn.secondary:hover{background:rgba(180,77,255,0.15);box-shadow:0 0 20px rgba(180,77,255,0.2)}
+.play-btn.retry-current{border-color:#ff8c00;color:#ff8c00;background:rgba(255,140,0,0.06)}
+.play-btn.retry-current:hover{background:rgba(255,140,0,0.15);box-shadow:0 0 20px rgba(255,140,0,0.2)}
+.play-btn.share{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.share:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.play-btn.small{padding:10px 24px;font-size:12px;letter-spacing:2px}
+
+.share-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:2px;color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:8px 20px;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none}
+.share-toast.show{opacity:1}
+
+/* Zone label colors */
+.zone-warmup{color:#00f0ff}
+.zone-addition{color:#39ff14}
+.zone-multiply{color:#ffd700}
+.zone-advanced{color:#ff8c00}
+.zone-master{color:#b44dff}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="main-title">MATHBLITZ</div>
+  <div class="subtitle">How fast is your brain?</div>
+  <div class="progress-track" id="progressTrack">
+    <div class="progress-labels" id="progressLabels"></div>
+    <div class="progress-dots" id="progressDots"></div>
+  </div>
+  <div class="start-stats" id="startStats"></div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">TAP or keys 1-2-3-4</div>
+</div>
+
+<!-- LEVEL INTRO -->
+<div id="introScreen" class="screen">
+  <div class="intro-zone" id="introZone"></div>
+  <div class="intro-level" id="introLevel"></div>
+  <div class="intro-desc" id="introDesc"></div>
+  <div class="intro-countdown" id="introCountdown">3</div>
+</div>
+
+<!-- GAMEPLAY -->
+<div id="gameScreen" class="screen">
+  <div class="game-hud">
+    <div class="hud-score" id="hudScore">0</div>
+    <div class="hud-level" id="hudLevel">L1</div>
+    <div class="hud-lives" id="hudLives"></div>
+  </div>
+  <div class="question-area">
+    <div class="question-number" id="questionNumber">Q 1/5</div>
+    <div class="question-sub" id="questionSub"></div>
+    <div class="question-text" id="questionText">3 + 0</div>
+  </div>
+  <div class="timer-bar-container">
+    <div class="timer-bar" id="timerBar"></div>
+  </div>
+  <div class="answers-grid" id="answersGrid">
+    <button class="answer-btn" data-idx="0"><span class="key-hint">1</span><span class="answer-text">3</span></button>
+    <button class="answer-btn" data-idx="1"><span class="key-hint">2</span><span class="answer-text">5</span></button>
+    <button class="answer-btn" data-idx="2"><span class="key-hint">3</span><span class="answer-text">2</span></button>
+    <button class="answer-btn" data-idx="3"><span class="key-hint">4</span><span class="answer-text">4</span></button>
+  </div>
+</div>
+
+<!-- LEVEL COMPLETE -->
+<div id="levelCompleteScreen" class="screen">
+  <div class="lc-title">LEVEL COMPLETE</div>
+  <div class="lc-stars" id="lcStars"></div>
+  <div id="lcAdaptive" class="lc-adaptive" style="display:none"></div>
+  <div id="lcFaster" class="lc-faster" style="display:none"></div>
+  <div class="lc-stats" id="lcStats"></div>
+  <button class="play-btn" id="nextLevelBtn">NEXT LEVEL</button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameOverScreen" class="screen">
+  <div class="go-title">GAME OVER</div>
+  <div class="go-subtitle" id="goSubtitle"></div>
+  <div class="go-stats" id="goStats"></div>
+  <div class="leaderboard" id="leaderboard"></div>
+  <div class="btn-row" id="goBtnRow">
+    <button class="play-btn small retry-current" id="retryCurrentBtn">RETRY LEVEL</button>
+    <button class="play-btn small secondary" id="retryCheckpointBtn">CHECKPOINT</button>
+    <button class="play-btn small share" id="shareBtn">SHARE</button>
+  </div>
+  <button class="play-btn small" id="homeBtn" style="margin-top:6px">HOME</button>
+</div>
+
+<!-- Feedback overlay -->
+<div class="feedback" id="feedback"></div>
+<!-- Share toast -->
+<div class="share-toast" id="shareToast">Copied to clipboard!</div>
+
+<script>
+(() => {
+  // ============================================================
+  // CONFIG
+  // ============================================================
+  var TOTAL_LEVELS = 30;
+  var LIVES_PER_LEVEL = 3;
+  var SCORE_KEY = 'neonarcade_neongrind_mathblitz';
+  var PROGRESS_KEY = 'neonarcade_neongrind_mathblitz_progress';
+
+  // Zone definitions for display
+  var ZONE_DEFS = [
+    { name: 'WARMUP', label: 'Getting Started', color: '#00f0ff', levels: [1, 6] },
+    { name: 'ADDITION', label: 'Adding Up', color: '#39ff14', levels: [7, 12] },
+    { name: 'MULTIPLY', label: 'Times Tables', color: '#ffd700', levels: [13, 18] },
+    { name: 'ADVANCED', label: 'Getting Serious', color: '#ff8c00', levels: [19, 24] },
+    { name: 'MASTER', label: 'Math Master', color: '#b44dff', levels: [25, 30] }
+  ];
+
+  // Level configs: define the base question type and parameters for each level
+  // Each level has: questionsPerLevel, baseTimer, opType description
+  var LEVEL_CONFIGS = [];
+  // Levels 1-3: Addition with 0
+  for (var i = 1; i <= 3; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 4, baseTimer: 8, opType: 'add_zero' });
+  // Levels 4-6: Simple addition (result < 10)
+  for (var i = 4; i <= 6; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 5, baseTimer: 7, opType: 'add_simple' });
+  // Levels 7-9: Addition bigger (any single digits)
+  for (var i = 7; i <= 9; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 5, baseTimer: 6, opType: 'add_bigger' });
+  // Levels 10-12: Subtraction intro (mix add + easy subtract)
+  for (var i = 10; i <= 12; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 6, baseTimer: 6, opType: 'sub_intro' });
+  // Levels 13-15: Multiplication intro (x2, x3, x5, x10)
+  for (var i = 13; i <= 15; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 6, baseTimer: 6, opType: 'mult_easy' });
+  // Levels 16-18: Two-digit add/subtract
+  for (var i = 16; i <= 18; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 6, baseTimer: 6, opType: 'two_digit' });
+  // Levels 19-21: Full multiplication (up to 12x12)
+  for (var i = 19; i <= 21; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 7, baseTimer: 5, opType: 'mult_full' });
+  // Levels 22-24: Division intro (clean division)
+  for (var i = 22; i <= 24; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 7, baseTimer: 5, opType: 'div_clean' });
+  // Levels 25-27: Mixed operations
+  for (var i = 25; i <= 27; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 7, baseTimer: 4.5, opType: 'mixed' });
+  // Levels 28-30: Chained operations
+  for (var i = 28; i <= 30; i++) LEVEL_CONFIGS.push({ questionsPerLevel: 8, baseTimer: 5, opType: 'chained' });
+
+  function getLevelConfig(level) {
+    return LEVEL_CONFIGS[Math.max(0, Math.min(level - 1, LEVEL_CONFIGS.length - 1))];
+  }
+
+  function getZoneForLevel(level) {
+    for (var i = 0; i < ZONE_DEFS.length; i++) {
+      if (level >= ZONE_DEFS[i].levels[0] && level <= ZONE_DEFS[i].levels[1]) return ZONE_DEFS[i];
+    }
+    return ZONE_DEFS[ZONE_DEFS.length - 1];
+  }
+
+  function getZoneIndex(level) {
+    for (var i = 0; i < ZONE_DEFS.length; i++) {
+      if (level >= ZONE_DEFS[i].levels[0] && level <= ZONE_DEFS[i].levels[1]) return i;
+    }
+    return ZONE_DEFS.length - 1;
+  }
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  var screens = {
+    start: document.getElementById('startScreen'),
+    intro: document.getElementById('introScreen'),
+    game: document.getElementById('gameScreen'),
+    levelComplete: document.getElementById('levelCompleteScreen'),
+    gameOver: document.getElementById('gameOverScreen')
+  };
+  var progressLabels = document.getElementById('progressLabels');
+  var progressDots = document.getElementById('progressDots');
+  var startStats = document.getElementById('startStats');
+  var startBtn = document.getElementById('startBtn');
+  var introZone = document.getElementById('introZone');
+  var introLevel = document.getElementById('introLevel');
+  var introDesc = document.getElementById('introDesc');
+  var introCountdown = document.getElementById('introCountdown');
+  var hudScore = document.getElementById('hudScore');
+  var hudLevel = document.getElementById('hudLevel');
+  var hudLives = document.getElementById('hudLives');
+  var questionNumber = document.getElementById('questionNumber');
+  var questionSub = document.getElementById('questionSub');
+  var questionText = document.getElementById('questionText');
+  var timerBar = document.getElementById('timerBar');
+  var answersGrid = document.getElementById('answersGrid');
+  var lcStars = document.getElementById('lcStars');
+  var lcAdaptive = document.getElementById('lcAdaptive');
+  var lcFaster = document.getElementById('lcFaster');
+  var lcStats = document.getElementById('lcStats');
+  var nextLevelBtn = document.getElementById('nextLevelBtn');
+  var goSubtitle = document.getElementById('goSubtitle');
+  var goStats = document.getElementById('goStats');
+  var leaderboardEl = document.getElementById('leaderboard');
+  var retryCurrentBtn = document.getElementById('retryCurrentBtn');
+  var retryCheckpointBtn = document.getElementById('retryCheckpointBtn');
+  var shareBtn = document.getElementById('shareBtn');
+  var homeBtn = document.getElementById('homeBtn');
+  var feedbackEl = document.getElementById('feedback');
+  var shareToast = document.getElementById('shareToast');
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  var progress = { levelsCleared: 0, stars: [], checkpoint: 0, bestTimes: {} };
+  var adaptive = {
+    recentCorrect: [],    // rolling window of last 10 answers (true/false)
+    recentTimes: [],      // rolling window of last 10 response times
+    lowAccuracyStreak: 0, // consecutive levels with <60% accuracy
+    timerAdjust: 0,       // cumulative timer adjustment from adaptive system
+    effectiveOpLevel: 0   // the actual operation complexity level being served
+  };
+  var state = {
+    level: 1,
+    score: 0,
+    lives: LIVES_PER_LEVEL,
+    questionIdx: 0,
+    totalQuestions: 0,
+    correctCount: 0,
+    wrongCount: 0,
+    consecutiveWrong: 0,
+    streak: 0,
+    responseTimes: [],
+    allResponseTimes: [],
+    timerStart: 0,
+    timerDuration: 0,
+    timerExtra: 0,
+    timerRafId: null,
+    answered: false,
+    currentQuestion: null,
+    maxLevelReached: 1,
+    totalCorrect: 0,
+    totalAnswered: 0,
+    adaptiveMsg: ''       // message to show on level complete
+  };
+
+  // ============================================================
+  // AUDIO (Web Audio API)
+  // ============================================================
+  var audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playTone(freq, duration, type, vol, freqEnd) {
+    try {
+      var ctx = getAudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      if (freqEnd) osc.frequency.linearRampToValueAtTime(freqEnd, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(vol || 0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+  }
+
+  function sndCorrect() {
+    playTone(523, 0.08, 'sine', 0.15);
+    setTimeout(function() { playTone(659, 0.1, 'sine', 0.15); }, 60);
+  }
+
+  function sndWrong() {
+    playTone(150, 0.2, 'square', 0.1);
+    playTone(120, 0.15, 'square', 0.08);
+  }
+
+  function sndCountdown() {
+    playTone(800, 0.08, 'sine', 0.1);
+  }
+
+  function sndCountdownGo() {
+    playTone(1000, 0.12, 'sine', 0.15);
+    setTimeout(function() { playTone(1200, 0.1, 'sine', 0.12); }, 80);
+  }
+
+  function sndLevelComplete() {
+    [523, 659, 784, 1047].forEach(function(f, i) {
+      setTimeout(function() { playTone(f, 0.15, 'sine', 0.12); }, i * 100);
+    });
+  }
+
+  function sndGameOver() {
+    [400, 350, 300, 200].forEach(function(f, i) {
+      setTimeout(function() { playTone(f, 0.2, 'sine', 0.1); }, i * 150);
+    });
+  }
+
+  function sndTimeout() {
+    playTone(300, 0.15, 'sawtooth', 0.08, 100);
+  }
+
+  // ============================================================
+  // PERSISTENCE
+  // ============================================================
+  function loadProgress() {
+    try {
+      var d = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+      if (d && typeof d.levelsCleared === 'number') {
+        progress = d;
+        if (!progress.bestTimes) progress.bestTimes = {};
+        if (!progress.stars) progress.stars = [];
+      }
+    } catch(e) {}
+  }
+
+  function saveProgressData() {
+    try {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    } catch(e) {}
+  }
+
+  function saveScore(score, level) {
+    var scores = [];
+    try { scores = JSON.parse(localStorage.getItem(SCORE_KEY) || '[]'); } catch(e) {}
+    scores.push({ score: score, level: level, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    try { localStorage.setItem(SCORE_KEY, JSON.stringify(scores)); } catch(e) {}
+    return scores;
+  }
+
+  function getScores() {
+    try { return JSON.parse(localStorage.getItem(SCORE_KEY) || '[]'); } catch(e) { return []; }
+  }
+
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days = Math.floor(diff / 86400000);
+    if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins > 0) return mins + (mins === 1 ? ' min ago' : ' mins ago');
+    return 'just now';
+  }
+
+  // ============================================================
+  // SCREEN MANAGEMENT
+  // ============================================================
+  function showScreen(name) {
+    Object.keys(screens).forEach(function(k) { screens[k].classList.remove('active'); });
+    screens[name].classList.add('active');
+  }
+
+  // ============================================================
+  // PROGRESS TRACK (START SCREEN)
+  // ============================================================
+  function buildProgressTrack() {
+    // Labels
+    while (progressLabels.firstChild) progressLabels.removeChild(progressLabels.firstChild);
+    ZONE_DEFS.forEach(function(z) {
+      var lbl = document.createElement('div');
+      lbl.className = 'progress-label';
+      lbl.textContent = z.name;
+      lbl.style.color = z.color;
+      if (state.level >= z.levels[0] && state.level <= z.levels[1]) {
+        lbl.classList.add('active');
+        lbl.style.fontWeight = '700';
+      }
+      progressLabels.appendChild(lbl);
+    });
+
+    // Dots
+    while (progressDots.firstChild) progressDots.removeChild(progressDots.firstChild);
+    for (var lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+      var dot = document.createElement('div');
+      dot.className = 'progress-dot';
+
+      var starCount = progress.stars[lvl - 1] || 0;
+      var isUnlocked = lvl <= progress.levelsCleared + 1;
+      var isCurrent = lvl === state.level;
+
+      if (starCount >= 3) dot.classList.add('star3');
+      else if (starCount >= 2) dot.classList.add('star2');
+      else if (starCount >= 1) dot.classList.add('star1');
+
+      if (isCurrent) dot.classList.add('current');
+      if (isUnlocked && !isCurrent) {
+        dot.classList.add('unlocked');
+        (function(l) {
+          dot.addEventListener('click', function() {
+            state.level = l;
+            buildProgressTrack();
+            updateStartStats();
+          });
+        })(lvl);
+      }
+
+      progressDots.appendChild(dot);
+    }
+
+    updateStartStats();
+  }
+
+  function updateStartStats() {
+    while (startStats.firstChild) startStats.removeChild(startStats.firstChild);
+
+    // Compute average speed from all saved best times
+    var times = [];
+    Object.keys(progress.bestTimes).forEach(function(k) {
+      times.push(progress.bestTimes[k]);
+    });
+    var avgSpeed = 0;
+    if (times.length > 0) {
+      var sum = 0;
+      for (var i = 0; i < times.length; i++) sum += times[i];
+      avgSpeed = sum / times.length;
+    }
+
+    var totalStars = 0;
+    for (var i = 0; i < progress.stars.length; i++) totalStars += (progress.stars[i] || 0);
+
+    var stats = [
+      { val: 'L' + state.level, lbl: 'CURRENT' },
+      { val: totalStars + '/' + (TOTAL_LEVELS * 3), lbl: 'STARS' }
+    ];
+    if (avgSpeed > 0) {
+      stats.push({ val: avgSpeed.toFixed(1) + 's', lbl: 'MATH SPEED' });
+    }
+
+    stats.forEach(function(s) {
+      var div = document.createElement('div');
+      div.className = 'start-stat';
+      var valEl = document.createElement('div');
+      valEl.className = 'stat-val';
+      valEl.textContent = s.val;
+      var lblEl = document.createElement('div');
+      lblEl.className = 'stat-lbl';
+      lblEl.textContent = s.lbl;
+      div.appendChild(valEl);
+      div.appendChild(lblEl);
+      startStats.appendChild(div);
+    });
+  }
+
+  // ============================================================
+  // QUESTION GENERATORS
+  // ============================================================
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function generateDistractors(correct, count, minDelta, maxDelta, minVal) {
+    if (minVal === undefined) minVal = 0;
+    var distractors = [];
+    var used = {};
+    used[correct] = true;
+    var attempts = 0;
+    while (distractors.length < count && attempts < 200) {
+      attempts++;
+      var delta = randInt(minDelta, maxDelta);
+      if (Math.random() < 0.5) delta = -delta;
+      var d = correct + delta;
+      if (d < minVal) d = correct + Math.abs(delta);
+      if (!used[d]) {
+        used[d] = true;
+        distractors.push(d);
+      }
+    }
+    var offset = 1;
+    while (distractors.length < count) {
+      if (!used[correct + offset]) {
+        used[correct + offset] = true;
+        distractors.push(correct + offset);
+      } else if (!used[correct - offset] && correct - offset >= minVal) {
+        used[correct - offset] = true;
+        distractors.push(correct - offset);
+      }
+      offset++;
+    }
+    return distractors;
+  }
+
+  // Addition with 0
+  function genAddZero() {
+    var a, b;
+    if (Math.random() < 0.5) {
+      a = randInt(1, 9);
+      b = 0;
+    } else {
+      a = 0;
+      b = randInt(1, 9);
+    }
+    var answer = a + b;
+    var wrong = generateDistractors(answer, 3, 1, 3, 0);
+    return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Simple addition (result < 10)
+  function genAddSimple() {
+    var a = randInt(1, 8);
+    var b = randInt(1, 9 - a);
+    var answer = a + b;
+    var wrong = generateDistractors(answer, 3, 1, 3, 0);
+    return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Addition bigger (any single digits)
+  function genAddBigger() {
+    var a = randInt(2, 9);
+    var b = randInt(2, 9);
+    var answer = a + b;
+    var wrong = generateDistractors(answer, 3, 1, 4, 0);
+    return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Subtraction intro (mix of addition and easy subtraction)
+  function genSubIntro() {
+    if (Math.random() < 0.4) {
+      // Easy addition
+      var a = randInt(3, 9);
+      var b = randInt(1, 6);
+      var answer = a + b;
+      var wrong = generateDistractors(answer, 3, 1, 3, 0);
+      return { text: a + ' + ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+    } else {
+      // Easy subtraction
+      var a = randInt(4, 9);
+      var b = randInt(1, a - 1);
+      var answer = a - b;
+      var wrong = generateDistractors(answer, 3, 1, 3, 0);
+      return { text: a + ' - ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+    }
+  }
+
+  // Multiplication intro (x2, x3, x5, x10 only)
+  function genMultEasy() {
+    var easyMultipliers = [2, 3, 5, 10];
+    var m = easyMultipliers[randInt(0, easyMultipliers.length - 1)];
+    var a = randInt(1, 9);
+    var answer = a * m;
+    var magnitude = Math.max(2, Math.floor(answer * 0.2));
+    var wrong = generateDistractors(answer, 3, 1, magnitude, 0);
+    return { text: a + ' \u00D7 ' + m, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Two-digit add/subtract
+  function genTwoDigit() {
+    var op = Math.random() < 0.5 ? '+' : '-';
+    var a, b, answer;
+    if (op === '+') {
+      a = randInt(10, 69);
+      b = randInt(10, 39);
+      answer = a + b;
+    } else {
+      a = randInt(20, 79);
+      b = randInt(10, Math.min(a - 1, 39));
+      answer = a - b;
+    }
+    var magnitude = Math.max(3, Math.floor(Math.abs(answer) * 0.15));
+    var wrong = generateDistractors(answer, 3, 1, magnitude, 0);
+    return { text: a + ' ' + op + ' ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Full multiplication (up to 12x12)
+  function genMultFull() {
+    var a = randInt(2, 12);
+    var b = randInt(2, 12);
+    var answer = a * b;
+    var magnitude = Math.max(3, Math.floor(answer * 0.2));
+    var wrong = generateDistractors(answer, 3, 1, magnitude, 1);
+    return { text: a + ' \u00D7 ' + b, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Clean division (no remainders)
+  function genDivClean() {
+    var divisor = randInt(2, 12);
+    var quotient = randInt(2, 12);
+    var dividend = divisor * quotient;
+    var answer = quotient;
+    var wrong = generateDistractors(answer, 3, 1, 3, 1);
+    return { text: dividend + ' \u00F7 ' + divisor, sub: 'SOLVE', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Mixed operations
+  function genMixed() {
+    var generators = [genAddBigger, genSubIntro, genMultFull, genDivClean, genTwoDigit];
+    return generators[randInt(0, generators.length - 1)]();
+  }
+
+  // Chained operations (two operations, evaluated left-to-right with standard order of operations)
+  function genChained() {
+    var patterns = [
+      function() {
+        // a + b x c
+        var b = randInt(2, 6), c = randInt(2, 6), a = randInt(1, 15);
+        return { text: a + ' + ' + b + ' \u00D7 ' + c, answer: a + b * c };
+      },
+      function() {
+        // a x b - c (result > 0)
+        var a = randInt(2, 6), b = randInt(2, 6), c = randInt(1, a * b - 1);
+        return { text: a + ' \u00D7 ' + b + ' - ' + c, answer: a * b - c };
+      },
+      function() {
+        // a + b - c (result > 0)
+        var a = randInt(10, 40), b = randInt(5, 20);
+        var c = randInt(1, a + b - 1);
+        return { text: a + ' + ' + b + ' - ' + c, answer: a + b - c };
+      },
+      function() {
+        // a - b + c
+        var a = randInt(10, 30), b = randInt(1, a - 1), c = randInt(1, 15);
+        return { text: a + ' - ' + b + ' + ' + c, answer: a - b + c };
+      },
+      function() {
+        // a x b + c x d
+        var a = randInt(2, 5), b = randInt(2, 5), c = randInt(2, 5), d = randInt(2, 5);
+        return { text: a + ' \u00D7 ' + b + ' + ' + c + ' \u00D7 ' + d, answer: a * b + c * d };
+      }
+    ];
+    var p = patterns[randInt(0, patterns.length - 1)]();
+    var answer = p.answer;
+    var magnitude = Math.max(3, Math.floor(Math.abs(answer) * 0.2));
+    var wrong = generateDistractors(answer, 3, 1, magnitude, 0);
+    return { text: p.text, sub: 'ORDER OF OPS', correct: answer, answers: shuffle([answer].concat(wrong)) };
+  }
+
+  // Maps opType string to generator function
+  var OP_GENERATORS = {
+    'add_zero': genAddZero,
+    'add_simple': genAddSimple,
+    'add_bigger': genAddBigger,
+    'sub_intro': genSubIntro,
+    'mult_easy': genMultEasy,
+    'two_digit': genTwoDigit,
+    'mult_full': genMultFull,
+    'div_clean': genDivClean,
+    'mixed': genMixed,
+    'chained': genChained
+  };
+
+  // Generate a question for a given level, respecting adaptive system
+  function generateQuestion(level) {
+    // The adaptive system may hold back the operation type
+    // effective level determines which operation type to use
+    var effectiveLevel = Math.min(level, adaptive.effectiveOpLevel);
+    var config = getLevelConfig(effectiveLevel);
+    var gen = OP_GENERATORS[config.opType];
+    if (!gen) gen = genAddZero;
+    return gen();
+  }
+
+  // ============================================================
+  // ADAPTIVE DIFFICULTY SYSTEM
+  // ============================================================
+  function getAdaptiveAccuracy() {
+    if (adaptive.recentCorrect.length === 0) return 1;
+    var correct = 0;
+    for (var i = 0; i < adaptive.recentCorrect.length; i++) {
+      if (adaptive.recentCorrect[i]) correct++;
+    }
+    return correct / adaptive.recentCorrect.length;
+  }
+
+  function getAdaptiveAvgTime() {
+    if (adaptive.recentTimes.length === 0) return 0;
+    var sum = 0;
+    for (var i = 0; i < adaptive.recentTimes.length; i++) sum += adaptive.recentTimes[i];
+    return sum / adaptive.recentTimes.length;
+  }
+
+  function pushAdaptiveResult(isCorrect, responseTime) {
+    adaptive.recentCorrect.push(isCorrect);
+    adaptive.recentTimes.push(responseTime);
+    // Keep rolling window of 10
+    if (adaptive.recentCorrect.length > 10) adaptive.recentCorrect.shift();
+    if (adaptive.recentTimes.length > 10) adaptive.recentTimes.shift();
+  }
+
+  // Called after each level to decide what happens next
+  function evaluateAdaptive(levelAccuracy) {
+    var accuracy = getAdaptiveAccuracy();
+
+    // Case 1: Accuracy below 60% for 2 consecutive levels
+    if (levelAccuracy < 0.6) {
+      adaptive.lowAccuracyStreak++;
+    } else {
+      adaptive.lowAccuracyStreak = 0;
+    }
+
+    if (adaptive.lowAccuracyStreak >= 2) {
+      // Don't advance operation complexity, give more time
+      adaptive.timerAdjust += 1;
+      // Hold back effective operation level
+      // (don't let it increase past current)
+      state.adaptiveMsg = 'SAME_OPS';
+      return;
+    }
+
+    if (accuracy >= 0.9 && adaptive.recentCorrect.length >= 5) {
+      // Player is comfortable - advance to next operation type
+      adaptive.effectiveOpLevel = state.level + 1;
+      // Reset timer adjustment when advancing ops
+      adaptive.timerAdjust = Math.max(0, adaptive.timerAdjust - 0.5);
+      state.adaptiveMsg = 'NEW_CHALLENGE';
+      return;
+    }
+
+    if (accuracy >= 0.6 && accuracy < 0.9) {
+      // Sweetspot - gradually speed up
+      adaptive.effectiveOpLevel = state.level + 1;
+      adaptive.timerAdjust = Math.max(-2, adaptive.timerAdjust - 0.3);
+      state.adaptiveMsg = 'GETTING_FASTER';
+      return;
+    }
+
+    // Default: normal progression
+    adaptive.effectiveOpLevel = state.level + 1;
+    state.adaptiveMsg = '';
+  }
+
+  function getEffectiveTimer(level) {
+    var config = getLevelConfig(level);
+    var timer = config.baseTimer + adaptive.timerAdjust + state.timerExtra;
+    // Never go below 2 seconds or above 12 seconds
+    return Math.max(2, Math.min(12, timer));
+  }
+
+  // ============================================================
+  // PARTICLES
+  // ============================================================
+  function spawnParticles(x, y, color, count) {
+    count = count || 10;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+
+      var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
+      var speed = 80 + Math.random() * 120;
+      var vx = Math.cos(angle) * speed;
+      var vy = Math.sin(angle) * speed;
+      var size = 3 + Math.random() * 4;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+
+      (function(el, startX, startY, vxl, vyl) {
+        var start = performance.now();
+        var dur = 400 + Math.random() * 300;
+        function anim(t) {
+          var elapsed = t - start;
+          var frac = Math.min(elapsed / dur, 1);
+          el.style.left = (startX + vxl * frac) + 'px';
+          el.style.top = (startY + vyl * frac + 50 * frac * frac) + 'px';
+          el.style.opacity = (1 - frac).toString();
+          if (frac < 1) requestAnimationFrame(anim);
+          else if (el.parentNode) el.parentNode.removeChild(el);
+        }
+        requestAnimationFrame(anim);
+      })(p, x, y, vx, vy);
+    }
+  }
+
+  // ============================================================
+  // FEEDBACK
+  // ============================================================
+  function showFeedback(text, className, duration) {
+    feedbackEl.textContent = text;
+    feedbackEl.className = 'feedback ' + className + ' show';
+    setTimeout(function() {
+      feedbackEl.classList.remove('show');
+    }, duration || 500);
+  }
+
+  function shakeScreen() {
+    document.body.classList.add('shaking');
+    setTimeout(function() {
+      document.body.classList.remove('shaking');
+    }, 250);
+  }
+
+  // ============================================================
+  // TIMER
+  // ============================================================
+  function startTimer(duration) {
+    state.timerStart = performance.now();
+    state.timerDuration = duration * 1000;
+    timerBar.style.width = '100%';
+    timerBar.className = 'timer-bar';
+
+    function tick() {
+      if (state.answered) return;
+      var elapsed = performance.now() - state.timerStart;
+      var frac = 1 - elapsed / state.timerDuration;
+      if (frac <= 0) {
+        timerBar.style.width = '0%';
+        onTimeout();
+        return;
+      }
+      timerBar.style.width = (frac * 100) + '%';
+      if (frac < 0.25) timerBar.className = 'timer-bar danger';
+      else if (frac < 0.5) timerBar.className = 'timer-bar warning';
+      else timerBar.className = 'timer-bar';
+      state.timerRafId = requestAnimationFrame(tick);
+    }
+    state.timerRafId = requestAnimationFrame(tick);
+  }
+
+  function stopTimer() {
+    if (state.timerRafId) {
+      cancelAnimationFrame(state.timerRafId);
+      state.timerRafId = null;
+    }
+  }
+
+  function onTimeout() {
+    if (state.answered) return;
+    state.answered = true;
+    stopTimer();
+    sndTimeout();
+
+    var btns = answersGrid.querySelectorAll('.answer-btn');
+    var correctVal = String(state.currentQuestion.correct);
+    btns.forEach(function(btn) {
+      btn.classList.add('disabled');
+      var ansText = btn.querySelector('.answer-text').textContent;
+      if (ansText === correctVal) {
+        btn.classList.add('correct');
+      }
+    });
+
+    state.wrongCount++;
+    state.totalAnswered++;
+    state.consecutiveWrong++;
+    state.streak = 0;
+    state.lives--;
+    showFeedback('TIME UP!', 'wrong-fb', 600);
+    shakeScreen();
+    updateLives();
+
+    // Push to adaptive tracker
+    pushAdaptiveResult(false, getEffectiveTimer(state.level));
+
+    // Anti-frustration: after 3 wrong in a row, secretly add 1 second
+    if (state.consecutiveWrong >= 3) {
+      state.timerExtra += 1;
+      state.consecutiveWrong = 0; // reset so it can trigger again
+    }
+
+    setTimeout(function() {
+      if (state.lives <= 0) {
+        gameOver();
+      } else {
+        state.questionIdx++;
+        if (state.questionIdx >= state.totalQuestions) {
+          levelComplete();
+        } else {
+          nextQuestion();
+        }
+      }
+    }, 800);
+  }
+
+  function nextQuestion() {
+    showQuestion();
+  }
+
+  // ============================================================
+  // GAME LOGIC
+  // ============================================================
+  function startLevel(level) {
+    state.level = level;
+    state.lives = LIVES_PER_LEVEL;
+    state.questionIdx = 0;
+    state.correctCount = 0;
+    state.wrongCount = 0;
+    state.consecutiveWrong = 0;
+    state.streak = 0;
+    state.responseTimes = [];
+    state.timerExtra = 0;
+    state.adaptiveMsg = '';
+
+    // Make sure adaptive effective op level is at least at current level
+    if (adaptive.effectiveOpLevel < level) {
+      adaptive.effectiveOpLevel = level;
+    }
+
+    var config = getLevelConfig(level);
+    state.totalQuestions = config.questionsPerLevel;
+
+    var zone = getZoneForLevel(level);
+
+    // Show intro
+    showScreen('intro');
+    introZone.textContent = zone.name + ' \u2014 ' + zone.label;
+    introZone.style.color = zone.color;
+    introLevel.textContent = 'LEVEL ' + level;
+
+    // Build description from operation type
+    var descriptions = {
+      'add_zero': 'Addition with zero',
+      'add_simple': 'Simple addition',
+      'add_bigger': 'Single-digit addition',
+      'sub_intro': 'Addition & subtraction',
+      'mult_easy': 'Easy times tables',
+      'two_digit': 'Two-digit math',
+      'mult_full': 'Full multiplication',
+      'div_clean': 'Clean division',
+      'mixed': 'Mixed operations',
+      'chained': 'Multi-step operations'
+    };
+    var effectiveConfig = getLevelConfig(Math.min(level, adaptive.effectiveOpLevel));
+    introDesc.textContent = descriptions[effectiveConfig.opType] || 'Math challenge';
+
+    // Countdown
+    var count = 3;
+    introCountdown.textContent = String(count);
+    introCountdown.style.color = '#ffd700';
+    introCountdown.style.transform = 'scale(1.2)';
+    setTimeout(function() { introCountdown.style.transform = 'scale(1)'; }, 100);
+    sndCountdown();
+
+    var cdInterval = setInterval(function() {
+      count--;
+      if (count > 0) {
+        introCountdown.textContent = String(count);
+        introCountdown.style.transform = 'scale(1.2)';
+        setTimeout(function() { introCountdown.style.transform = 'scale(1)'; }, 100);
+        sndCountdown();
+      } else {
+        introCountdown.textContent = 'GO!';
+        introCountdown.style.color = '#39ff14';
+        introCountdown.style.transform = 'scale(1.3)';
+        sndCountdownGo();
+        clearInterval(cdInterval);
+        setTimeout(function() {
+          introCountdown.style.color = '#ffd700';
+          showScreen('game');
+          showQuestion();
+        }, 400);
+      }
+    }, 700);
+  }
+
+  function showQuestion() {
+    state.answered = false;
+    var zone = getZoneForLevel(state.level);
+
+    hudScore.textContent = String(state.score);
+    hudLevel.textContent = 'L' + state.level;
+    updateLives();
+    questionNumber.textContent = 'Q ' + (state.questionIdx + 1) + '/' + state.totalQuestions;
+
+    var q = generateQuestion(state.level);
+    state.currentQuestion = q;
+
+    questionText.textContent = q.text;
+    questionSub.textContent = q.sub || '';
+
+    // Adjust font size for longer text
+    if (q.text.length > 20) {
+      questionText.style.fontSize = 'clamp(20px,5vw,36px)';
+    } else {
+      questionText.style.fontSize = '';
+    }
+
+    var btns = answersGrid.querySelectorAll('.answer-btn');
+    btns.forEach(function(btn, i) {
+      btn.className = 'answer-btn';
+      var txt = btn.querySelector('.answer-text');
+      txt.textContent = String(q.answers[i]);
+      txt.style.fontSize = '';
+      txt.style.letterSpacing = '';
+    });
+
+    // Start timer with adaptive + anti-frustration adjustments
+    var timeLim = getEffectiveTimer(state.level);
+    startTimer(timeLim);
+  }
+
+  function checkAnswer(idx) {
+    if (state.answered) return;
+    state.answered = true;
+    stopTimer();
+
+    var elapsed = performance.now() - state.timerStart;
+    var responseTime = elapsed / 1000;
+    state.responseTimes.push(responseTime);
+    state.allResponseTimes.push(responseTime);
+    state.totalAnswered++;
+
+    var selectedBtn = answersGrid.querySelectorAll('.answer-btn')[idx];
+    var selectedAnswer = selectedBtn.querySelector('.answer-text').textContent;
+    var correct = String(state.currentQuestion.correct);
+    var isCorrect = selectedAnswer === correct;
+
+    var btns = answersGrid.querySelectorAll('.answer-btn');
+    btns.forEach(function(btn) {
+      btn.classList.add('disabled');
+      if (btn.querySelector('.answer-text').textContent === correct) {
+        btn.classList.add('correct');
+      }
+    });
+
+    if (isCorrect) {
+      state.correctCount++;
+      state.totalCorrect++;
+      state.consecutiveWrong = 0;
+      state.streak++;
+
+      // Score: base 100, speed bonus up to 2x, streak bonus
+      var timeLim = getEffectiveTimer(state.level);
+      var speedFrac = Math.max(0, 1 - (responseTime / timeLim));
+      var speedBonus = 1 + speedFrac;
+      var streakBonus = Math.max(0, (state.streak - 1)) * 10;
+      var points = Math.round(100 * speedBonus) + streakBonus;
+      state.score += points;
+
+      sndCorrect();
+      showFeedback('+' + points, 'correct-fb', 400);
+
+      // Particles from button position
+      var rect = selectedBtn.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#39ff14', 10);
+
+      // Push to adaptive tracker
+      pushAdaptiveResult(true, responseTime);
+    } else {
+      state.wrongCount++;
+      state.consecutiveWrong++;
+      state.streak = 0;
+      state.lives--;
+      sndWrong();
+      showFeedback('WRONG', 'wrong-fb', 500);
+      shakeScreen();
+      selectedBtn.classList.add('wrong');
+      updateLives();
+
+      // Push to adaptive tracker
+      pushAdaptiveResult(false, responseTime);
+
+      // Anti-frustration: after 3 wrong in a row, secretly add 1 second
+      if (state.consecutiveWrong >= 3) {
+        state.timerExtra += 1;
+        state.consecutiveWrong = 0;
+      }
+    }
+
+    setTimeout(function() {
+      if (state.lives <= 0) {
+        gameOver();
+      } else {
+        state.questionIdx++;
+        if (state.questionIdx >= state.totalQuestions) {
+          levelComplete();
+        } else {
+          showQuestion();
+        }
+      }
+    }, 700);
+  }
+
+  function updateLives() {
+    var hearts = '';
+    for (var i = 0; i < LIVES_PER_LEVEL; i++) {
+      hearts += i < state.lives ? '\u2764\uFE0F' : '\uD83D\uDDA4';
+    }
+    hudLives.textContent = hearts;
+  }
+
+  function levelComplete() {
+    stopTimer();
+    sndLevelComplete();
+
+    var avgTime = 0;
+    if (state.responseTimes.length > 0) {
+      var sum = 0;
+      for (var i = 0; i < state.responseTimes.length; i++) sum += state.responseTimes[i];
+      avgTime = sum / state.responseTimes.length;
+    }
+
+    var config = getLevelConfig(state.level);
+    var timeLim = config.baseTimer;
+
+    // Star calculation
+    var stars = 1;
+    if (state.wrongCount === 0) stars = 2;
+    if (state.wrongCount === 0 && avgTime < timeLim * 0.6) stars = 3;
+
+    // Update progress
+    var levelIdx = state.level - 1;
+    while (progress.stars.length <= levelIdx) progress.stars.push(0);
+    if (stars > (progress.stars[levelIdx] || 0)) {
+      progress.stars[levelIdx] = stars;
+    }
+    if (state.level > progress.levelsCleared) {
+      progress.levelsCleared = state.level;
+    }
+    // Checkpoint every 5 levels
+    var newCheckpoint = Math.floor((state.level - 1) / 5) * 5;
+    if (newCheckpoint > (progress.checkpoint || 0)) {
+      progress.checkpoint = newCheckpoint;
+    }
+
+    // Best time tracking
+    var isFaster = false;
+    var bestKey = 'level_' + state.level;
+    if (!progress.bestTimes[bestKey] || avgTime < progress.bestTimes[bestKey]) {
+      if (progress.bestTimes[bestKey]) isFaster = true;
+      progress.bestTimes[bestKey] = avgTime;
+    }
+    saveProgressData();
+
+    state.maxLevelReached = state.level;
+
+    // Evaluate adaptive system
+    var levelAccuracy = state.totalQuestions > 0 ? state.correctCount / state.totalQuestions : 1;
+    evaluateAdaptive(levelAccuracy);
+
+    // Show level complete
+    showScreen('levelComplete');
+    var starEmoji = '';
+    for (var i = 0; i < 3; i++) {
+      starEmoji += i < stars ? '\u2B50' : '\u2606';
+    }
+    lcStars.textContent = starEmoji;
+
+    // Show adaptive message
+    lcAdaptive.style.display = 'none';
+    lcAdaptive.className = 'lc-adaptive';
+    if (state.adaptiveMsg === 'GETTING_FASTER') {
+      lcAdaptive.textContent = 'GETTING FASTER...';
+      lcAdaptive.classList.add('msg-faster');
+      lcAdaptive.style.display = 'block';
+    } else if (state.adaptiveMsg === 'NEW_CHALLENGE') {
+      lcAdaptive.textContent = 'NEW CHALLENGE!';
+      lcAdaptive.classList.add('msg-new');
+      lcAdaptive.style.display = 'block';
+    } else if (state.adaptiveMsg === 'SAME_OPS') {
+      lcAdaptive.textContent = 'SAME OPERATIONS \u2014 MORE TIME';
+      lcAdaptive.classList.add('msg-same');
+      lcAdaptive.style.display = 'block';
+    }
+
+    var accuracy = state.totalQuestions > 0 ? Math.round((state.correctCount / state.totalQuestions) * 100) : 0;
+
+    // Build stats with DOM
+    while (lcStats.firstChild) lcStats.removeChild(lcStats.firstChild);
+    var statsData = [
+      { label: 'ACCURACY', value: accuracy + '%' },
+      { label: 'AVG SPEED', value: avgTime.toFixed(1) + 's' },
+      { label: 'SCORE', value: String(state.score) },
+      { label: 'STREAK', value: String(state.streak) }
+    ];
+    statsData.forEach(function(s) {
+      var row = document.createElement('div');
+      var lbl = document.createElement('span');
+      lbl.className = 'stat-label';
+      lbl.textContent = s.label;
+      var val = document.createElement('span');
+      val.className = 'stat-value';
+      val.textContent = s.value;
+      row.appendChild(lbl);
+      row.appendChild(val);
+      lcStats.appendChild(row);
+    });
+
+    if (isFaster) {
+      lcFaster.textContent = 'FASTER! New best for this level!';
+      lcFaster.style.display = 'block';
+    } else {
+      lcFaster.style.display = 'none';
+    }
+
+    if (state.level >= TOTAL_LEVELS) {
+      nextLevelBtn.textContent = 'YOU WIN!';
+      nextLevelBtn.onclick = function() {
+        state.level = 1;
+        showStartScreen();
+      };
+    } else {
+      nextLevelBtn.textContent = 'NEXT LEVEL';
+      nextLevelBtn.onclick = function() {
+        startLevel(state.level + 1);
+      };
+    }
+
+    // Particles celebration
+    for (var i = 0; i < stars; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var x = window.innerWidth * (0.3 + Math.random() * 0.4);
+          var y = window.innerHeight * 0.3;
+          spawnParticles(x, y, '#ffd700', 12);
+        }, idx * 200);
+      })(i);
+    }
+  }
+
+  function gameOver() {
+    stopTimer();
+    sndGameOver();
+
+    state.maxLevelReached = state.level;
+    var scores = saveScore(state.score, state.level);
+
+    showScreen('gameOver');
+
+    var zone = getZoneForLevel(state.level);
+    goSubtitle.textContent = 'Reached ' + zone.name + ' \u2014 Level ' + state.level;
+
+    var avgTime = 0;
+    if (state.allResponseTimes.length > 0) {
+      var sum = 0;
+      for (var i = 0; i < state.allResponseTimes.length; i++) sum += state.allResponseTimes[i];
+      avgTime = sum / state.allResponseTimes.length;
+    }
+
+    var overallAccuracy = state.totalAnswered > 0 ? Math.round((state.totalCorrect / state.totalAnswered) * 100) : 0;
+
+    // Build stats with DOM
+    while (goStats.firstChild) goStats.removeChild(goStats.firstChild);
+    var statsData = [
+      { label: 'SCORE', value: String(state.score) },
+      { label: 'LEVEL', value: state.level + '/30' },
+      { label: 'ACCURACY', value: overallAccuracy + '%' },
+      { label: 'AVG SPEED', value: avgTime.toFixed(1) + 's' }
+    ];
+    statsData.forEach(function(s) {
+      var row = document.createElement('div');
+      var lbl = document.createElement('span');
+      lbl.className = 'stat-label';
+      lbl.textContent = s.label;
+      var val = document.createElement('span');
+      val.className = 'stat-value';
+      val.textContent = s.value;
+      row.appendChild(lbl);
+      row.appendChild(val);
+      goStats.appendChild(row);
+    });
+
+    // Build leaderboard with DOM
+    while (leaderboardEl.firstChild) leaderboardEl.removeChild(leaderboardEl.firstChild);
+    var lbTitle = document.createElement('div');
+    lbTitle.className = 'lb-title';
+    lbTitle.textContent = '\uD83C\uDFC6 YOUR BESTS';
+    leaderboardEl.appendChild(lbTitle);
+
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'lb-row';
+
+      var rank = document.createElement('span');
+      rank.className = 'lb-rank';
+      rank.textContent = String(i + 1);
+
+      var sc = document.createElement('span');
+      sc.className = 'lb-score';
+      sc.textContent = s.score + ' pts';
+
+      var lv = document.createElement('span');
+      lv.className = 'lb-level';
+      lv.textContent = 'L' + (s.level || '?');
+
+      var tm = document.createElement('span');
+      tm.className = 'lb-time';
+      tm.textContent = timeAgo(s.ts);
+
+      row.appendChild(rank);
+      row.appendChild(sc);
+      row.appendChild(lv);
+      row.appendChild(tm);
+      leaderboardEl.appendChild(row);
+    });
+
+    // Retry current level button
+    retryCurrentBtn.textContent = 'RETRY L' + state.level;
+    retryCurrentBtn.onclick = function() {
+      state.score = 0;
+      state.totalCorrect = 0;
+      state.totalAnswered = 0;
+      state.allResponseTimes = [];
+      startLevel(state.level);
+    };
+
+    // Checkpoint retry button
+    var checkpoint = progress.checkpoint || 0;
+    var checkpointLevel = checkpoint + 1;
+    if (checkpointLevel >= state.level || checkpointLevel > TOTAL_LEVELS) {
+      retryCheckpointBtn.style.display = 'none';
+    } else {
+      retryCheckpointBtn.style.display = '';
+      retryCheckpointBtn.textContent = 'FROM L' + checkpointLevel;
+      retryCheckpointBtn.onclick = function() {
+        state.score = 0;
+        state.totalCorrect = 0;
+        state.totalAnswered = 0;
+        state.allResponseTimes = [];
+        adaptive.timerAdjust = 0;
+        adaptive.lowAccuracyStreak = 0;
+        startLevel(checkpointLevel);
+      };
+    }
+  }
+
+  // ============================================================
+  // SHARING
+  // ============================================================
+  function buildShareText() {
+    var level = state.maxLevelReached || progress.levelsCleared || 1;
+    var barLen = 30;
+    var filled = Math.round((level / TOTAL_LEVELS) * barLen);
+    var bar = '';
+    for (var i = 0; i < barLen; i++) bar += i < filled ? '\u2588' : '\u2591';
+
+    var avgTime = 0;
+    if (state.allResponseTimes.length > 0) {
+      var sum = 0;
+      for (var j = 0; j < state.allResponseTimes.length; j++) sum += state.allResponseTimes[j];
+      avgTime = sum / state.allResponseTimes.length;
+    }
+
+    var overallAccuracy = state.totalAnswered > 0 ? Math.round((state.totalCorrect / state.totalAnswered) * 100) : 0;
+
+    return '\uD83E\uDDE0 MATHBLITZ\n' +
+      'Level ' + level + '/30 | Score: ' + state.score.toLocaleString() + '\n' +
+      bar + '\n' +
+      'Speed: ' + avgTime.toFixed(1) + 's avg | Accuracy: ' + overallAccuracy + '%\n' +
+      'Can you beat level ' + level + '?';
+  }
+
+  function doShare() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast();
+      }).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(); } catch(e) {}
+    if (ta.parentNode) ta.parentNode.removeChild(ta);
+  }
+
+  function showToast() {
+    shareToast.classList.add('show');
+    setTimeout(function() { shareToast.classList.remove('show'); }, 2000);
+  }
+
+  // ============================================================
+  // START SCREEN
+  // ============================================================
+  function showStartScreen() {
+    state.level = Math.min(progress.levelsCleared + 1, TOTAL_LEVELS);
+    state.score = 0;
+    state.totalCorrect = 0;
+    state.totalAnswered = 0;
+    state.allResponseTimes = [];
+    state.streak = 0;
+    // Reset adaptive for a new run
+    adaptive.recentCorrect = [];
+    adaptive.recentTimes = [];
+    adaptive.lowAccuracyStreak = 0;
+    adaptive.timerAdjust = 0;
+    adaptive.effectiveOpLevel = state.level;
+    buildProgressTrack();
+    showScreen('start');
+  }
+
+  // ============================================================
+  // INPUT HANDLERS
+  // ============================================================
+  var answerBtnsList = answersGrid.querySelectorAll('.answer-btn');
+  for (var bi = 0; bi < answerBtnsList.length; bi++) {
+    (function(idx) {
+      answerBtnsList[idx].addEventListener('click', function(e) {
+        e.preventDefault();
+        checkAnswer(idx);
+      });
+    })(bi);
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    if (screens.game.classList.contains('active') && !state.answered) {
+      if (e.key === '1' || e.key === 'q') checkAnswer(0);
+      else if (e.key === '2' || e.key === 'w') checkAnswer(1);
+      else if (e.key === '3' || e.key === 'a') checkAnswer(2);
+      else if (e.key === '4' || e.key === 's') checkAnswer(3);
+    }
+    if (e.key === 'Enter') {
+      if (screens.start.classList.contains('active')) {
+        startBtn.click();
+      } else if (screens.levelComplete.classList.contains('active')) {
+        nextLevelBtn.click();
+      } else if (screens.gameOver.classList.contains('active')) {
+        retryCurrentBtn.click();
+      }
+    }
+  });
+
+  // Button handlers
+  startBtn.addEventListener('click', function() {
+    state.score = 0;
+    state.totalCorrect = 0;
+    state.totalAnswered = 0;
+    state.allResponseTimes = [];
+    state.streak = 0;
+    adaptive.recentCorrect = [];
+    adaptive.recentTimes = [];
+    adaptive.lowAccuracyStreak = 0;
+    adaptive.timerAdjust = 0;
+    adaptive.effectiveOpLevel = state.level;
+    startLevel(state.level);
+  });
+
+  shareBtn.addEventListener('click', function() {
+    doShare();
+  });
+
+  homeBtn.addEventListener('click', function() {
+    showStartScreen();
+  });
+
+  // Prevent double-tap zoom on mobile
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
+  var lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e) {
+    var now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, false);
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  loadProgress();
+  showStartScreen();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON GRIND — Level Up Your Skills</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #4a4a6a;
+    --text-mid: #8888aa;
+    --text-bright: #cccce0;
+    --border: rgba(0,240,255,0.1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* --- SCANLINES --- */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.06) 2px,
+      rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* --- ANIMATED BG --- */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(180,77,255,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,240,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- HEADER --- */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover {
+    color: var(--neon-cyan);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 72px);
+    letter-spacing: 8px;
+    color: var(--neon-purple);
+    text-shadow:
+      0 0 10px rgba(180,77,255,0.6),
+      0 0 40px rgba(180,77,255,0.2),
+      0 0 80px rgba(180,77,255,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-cyan);
+    text-shadow:
+      0 0 10px rgba(0,240,255,0.6),
+      0 0 40px rgba(0,240,255,0.2);
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 2.5vw, 16px);
+    color: var(--text-mid);
+    max-width: 600px;
+    margin: 16px auto 0;
+    line-height: 1.6;
+    letter-spacing: 1px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
+    margin: 30px auto 0;
+  }
+
+  /* --- STATS BAR --- */
+  .stats-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.4);
+  }
+
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* --- GAME GRID --- */
+  .games-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  /* --- GAME CARD --- */
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(180,77,255,0.25);
+    transform: translateY(-4px);
+    box-shadow:
+      0 8px 32px rgba(180,77,255,0.08),
+      0 0 0 1px rgba(180,77,255,0.1);
+  }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-screenshot img {
+    transform: scale(1.03);
+  }
+
+  .card-screenshot .placeholder {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-new {
+    background: rgba(57,255,20,0.15);
+    color: var(--neon-green);
+    border: 1px solid rgba(57,255,20,0.3);
+  }
+
+  .badge-brain {
+    background: rgba(180,77,255,0.15);
+    color: var(--neon-purple);
+    border: 1px solid rgba(180,77,255,0.3);
+  }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .meta-item strong {
+    color: var(--neon-cyan);
+    font-weight: 700;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--neon-purple);
+    transition: all 0.2s;
+  }
+
+  .game-card:hover .card-play {
+    letter-spacing: 4px;
+    color: var(--neon-cyan);
+  }
+
+  .play-arrow {
+    font-size: 16px;
+    transition: transform 0.2s;
+  }
+
+  .game-card:hover .play-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Per-game accent colors */
+  .game-card[data-accent="cyan"] .card-title { color: var(--neon-cyan); }
+  .game-card[data-accent="cyan"]:hover { border-color: rgba(0,240,255,0.3); box-shadow: 0 8px 32px rgba(0,240,255,0.08); }
+
+  .game-card[data-accent="pink"] .card-title { color: var(--neon-pink); }
+  .game-card[data-accent="pink"]:hover { border-color: rgba(255,45,123,0.3); box-shadow: 0 8px 32px rgba(255,45,123,0.08); }
+
+  .game-card[data-accent="green"] .card-title { color: var(--neon-green); }
+  .game-card[data-accent="green"]:hover { border-color: rgba(57,255,20,0.3); box-shadow: 0 8px 32px rgba(57,255,20,0.08); }
+
+  .game-card[data-accent="gold"] .card-title { color: var(--neon-gold); }
+  .game-card[data-accent="gold"]:hover { border-color: rgba(255,215,0,0.3); box-shadow: 0 8px 32px rgba(255,215,0,0.08); }
+
+  .game-card[data-accent="purple"] .card-title { color: var(--neon-purple); }
+  .game-card[data-accent="purple"]:hover { border-color: rgba(180,77,255,0.3); box-shadow: 0 8px 32px rgba(180,77,255,0.08); }
+
+  .game-card[data-accent="orange"] .card-title { color: var(--neon-orange); }
+  .game-card[data-accent="orange"]:hover { border-color: rgba(255,140,0,0.3); box-shadow: 0 8px 32px rgba(255,140,0,0.08); }
+
+  /* --- COMING SOON --- */
+  .coming-soon {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+
+  .coming-soon h3 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .upcoming-list {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .upcoming-item {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #3a3a5a;
+    padding: 6px 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #6a6a8a;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover {
+    color: var(--neon-purple);
+  }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 700px) {
+    .games-grid {
+      grid-template-columns: 1fr;
+      padding: 12px 16px 60px;
+      gap: 16px;
+    }
+    header {
+      padding: 40px 16px 16px;
+    }
+    .stats-bar {
+      gap: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <a href="../index.html" class="back-link">&larr; NEON ARCADE</a>
+  <div class="logo">NEON<span>GRIND</span></div>
+  <p class="tagline">Level up your skills — push your ceiling</p>
+  <p class="header-desc">Progressive skill games that get harder every level. Practice to improve, grind to master. How far can you get?</p>
+  <div class="header-line"></div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-value">3</div>
+    <div class="stat-label">Games</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">80</div>
+    <div class="stat-label">Total Levels</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">5-10m</div>
+    <div class="stat-label">Per Session</div>
+  </div>
+</div>
+
+<div class="games-grid">
+
+  <!-- 1. MATHBLITZ -->
+  <a href="mathblitz.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img src="screenshots/mathblitz.png" alt="MathBlitz" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">+x</div>
+      <span class="card-badge badge-brain">GRIND</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 01</span>
+      <h2 class="card-title">MATHBLITZ</h2>
+      <p class="card-desc">Mental math at speed. Starts easy, gets relentless. The game finds your ceiling and pushes you faster. 30 levels from "3+0" to chained operations. How fast is your brain?</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>30</strong> levels</span>
+        <span class="meta-item"><strong>5</strong> zones</span>
+        <span class="meta-item">Math / Speed</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Mental Math</span>
+        <span class="tag">Speed</span>
+        <span class="tag">Progressive</span>
+      </div>
+      <div class="card-play">TRAIN NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 2. REFLEX CHAIN -->
+  <a href="reflex-chain.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img src="screenshots/reflex-chain.png" alt="Reflex Chain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&oplus;</div>
+      <span class="card-badge badge-brain">GRIND</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 02</span>
+      <h2 class="card-title">REFLEX CHAIN</h2>
+      <p class="card-desc">Tap targets before they vanish. Then they move. Then decoys appear. Then you must tap in order. 25 levels of escalating reaction challenges. Milliseconds matter.</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>25</strong> levels</span>
+        <span class="meta-item"><strong>5</strong> zones</span>
+        <span class="meta-item">Reaction / Focus</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Reaction Time</span>
+        <span class="tag">Focus</span>
+        <span class="tag">Progressive</span>
+      </div>
+      <div class="card-play">TRAIN NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 3. NEUROSORT -->
+  <a href="neurosort.html" class="game-card" data-accent="orange">
+    <div class="card-screenshot">
+      <img src="screenshots/neurosort.png" alt="NeuroSort" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&darr;</div>
+      <span class="card-badge badge-brain">GRIND</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 03</span>
+      <h2 class="card-title">NEUROSORT</h2>
+      <p class="card-desc">Items fall. Sort them into bins by swiping. Color, then shape, then both. Then the rules invert. 25 levels of pattern-matching chaos. Your hands must move before you think.</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>25</strong> levels</span>
+        <span class="meta-item"><strong>5</strong> zones</span>
+        <span class="meta-item">Sorting / Speed</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Pattern Match</span>
+        <span class="tag">Sorting</span>
+        <span class="tag">Progressive</span>
+      </div>
+      <div class="card-play">TRAIN NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+</div>
+
+<div class="coming-soon">
+  <h3>COMING SOON</h3>
+  <div class="upcoming-list">
+    <span class="upcoming-item">SEQUENCER</span>
+    <span class="upcoming-item">GRIDLOCK SPRINT</span>
+    <span class="upcoming-item">STACKLOGIC</span>
+    <span class="upcoming-item">PATHFINDER</span>
+    <span class="upcoming-item">WORDFORGE</span>
+    <span class="upcoming-item">CHROMAFLOW</span>
+    <span class="upcoming-item">DUALMIND</span>
+  </div>
+</div>
+
+<footer>
+  <p>GRIND TO MASTER &mdash; LEVELS GET HARDER &mdash; YOU GET FASTER</p>
+  <p class="credit">Part of <a href="../index.html">NEON ARCADE</a> &mdash; Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+</body>
+</html>

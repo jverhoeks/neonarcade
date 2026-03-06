@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NEUROSORT - NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.04) 0%,transparent 50%)}
+canvas{position:absolute;top:0;left:0;z-index:1}
+.screen{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;transition:opacity 0.3s}
+.screen.hidden{opacity:0;pointer-events:none}
+.game-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:8px}
+.game-subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3.5vw,20px);letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-bottom:40px}
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin:8px}
+.play-btn:hover,.play-btn:active{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.play-btn.pink{border-color:#ff2d7b;color:#ff2d7b;background:rgba(255,45,123,0.06)}
+.play-btn.pink:hover,.play-btn.pink:active{background:rgba(255,45,123,0.15);box-shadow:0 0 20px rgba(255,45,123,0.2)}
+.play-btn.green{border-color:#39ff14;color:#39ff14;background:rgba(57,255,20,0.06)}
+.play-btn.green:hover,.play-btn.green:active{background:rgba(57,255,20,0.15);box-shadow:0 0 20px rgba(57,255,20,0.2)}
+.play-btn.gold{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.gold:hover,.play-btn.gold:active{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+#hud{position:absolute;top:0;left:0;width:100%;z-index:20;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+#hud.hidden{display:none}
+.hud-item{display:flex;flex-direction:column;align-items:center}
+.hud-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a4a6a}
+.hud-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,4vw,22px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-lives{display:flex;gap:4px}
+.hud-heart{width:14px;height:14px;display:inline-block;background:#ff2d7b;clip-path:path('M7 2.5C5.5 0 2 0 1 2.5C0 5 2.5 8 7 12C11.5 8 14 5 13 2.5C12 0 8.5 0 7 2.5Z');filter:drop-shadow(0 0 4px rgba(255,45,123,0.6));transition:transform 0.2s}
+.hud-heart.lost{background:#333;filter:none}
+#rule-bar{position:absolute;z-index:20;width:100%;text-align:center;font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(10px,2.5vw,14px);letter-spacing:2px;color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.4);padding:6px 10px;background:rgba(10,10,18,0.8);border-bottom:1px solid rgba(180,77,255,0.15);transition:background 0.3s,border-color 0.3s,color 0.3s}
+#rule-bar.hidden{display:none}
+#rule-bar.warn-flash{background:rgba(180,77,255,0.2);border-bottom-color:rgba(180,77,255,0.5);color:#e088ff;animation:ruleWarn 0.5s infinite}
+@keyframes ruleWarn{0%,100%{opacity:1}50%{opacity:0.6}}
+#bins-container{position:absolute;bottom:0;left:0;width:100%;z-index:20;display:flex;justify-content:center;gap:6px;padding:0 8px 12px;pointer-events:all}
+#bins-container.hidden{display:none}
+.bin{flex:1;max-width:120px;height:clamp(70px,18vh,100px);border:2px solid #333;border-radius:6px;background:rgba(18,18,31,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color 0.2s,box-shadow 0.2s,transform 0.1s;overflow:hidden}
+.bin:active{transform:scale(0.95)}
+.bin .bin-icon{width:28px;height:28px;margin-bottom:2px;position:relative}
+.bin .bin-label{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(9px,2.2vw,12px);letter-spacing:1px;text-transform:uppercase;color:#8888aa;text-align:center;line-height:1.1}
+.bin .bin-fill{position:absolute;bottom:0;left:0;width:100%;background:rgba(255,255,255,0.04);transition:height 0.3s;pointer-events:none}
+.bin.glow-cyan{border-color:#00f0ff;box-shadow:0 0 15px rgba(0,240,255,0.3)}
+.bin.glow-pink{border-color:#ff2d7b;box-shadow:0 0 15px rgba(255,45,123,0.3)}
+.bin.glow-green{border-color:#39ff14;box-shadow:0 0 15px rgba(57,255,20,0.3)}
+.bin.glow-orange{border-color:#ff8c00;box-shadow:0 0 15px rgba(255,140,0,0.3)}
+.bin.glow-gold{border-color:#ffd700;box-shadow:0 0 15px rgba(255,215,0,0.3)}
+.bin.glow-purple{border-color:#b44dff;box-shadow:0 0 15px rgba(180,77,255,0.3)}
+.bin.correct{animation:binCorrect 0.3s}
+.bin.wrong{animation:binWrong 0.3s}
+.bin.pulse-match{animation:binPulse 0.6s ease-in-out infinite}
+@keyframes binCorrect{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes binWrong{0%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+@keyframes binPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+#inversion-flash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.15s}
+#inversion-flash .text{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,7vw,48px);letter-spacing:6px;text-shadow:0 0 20px rgba(180,77,255,0.8),0 0 60px rgba(180,77,255,0.3)}
+#inversion-warning{position:fixed;top:0;left:0;width:100%;height:100%;z-index:49;pointer-events:none;opacity:0;border:4px solid #b44dff;box-sizing:border-box;transition:opacity 0.15s}
+.screen-shake{animation:shake 0.25s}
+@keyframes shake{0%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,3px)}80%{transform:translate(2px,-3px)}100%{transform:translate(0)}}
+.zone-label{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,3vw,18px);letter-spacing:4px;text-transform:uppercase;margin-bottom:4px}
+.zone-1{color:#00f0ff}
+.zone-2{color:#39ff14}
+.zone-3{color:#ff8c00}
+.zone-4{color:#b44dff}
+.zone-5{color:#ffd700}
+.level-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,48px);letter-spacing:4px;margin-bottom:12px}
+.level-rule{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(14px,3.5vw,20px);color:#8888aa;text-align:center;max-width:300px;line-height:1.4;margin-bottom:20px}
+.countdown{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(48px,15vw,80px);color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.6),0 0 60px rgba(0,240,255,0.2)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin:16px 0}
+.stat-item{text-align:center}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#4a4a6a}
+.stat-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(18px,4vw,24px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stars{display:flex;gap:8px;margin:12px 0;justify-content:center}
+.star{font-size:clamp(24px,6vw,36px);opacity:0.2;transition:opacity 0.3s,transform 0.3s}
+.star.earned{opacity:1;transform:scale(1.1)}
+.level-select{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:320px;margin:16px 0}
+.level-btn{width:44px;height:44px;border:1px solid #333;background:rgba(18,18,31,0.8);color:#4a4a6a;font-family:'Orbitron',monospace;font-weight:700;font-size:12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.level-btn.unlocked{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.level-btn.unlocked:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 10px rgba(0,240,255,0.2)}
+.level-btn.current{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.1)}
+.score-list{margin:12px 0;width:100%;max-width:280px}
+.score-row{display:flex;align-items:center;padding:4px 0;gap:8px}
+.score-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#4a4a6a;width:24px;text-align:right}
+.score-val{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
+.score-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;text-transform:uppercase;color:#4a4a6a;margin-top:16px;text-align:center;line-height:1.6}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.zone-progress{display:flex;gap:4px;margin:8px 0}
+.zone-dot{width:10px;height:10px;border-radius:50%;background:#1a1a2e;border:1px solid #333;transition:all 0.3s}
+.zone-dot.complete{background:#39ff14;border-color:#39ff14;box-shadow:0 0 6px rgba(57,255,20,0.5)}
+.zone-dot.current{border-color:#00f0ff;box-shadow:0 0 6px rgba(0,240,255,0.5)}
+.bin-preview{display:flex;gap:12px;margin:16px 0;justify-content:center}
+.bin-preview-item{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border:1px solid #333;border-radius:4px;background:rgba(18,18,31,0.5)}
+.bin-preview-icon{width:24px;height:24px;margin-bottom:4px}
+.bin-preview-label{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:10px;color:#8888aa;letter-spacing:1px;text-transform:uppercase}
+#combo-display{position:absolute;top:78px;left:50%;transform:translateX(-50%);z-index:25;pointer-events:none;font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(20px,5vw,32px);letter-spacing:4px;text-shadow:0 0 15px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);opacity:0;transition:opacity 0.2s,transform 0.2s}
+#combo-display.visible{opacity:1}
+#combo-display.gold{color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.6),0 0 40px rgba(255,215,0,0.2)}
+#turbo-text{position:absolute;top:110px;left:50%;transform:translateX(-50%);z-index:25;pointer-events:none;font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(14px,3.5vw,20px);letter-spacing:6px;color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,0.8);opacity:0;transition:opacity 0.3s}
+#turbo-text.visible{opacity:1}
+#gold-border{position:fixed;top:0;left:0;width:100%;height:100%;z-index:48;pointer-events:none;border:3px solid transparent;box-sizing:border-box;transition:border-color 0.3s}
+#gold-border.active{border-color:rgba(255,215,0,0.3);animation:goldPulse 1.5s ease-in-out infinite}
+@keyframes goldPulse{0%,100%{border-color:rgba(255,215,0,0.15)}50%{border-color:rgba(255,215,0,0.4)}}
+#screen-dim{position:fixed;top:0;left:0;width:100%;height:100%;z-index:47;pointer-events:none;background:rgba(0,0,0,0);transition:background 0.3s}
+#screen-dim.active{background:rgba(0,0,0,0.15)}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="hud" class="hidden">
+  <div class="hud-item"><span class="hud-label">Score</span><span class="hud-value" id="hud-score">0</span></div>
+  <div class="hud-item"><span class="hud-label">Level</span><span class="hud-value" id="hud-level">1</span></div>
+  <div class="hud-item"><span class="hud-label">Lives</span><div class="hud-lives" id="hud-lives"></div></div>
+  <div class="hud-item"><span class="hud-label">Combo</span><span class="hud-value" id="hud-combo">0</span></div>
+</div>
+<div id="combo-display"></div>
+<div id="turbo-text">TURBO!</div>
+<div id="rule-bar" class="hidden"></div>
+<div id="bins-container" class="hidden"></div>
+<div id="inversion-flash"><span class="text">RULES INVERTED!</span></div>
+<div id="inversion-warning"></div>
+<div id="gold-border"></div>
+<div id="screen-dim"></div>
+
+<div id="screen-start" class="screen">
+  <div class="game-title">NEUROSORT</div>
+  <div class="game-subtitle">Sort at the speed of thought</div>
+  <div class="zone-progress" id="start-zone-progress"></div>
+  <div class="btn-row">
+    <button class="play-btn" id="btn-start">START</button>
+    <button class="play-btn gold" id="btn-continue" style="display:none">CONTINUE</button>
+  </div>
+  <div class="level-select" id="level-select"></div>
+  <div class="controls-hint">
+    SWIPE or TAP BINS to sort<br>
+    KEYBOARD: A S D F or 1 2 3 4 5
+  </div>
+</div>
+
+<div id="screen-intro" class="screen hidden">
+  <div class="zone-label" id="intro-zone"></div>
+  <div class="level-title" id="intro-level"></div>
+  <div class="level-rule" id="intro-rule"></div>
+  <div class="bin-preview" id="intro-bins"></div>
+  <div class="countdown" id="intro-countdown"></div>
+</div>
+
+<div id="screen-complete" class="screen hidden">
+  <div class="zone-label" id="complete-zone"></div>
+  <div style="font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,6vw,36px);letter-spacing:4px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.6);margin-bottom:8px">LEVEL COMPLETE</div>
+  <div class="stars" id="complete-stars"></div>
+  <div class="stats-grid" id="complete-stats"></div>
+  <div class="btn-row">
+    <button class="play-btn green" id="btn-next">NEXT LEVEL</button>
+  </div>
+</div>
+
+<div id="screen-gameover" class="screen hidden">
+  <div style="font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,44px);letter-spacing:4px;color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.6);margin-bottom:12px">GAME OVER</div>
+  <div class="stats-grid" id="gameover-stats"></div>
+  <div style="font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;color:#ffd700;margin:8px 0" id="gameover-best"></div>
+  <div class="score-list" id="gameover-scores"></div>
+  <div class="btn-row">
+    <button class="play-btn pink" id="btn-retry">RETRY</button>
+    <button class="play-btn" id="btn-share">SHARE</button>
+  </div>
+</div>
+
+<div id="screen-allcomplete" class="screen hidden">
+  <div style="font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,44px);letter-spacing:4px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.6);margin-bottom:12px">MASTER SORTER</div>
+  <div class="game-subtitle">All 25 levels complete!</div>
+  <div class="stats-grid" id="allcomplete-stats"></div>
+  <div class="score-list" id="allcomplete-scores"></div>
+  <div class="btn-row">
+    <button class="play-btn gold" id="btn-replay">PLAY AGAIN</button>
+    <button class="play-btn" id="btn-share-all">SHARE</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ============================================================
+  // CONFIG
+  // ============================================================
+  var COLORS = {
+    cyan:   { hex: '#00f0ff', rgb: [0,240,255], name: 'CYAN' },
+    pink:   { hex: '#ff2d7b', rgb: [255,45,123], name: 'PINK' },
+    green:  { hex: '#39ff14', rgb: [57,255,20], name: 'GREEN' },
+    orange: { hex: '#ff8c00', rgb: [255,140,0], name: 'ORANGE' },
+    gold:   { hex: '#ffd700', rgb: [255,215,0], name: 'WILD' }
+  };
+  var SHAPES = ['circle','square','triangle','diamond'];
+  var SHAPE_NAMES = { circle:'CIRCLE', square:'SQUARE', triangle:'TRIANGLE', diamond:'DIAMOND' };
+  var ZONE_COLORS = ['#00f0ff','#39ff14','#ff8c00','#b44dff','#ffd700'];
+  var ZONE_NAMES = ['CHROMATIC','GEOMETRY','FUSION','INVERSION','CHAOS'];
+
+  var SCORE_KEY = 'neonarcade_neongrind_neurosort';
+  var PROGRESS_KEY = 'neonarcade_neongrind_neurosort_progress';
+
+  function getZone(level) { return Math.floor((level - 1) / 5); }
+  function getZoneLevel(level) { return ((level - 1) % 5) + 1; }
+
+  // --- Zone item sizes ---
+  var ZONE_ITEM_SIZES = [20, 18, 16, 15, 14];
+
+  // --- Zone preview times (ms) ---
+  var ZONE_PREVIEW_TIMES = [500, 300, 200, 150, 150];
+
+  function getLevelConfig(level) {
+    var zone = getZone(level);
+    var zl = getZoneLevel(level);
+    var binCount, itemCount, baseSpeed, gapBase, sortMode, invertInterval, hasWild, itemSize, previewTime;
+
+    itemSize = ZONE_ITEM_SIZES[zone] || 20;
+    previewTime = ZONE_PREVIEW_TIMES[zone] || 300;
+
+    switch (zone) {
+      case 0: // Zone 1 (levels 1-5): speed 2.0 -> 3.0, gap 1200 -> 800, 18 items
+        binCount = zl <= 3 ? 2 : 3;
+        itemCount = 18;
+        baseSpeed = 2.0 + (zl - 1) * 0.25; // 2.0, 2.25, 2.5, 2.75, 3.0
+        gapBase = 1200 - (zl - 1) * 100;    // 1200, 1100, 1000, 900, 800
+        sortMode = 'color';
+        invertInterval = 0;
+        hasWild = false;
+        break;
+      case 1: // Zone 2 (levels 6-10): speed 2.8 -> 4.0, gap 1000 -> 600, 22 items
+        binCount = zl <= 2 ? 3 : 4;
+        itemCount = 22;
+        baseSpeed = 2.8 + (zl - 1) * 0.3;   // 2.8, 3.1, 3.4, 3.7, 4.0
+        gapBase = 1000 - (zl - 1) * 100;     // 1000, 900, 800, 700, 600
+        sortMode = 'shape';
+        invertInterval = 0;
+        hasWild = false;
+        break;
+      case 2: // Zone 3 (levels 11-15): speed 3.5 -> 5.0, gap 800 -> 500, 25 items
+        binCount = 4;
+        itemCount = 25;
+        baseSpeed = 3.5 + (zl - 1) * 0.375;  // 3.5, 3.875, 4.25, 4.625, 5.0
+        gapBase = 800 - (zl - 1) * 75;        // 800, 725, 650, 575, 500
+        sortMode = 'colorshape';
+        invertInterval = 0;
+        hasWild = false;
+        break;
+      case 3: // Zone 4 (levels 16-20): speed 4.0 -> 5.5, gap 700 -> 400, 28 items, invert every 6s
+        binCount = 4;
+        itemCount = 28;
+        baseSpeed = 4.0 + (zl - 1) * 0.375;   // 4.0, 4.375, 4.75, 5.125, 5.5
+        gapBase = 700 - (zl - 1) * 75;         // 700, 625, 550, 475, 400
+        sortMode = 'colorshape';
+        invertInterval = 6000;
+        hasWild = false;
+        break;
+      case 4: // Zone 5 (levels 21-25): speed 4.5 -> 6.5, gap 600 -> 350, 30 items, invert every 4s
+        binCount = 5;
+        itemCount = 30;
+        baseSpeed = 4.5 + (zl - 1) * 0.5;     // 4.5, 5.0, 5.5, 6.0, 6.5
+        gapBase = 600 - (zl - 1) * 62.5;       // 600, 537, 475, 412, 350
+        sortMode = 'colorshape';
+        invertInterval = 4000;
+        hasWild = true;
+        break;
+      default:
+        binCount = 2; itemCount = 18; baseSpeed = 2.0; gapBase = 1200; sortMode = 'color'; invertInterval = 0; hasWild = false;
+    }
+    return { zone: zone, zl: zl, binCount: binCount, itemCount: itemCount, baseSpeed: baseSpeed, gapBase: gapBase, sortMode: sortMode, invertInterval: invertInterval, hasWild: hasWild, itemSize: itemSize, previewTime: previewTime };
+  }
+
+  function generateBins(config) {
+    var bins = [];
+    if (config.sortMode === 'color') {
+      var colorKeys = ['cyan','pink','green'];
+      for (var i = 0; i < config.binCount; i++) {
+        bins.push({ acceptColor: colorKeys[i], acceptShape: null, label: COLORS[colorKeys[i]].name, glowClass: 'glow-' + colorKeys[i], color: colorKeys[i] });
+      }
+    } else if (config.sortMode === 'shape') {
+      for (var i = 0; i < config.binCount; i++) {
+        bins.push({ acceptColor: null, acceptShape: SHAPES[i], label: SHAPE_NAMES[SHAPES[i]], glowClass: 'glow-cyan', color: 'cyan' });
+      }
+    } else {
+      var combos = [
+        { c: 'cyan', s: 'circle' }, { c: 'pink', s: 'square' },
+        { c: 'green', s: 'triangle' }, { c: 'orange', s: 'diamond' },
+        { c: 'cyan', s: 'square' }
+      ];
+      for (var i = 0; i < config.binCount; i++) {
+        var combo = combos[i];
+        bins.push({
+          acceptColor: combo.c, acceptShape: combo.s,
+          label: COLORS[combo.c].name + ' ' + SHAPE_NAMES[combo.s],
+          glowClass: 'glow-' + combo.c, color: combo.c
+        });
+      }
+    }
+    return bins;
+  }
+
+  function generateItems(config, bins) {
+    var items = [];
+    for (var i = 0; i < config.itemCount; i++) {
+      if (config.hasWild && Math.random() < 0.15) {
+        items.push({ color: 'gold', shape: 'diamond', isWild: true });
+      } else {
+        var bin = bins[Math.floor(Math.random() * bins.length)];
+        var color, shape;
+        if (config.sortMode === 'color') {
+          color = bin.acceptColor;
+          shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+        } else if (config.sortMode === 'shape') {
+          shape = bin.acceptShape;
+          var colorKeys = ['cyan','pink','green','orange'];
+          color = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+        } else {
+          color = bin.acceptColor;
+          shape = bin.acceptShape;
+        }
+        items.push({ color: color, shape: shape, isWild: false });
+      }
+    }
+    for (var i = items.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = items[i]; items[i] = items[j]; items[j] = tmp;
+    }
+    return items;
+  }
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  var screenStart = document.getElementById('screen-start');
+  var screenIntro = document.getElementById('screen-intro');
+  var screenComplete = document.getElementById('screen-complete');
+  var screenGameover = document.getElementById('screen-gameover');
+  var screenAllComplete = document.getElementById('screen-allcomplete');
+  var hud = document.getElementById('hud');
+  var ruleBar = document.getElementById('rule-bar');
+  var binsContainer = document.getElementById('bins-container');
+  var inversionFlash = document.getElementById('inversion-flash');
+  var inversionWarning = document.getElementById('inversion-warning');
+  var hudScore = document.getElementById('hud-score');
+  var hudLevel = document.getElementById('hud-level');
+  var hudLives = document.getElementById('hud-lives');
+  var hudCombo = document.getElementById('hud-combo');
+  var comboDisplay = document.getElementById('combo-display');
+  var turboText = document.getElementById('turbo-text');
+  var goldBorder = document.getElementById('gold-border');
+  var screenDim = document.getElementById('screen-dim');
+
+  // ============================================================
+  // SIZING
+  // ============================================================
+  var W, H, dpr;
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ruleBar.style.top = '52px';
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ============================================================
+  // AUDIO
+  // ============================================================
+  var audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(freq, dur, type, vol) {
+    ensureAudio();
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (dur || 0.15));
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + (dur || 0.15));
+  }
+
+  function sndCorrect(binIdx) {
+    var pitches = [523, 659, 784, 880, 988];
+    playTone(pitches[binIdx % pitches.length], 0.12, 'sine', 0.15);
+    setTimeout(function() { playTone(pitches[binIdx % pitches.length] * 1.5, 0.08, 'sine', 0.08); }, 30);
+  }
+  function sndWrong() {
+    playTone(150, 0.25, 'sawtooth', 0.12);
+    playTone(120, 0.3, 'square', 0.06);
+  }
+  function sndDrop() {
+    playTone(80, 0.3, 'sine', 0.12);
+    setTimeout(function() { playTone(60, 0.35, 'sine', 0.06); }, 50);
+  }
+  function sndInvert() {
+    playTone(400, 0.05, 'square', 0.15);
+    setTimeout(function() { playTone(600, 0.05, 'square', 0.12); }, 60);
+    setTimeout(function() { playTone(800, 0.05, 'square', 0.10); }, 120);
+    setTimeout(function() { playTone(300, 0.15, 'sawtooth', 0.10); }, 180);
+  }
+  function sndLevelComplete() {
+    var notes = [523, 659, 784, 1047];
+    notes.forEach(function(n, i) { setTimeout(function() { playTone(n, 0.15, 'sine', 0.12); }, i * 100); });
+  }
+  function sndCombo(count) {
+    playTone(523 + count * 60, 0.08, 'sine', 0.1);
+    setTimeout(function() { playTone((523 + count * 60) * 1.25, 0.06, 'sine', 0.06); }, 20);
+  }
+  function sndCountdown() { playTone(440, 0.08, 'square', 0.08); }
+  function sndCountdownGo() { playTone(880, 0.15, 'sine', 0.15); }
+
+  // ============================================================
+  // PERSISTENCE
+  // ============================================================
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return b.score - a.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+  function getScores(key) {
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+  function loadProgress() {
+    var p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null');
+    if (!p) return { maxLevel: 1, stars: {} };
+    return p;
+  }
+  function saveProgress(prog) {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(prog));
+  }
+
+  // ============================================================
+  // GAME STATE
+  // ============================================================
+  var state = 'start';
+  var progress = loadProgress();
+  var level = 1;
+  var score = 0;
+  var lives = 3;
+  var combo = 0;
+  var maxCombo = 0;
+  var correctCount = 0;
+  var totalSorted = 0;
+  var totalSortTime = 0;
+  var droppedCount = 0;
+  var levelConfig = null;
+  var binDefs = [];
+  var binCounts = [];
+  var itemQueue = [];
+  var itemIdx = 0;
+  var currentItem = null;
+  var itemState = 'none';
+  var itemX = 0, itemY = 0;
+  var sortTargetX = 0, sortTargetY = 0;
+  var sortStartTime = 0;
+  var itemSpawnTime = 0;
+  var lastItemTime = 0;
+  var inverted = false;
+  var lastInvertTime = 0;
+  var invertedMapping = null;
+  var particles = [];
+  var trails = [];
+  var shakeTimer = 0;
+  var shakeIntensity = 0;
+  var countdownTimer = 0;
+  var countdownValue = 0;
+  var levelStartScore = 0;
+  var binRects = [];
+  var sortAnimating = false;
+  var sortAnimStart = 0;
+  var sortAnimDur = 120;
+  var sortAnimStartX = 0;
+  var sortAnimStartY = 0;
+  var sortAnimCorrect = false;
+
+  // --- Adaptive difficulty state ---
+  var recentResults = []; // rolling window of last 15: true=correct, false=wrong/dropped
+  var adaptiveSlowdown = 0; // count of items to slow down for
+  var turboActive = false;
+  var turboShowTimer = 0;
+
+  // --- Inversion warning state ---
+  var inversionWarnShown = false;
+
+  // --- Combo break dim ---
+  var comboDimTimer = 0;
+
+  // --- Whoosh entrance state ---
+  var itemEntrancePhase = 0; // 0 = not animating, 1 = animating in
+  var itemEntranceStart = 0;
+  var ENTRANCE_DUR = 150; // ms for whoosh
+
+  function getFallArea() {
+    var top = 78;
+    var bottom = H - (binsContainer.offsetHeight || 100) - 8;
+    return { top: top, bottom: bottom, height: bottom - top };
+  }
+
+  // ============================================================
+  // ADAPTIVE DIFFICULTY
+  // ============================================================
+  function recordResult(correct) {
+    recentResults.push(correct);
+    if (recentResults.length > 15) recentResults.shift();
+  }
+
+  function getRollingAccuracy() {
+    if (recentResults.length < 5) return 0.75; // not enough data
+    var correct = 0;
+    for (var i = 0; i < recentResults.length; i++) {
+      if (recentResults[i]) correct++;
+    }
+    return correct / recentResults.length;
+  }
+
+  function getAdaptiveSpeedMultiplier() {
+    if (adaptiveSlowdown > 0) {
+      return 0.85; // secretly 15% slower
+    }
+    if (turboActive) {
+      return 1.10; // 10% faster
+    }
+    return 1.0;
+  }
+
+  function checkAdaptiveDifficulty() {
+    if (recentResults.length < 15) return;
+    var acc = getRollingAccuracy();
+    if (acc < 0.5 && adaptiveSlowdown <= 0) {
+      adaptiveSlowdown = 5;
+    }
+    if (acc > 0.95 && !turboActive) {
+      turboActive = true;
+      turboShowTimer = 60; // frames to show TURBO text
+      turboText.classList.add('visible');
+    }
+  }
+
+  // ============================================================
+  // WITHIN-LEVEL SPEED RAMP
+  // ============================================================
+  function getWithinLevelSpeedMultiplier() {
+    if (!levelConfig || levelConfig.itemCount <= 1) return 1.0;
+    var progress = Math.max(0, (itemIdx - 1)) / levelConfig.itemCount;
+    return 1.0 + 0.3 * progress;
+  }
+
+  function getEffectiveFallSpeed() {
+    var base = levelConfig.baseSpeed;
+    var withinLevel = getWithinLevelSpeedMultiplier();
+    var adaptive = getAdaptiveSpeedMultiplier();
+    return base * withinLevel * adaptive;
+  }
+
+  // ============================================================
+  // PARTICLES
+  // ============================================================
+  function spawnParticles(x, y, color, count, speed) {
+    count = count || 12;
+    speed = speed || 3;
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      var vel = speed * (0.5 + Math.random());
+      particles.push({ x: x, y: y, vx: Math.cos(angle) * vel, vy: Math.sin(angle) * vel, life: 1, decay: 0.015 + Math.random() * 0.02, size: 2 + Math.random() * 3, color: color, gravity: 0 });
+    }
+  }
+
+  function spawnShatter(x, y, color) {
+    for (var i = 0; i < 16; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var vel = 2 + Math.random() * 5;
+      particles.push({ x: x, y: y, vx: Math.cos(angle) * vel, vy: Math.sin(angle) * vel - 2, life: 1, decay: 0.02 + Math.random() * 0.015, size: 3 + Math.random() * 4, color: color, gravity: 0.15 });
+    }
+  }
+
+  function updateParticles() {
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.gravity) p.vy += p.gravity;
+      p.life -= p.decay;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function drawParticles() {
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  // ============================================================
+  // TRAILS (motion blur)
+  // ============================================================
+  function addTrail(x, y, color, size) {
+    trails.push({ x: x, y: y, color: color, life: 1, decay: 0.06, size: size || 4 });
+  }
+
+  function updateTrails() {
+    for (var i = trails.length - 1; i >= 0; i--) {
+      trails[i].life -= trails[i].decay;
+      if (trails[i].life <= 0) trails.splice(i, 1);
+    }
+  }
+
+  function drawTrails() {
+    for (var i = 0; i < trails.length; i++) {
+      var t = trails[i];
+      ctx.globalAlpha = t.life * 0.5;
+      ctx.fillStyle = t.color;
+      ctx.shadowColor = t.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, t.size * t.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  // ============================================================
+  // DRAW SHAPES
+  // ============================================================
+  function roundRect(cx, x, y, w, h, r) {
+    cx.moveTo(x + r, y);
+    cx.lineTo(x + w - r, y);
+    cx.quadraticCurveTo(x + w, y, x + w, y + r);
+    cx.lineTo(x + w, y + h - r);
+    cx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    cx.lineTo(x + r, y + h);
+    cx.quadraticCurveTo(x, y + h, x, y + h - r);
+    cx.lineTo(x, y + r);
+    cx.quadraticCurveTo(x, y, x + r, y);
+  }
+
+  function drawShape(x, y, shape, colorKey, size, alpha, glowGold) {
+    var c = COLORS[colorKey] || COLORS.cyan;
+    ctx.globalAlpha = alpha || 1;
+
+    // Gold glow for 5x combo
+    if (glowGold) {
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = 'rgba(255,215,0,0.12)';
+      ctx.beginPath();
+      ctx.arc(x, y, size + 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.strokeStyle = c.hex;
+    ctx.fillStyle = 'rgba(' + c.rgb[0] + ',' + c.rgb[1] + ',' + c.rgb[2] + ',0.15)';
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = c.hex;
+    ctx.shadowBlur = 12;
+    var s = size || 20;
+
+    ctx.beginPath();
+    switch (shape) {
+      case 'circle':
+        ctx.arc(x, y, s, 0, Math.PI * 2);
+        break;
+      case 'square':
+        var hs = s * 0.85;
+        roundRect(ctx, x - hs, y - hs, hs * 2, hs * 2, 3);
+        break;
+      case 'triangle':
+        ctx.moveTo(x, y - s);
+        ctx.lineTo(x + s * 0.9, y + s * 0.7);
+        ctx.lineTo(x - s * 0.9, y + s * 0.7);
+        ctx.closePath();
+        break;
+      case 'diamond':
+        ctx.moveTo(x, y - s);
+        ctx.lineTo(x + s * 0.7, y);
+        ctx.lineTo(x, y + s);
+        ctx.lineTo(x - s * 0.7, y);
+        ctx.closePath();
+        break;
+    }
+    ctx.fill();
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  function drawShapeSmall(cx, x, y, shape, colorHex, size) {
+    cx.strokeStyle = colorHex;
+    cx.lineWidth = 1.5;
+    var s = size || 10;
+
+    cx.fillStyle = colorHex;
+    cx.globalAlpha = 0.15;
+    cx.beginPath();
+    switch (shape) {
+      case 'circle': cx.arc(x, y, s, 0, Math.PI * 2); break;
+      case 'square': cx.rect(x - s * 0.85, y - s * 0.85, s * 1.7, s * 1.7); break;
+      case 'triangle':
+        cx.moveTo(x, y - s); cx.lineTo(x + s * 0.9, y + s * 0.7); cx.lineTo(x - s * 0.9, y + s * 0.7); cx.closePath(); break;
+      case 'diamond':
+        cx.moveTo(x, y - s); cx.lineTo(x + s * 0.7, y); cx.lineTo(x, y + s); cx.lineTo(x - s * 0.7, y); cx.closePath(); break;
+    }
+    cx.fill();
+    cx.globalAlpha = 1;
+
+    cx.beginPath();
+    switch (shape) {
+      case 'circle': cx.arc(x, y, s, 0, Math.PI * 2); break;
+      case 'square': cx.rect(x - s * 0.85, y - s * 0.85, s * 1.7, s * 1.7); break;
+      case 'triangle':
+        cx.moveTo(x, y - s); cx.lineTo(x + s * 0.9, y + s * 0.7); cx.lineTo(x - s * 0.9, y + s * 0.7); cx.closePath(); break;
+      case 'diamond':
+        cx.moveTo(x, y - s); cx.lineTo(x + s * 0.7, y); cx.lineTo(x, y + s); cx.lineTo(x - s * 0.7, y); cx.closePath(); break;
+    }
+    cx.stroke();
+  }
+
+  // ============================================================
+  // GRID BACKGROUND
+  // ============================================================
+  function drawGrid() {
+    ctx.strokeStyle = 'rgba(26,26,46,0.6)';
+    ctx.lineWidth = 1;
+    var spacing = 40;
+    for (var x = 0; x < W; x += spacing) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (var y = 0; y < H; y += spacing) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+  }
+
+  // ============================================================
+  // MOTION BLUR (draw faded trailing copies of falling item)
+  // ============================================================
+  function drawMotionBlur(x, y, shape, colorKey, size, speed) {
+    var numTrails = Math.min(6, Math.floor(speed * 1.2));
+    for (var i = 1; i <= numTrails; i++) {
+      var trailY = y - i * (speed * 1.5);
+      var alpha = 0.15 * (1 - i / (numTrails + 1));
+      var trailSize = size * (1 - i * 0.04);
+      if (alpha > 0.01 && trailSize > 2) {
+        drawShape(x, trailY, shape, colorKey, trailSize, alpha);
+      }
+    }
+  }
+
+  // ============================================================
+  // SCREEN MANAGEMENT
+  // ============================================================
+  function showScreen(name) {
+    var screens = [screenStart, screenIntro, screenComplete, screenGameover, screenAllComplete];
+    for (var i = 0; i < screens.length; i++) screens[i].classList.add('hidden');
+
+    var gameUI = name === 'playing';
+    hud.classList.toggle('hidden', !gameUI);
+    ruleBar.classList.toggle('hidden', !gameUI);
+    binsContainer.classList.toggle('hidden', !gameUI);
+
+    if (!gameUI) {
+      comboDisplay.classList.remove('visible');
+      turboText.classList.remove('visible');
+      goldBorder.classList.remove('active');
+      screenDim.classList.remove('active');
+    }
+
+    switch (name) {
+      case 'start': screenStart.classList.remove('hidden'); break;
+      case 'intro': screenIntro.classList.remove('hidden'); break;
+      case 'complete': screenComplete.classList.remove('hidden'); break;
+      case 'gameover': screenGameover.classList.remove('hidden'); break;
+      case 'allcomplete': screenAllComplete.classList.remove('hidden'); break;
+    }
+    state = name;
+  }
+
+  // ============================================================
+  // BUILD START SCREEN
+  // ============================================================
+  function buildStartScreen() {
+    progress = loadProgress();
+    var zoneProgress = document.getElementById('start-zone-progress');
+    while (zoneProgress.firstChild) zoneProgress.removeChild(zoneProgress.firstChild);
+
+    for (var z = 0; z < 5; z++) {
+      var dot = document.createElement('div');
+      dot.className = 'zone-dot';
+      var zoneCompleteCount = 0;
+      for (var k = z * 5 + 1; k <= z * 5 + 5; k++) {
+        if (progress.stars && progress.stars[k] && progress.stars[k] > 0) zoneCompleteCount++;
+      }
+      var zoneComplete = zoneCompleteCount === 5;
+      var zoneCurrent = progress.maxLevel >= z * 5 + 1 && progress.maxLevel <= z * 5 + 5;
+      if (zoneComplete) dot.classList.add('complete');
+      else if (zoneCurrent) dot.classList.add('current');
+      zoneProgress.appendChild(dot);
+    }
+
+    var btnCont = document.getElementById('btn-continue');
+    if (progress.maxLevel > 1) {
+      btnCont.style.display = '';
+      btnCont.textContent = 'CONTINUE (L' + progress.maxLevel + ')';
+    } else {
+      btnCont.style.display = 'none';
+    }
+
+    var ls = document.getElementById('level-select');
+    while (ls.firstChild) ls.removeChild(ls.firstChild);
+
+    for (var l = 1; l <= 25; l++) {
+      (function(lev) {
+        var btn = document.createElement('button');
+        btn.className = 'level-btn';
+        var unlocked = lev <= progress.maxLevel;
+        if (unlocked) btn.classList.add('unlocked');
+        if (lev === progress.maxLevel) btn.classList.add('current');
+        btn.textContent = lev;
+        btn.disabled = !unlocked;
+        if (unlocked) {
+          btn.addEventListener('click', function() { level = lev; score = 0; lives = 3; startLevel(); });
+        }
+        ls.appendChild(btn);
+      })(l);
+    }
+
+    showScreen('start');
+  }
+
+  // ============================================================
+  // LEVEL INTRO
+  // ============================================================
+  function startLevel() {
+    ensureAudio();
+    levelConfig = getLevelConfig(level);
+    binDefs = generateBins(levelConfig);
+    itemQueue = generateItems(levelConfig, binDefs);
+    binCounts = [];
+    for (var i = 0; i < binDefs.length; i++) binCounts.push(0);
+    itemIdx = 0;
+    currentItem = null;
+    itemState = 'none';
+    combo = 0;
+    maxCombo = 0;
+    correctCount = 0;
+    totalSorted = 0;
+    totalSortTime = 0;
+    droppedCount = 0;
+    inverted = false;
+    lastInvertTime = 0;
+    invertedMapping = null;
+    particles = [];
+    trails = [];
+    levelStartScore = score;
+    sortAnimating = false;
+    recentResults = [];
+    adaptiveSlowdown = 0;
+    turboActive = false;
+    turboShowTimer = 0;
+    inversionWarnShown = false;
+    comboDimTimer = 0;
+    itemEntrancePhase = 0;
+
+    var zone = levelConfig.zone;
+    var introZone = document.getElementById('intro-zone');
+    introZone.className = 'zone-label zone-' + (zone + 1);
+    introZone.textContent = 'ZONE ' + (zone + 1) + ' \u2014 ' + ZONE_NAMES[zone];
+
+    var introLevel = document.getElementById('intro-level');
+    introLevel.textContent = 'LEVEL ' + level;
+    introLevel.style.color = ZONE_COLORS[zone];
+    introLevel.style.textShadow = '0 0 10px ' + ZONE_COLORS[zone];
+
+    var ruleText = '';
+    switch (levelConfig.sortMode) {
+      case 'color': ruleText = 'Sort items by their COLOR into the matching bins.'; break;
+      case 'shape': ruleText = 'Sort items by their SHAPE into the matching bins.'; break;
+      case 'colorshape': ruleText = 'Sort items by COLOR and SHAPE combination.'; break;
+    }
+    if (levelConfig.invertInterval) ruleText += ' Rules INVERT every ' + (levelConfig.invertInterval / 1000) + ' seconds!';
+    if (levelConfig.hasWild) ruleText += ' GOLD items are wildcards \u2014 send to the bin with fewest items!';
+    document.getElementById('intro-rule').textContent = ruleText;
+
+    var preview = document.getElementById('intro-bins');
+    while (preview.firstChild) preview.removeChild(preview.firstChild);
+
+    binDefs.forEach(function(b) {
+      var div = document.createElement('div');
+      div.className = 'bin-preview-item';
+      var miniCanvas = document.createElement('canvas');
+      miniCanvas.width = 48; miniCanvas.height = 48;
+      miniCanvas.style.width = '24px'; miniCanvas.style.height = '24px';
+      miniCanvas.className = 'bin-preview-icon';
+      var mc = miniCanvas.getContext('2d');
+      mc.scale(2, 2);
+      if (b.acceptShape) {
+        drawShapeSmall(mc, 12, 12, b.acceptShape, b.acceptColor ? COLORS[b.acceptColor].hex : '#00f0ff', 8);
+      } else if (b.acceptColor) {
+        mc.fillStyle = COLORS[b.acceptColor].hex;
+        mc.globalAlpha = 1;
+        mc.beginPath(); mc.arc(12, 12, 8, 0, Math.PI * 2); mc.fill();
+      }
+      div.appendChild(miniCanvas);
+      var lbl = document.createElement('div');
+      lbl.className = 'bin-preview-label';
+      lbl.textContent = b.label;
+      div.appendChild(lbl);
+      preview.appendChild(div);
+    });
+
+    showScreen('intro');
+
+    countdownValue = 3;
+    document.getElementById('intro-countdown').textContent = '3';
+    document.getElementById('intro-countdown').style.color = '#00f0ff';
+    sndCountdown();
+
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(function() {
+      countdownValue--;
+      if (countdownValue > 0) {
+        document.getElementById('intro-countdown').textContent = String(countdownValue);
+        sndCountdown();
+      } else {
+        document.getElementById('intro-countdown').textContent = 'GO!';
+        document.getElementById('intro-countdown').style.color = '#39ff14';
+        sndCountdownGo();
+        clearInterval(countdownTimer);
+        countdownTimer = 0;
+        setTimeout(function() {
+          beginPlaying();
+        }, 500);
+      }
+    }, 800);
+  }
+
+  // ============================================================
+  // GAMEPLAY
+  // ============================================================
+  function beginPlaying() {
+    createBinsDOM();
+    updateHUD();
+    updateRuleBar();
+    showScreen('playing');
+    lastItemTime = performance.now();
+    lastInvertTime = performance.now();
+    spawnNextItem();
+  }
+
+  function createBinsDOM() {
+    while (binsContainer.firstChild) binsContainer.removeChild(binsContainer.firstChild);
+    binRects = [];
+    var effectiveBins = getEffectiveBins();
+
+    effectiveBins.forEach(function(b, i) {
+      var div = document.createElement('div');
+      div.className = 'bin';
+      div.setAttribute('data-bin', i);
+
+      var iconCanvas = document.createElement('canvas');
+      iconCanvas.width = 56; iconCanvas.height = 56;
+      iconCanvas.style.width = '28px'; iconCanvas.style.height = '28px';
+      iconCanvas.className = 'bin-icon';
+      var ic = iconCanvas.getContext('2d');
+      ic.scale(2, 2);
+      if (b.acceptShape) {
+        drawShapeSmall(ic, 14, 14, b.acceptShape, b.acceptColor ? COLORS[b.acceptColor].hex : '#00f0ff', 10);
+      } else if (b.acceptColor) {
+        ic.fillStyle = COLORS[b.acceptColor].hex;
+        ic.globalAlpha = 1;
+        ic.beginPath(); ic.arc(14, 14, 10, 0, Math.PI * 2); ic.fill();
+      }
+      div.appendChild(iconCanvas);
+
+      var lbl = document.createElement('div');
+      lbl.className = 'bin-label';
+      lbl.textContent = b.label;
+      div.appendChild(lbl);
+
+      var fill = document.createElement('div');
+      fill.className = 'bin-fill';
+      fill.style.height = '0%';
+      div.appendChild(fill);
+
+      (function(idx) {
+        div.addEventListener('click', function(e) { e.stopPropagation(); sortToBin(idx); });
+        div.addEventListener('touchend', function(e) { e.preventDefault(); e.stopPropagation(); sortToBin(idx); });
+      })(i);
+
+      binsContainer.appendChild(div);
+    });
+
+    requestAnimationFrame(function() {
+      var binEls = binsContainer.querySelectorAll('.bin');
+      binRects = [];
+      for (var i = 0; i < binEls.length; i++) {
+        var r = binEls[i].getBoundingClientRect();
+        binRects.push({ x: r.left, y: r.top, w: r.width, h: r.height, cx: r.left + r.width / 2, cy: r.top + r.height / 2 });
+      }
+    });
+  }
+
+  function getEffectiveBins() {
+    if (!inverted || !invertedMapping) return binDefs;
+    return invertedMapping.map(function(i) { return binDefs[i]; });
+  }
+
+  function updateBinsDOM() {
+    var bins = binsContainer.querySelectorAll('.bin');
+    var effectiveBins = getEffectiveBins();
+    for (var i = 0; i < bins.length; i++) {
+      if (i >= effectiveBins.length) continue;
+      var b = effectiveBins[i];
+      var lbl = bins[i].querySelector('.bin-label');
+      if (lbl) lbl.textContent = b.label;
+
+      var iconCanvas = bins[i].querySelector('.bin-icon');
+      if (iconCanvas) {
+        var ic = iconCanvas.getContext('2d');
+        ic.setTransform(1, 0, 0, 1, 0, 0);
+        ic.clearRect(0, 0, 56, 56);
+        ic.scale(2, 2);
+        if (b.acceptShape) {
+          drawShapeSmall(ic, 14, 14, b.acceptShape, b.acceptColor ? COLORS[b.acceptColor].hex : '#00f0ff', 10);
+        } else if (b.acceptColor) {
+          ic.fillStyle = COLORS[b.acceptColor].hex;
+          ic.globalAlpha = 1;
+          ic.beginPath(); ic.arc(14, 14, 10, 0, Math.PI * 2); ic.fill();
+        }
+      }
+
+      var totalItems = levelConfig.itemCount;
+      var realBinIdx = inverted && invertedMapping ? invertedMapping[i] : i;
+      var fillPct = Math.min(100, (binCounts[realBinIdx] / Math.ceil(totalItems / binDefs.length)) * 100);
+      var fillEl = bins[i].querySelector('.bin-fill');
+      if (fillEl) {
+        fillEl.style.height = fillPct + '%';
+        fillEl.style.background = 'rgba(' + (COLORS[b.color] || COLORS.cyan).rgb.join(',') + ',0.08)';
+      }
+    }
+  }
+
+  function updateHUD() {
+    hudScore.textContent = score;
+    hudLevel.textContent = level;
+    hudCombo.textContent = combo > 1 ? 'x' + combo : '';
+    hudCombo.style.color = combo >= 5 ? '#ffd700' : combo >= 3 ? '#39ff14' : '#00f0ff';
+    while (hudLives.firstChild) hudLives.removeChild(hudLives.firstChild);
+    for (var i = 0; i < 3; i++) {
+      var h = document.createElement('span');
+      h.className = 'hud-heart' + (i >= lives ? ' lost' : '');
+      hudLives.appendChild(h);
+    }
+
+    // Update prominent combo display
+    if (combo >= 3) {
+      comboDisplay.textContent = combo + 'x COMBO';
+      comboDisplay.classList.add('visible');
+      if (combo >= 5) {
+        comboDisplay.classList.add('gold');
+      } else {
+        comboDisplay.classList.remove('gold');
+        comboDisplay.style.color = '#00f0ff';
+      }
+    } else {
+      comboDisplay.classList.remove('visible');
+      comboDisplay.classList.remove('gold');
+    }
+
+    // Gold border at 10x combo
+    if (combo >= 10) {
+      goldBorder.classList.add('active');
+    } else {
+      goldBorder.classList.remove('active');
+    }
+  }
+
+  function updateRuleBar() {
+    var text = '';
+    if (levelConfig.sortMode === 'color') text = 'SORT BY: COLOR';
+    else if (levelConfig.sortMode === 'shape') text = 'SORT BY: SHAPE';
+    else text = 'SORT BY: COLOR + SHAPE';
+    if (inverted) text = '\u26A0 INVERTED \u26A0 ' + text;
+    ruleBar.textContent = text;
+    ruleBar.style.color = inverted ? '#ff2d7b' : '#b44dff';
+    ruleBar.style.borderBottomColor = inverted ? 'rgba(255,45,123,0.3)' : 'rgba(180,77,255,0.15)';
+    ruleBar.style.background = inverted ? 'rgba(255,45,123,0.08)' : 'rgba(10,10,18,0.8)';
+    ruleBar.classList.remove('warn-flash');
+  }
+
+  function spawnNextItem() {
+    if (itemIdx >= itemQueue.length) {
+      levelComplete();
+      return;
+    }
+    currentItem = itemQueue[itemIdx];
+    itemIdx++;
+    itemX = W / 2;
+    itemY = getFallArea().top - 20; // start offscreen for whoosh
+    itemState = 'entrance';
+    itemEntrancePhase = 1;
+    itemEntranceStart = performance.now();
+    itemSpawnTime = performance.now();
+    sortStartTime = performance.now();
+    sortAnimating = false;
+  }
+
+  function checkMatch(bin, item) {
+    if (item.isWild) return false;
+    if (levelConfig.sortMode === 'color') return bin.acceptColor === item.color;
+    if (levelConfig.sortMode === 'shape') return bin.acceptShape === item.shape;
+    return bin.acceptColor === item.color && bin.acceptShape === item.shape;
+  }
+
+  function sortToBin(binIdx) {
+    if (state !== 'playing') return;
+    if (itemState !== 'falling' && itemState !== 'preview' && itemState !== 'entrance') return;
+    if (sortAnimating) return;
+    ensureAudio();
+
+    var effectiveBins = getEffectiveBins();
+    if (binIdx >= effectiveBins.length) return;
+    var bin = effectiveBins[binIdx];
+
+    var correct = false;
+    if (currentItem.isWild) {
+      var minCount = Infinity;
+      for (var j = 0; j < binDefs.length; j++) {
+        if (binCounts[j] < minCount) minCount = binCounts[j];
+      }
+      var realBinIdx = inverted && invertedMapping ? invertedMapping[binIdx] : binIdx;
+      correct = (binCounts[realBinIdx] === minCount);
+    } else {
+      correct = checkMatch(bin, currentItem);
+    }
+
+    if (binRects[binIdx]) {
+      sortTargetX = binRects[binIdx].cx;
+      sortTargetY = binRects[binIdx].cy;
+    } else {
+      sortTargetX = W / 2;
+      sortTargetY = H - 60;
+    }
+
+    itemState = 'sorting';
+    itemEntrancePhase = 0;
+    sortAnimating = true;
+    sortAnimStart = performance.now();
+    sortAnimStartX = itemX;
+    sortAnimStartY = itemY;
+    sortAnimCorrect = correct;
+
+    var sortTime = performance.now() - sortStartTime;
+    totalSorted++;
+    totalSortTime += sortTime;
+
+    if (correct) {
+      var rbi = inverted && invertedMapping ? invertedMapping[binIdx] : binIdx;
+      binCounts[rbi]++;
+      combo++;
+      if (combo > maxCombo) maxCombo = combo;
+      correctCount++;
+      // Points: base 100 + combo bonus. At 5x combo, items are worth 2x
+      var comboMultiplier = combo >= 5 ? 2 : 1;
+      var pts = (100 + (combo - 1) * 25) * comboMultiplier;
+      score += pts;
+      sndCorrect(binIdx);
+      if (combo > 1) sndCombo(combo);
+      spawnParticles(itemX, itemY, COLORS[currentItem.color].hex, 12, 3);
+      var binEl = binsContainer.querySelectorAll('.bin')[binIdx];
+      if (binEl) { binEl.classList.add('correct'); setTimeout(function() { binEl.classList.remove('correct'); }, 300); }
+      recordResult(true);
+      updateBinsDOM();
+      updateHUD();
+      // Adaptive: if turbo was active and they keep getting correct, stay turbo
+    } else {
+      // Combo broken - trigger dim effect
+      if (combo >= 3) {
+        comboDimTimer = 20; // frames
+        screenDim.classList.add('active');
+      }
+      combo = 0;
+      lives--;
+      sndWrong();
+      spawnShatter(itemX, itemY, COLORS[currentItem.color].hex);
+      document.body.classList.add('screen-shake');
+      setTimeout(function() { document.body.classList.remove('screen-shake'); }, 250);
+      shakeTimer = 15;
+      shakeIntensity = 4;
+      var binEl = binsContainer.querySelectorAll('.bin')[binIdx];
+      if (binEl) { binEl.classList.add('wrong'); setTimeout(function() { binEl.classList.remove('wrong'); }, 300); }
+      recordResult(false);
+      // End turbo on miss
+      turboActive = false;
+      turboText.classList.remove('visible');
+      updateHUD();
+    }
+
+    // Adaptive difficulty check
+    if (adaptiveSlowdown > 0) adaptiveSlowdown--;
+    checkAdaptiveDifficulty();
+  }
+
+  function finishSortAnimation() {
+    sortAnimating = false;
+    if (sortAnimCorrect) {
+      spawnParticles(sortTargetX, sortTargetY, COLORS[currentItem.color].hex, 8, 2);
+    }
+    var wasCorrect = sortAnimCorrect;
+    currentItem = null;
+    itemState = 'none';
+    lastItemTime = performance.now();
+
+    if (!wasCorrect && lives <= 0) {
+      setTimeout(function() { gameOver(); }, 200);
+      return;
+    }
+
+    scheduleNextItem();
+  }
+
+  function scheduleNextItem() {
+    // Gap decreases within level too
+    var baseGap = levelConfig.gapBase;
+    var withinLevelReduction = (itemIdx / levelConfig.itemCount) * 0.2; // up to 20% shorter at end
+    var gap = Math.max(200, baseGap * (1 - withinLevelReduction));
+    setTimeout(function() {
+      if (state === 'playing' && itemState === 'none') {
+        spawnNextItem();
+      }
+    }, gap);
+  }
+
+  function itemMissed() {
+    if (state !== 'playing') return;
+    sndDrop();
+    lives--;
+    // Combo broken on drop
+    if (combo >= 3) {
+      comboDimTimer = 20;
+      screenDim.classList.add('active');
+    }
+    combo = 0;
+    droppedCount++;
+    totalSorted++;
+    totalSortTime += performance.now() - sortStartTime;
+    spawnShatter(itemX, itemY, COLORS[currentItem.color].hex);
+    shakeTimer = 10;
+    shakeIntensity = 3;
+    recordResult(false);
+    // End turbo on drop
+    turboActive = false;
+    turboText.classList.remove('visible');
+    if (adaptiveSlowdown > 0) adaptiveSlowdown--;
+    checkAdaptiveDifficulty();
+    updateHUD();
+
+    currentItem = null;
+    itemState = 'none';
+    itemEntrancePhase = 0;
+    lastItemTime = performance.now();
+
+    if (lives <= 0) {
+      setTimeout(function() { gameOver(); }, 300);
+      return;
+    }
+    scheduleNextItem();
+  }
+
+  // ============================================================
+  // INVERSION
+  // ============================================================
+  function checkInversion(now) {
+    if (!levelConfig || levelConfig.invertInterval <= 0) return;
+
+    var timeSinceLast = now - lastInvertTime;
+    var timeToInvert = levelConfig.invertInterval;
+
+    // Warning flash 2 seconds before inversion
+    if (timeSinceLast >= timeToInvert - 2000 && !inversionWarnShown) {
+      inversionWarnShown = true;
+      ruleBar.classList.add('warn-flash');
+    }
+
+    // Purple border flash 0.5 seconds before
+    if (timeSinceLast >= timeToInvert - 500 && timeSinceLast < timeToInvert) {
+      inversionWarning.style.opacity = '1';
+      inversionWarning.style.borderColor = '#b44dff';
+    } else {
+      inversionWarning.style.opacity = '0';
+    }
+
+    if (timeSinceLast >= timeToInvert) {
+      inverted = !inverted;
+      lastInvertTime = now;
+      inversionWarnShown = false;
+      inversionWarning.style.opacity = '0';
+
+      if (inverted) {
+        invertedMapping = [];
+        for (var i = 0; i < binDefs.length; i++) invertedMapping.push(i);
+        var changed = false;
+        var maxAttempts = 20;
+        while (!changed && maxAttempts-- > 0) {
+          for (var i = invertedMapping.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = invertedMapping[i]; invertedMapping[i] = invertedMapping[j]; invertedMapping[j] = tmp;
+          }
+          for (var i = 0; i < invertedMapping.length; i++) {
+            if (invertedMapping[i] !== i) { changed = true; break; }
+          }
+        }
+      } else {
+        invertedMapping = null;
+      }
+
+      sndInvert();
+      updateRuleBar();
+      updateBinsDOM();
+      createBinsDOM();
+
+      inversionFlash.style.opacity = '1';
+      inversionFlash.style.background = inverted ? 'rgba(180,77,255,0.15)' : 'rgba(57,255,20,0.1)';
+      inversionFlash.querySelector('.text').textContent = inverted ? 'RULES INVERTED!' : 'RULES RESTORED!';
+      inversionFlash.querySelector('.text').style.color = inverted ? '#b44dff' : '#39ff14';
+      setTimeout(function() { inversionFlash.style.opacity = '0'; }, 1200);
+    }
+  }
+
+  // ============================================================
+  // LEVEL COMPLETE
+  // ============================================================
+  function levelComplete() {
+    sndLevelComplete();
+    var accuracy = totalSorted > 0 ? Math.round((correctCount / totalSorted) * 100) : 100;
+    var avgTime = totalSorted > 0 ? totalSortTime / totalSorted / 1000 : 0;
+    var levelScore = score - levelStartScore;
+
+    // Star rating: harder thresholds
+    // 1 star: complete the level
+    // 2 stars: 85%+ accuracy
+    // 3 stars: 95%+ accuracy AND avg sort time under 0.8s AND no items dropped
+    var stars = 1;
+    if (accuracy >= 85) stars = 2;
+    if (accuracy >= 95 && avgTime < 0.8 && droppedCount === 0) stars = 3;
+
+    progress = loadProgress();
+    if (!progress.stars) progress.stars = {};
+    var prevStars = progress.stars[level] || 0;
+    if (stars > prevStars) progress.stars[level] = stars;
+    if (level + 1 > progress.maxLevel) progress.maxLevel = Math.min(26, level + 1);
+    saveProgress(progress);
+    saveScore(SCORE_KEY, score);
+
+    if (level >= 25) {
+      showAllComplete(accuracy, avgTime);
+      return;
+    }
+
+    var zone = levelConfig.zone;
+    var compZone = document.getElementById('complete-zone');
+    compZone.className = 'zone-label zone-' + (zone + 1);
+    compZone.textContent = 'ZONE ' + (zone + 1) + ' \u2014 ' + ZONE_NAMES[zone];
+
+    var starsDiv = document.getElementById('complete-stars');
+    while (starsDiv.firstChild) starsDiv.removeChild(starsDiv.firstChild);
+    for (var i = 0; i < 3; i++) {
+      var s = document.createElement('span');
+      s.className = 'star' + (i < stars ? ' earned' : '');
+      s.textContent = '\u2605';
+      s.style.color = i < stars ? '#ffd700' : '#333';
+      starsDiv.appendChild(s);
+    }
+
+    var statsEl = document.getElementById('complete-stats');
+    while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
+    var statsData = [
+      { label: 'Accuracy', value: accuracy + '%' },
+      { label: 'Avg Speed', value: avgTime.toFixed(2) + 's' },
+      { label: 'Max Combo', value: String(maxCombo) },
+      { label: 'Score', value: '+' + levelScore }
+    ];
+    statsData.forEach(function(sd) {
+      var div = document.createElement('div');
+      div.className = 'stat-item';
+      var sl = document.createElement('span');
+      sl.className = 'stat-label';
+      sl.textContent = sd.label;
+      var sv = document.createElement('span');
+      sv.className = 'stat-value';
+      sv.textContent = sd.value;
+      div.appendChild(sl);
+      div.appendChild(sv);
+      statsEl.appendChild(div);
+    });
+
+    showScreen('complete');
+  }
+
+  function showAllComplete(accuracy, avgTime) {
+    var statsEl = document.getElementById('allcomplete-stats');
+    while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
+    var statsData = [
+      { label: 'Total Score', value: String(score) },
+      { label: 'Final Accuracy', value: accuracy + '%' }
+    ];
+    statsData.forEach(function(sd) {
+      var div = document.createElement('div');
+      div.className = 'stat-item';
+      var sl = document.createElement('span');
+      sl.className = 'stat-label';
+      sl.textContent = sd.label;
+      var sv = document.createElement('span');
+      sv.className = 'stat-value';
+      sv.textContent = sd.value;
+      div.appendChild(sl);
+      div.appendChild(sv);
+      statsEl.appendChild(div);
+    });
+
+    var scores = getScores(SCORE_KEY);
+    var scoresDiv = document.getElementById('allcomplete-scores');
+    while (scoresDiv.firstChild) scoresDiv.removeChild(scoresDiv.firstChild);
+    var header = document.createElement('div');
+    header.style.cssText = 'font-family:Orbitron,monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;margin-bottom:8px';
+    header.textContent = 'YOUR BESTS';
+    scoresDiv.appendChild(header);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = s.score + ' pts';
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      scoresDiv.appendChild(row);
+    });
+
+    showScreen('allcomplete');
+  }
+
+  // ============================================================
+  // GAME OVER
+  // ============================================================
+  function gameOver() {
+    var accuracy = totalSorted > 0 ? Math.round((correctCount / totalSorted) * 100) : 0;
+    var scores = saveScore(SCORE_KEY, score);
+    var isNewBest = scores[0] && scores[0].score === score && scores[0].ts >= Date.now() - 2000;
+
+    var statsEl = document.getElementById('gameover-stats');
+    while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
+    var statsData = [
+      { label: 'Score', value: String(score) },
+      { label: 'Level', value: level + '/25' },
+      { label: 'Accuracy', value: accuracy + '%' },
+      { label: 'Max Combo', value: String(maxCombo) }
+    ];
+    statsData.forEach(function(sd) {
+      var div = document.createElement('div');
+      div.className = 'stat-item';
+      var sl = document.createElement('span');
+      sl.className = 'stat-label';
+      sl.textContent = sd.label;
+      var sv = document.createElement('span');
+      sv.className = 'stat-value';
+      sv.textContent = sd.value;
+      div.appendChild(sl);
+      div.appendChild(sv);
+      statsEl.appendChild(div);
+    });
+
+    document.getElementById('gameover-best').textContent = isNewBest ? 'NEW HIGH SCORE!' : '';
+
+    var scoresDiv = document.getElementById('gameover-scores');
+    while (scoresDiv.firstChild) scoresDiv.removeChild(scoresDiv.firstChild);
+    var header = document.createElement('div');
+    header.style.cssText = 'font-family:Orbitron,monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;margin-bottom:8px';
+    header.textContent = 'YOUR BESTS';
+    scoresDiv.appendChild(header);
+    scores.forEach(function(s, i) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      var rank = document.createElement('span');
+      rank.className = 'score-rank';
+      rank.textContent = String(i + 1);
+      var val = document.createElement('span');
+      val.className = 'score-val';
+      val.textContent = s.score + ' pts';
+      var time = document.createElement('span');
+      time.className = 'score-time';
+      time.textContent = timeAgo(s.ts);
+      row.appendChild(rank);
+      row.appendChild(val);
+      row.appendChild(time);
+      scoresDiv.appendChild(row);
+    });
+
+    showScreen('gameover');
+  }
+
+  // ============================================================
+  // SHARE
+  // ============================================================
+  function buildShareText() {
+    var accuracy = totalSorted > 0 ? Math.round((correctCount / totalSorted) * 100) : 0;
+    var avgTime = totalSorted > 0 ? (totalSortTime / totalSorted / 1000).toFixed(1) : '0.0';
+    var filled = Math.round((level / 25) * 25);
+    var bar = '';
+    for (var i = 0; i < 25; i++) bar += i < filled ? '\u2588' : '\u2591';
+    return '\uD83E\uDDE0 NEUROSORT\nLevel ' + level + '/25 | Accuracy: ' + accuracy + '%\n' + bar + '\nSort speed: ' + avgTime + 's avg\nHow fast can you sort?';
+  }
+
+  function share() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(flashCopied);
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(flashCopied).catch(function() {});
+    }
+  }
+
+  function flashCopied() {
+    var btn = document.getElementById('btn-share');
+    if (btn) {
+      var orig = btn.textContent;
+      btn.textContent = 'COPIED!';
+      setTimeout(function() { btn.textContent = orig; }, 1500);
+    }
+  }
+
+  // ============================================================
+  // INPUT - SWIPE
+  // ============================================================
+  var touchStartX = 0, touchStartY = 0, isSwiping = false;
+  var SWIPE_THRESHOLD = 30;
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    var t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    isSwiping = true;
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+
+  canvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    if (!isSwiping) return;
+    isSwiping = false;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - touchStartX;
+    var dist = Math.abs(dx);
+
+    if (dist >= SWIPE_THRESHOLD && state === 'playing' && (itemState === 'falling' || itemState === 'preview' || itemState === 'entrance')) {
+      var numBins = binDefs.length;
+      if (numBins === 2) {
+        sortToBin(dx < 0 ? 0 : 1);
+      } else {
+        var endX = t.clientX;
+        var binWidth = W / numBins;
+        var binIdx = Math.min(numBins - 1, Math.max(0, Math.floor(endX / binWidth)));
+        sortToBin(binIdx);
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('mousedown', function(e) {
+    touchStartX = e.clientX;
+    touchStartY = e.clientY;
+    isSwiping = true;
+  });
+  canvas.addEventListener('mouseup', function(e) {
+    if (!isSwiping) return;
+    isSwiping = false;
+    var dx = e.clientX - touchStartX;
+    var dist = Math.abs(dx);
+    if (dist >= SWIPE_THRESHOLD && state === 'playing' && (itemState === 'falling' || itemState === 'preview' || itemState === 'entrance')) {
+      var numBins = binDefs.length;
+      if (numBins === 2) {
+        sortToBin(dx < 0 ? 0 : 1);
+      } else {
+        var endX = e.clientX;
+        var binWidth = W / numBins;
+        var binIdx = Math.min(numBins - 1, Math.max(0, Math.floor(endX / binWidth)));
+        sortToBin(binIdx);
+      }
+    }
+  });
+
+  // ============================================================
+  // INPUT - KEYBOARD
+  // ============================================================
+  document.addEventListener('keydown', function(e) {
+    if (state !== 'playing') return;
+    if (itemState !== 'falling' && itemState !== 'preview' && itemState !== 'entrance') return;
+
+    var numBins = binDefs.length;
+    var binIdx = -1;
+
+    switch (e.key) {
+      case 'ArrowLeft': binIdx = 0; break;
+      case 'ArrowRight': binIdx = numBins - 1; break;
+      case 'ArrowUp': if (numBins >= 3) binIdx = Math.floor(numBins / 2); break;
+      case 'ArrowDown': if (numBins >= 4) binIdx = Math.floor(numBins / 2) - 1; break;
+      case 'a': case 'A': case '1': binIdx = 0; break;
+      case 's': case 'S': case '2': binIdx = Math.min(1, numBins - 1); break;
+      case 'd': case 'D': case '3': binIdx = Math.min(2, numBins - 1); break;
+      case 'f': case 'F': case '4': binIdx = Math.min(3, numBins - 1); break;
+      case 'g': case 'G': case '5': binIdx = Math.min(4, numBins - 1); break;
+    }
+
+    if (binIdx >= 0 && binIdx < numBins) {
+      e.preventDefault();
+      sortToBin(binIdx);
+    }
+  });
+
+  // ============================================================
+  // BUTTONS
+  // ============================================================
+  document.getElementById('btn-start').addEventListener('click', function() {
+    level = 1; score = 0; lives = 3;
+    startLevel();
+  });
+  document.getElementById('btn-continue').addEventListener('click', function() {
+    level = Math.min(25, progress.maxLevel);
+    score = 0; lives = 3;
+    startLevel();
+  });
+  document.getElementById('btn-next').addEventListener('click', function() {
+    level++;
+    if (level > 25) { showAllComplete(100, 0); return; }
+    startLevel();
+  });
+  document.getElementById('btn-retry').addEventListener('click', function() {
+    var checkpoint = Math.floor((level - 1) / 5) * 5 + 1;
+    level = checkpoint;
+    score = 0; lives = 3;
+    startLevel();
+  });
+  document.getElementById('btn-share').addEventListener('click', share);
+  document.getElementById('btn-share-all').addEventListener('click', share);
+  document.getElementById('btn-replay').addEventListener('click', function() {
+    level = 1; score = 0; lives = 3;
+    startLevel();
+  });
+
+  // ============================================================
+  // IDLE ANIMATION
+  // ============================================================
+  var idleShapes = [];
+  function initIdleShapes() {
+    idleShapes = [];
+    for (var i = 0; i < 8; i++) {
+      idleShapes.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.5, vy: 0.3 + Math.random() * 0.5,
+        shape: SHAPES[Math.floor(Math.random() * SHAPES.length)],
+        color: ['cyan','pink','green','orange'][Math.floor(Math.random() * 4)],
+        size: 8 + Math.random() * 12, alpha: 0.15 + Math.random() * 0.15
+      });
+    }
+  }
+  initIdleShapes();
+
+  function drawIdleShapes() {
+    for (var i = 0; i < idleShapes.length; i++) {
+      var s = idleShapes[i];
+      s.x += s.vx;
+      s.y += s.vy;
+      if (s.y > H + 30) { s.y = -30; s.x = Math.random() * W; }
+      if (s.x < -30) s.x = W + 30;
+      if (s.x > W + 30) s.x = -30;
+      drawShape(s.x, s.y, s.shape, s.color, s.size, s.alpha);
+    }
+  }
+
+  // ============================================================
+  // MASTER LOOP
+  // ============================================================
+  var lastFrame = performance.now();
+
+  function masterLoop(now) {
+    var dt = Math.min(now - lastFrame, 33.33);
+    lastFrame = now;
+
+    ctx.clearRect(0, 0, W, H);
+
+    if (shakeTimer > 0) {
+      shakeTimer--;
+      var sx = (Math.random() - 0.5) * shakeIntensity * 2;
+      var sy = (Math.random() - 0.5) * shakeIntensity * 2;
+      ctx.save();
+      ctx.translate(sx, sy);
+    }
+
+    drawGrid();
+
+    if (state !== 'playing') {
+      drawIdleShapes();
+    }
+
+    if (state === 'playing') {
+      var fallArea = getFallArea();
+
+      checkInversion(now);
+
+      // Combo dim timer
+      if (comboDimTimer > 0) {
+        comboDimTimer--;
+        if (comboDimTimer <= 0) {
+          screenDim.classList.remove('active');
+        }
+      }
+
+      // Turbo text timer
+      if (turboShowTimer > 0) {
+        turboShowTimer--;
+        if (turboShowTimer <= 0 && !turboActive) {
+          turboText.classList.remove('visible');
+        }
+      }
+
+      var currentItemSize = levelConfig.itemSize;
+      var effectiveSpeed = getEffectiveFallSpeed();
+
+      // Sort animation
+      if (sortAnimating && currentItem) {
+        var elapsed = now - sortAnimStart;
+        var t = Math.min(1, elapsed / sortAnimDur);
+        var ease = 1 - Math.pow(1 - t, 3);
+        itemX = sortAnimStartX + (sortTargetX - sortAnimStartX) * ease;
+        itemY = sortAnimStartY + (sortTargetY - sortAnimStartY) * ease;
+
+        var scale = sortAnimCorrect ? (1 - t * 0.4) : (1 - t * 0.7);
+        var alpha = 1 - t * 0.5;
+        var glowGold = combo >= 5;
+        drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize * scale, alpha, glowGold);
+
+        if (t >= 1) {
+          finishSortAnimation();
+        }
+      } else if (itemState === 'entrance') {
+        // Whoosh entrance animation
+        if (currentItem) {
+          var entranceElapsed = now - itemEntranceStart;
+          var entranceT = Math.min(1, entranceElapsed / ENTRANCE_DUR);
+          var entranceEase = 1 - Math.pow(1 - entranceT, 3); // ease out
+          var targetY = fallArea.top + 20;
+          var startY = fallArea.top - 40;
+          itemY = startY + (targetY - startY) * entranceEase;
+
+          // Scale from 0.3 to 1
+          var entranceScale = 0.3 + 0.7 * entranceEase;
+          var entranceAlpha = 0.3 + 0.7 * entranceEase;
+          var glowGold = combo >= 5;
+          drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize * entranceScale, entranceAlpha, glowGold);
+
+          // Whoosh trail during entrance
+          if (entranceT < 0.8) {
+            for (var ti = 1; ti <= 4; ti++) {
+              var trailAlpha = 0.1 * (1 - ti / 5) * (1 - entranceT);
+              drawShape(itemX, itemY - ti * 8, currentItem.shape, currentItem.color, currentItemSize * 0.6, trailAlpha);
+            }
+          }
+
+          if (entranceT >= 1) {
+            itemEntrancePhase = 0;
+            itemState = 'preview';
+            itemSpawnTime = now;
+            itemY = targetY;
+          }
+        }
+      } else if (itemState === 'preview') {
+        // Adaptive preview time based on zone
+        if (now - itemSpawnTime > levelConfig.previewTime) {
+          itemState = 'falling';
+        }
+        if (currentItem) {
+          var pulse = 1 + Math.sin(now * 0.01) * 0.1;
+          var glowGold = combo >= 5;
+          drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize * pulse, 0.8, glowGold);
+
+          // Subtle guide line to correct bin
+          var effectiveBins = getEffectiveBins();
+          for (var bi = 0; bi < effectiveBins.length; bi++) {
+            var b = effectiveBins[bi];
+            var matches = false;
+            if (currentItem.isWild) {
+              var minC = Infinity;
+              for (var j = 0; j < binDefs.length; j++) { if (binCounts[j] < minC) minC = binCounts[j]; }
+              var rbi = inverted && invertedMapping ? invertedMapping[bi] : bi;
+              matches = binCounts[rbi] === minC;
+            } else {
+              matches = checkMatch(b, currentItem);
+            }
+            if (matches && binRects[bi]) {
+              ctx.globalAlpha = 0.06 + Math.sin(now * 0.005) * 0.03;
+              ctx.strokeStyle = COLORS[currentItem.color].hex;
+              ctx.lineWidth = 1;
+              ctx.setLineDash([4, 8]);
+              ctx.beginPath();
+              ctx.moveTo(itemX, itemY + currentItemSize + 2);
+              ctx.lineTo(binRects[bi].cx, binRects[bi].y);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              ctx.globalAlpha = 1;
+              break;
+            }
+          }
+        }
+      } else if (itemState === 'falling') {
+        var speed = effectiveSpeed * (dt / 16.67);
+        itemY += speed;
+
+        // Motion blur trail behind fast-falling items
+        if (currentItem) {
+          var blurIntensity = effectiveSpeed;
+          if (blurIntensity > 2.5 && Math.random() < 0.6) {
+            addTrail(itemX + (Math.random() - 0.5) * 8, itemY - currentItemSize * 0.5, COLORS[currentItem.color].hex, currentItemSize * 0.4);
+          }
+
+          // Draw motion blur (faded copies above)
+          drawMotionBlur(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize, effectiveSpeed);
+
+          // Draw the actual item
+          var glowGold = combo >= 5;
+          drawShape(itemX, itemY, currentItem.shape, currentItem.color, currentItemSize, 1, glowGold);
+        }
+
+        if (itemY > fallArea.bottom + 10) {
+          itemMissed();
+        }
+
+        // Highlight and pulse matching bins
+        if (currentItem && binRects.length > 0) {
+          var binEls = binsContainer.querySelectorAll('.bin');
+          var effectiveBins = getEffectiveBins();
+          for (var bi = 0; bi < binEls.length; bi++) {
+            binEls[bi].classList.remove('glow-cyan','glow-pink','glow-green','glow-orange','glow-gold','glow-purple','pulse-match');
+            if (bi < effectiveBins.length) {
+              var b = effectiveBins[bi];
+              var matches = false;
+              if (currentItem.isWild) {
+                var minC = Infinity;
+                for (var j = 0; j < binDefs.length; j++) { if (binCounts[j] < minC) minC = binCounts[j]; }
+                var rbi = inverted && invertedMapping ? invertedMapping[bi] : bi;
+                matches = binCounts[rbi] === minC;
+              } else {
+                matches = checkMatch(b, currentItem);
+              }
+              if (matches && itemY > fallArea.top + fallArea.height * 0.25) {
+                binEls[bi].classList.add(b.glowClass || 'glow-cyan');
+                // Pulse matching bins when item is past 50% of fall area
+                if (itemY > fallArea.top + fallArea.height * 0.5) {
+                  binEls[bi].classList.add('pulse-match');
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Progress bar (items remaining)
+      var progX = 10;
+      var progY = 72;
+      var progW = W - 20;
+      ctx.fillStyle = 'rgba(26,26,46,0.8)';
+      ctx.fillRect(progX, progY, progW, 3);
+      var pct = itemIdx / itemQueue.length;
+      ctx.fillStyle = ZONE_COLORS[levelConfig.zone];
+      ctx.shadowColor = ZONE_COLORS[levelConfig.zone];
+      ctx.shadowBlur = 4;
+      ctx.fillRect(progX, progY, progW * pct, 3);
+      ctx.shadowBlur = 0;
+    }
+
+    updateTrails();
+    drawTrails();
+    updateParticles();
+    drawParticles();
+
+    if (shakeTimer > 0) {
+      ctx.restore();
+    }
+
+    requestAnimationFrame(masterLoop);
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  buildStartScreen();
+  requestAnimationFrame(masterLoop);
+
+})();
+</script>
+</body>
+</html>

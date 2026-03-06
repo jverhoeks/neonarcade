@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SUDOKU — NEON ARCADE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+  z-index: 9999;
+}
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 60%);
+  z-index: 0;
+}
+
+.screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { display: flex; }
+
+#startScreen {
+  padding: 20px;
+  gap: 10px;
+}
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(42px, 10vw, 80px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  letter-spacing: 8px;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.8), 0 0 60px rgba(0,240,255,0.3); }
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 3vw, 20px);
+  font-weight: 300;
+  color: #00f0ff;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.diff-list {
+  display: flex; flex-direction: column; gap: 10px;
+  width: 100%; max-width: 340px;
+  margin-bottom: 12px;
+}
+.diff-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px;
+  border: 1px solid rgba(0,240,255,0.15);
+  background: rgba(0,240,255,0.03);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Rajdhani', sans-serif;
+}
+.diff-btn:hover, .diff-btn:active {
+  background: rgba(0,240,255,0.08);
+  border-color: rgba(0,240,255,0.3);
+  box-shadow: 0 0 15px rgba(0,240,255,0.1);
+}
+.diff-btn .diff-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #00f0ff;
+}
+.diff-btn .diff-info {
+  font-size: 13px;
+  color: #4a4a6a;
+  letter-spacing: 1px;
+}
+.diff-btn .diff-best {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: #ffd700;
+}
+
+.daily-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 14px 36px;
+  border: 1px solid #ffd700;
+  background: rgba(255,215,0,0.06);
+  color: #ffd700;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+  width: 100%; max-width: 340px;
+  text-align: center;
+}
+.daily-btn:hover {
+  background: rgba(255,215,0,0.12);
+  box-shadow: 0 0 20px rgba(255,215,0,0.15);
+}
+.daily-streak {
+  font-size: 12px;
+  color: #ffd700;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.continue-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 30px;
+  border: 1px solid rgba(57,255,20,0.3);
+  background: rgba(57,255,20,0.05);
+  color: #39ff14;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+  width: 100%; max-width: 340px;
+  text-align: center;
+}
+.continue-btn:hover {
+  background: rgba(57,255,20,0.1);
+  box-shadow: 0 0 15px rgba(57,255,20,0.1);
+}
+.continue-btn.hidden { display: none; }
+
+.stats-row {
+  display: flex; gap: 16px;
+  margin-top: 12px;
+}
+.stat-item { text-align: center; }
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #00f0ff;
+}
+.stat-label {
+  font-size: 11px;
+  color: #4a4a6a;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+#gameScreen {
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 16px;
+  flex-shrink: 0;
+}
+.top-left {
+  display: flex; align-items: center; gap: 10px;
+}
+.back-btn {
+  font-size: 22px;
+  color: #4a4a6a;
+  cursor: pointer;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: #00f0ff; }
+.difficulty-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #00f0ff;
+  opacity: 0.7;
+}
+.daily-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ffd700;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.2);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.daily-badge.hidden { display: none; }
+.top-right {
+  display: flex; align-items: center; gap: 14px;
+}
+.timer-display {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 400;
+  color: #8888aa;
+  letter-spacing: 1px;
+}
+.hint-counter {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  color: #ffd700;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.grid-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 4px 8px;
+}
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  border: 2px solid rgba(0,240,255,0.25);
+  background: rgba(18,18,31,0.9);
+  border-radius: 2px;
+}
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+}
+.cell[data-col="2"], .cell[data-col="5"] { border-right: 2px solid rgba(0,240,255,0.2); }
+.cell[data-col="3"], .cell[data-col="6"] { border-left: none; }
+.cell[data-row="2"], .cell[data-row="5"] { border-bottom: 2px solid rgba(0,240,255,0.2); }
+.cell[data-row="3"], .cell[data-row="6"] { border-top: none; }
+
+.cell.given { color: #8888aa; }
+.cell.player { color: #00f0ff; }
+.cell.selected {
+  background: rgba(0,240,255,0.12) !important;
+  box-shadow: inset 0 0 12px rgba(0,240,255,0.15);
+}
+.cell.highlighted-unit { background: rgba(0,240,255,0.03); }
+.cell.highlighted-digit { background: rgba(0,240,255,0.08); }
+.cell.conflict {
+  background: rgba(255,45,123,0.15) !important;
+  color: #ff2d7b !important;
+}
+.cell.hint-reveal {
+  animation: hintPulse 1s ease-out;
+  color: #ffd700 !important;
+}
+@keyframes hintPulse {
+  0% { background: rgba(255,215,0,0.3); box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+  100% { background: transparent; box-shadow: none; }
+}
+.cell.win-pulse { animation: winPulse 0.6s ease-out; }
+@keyframes winPulse {
+  0% { background: rgba(57,255,20,0.3); }
+  100% { background: transparent; }
+}
+
+.cell-notes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+}
+.cell-notes span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  color: rgba(0,240,255,0.4);
+}
+.cell-value {
+  position: relative;
+  z-index: 1;
+}
+
+.pad-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  flex-shrink: 0;
+}
+.number-pad {
+  display: flex;
+  gap: 4px;
+}
+.pad-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0,240,255,0.12);
+  background: rgba(0,240,255,0.03);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+}
+.pad-btn:hover, .pad-btn:active {
+  background: rgba(0,240,255,0.1);
+  border-color: rgba(0,240,255,0.3);
+}
+.pad-btn.active-digit {
+  background: rgba(0,240,255,0.15);
+  border-color: rgba(0,240,255,0.4);
+  box-shadow: 0 0 12px rgba(0,240,255,0.15);
+}
+.pad-btn.exhausted { opacity: 0.2; cursor: default; }
+.pad-btn .pad-digit { line-height: 1; }
+.pad-btn .pad-count {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  color: #4a4a6a;
+}
+
+.tool-bar {
+  display: flex;
+  gap: 6px;
+}
+.tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #8888aa;
+  text-transform: uppercase;
+}
+.tool-btn:hover, .tool-btn:active {
+  background: rgba(255,255,255,0.06);
+  color: #ccc;
+}
+.tool-btn.notes-active {
+  border-color: rgba(180,77,255,0.4);
+  background: rgba(180,77,255,0.1);
+  color: #b44dff;
+}
+.tool-btn .tool-icon { font-size: 16px; }
+
+#completeScreen {
+  padding: 30px;
+  gap: 14px;
+}
+.complete-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(36px, 8vw, 64px);
+  font-weight: 900;
+  color: #39ff14;
+  text-shadow: 0 0 20px rgba(57,255,20,0.5), 0 0 40px rgba(57,255,20,0.2);
+  letter-spacing: 6px;
+}
+.complete-stars {
+  font-size: 32px;
+  margin: 4px 0;
+}
+.complete-time {
+  font-family: 'Orbitron', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: #00f0ff;
+}
+.complete-stats {
+  display: flex; gap: 20px;
+  margin: 4px 0;
+}
+.complete-stat { text-align: center; }
+.complete-stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  color: #00f0ff;
+}
+.complete-stat-label {
+  font-size: 11px;
+  color: #4a4a6a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.complete-best {
+  font-size: 13px;
+  color: #ffd700;
+  letter-spacing: 1px;
+}
+.complete-best.hidden { display: none; }
+
+.leaderboard {
+  width: 100%; max-width: 300px;
+  margin: 4px 0;
+}
+.lb-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a4a6a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.lb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.lb-rank {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  color: #4a4a6a;
+  width: 24px;
+}
+.lb-score {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  color: #00f0ff;
+  flex: 1;
+}
+.lb-time-ago {
+  font-size: 12px;
+  color: #4a4a6a;
+}
+
+.action-row {
+  display: flex; gap: 10px;
+  margin-top: 6px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  border: 1px solid #39ff14;
+  background: rgba(57,255,20,0.06);
+  color: #39ff14;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+  transform: scale(1.04);
+}
+.share-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%; transform: translateX(-50%);
+  background: rgba(57,255,20,0.15);
+  border: 1px solid rgba(57,255,20,0.3);
+  color: #39ff14;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.share-toast.visible { opacity: 1; }
+
+.loading-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(10,10,18,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  flex-direction: column;
+  gap: 16px;
+}
+.loading-overlay.active { display: flex; }
+.loading-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #00f0ff;
+  animation: loadPulse 1s ease-in-out infinite;
+}
+@keyframes loadPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2px, -1px); }
+  30% { transform: translate(2px, 1px); }
+  50% { transform: translate(-1px, 2px); }
+  70% { transform: translate(1px, -2px); }
+  90% { transform: translate(-2px, 1px); }
+}
+.shake { animation: shake 0.25s ease-in-out; }
+
+.confetti {
+  position: fixed;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  animation: confettiFall 1.5s ease-out forwards;
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateY(200px) rotate(720deg) scale(0.3); }
+}
+</style>
+</head>
+<body>
+
+<div id="startScreen" class="screen active">
+  <div class="game-title">SUDOKU</div>
+  <div class="game-subtitle">The Classic 9x9</div>
+  <button id="continueBtn" class="continue-btn hidden">CONTINUE</button>
+  <div class="diff-list">
+    <div class="diff-btn" data-diff="easy">
+      <span class="diff-name">EASY</span>
+      <span class="diff-info">36-40 clues</span>
+      <span class="diff-best" id="bestEasy">--:--</span>
+    </div>
+    <div class="diff-btn" data-diff="medium">
+      <span class="diff-name">MEDIUM</span>
+      <span class="diff-info">30-35 clues</span>
+      <span class="diff-best" id="bestMedium">--:--</span>
+    </div>
+    <div class="diff-btn" data-diff="hard">
+      <span class="diff-name">HARD</span>
+      <span class="diff-info">25-29 clues</span>
+      <span class="diff-best" id="bestHard">--:--</span>
+    </div>
+    <div class="diff-btn" data-diff="expert">
+      <span class="diff-name">EXPERT</span>
+      <span class="diff-info">22-26 clues</span>
+      <span class="diff-best" id="bestExpert">--:--</span>
+    </div>
+  </div>
+  <button id="dailyBtn" class="daily-btn">DAILY PUZZLE</button>
+  <div id="dailyStreak" class="daily-streak"></div>
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val" id="statPlayed">0</div>
+      <div class="stat-label">Played</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="statWon">0</div>
+      <div class="stat-label">Won</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="statWinPct">0%</div>
+      <div class="stat-label">Win %</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="statStreak">0</div>
+      <div class="stat-label">Streak</div>
+    </div>
+  </div>
+</div>
+
+<div id="gameScreen" class="screen">
+  <div class="top-bar">
+    <div class="top-left">
+      <button class="back-btn" id="backBtn">&larr;</button>
+      <span class="difficulty-label" id="diffLabel">EASY</span>
+      <span class="daily-badge hidden" id="dailyBadge">DAILY</span>
+    </div>
+    <div class="top-right">
+      <span class="timer-display" id="timerDisplay">00:00</span>
+      <span class="hint-counter" id="hintCounter" title="Hints">3</span>
+    </div>
+  </div>
+  <div class="grid-container" id="gridContainer">
+    <div class="sudoku-grid" id="sudokuGrid"></div>
+  </div>
+  <div class="pad-container">
+    <div class="number-pad" id="numberPad"></div>
+    <div class="tool-bar">
+      <button class="tool-btn" id="undoBtn"><span class="tool-icon">&#8630;</span> Undo</button>
+      <button class="tool-btn" id="eraseBtn"><span class="tool-icon">&#9003;</span> Erase</button>
+      <button class="tool-btn" id="notesBtn"><span class="tool-icon">&#9998;</span> Notes</button>
+      <button class="tool-btn" id="hintBtn"><span class="tool-icon">&#9728;</span> Hint</button>
+    </div>
+  </div>
+</div>
+
+<div id="completeScreen" class="screen">
+  <div class="complete-title">SOLVED!</div>
+  <div class="complete-stars" id="completeStars"></div>
+  <div class="complete-time" id="completeTime">00:00</div>
+  <div class="complete-stats">
+    <div class="complete-stat">
+      <div class="complete-stat-val" id="completeHints">0</div>
+      <div class="complete-stat-label">Hints</div>
+    </div>
+    <div class="complete-stat">
+      <div class="complete-stat-val" id="completeDiff">EASY</div>
+      <div class="complete-stat-label">Difficulty</div>
+    </div>
+  </div>
+  <div class="complete-best hidden" id="completeBest">NEW PERSONAL BEST!</div>
+  <div class="leaderboard" id="completeLB">
+    <div class="lb-title">YOUR BESTS</div>
+  </div>
+  <div class="action-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="newGameBtn">NEW GAME</button>
+    <button class="play-btn" id="menuBtn">MENU</button>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-text">GENERATING PUZZLE...</div>
+</div>
+
+<div class="share-toast" id="shareToast">COPIED TO CLIPBOARD</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ==================== SEEDED PRNG ====================
+  function SeededRNG(seed) {
+    this.seed = seed | 0;
+    this.next = function() {
+      this.seed = (this.seed * 1664525 + 1013904223) & 0xFFFFFFFF;
+      return (this.seed >>> 0) / 4294967295;
+    };
+    this.nextInt = function(min, max) {
+      return Math.floor(this.next() * (max - min + 1)) + min;
+    };
+    this.shuffle = function(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(this.next() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    };
+  }
+
+  // ==================== GRID UTILITIES ====================
+  function getRow(r) {
+    var indices = [];
+    for (var c = 0; c < 9; c++) indices.push(r * 9 + c);
+    return indices;
+  }
+  function getCol(c) {
+    var indices = [];
+    for (var r = 0; r < 9; r++) indices.push(r * 9 + c);
+    return indices;
+  }
+  function getBox(r, c) {
+    var br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    var indices = [];
+    for (var dr = 0; dr < 3; dr++)
+      for (var dc = 0; dc < 3; dc++)
+        indices.push((br + dr) * 9 + (bc + dc));
+    return indices;
+  }
+  function isValidPlacement(grid, r, c, val) {
+    for (var cc = 0; cc < 9; cc++) {
+      if (cc !== c && grid[r * 9 + cc] === val) return false;
+    }
+    for (var rr = 0; rr < 9; rr++) {
+      if (rr !== r && grid[rr * 9 + c] === val) return false;
+    }
+    var br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    for (var dr = 0; dr < 3; dr++)
+      for (var dc = 0; dc < 3; dc++) {
+        var rr2 = br + dr, cc2 = bc + dc;
+        if (rr2 !== r || cc2 !== c) {
+          if (grid[rr2 * 9 + cc2] === val) return false;
+        }
+      }
+    return true;
+  }
+
+  // ==================== GENERATOR ====================
+  function generateComplete(rng) {
+    var grid = new Array(81).fill(0);
+    function fill(pos) {
+      if (pos === 81) return true;
+      var r = Math.floor(pos / 9), c = pos % 9;
+      var digits = rng.shuffle([1,2,3,4,5,6,7,8,9]);
+      for (var i = 0; i < 9; i++) {
+        var d = digits[i];
+        if (isValidPlacement(grid, r, c, d)) {
+          grid[pos] = d;
+          if (fill(pos + 1)) return true;
+          grid[pos] = 0;
+        }
+      }
+      return false;
+    }
+    fill(0);
+    return grid;
+  }
+
+  function countSolutions(grid, maxSolutions) {
+    var g = grid.slice();
+    var count = 0;
+    function solve(pos) {
+      if (count >= maxSolutions) return;
+      while (pos < 81 && g[pos] !== 0) pos++;
+      if (pos === 81) { count++; return; }
+      var r = Math.floor(pos / 9), c = pos % 9;
+      for (var d = 1; d <= 9; d++) {
+        if (isValidPlacement(g, r, c, d)) {
+          g[pos] = d;
+          solve(pos + 1);
+          if (count >= maxSolutions) return;
+          g[pos] = 0;
+        }
+      }
+    }
+    solve(0);
+    return count;
+  }
+
+  var DIFF_CONFIG = {
+    easy:   [36, 40],
+    medium: [30, 35],
+    hard:   [25, 29],
+    expert: [22, 26]
+  };
+
+  var PAR_TIMES = {
+    easy: 300,
+    medium: 720,
+    hard: 1500,
+    expert: 2400
+  };
+
+  function createPuzzle(solution, difficulty, rng) {
+    var config = DIFF_CONFIG[difficulty];
+    var targetGivens = rng.nextInt(config[0], config[1]);
+    var puzzle = solution.slice();
+    var positions = [];
+    for (var i = 0; i < 81; i++) positions.push(i);
+    positions = rng.shuffle(positions);
+    var removed = 0;
+    var targetRemoved = 81 - targetGivens;
+    for (var pi = 0; pi < positions.length && removed < targetRemoved; pi++) {
+      var pos = positions[pi];
+      var val = puzzle[pos];
+      puzzle[pos] = 0;
+      if (countSolutions(puzzle, 2) === 1) {
+        removed++;
+      } else {
+        puzzle[pos] = val;
+      }
+    }
+    return puzzle;
+  }
+
+  // ==================== AUDIO ====================
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    return audioCtx;
+  }
+  function playTone(freq, dur, vol, type) {
+    var ctx = getAudio();
+    if (!ctx) return;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = vol;
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  }
+  function sndPlace() { playTone(500, 0.03, 0.06, 'sine'); }
+  function sndRemove() { playTone(350, 0.03, 0.04, 'sine'); }
+  function sndNote() { playTone(700, 0.02, 0.03, 'sine'); }
+  function sndConflict() { playTone(150, 0.08, 0.06, 'square'); }
+  function sndHint() {
+    var ctx = getAudio();
+    if (!ctx) return;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.1);
+    gain.gain.value = 0.06;
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.12);
+  }
+  function sndWin() {
+    var ctx = getAudio();
+    if (!ctx) return;
+    [523, 659, 784, 1047].forEach(function(f, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      gain.gain.value = 0.08;
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.2);
+    });
+  }
+  function sndError() { playTone(120, 0.15, 0.06, 'square'); }
+
+  // ==================== STATE ====================
+  var state = {
+    grid: null,
+    solution: null,
+    given: null,
+    notes: null,
+    history: [],
+    timer: 0,
+    timerStarted: false,
+    timerInterval: null,
+    hintsUsed: 0,
+    hintsLeft: 3,
+    difficulty: 'easy',
+    isDaily: false,
+    selectedCell: -1,
+    notesMode: false,
+    completed: false,
+    errors: 0
+  };
+
+  // ==================== STORAGE ====================
+  var STATS_KEY = 'neonarcade_neonmind_sudoku_stats';
+  var CURRENT_KEY = 'neonarcade_neonmind_sudoku_current';
+  var DAILY_KEY = 'neonarcade_neonmind_sudoku_daily';
+  var SCORES_KEY = 'neonarcade_scores_sudoku';
+
+  function loadStats() {
+    try {
+      return JSON.parse(localStorage.getItem(STATS_KEY)) || defaultStats();
+    } catch(e) { return defaultStats(); }
+  }
+  function defaultStats() {
+    return {
+      perDifficulty: {
+        easy: { played: 0, won: 0, bestTime: null, stars: 0 },
+        medium: { played: 0, won: 0, bestTime: null, stars: 0 },
+        hard: { played: 0, won: 0, bestTime: null, stars: 0 },
+        expert: { played: 0, won: 0, bestTime: null, stars: 0 }
+      },
+      streak: 0, bestStreak: 0, totalPlayed: 0, totalWon: 0
+    };
+  }
+  function saveStats(stats) { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }
+
+  function saveScore(key, score) {
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({ score: score, ts: Date.now() });
+    scores.sort(function(a, b) { return a.score - b.score; });
+    scores = scores.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(scores));
+    return scores;
+  }
+
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins  = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    var days  = Math.floor(diff / 86400000);
+    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
+    return 'just now';
+  }
+
+  function saveCurrent() {
+    if (state.completed) { localStorage.removeItem(CURRENT_KEY); return; }
+    var data = {
+      grid: state.grid,
+      solution: state.solution,
+      given: state.given,
+      notes: state.notes.map(function(s) { return Array.from(s); }),
+      history: state.history.map(function(h) {
+        return {
+          cell: h.cell,
+          prevValue: h.prevValue,
+          prevNotes: Array.from(h.prevNotes),
+          newValue: h.newValue,
+          newNotes: Array.from(h.newNotes)
+        };
+      }),
+      timer: state.timer,
+      difficulty: state.difficulty,
+      isDaily: state.isDaily,
+      hintsUsed: state.hintsUsed,
+      hintsLeft: state.hintsLeft,
+      errors: state.errors
+    };
+    localStorage.setItem(CURRENT_KEY, JSON.stringify(data));
+  }
+
+  function loadCurrent() {
+    try {
+      var data = JSON.parse(localStorage.getItem(CURRENT_KEY));
+      if (!data || !data.grid) return null;
+      data.notes = data.notes.map(function(a) { return new Set(a); });
+      data.history = (data.history || []).map(function(h) {
+        return {
+          cell: h.cell,
+          prevValue: h.prevValue,
+          prevNotes: new Set(h.prevNotes),
+          newValue: h.newValue,
+          newNotes: new Set(h.newNotes)
+        };
+      });
+      return data;
+    } catch(e) { return null; }
+  }
+
+  function loadDaily() {
+    try { return JSON.parse(localStorage.getItem(DAILY_KEY)) || {}; } catch(e) { return {}; }
+  }
+  function saveDaily(d) { localStorage.setItem(DAILY_KEY, JSON.stringify(d)); }
+
+  function getTodayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function getDailySeed() {
+    var d = new Date();
+    return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  }
+  function getDailyNumber() {
+    var start = new Date(2024, 0, 1);
+    var now = new Date(); now.setHours(0,0,0,0);
+    return Math.floor((now - start) / 86400000) + 1;
+  }
+
+  // ==================== DOM ====================
+  var $startScreen = document.getElementById('startScreen');
+  var $gameScreen = document.getElementById('gameScreen');
+  var $completeScreen = document.getElementById('completeScreen');
+  var $loadingOverlay = document.getElementById('loadingOverlay');
+  var $grid = document.getElementById('sudokuGrid');
+  var $gridContainer = document.getElementById('gridContainer');
+  var $pad = document.getElementById('numberPad');
+  var $timer = document.getElementById('timerDisplay');
+  var $diffLabel = document.getElementById('diffLabel');
+  var $dailyBadge = document.getElementById('dailyBadge');
+  var $hintCounter = document.getElementById('hintCounter');
+  var $continueBtn = document.getElementById('continueBtn');
+  var $notesBtn = document.getElementById('notesBtn');
+  var $undoBtn = document.getElementById('undoBtn');
+  var $eraseBtn = document.getElementById('eraseBtn');
+  var $hintBtn = document.getElementById('hintBtn');
+  var $backBtn = document.getElementById('backBtn');
+  var $dailyBtn = document.getElementById('dailyBtn');
+  var $dailyStreak = document.getElementById('dailyStreak');
+  var $shareToast = document.getElementById('shareToast');
+
+  var cells = [];
+  var padBtns = [];
+
+  // ==================== SIZING ====================
+  function computeSizes() {
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var topBarH = 44;
+    var padH = 120;
+    var safeBottom = 20;
+    var availH = vh - topBarH - padH - safeBottom;
+    var availW = vw - 16;
+    var gridSize = Math.min(availH, availW, 440);
+    var cellSize = Math.floor(gridSize / 9);
+    cellSize = Math.max(cellSize, 32);
+    gridSize = cellSize * 9;
+
+    $grid.style.width = gridSize + 'px';
+    $grid.style.height = gridSize + 'px';
+
+    var fontSize = Math.max(Math.floor(cellSize * 0.48), 14);
+    var noteSize = Math.max(Math.floor(cellSize * 0.22), 7);
+
+    cells.forEach(function(cell) {
+      cell.style.fontSize = fontSize + 'px';
+      var noteEls = cell.querySelectorAll('.cell-notes span');
+      noteEls.forEach(function(n) { n.style.fontSize = noteSize + 'px'; });
+    });
+
+    var padBtnSize = Math.min(Math.floor((gridSize - 32) / 9), 44);
+    padBtnSize = Math.max(padBtnSize, 34);
+    var padFontSize = Math.max(Math.floor(padBtnSize * 0.45), 14);
+    var padCountSize = Math.max(Math.floor(padBtnSize * 0.25), 9);
+    padBtns.forEach(function(btn) {
+      btn.style.width = padBtnSize + 'px';
+      btn.style.height = padBtnSize + 'px';
+      btn.querySelector('.pad-digit').style.fontSize = padFontSize + 'px';
+      btn.querySelector('.pad-count').style.fontSize = padCountSize + 'px';
+    });
+  }
+
+  // ==================== BUILD DOM ====================
+  function buildGrid() {
+    while ($grid.firstChild) $grid.removeChild($grid.firstChild);
+    cells = [];
+    for (var i = 0; i < 81; i++) {
+      var r = Math.floor(i / 9), c = i % 9;
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.setAttribute('data-row', String(r));
+      cell.setAttribute('data-col', String(c));
+      cell.setAttribute('data-idx', String(i));
+
+      var notesDiv = document.createElement('div');
+      notesDiv.className = 'cell-notes';
+      for (var n = 1; n <= 9; n++) {
+        var ns = document.createElement('span');
+        ns.setAttribute('data-note', String(n));
+        notesDiv.appendChild(ns);
+      }
+      cell.appendChild(notesDiv);
+
+      var valSpan = document.createElement('span');
+      valSpan.className = 'cell-value';
+      cell.appendChild(valSpan);
+
+      cell.addEventListener('click', onCellClick);
+      $grid.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  function buildPad() {
+    while ($pad.firstChild) $pad.removeChild($pad.firstChild);
+    padBtns = [];
+    for (var d = 1; d <= 9; d++) {
+      var btn = document.createElement('div');
+      btn.className = 'pad-btn';
+      btn.setAttribute('data-digit', String(d));
+      var digitSpan = document.createElement('span');
+      digitSpan.className = 'pad-digit';
+      digitSpan.textContent = String(d);
+      var countSpan = document.createElement('span');
+      countSpan.className = 'pad-count';
+      countSpan.textContent = '';
+      btn.appendChild(digitSpan);
+      btn.appendChild(countSpan);
+      btn.addEventListener('click', onPadClick);
+      $pad.appendChild(btn);
+      padBtns.push(btn);
+    }
+  }
+
+  // ==================== RENDERING ====================
+  function renderGrid() {
+    for (var i = 0; i < 81; i++) {
+      var cell = cells[i];
+      var val = state.grid[i];
+      var valSpan = cell.querySelector('.cell-value');
+      var notesDiv = cell.querySelector('.cell-notes');
+
+      cell.classList.remove('given', 'player', 'selected', 'highlighted-unit', 'highlighted-digit', 'conflict', 'hint-reveal', 'win-pulse');
+
+      if (state.given[i]) {
+        cell.classList.add('given');
+        valSpan.textContent = String(val);
+        notesDiv.style.display = 'none';
+        valSpan.style.display = '';
+      } else if (val !== 0) {
+        cell.classList.add('player');
+        valSpan.textContent = String(val);
+        notesDiv.style.display = 'none';
+        valSpan.style.display = '';
+      } else {
+        valSpan.textContent = '';
+        var notes = state.notes[i];
+        if (notes.size > 0) {
+          notesDiv.style.display = 'grid';
+          valSpan.style.display = 'none';
+          for (var n = 1; n <= 9; n++) {
+            var ns = notesDiv.querySelector('[data-note="' + n + '"]');
+            ns.textContent = notes.has(n) ? String(n) : '';
+          }
+        } else {
+          notesDiv.style.display = 'none';
+          valSpan.style.display = '';
+        }
+      }
+    }
+    updateHighlights();
+    updatePadCounts();
+  }
+
+  function updateHighlights() {
+    for (var i = 0; i < 81; i++) {
+      cells[i].classList.remove('selected', 'highlighted-unit', 'highlighted-digit', 'conflict');
+    }
+
+    if (state.selectedCell < 0 || state.selectedCell >= 81) {
+      padBtns.forEach(function(btn) { btn.classList.remove('active-digit'); });
+      findConflicts();
+      return;
+    }
+
+    var sel = state.selectedCell;
+    var sr = Math.floor(sel / 9), sc = sel % 9;
+    var selVal = state.grid[sel];
+
+    cells[sel].classList.add('selected');
+
+    var unitCells = new Set();
+    getRow(sr).forEach(function(idx) { unitCells.add(idx); });
+    getCol(sc).forEach(function(idx) { unitCells.add(idx); });
+    getBox(sr, sc).forEach(function(idx) { unitCells.add(idx); });
+    unitCells.forEach(function(idx) {
+      if (idx !== sel) cells[idx].classList.add('highlighted-unit');
+    });
+
+    if (selVal !== 0) {
+      for (var i = 0; i < 81; i++) {
+        if (i !== sel && state.grid[i] === selVal) {
+          cells[i].classList.add('highlighted-digit');
+        }
+      }
+    }
+
+    findConflicts();
+
+    padBtns.forEach(function(btn) {
+      btn.classList.remove('active-digit');
+      if (selVal !== 0 && parseInt(btn.getAttribute('data-digit')) === selVal) {
+        btn.classList.add('active-digit');
+      }
+    });
+  }
+
+  function findConflicts() {
+    for (var i = 0; i < 81; i++) {
+      cells[i].classList.remove('conflict');
+    }
+    for (var i = 0; i < 81; i++) {
+      var val = state.grid[i];
+      if (val === 0) continue;
+      var r = Math.floor(i / 9), c = i % 9;
+      var hasConflict = false;
+      for (var cc = 0; cc < 9; cc++) {
+        var j = r * 9 + cc;
+        if (j !== i && state.grid[j] === val) { hasConflict = true; cells[j].classList.add('conflict'); }
+      }
+      for (var rr = 0; rr < 9; rr++) {
+        var j2 = rr * 9 + c;
+        if (j2 !== i && state.grid[j2] === val) { hasConflict = true; cells[j2].classList.add('conflict'); }
+      }
+      var boxCells = getBox(r, c);
+      for (var bi = 0; bi < boxCells.length; bi++) {
+        var j3 = boxCells[bi];
+        if (j3 !== i && state.grid[j3] === val) { hasConflict = true; cells[j3].classList.add('conflict'); }
+      }
+      if (hasConflict) cells[i].classList.add('conflict');
+    }
+  }
+
+  function updatePadCounts() {
+    var counts = new Array(10).fill(0);
+    for (var i = 0; i < 81; i++) {
+      if (state.grid[i] > 0) counts[state.grid[i]]++;
+    }
+    padBtns.forEach(function(btn) {
+      var d = parseInt(btn.getAttribute('data-digit'));
+      var remaining = 9 - counts[d];
+      btn.querySelector('.pad-count').textContent = remaining > 0 ? String(remaining) : '';
+      if (remaining <= 0) {
+        btn.classList.add('exhausted');
+      } else {
+        btn.classList.remove('exhausted');
+      }
+    });
+  }
+
+  // ==================== TIMER ====================
+  function formatTime(secs) {
+    var m = Math.floor(secs / 60);
+    var s = secs % 60;
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+  function startTimer() {
+    if (state.timerInterval) return;
+    state.timerStarted = true;
+    state.timerInterval = setInterval(function() {
+      state.timer++;
+      $timer.textContent = formatTime(state.timer);
+    }, 1000);
+  }
+  function stopTimer() {
+    if (state.timerInterval) {
+      clearInterval(state.timerInterval);
+      state.timerInterval = null;
+    }
+  }
+
+  // ==================== INTERACTIONS ====================
+  function onCellClick() {
+    var idx = parseInt(this.getAttribute('data-idx'));
+    if (state.completed) return;
+    if (!state.timerStarted) startTimer();
+    state.selectedCell = idx;
+    updateHighlights();
+  }
+
+  function onPadClick() {
+    var digit = parseInt(this.getAttribute('data-digit'));
+    if (state.selectedCell < 0 || state.completed) return;
+    var idx = state.selectedCell;
+    if (state.given[idx]) return;
+    if (!state.timerStarted) startTimer();
+    if (state.notesMode) {
+      toggleNote(idx, digit);
+    } else {
+      placeDigit(idx, digit);
+    }
+  }
+
+  function placeDigit(idx, digit) {
+    var prevValue = state.grid[idx];
+    var prevNotes = new Set(state.notes[idx]);
+
+    if (prevValue === digit) {
+      state.history.push({
+        cell: idx, prevValue: prevValue, prevNotes: prevNotes,
+        newValue: 0, newNotes: new Set()
+      });
+      state.grid[idx] = 0;
+      state.notes[idx] = new Set();
+      sndRemove();
+    } else {
+      state.history.push({
+        cell: idx, prevValue: prevValue, prevNotes: prevNotes,
+        newValue: digit, newNotes: new Set()
+      });
+      state.grid[idx] = digit;
+      state.notes[idx] = new Set();
+
+      var r = Math.floor(idx / 9), c = idx % 9;
+      var affected = new Set();
+      getRow(r).forEach(function(i) { affected.add(i); });
+      getCol(c).forEach(function(i) { affected.add(i); });
+      getBox(r, c).forEach(function(i) { affected.add(i); });
+      affected.forEach(function(i) {
+        if (i !== idx) state.notes[i].delete(digit);
+      });
+
+      if (!isValidPlacement(state.grid, r, c, digit)) {
+        sndConflict();
+        state.errors++;
+      } else {
+        sndPlace();
+      }
+    }
+
+    renderGrid();
+    saveCurrent();
+    checkComplete();
+  }
+
+  function toggleNote(idx, digit) {
+    if (state.grid[idx] !== 0) return;
+    var prevNotes = new Set(state.notes[idx]);
+    if (state.notes[idx].has(digit)) {
+      state.notes[idx].delete(digit);
+    } else {
+      state.notes[idx].add(digit);
+    }
+    state.history.push({
+      cell: idx, prevValue: 0, prevNotes: prevNotes,
+      newValue: 0, newNotes: new Set(state.notes[idx])
+    });
+    sndNote();
+    renderGrid();
+    saveCurrent();
+  }
+
+  function doUndo() {
+    if (state.history.length === 0 || state.completed) return;
+    var entry = state.history.pop();
+    state.grid[entry.cell] = entry.prevValue;
+    state.notes[entry.cell] = new Set(entry.prevNotes);
+    sndRemove();
+    renderGrid();
+    saveCurrent();
+  }
+
+  function doErase() {
+    if (state.selectedCell < 0 || state.completed) return;
+    var idx = state.selectedCell;
+    if (state.given[idx]) return;
+    var prevValue = state.grid[idx];
+    var prevNotes = new Set(state.notes[idx]);
+    if (prevValue === 0 && prevNotes.size === 0) return;
+    state.history.push({
+      cell: idx, prevValue: prevValue, prevNotes: prevNotes,
+      newValue: 0, newNotes: new Set()
+    });
+    state.grid[idx] = 0;
+    state.notes[idx] = new Set();
+    sndRemove();
+    renderGrid();
+    saveCurrent();
+  }
+
+  function doHint() {
+    if (state.hintsLeft <= 0 || state.completed) return;
+    var idx = -1;
+    if (state.selectedCell >= 0 && !state.given[state.selectedCell] && state.grid[state.selectedCell] === 0) {
+      idx = state.selectedCell;
+    } else {
+      var empties = [];
+      for (var i = 0; i < 81; i++) {
+        if (state.grid[i] === 0 && !state.given[i]) empties.push(i);
+      }
+      if (empties.length === 0) return;
+      idx = empties[Math.floor(Math.random() * empties.length)];
+    }
+
+    var prevValue = state.grid[idx];
+    var prevNotes = new Set(state.notes[idx]);
+    state.history.push({
+      cell: idx, prevValue: prevValue, prevNotes: prevNotes,
+      newValue: state.solution[idx], newNotes: new Set()
+    });
+    state.grid[idx] = state.solution[idx];
+    state.notes[idx] = new Set();
+    state.hintsUsed++;
+    state.hintsLeft--;
+    state.selectedCell = idx;
+
+    var r = Math.floor(idx / 9), c = idx % 9;
+    var digit = state.grid[idx];
+    var affected = new Set();
+    getRow(r).forEach(function(i) { affected.add(i); });
+    getCol(c).forEach(function(i) { affected.add(i); });
+    getBox(r, c).forEach(function(i) { affected.add(i); });
+    affected.forEach(function(i) {
+      if (i !== idx) state.notes[i].delete(digit);
+    });
+
+    $hintCounter.textContent = String(state.hintsLeft);
+    sndHint();
+    renderGrid();
+    cells[idx].classList.add('hint-reveal');
+    setTimeout(function() { cells[idx].classList.remove('hint-reveal'); }, 1000);
+    saveCurrent();
+    checkComplete();
+  }
+
+  function toggleNotesMode() {
+    state.notesMode = !state.notesMode;
+    if (state.notesMode) {
+      $notesBtn.classList.add('notes-active');
+    } else {
+      $notesBtn.classList.remove('notes-active');
+    }
+  }
+
+  // ==================== COMPLETION ====================
+  function checkComplete() {
+    for (var i = 0; i < 81; i++) {
+      if (state.grid[i] === 0) return;
+    }
+    var allCorrect = true;
+    for (var i = 0; i < 81; i++) {
+      if (state.grid[i] !== state.solution[i]) { allCorrect = false; break; }
+    }
+    if (allCorrect) {
+      onWin();
+    } else {
+      sndError();
+      $grid.classList.add('shake');
+      setTimeout(function() { $grid.classList.remove('shake'); }, 300);
+      findConflicts();
+    }
+  }
+
+  function onWin() {
+    state.completed = true;
+    stopTimer();
+    sndWin();
+
+    var delay = 0;
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        (function(idx, d) {
+          setTimeout(function() { cells[idx].classList.add('win-pulse'); }, d);
+        })(r * 9 + c, delay);
+        delay += 15;
+      }
+    }
+
+    spawnConfetti();
+
+    var stats = loadStats();
+    var ds = stats.perDifficulty[state.difficulty];
+    ds.played++;
+    ds.won++;
+    var isNewBest = (ds.bestTime === null || state.timer < ds.bestTime);
+    if (isNewBest) ds.bestTime = state.timer;
+
+    var stars = 1;
+    if (state.hintsUsed === 0) stars = 2;
+    if (state.hintsUsed === 0 && state.timer <= PAR_TIMES[state.difficulty]) stars = 3;
+    if (stars > ds.stars) ds.stars = stars;
+
+    stats.totalPlayed++;
+    stats.totalWon++;
+    stats.streak++;
+    if (stats.streak > stats.bestStreak) stats.bestStreak = stats.streak;
+    saveStats(stats);
+
+    var scoreKey = SCORES_KEY + '_' + state.difficulty;
+    var scores = saveScore(scoreKey, state.timer);
+
+    if (state.isDaily) {
+      var daily = loadDaily();
+      var yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      var yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
+      if (daily.date === yesterdayStr && daily.completed) {
+        daily.streak = (daily.streak || 0) + 1;
+      } else if (daily.date !== getTodayStr()) {
+        daily.streak = 1;
+      }
+      daily.date = getTodayStr();
+      daily.completed = true;
+      daily.time = state.timer;
+      saveDaily(daily);
+    }
+
+    localStorage.removeItem(CURRENT_KEY);
+
+    setTimeout(function() { showCompleteScreen(stars, scores, isNewBest); }, 800);
+  }
+
+  function spawnConfetti() {
+    var colors = ['#00f0ff', '#39ff14', '#ffd700', '#ff2d7b', '#b44dff', '#ff8c00'];
+    for (var i = 0; i < 40; i++) {
+      (function(delay) {
+        setTimeout(function() {
+          var el = document.createElement('div');
+          el.className = 'confetti';
+          el.style.left = (Math.random() * 100) + '%';
+          el.style.top = (Math.random() * 40 + 10) + '%';
+          el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          var size = (4 + Math.random() * 6) + 'px';
+          el.style.width = size;
+          el.style.height = size;
+          document.body.appendChild(el);
+          setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 1600);
+        }, delay);
+      })(i * 30);
+    }
+  }
+
+  // ==================== SCREENS ====================
+  function showScreen(id) {
+    [$startScreen, $gameScreen, $completeScreen].forEach(function(s) {
+      s.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+  }
+
+  function showStartScreen() {
+    stopTimer();
+    showScreen('startScreen');
+
+    var stats = loadStats();
+    document.getElementById('statPlayed').textContent = String(stats.totalPlayed);
+    document.getElementById('statWon').textContent = String(stats.totalWon);
+    document.getElementById('statWinPct').textContent = stats.totalPlayed > 0 ? Math.round((stats.totalWon / stats.totalPlayed) * 100) + '%' : '0%';
+    document.getElementById('statStreak').textContent = String(stats.streak);
+
+    ['easy', 'medium', 'hard', 'expert'].forEach(function(d) {
+      var el = document.getElementById('best' + d.charAt(0).toUpperCase() + d.slice(1));
+      var bt = stats.perDifficulty[d].bestTime;
+      el.textContent = bt !== null ? formatTime(bt) : '--:--';
+    });
+
+    var saved = loadCurrent();
+    if (saved) {
+      $continueBtn.classList.remove('hidden');
+    } else {
+      $continueBtn.classList.add('hidden');
+    }
+
+    var daily = loadDaily();
+    if (daily.streak && daily.streak > 0) {
+      $dailyStreak.textContent = 'Streak: ' + daily.streak + ' day' + (daily.streak !== 1 ? 's' : '');
+    } else {
+      $dailyStreak.textContent = '';
+    }
+
+    if (daily.date === getTodayStr() && daily.completed) {
+      $dailyBtn.textContent = 'DAILY COMPLETED';
+      $dailyBtn.style.opacity = '0.5';
+    } else {
+      $dailyBtn.textContent = 'DAILY PUZZLE';
+      $dailyBtn.style.opacity = '1';
+    }
+  }
+
+  function showCompleteScreen(stars, scores, isNewBest) {
+    showScreen('completeScreen');
+
+    document.getElementById('completeTime').textContent = formatTime(state.timer);
+    document.getElementById('completeDiff').textContent = state.difficulty.toUpperCase();
+    document.getElementById('completeHints').textContent = String(state.hintsUsed);
+
+    var starStr = '';
+    for (var i = 0; i < 3; i++) {
+      starStr += i < stars ? '\u2605' : '\u2606';
+    }
+    document.getElementById('completeStars').textContent = starStr;
+
+    var bestEl = document.getElementById('completeBest');
+    if (isNewBest) {
+      bestEl.classList.remove('hidden');
+    } else {
+      bestEl.classList.add('hidden');
+    }
+
+    // Rebuild leaderboard using DOM methods
+    var lbContainer = document.getElementById('completeLB');
+    while (lbContainer.firstChild) lbContainer.removeChild(lbContainer.firstChild);
+    var titleDiv = document.createElement('div');
+    titleDiv.className = 'lb-title';
+    titleDiv.textContent = 'YOUR BESTS';
+    lbContainer.appendChild(titleDiv);
+
+    if (scores && scores.length > 0) {
+      scores.forEach(function(entry, idx) {
+        var row = document.createElement('div');
+        row.className = 'lb-row';
+
+        var rankSpan = document.createElement('span');
+        rankSpan.className = 'lb-rank';
+        rankSpan.textContent = String(idx + 1);
+
+        var scoreSpan = document.createElement('span');
+        scoreSpan.className = 'lb-score';
+        scoreSpan.textContent = formatTime(entry.score);
+
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'lb-time-ago';
+        timeSpan.textContent = timeAgo(entry.ts);
+
+        row.appendChild(rankSpan);
+        row.appendChild(scoreSpan);
+        row.appendChild(timeSpan);
+        lbContainer.appendChild(row);
+      });
+    }
+  }
+
+  // ==================== NEW GAME ====================
+  function startNewGame(difficulty, isDaily) {
+    state.difficulty = difficulty;
+    state.isDaily = isDaily;
+    state.selectedCell = -1;
+    state.notesMode = false;
+    state.completed = false;
+    state.history = [];
+    state.timer = 0;
+    state.timerStarted = false;
+    state.hintsUsed = 0;
+    state.hintsLeft = 3;
+    state.errors = 0;
+    state.notes = [];
+    for (var i = 0; i < 81; i++) state.notes.push(new Set());
+
+    $notesBtn.classList.remove('notes-active');
+    $timer.textContent = '00:00';
+    $hintCounter.textContent = '3';
+    $diffLabel.textContent = difficulty.toUpperCase();
+
+    if (isDaily) {
+      $dailyBadge.classList.remove('hidden');
+      $dailyBadge.textContent = 'DAILY #' + getDailyNumber();
+    } else {
+      $dailyBadge.classList.add('hidden');
+    }
+
+    showScreen('gameScreen');
+    $loadingOverlay.classList.add('active');
+
+    setTimeout(function() {
+      var rng;
+      if (isDaily) {
+        rng = new SeededRNG(getDailySeed());
+      } else {
+        rng = new SeededRNG(Date.now() ^ (Math.random() * 0xFFFFFFFF));
+      }
+      var solution = generateComplete(rng);
+      var diff = isDaily ? 'medium' : difficulty;
+      var puzzle = createPuzzle(solution, diff, rng);
+
+      state.solution = solution;
+      state.grid = puzzle.slice();
+      state.given = puzzle.map(function(v) { return v !== 0; });
+
+      $loadingOverlay.classList.remove('active');
+      renderGrid();
+      computeSizes();
+      saveCurrent();
+    }, 50);
+  }
+
+  function continueSavedGame() {
+    var data = loadCurrent();
+    if (!data) return;
+
+    state.grid = data.grid;
+    state.solution = data.solution;
+    state.given = data.given;
+    state.notes = data.notes;
+    state.history = data.history;
+    state.timer = data.timer;
+    state.difficulty = data.difficulty;
+    state.isDaily = data.isDaily;
+    state.hintsUsed = data.hintsUsed;
+    state.hintsLeft = data.hintsLeft;
+    state.errors = data.errors || 0;
+    state.selectedCell = -1;
+    state.notesMode = false;
+    state.completed = false;
+    state.timerStarted = false;
+
+    $notesBtn.classList.remove('notes-active');
+    $timer.textContent = formatTime(state.timer);
+    $hintCounter.textContent = String(state.hintsLeft);
+    $diffLabel.textContent = state.difficulty.toUpperCase();
+
+    if (state.isDaily) {
+      $dailyBadge.classList.remove('hidden');
+      $dailyBadge.textContent = 'DAILY #' + getDailyNumber();
+    } else {
+      $dailyBadge.classList.add('hidden');
+    }
+
+    showScreen('gameScreen');
+    renderGrid();
+    computeSizes();
+  }
+
+  // ==================== SHARING ====================
+  function doShare() {
+    var diffName = state.difficulty.toUpperCase();
+    var timeStr = formatTime(state.timer);
+    var hintsStr = state.hintsUsed === 0 ? 'No hints' : state.hintsUsed + ' hint' + (state.hintsUsed !== 1 ? 's' : '');
+    var errStr = state.errors === 0 ? 'No errors' : state.errors + ' error' + (state.errors !== 1 ? 's' : '');
+
+    var text = 'SUDOKU [' + diffName + ']\nSolved in ' + timeStr + '\n' + hintsStr + ' | ' + errStr;
+
+    if (state.isDaily) {
+      var daily = loadDaily();
+      text += '\nStreak: ' + (daily.streak || 1) + ' day' + ((daily.streak || 1) !== 1 ? 's' : '');
+    }
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() { copyToClipboard(text); });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(showToast).catch(function() { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  function showToast() {
+    $shareToast.classList.add('visible');
+    setTimeout(function() { $shareToast.classList.remove('visible'); }, 2000);
+  }
+
+  // ==================== KEYBOARD ====================
+  document.addEventListener('keydown', function(e) {
+    if (!$gameScreen.classList.contains('active') || state.completed) return;
+
+    var key = e.key;
+
+    if (key >= '1' && key <= '9') {
+      e.preventDefault();
+      if (state.selectedCell >= 0 && !state.given[state.selectedCell]) {
+        if (!state.timerStarted) startTimer();
+        if (state.notesMode) {
+          toggleNote(state.selectedCell, parseInt(key));
+        } else {
+          placeDigit(state.selectedCell, parseInt(key));
+        }
+      }
+      return;
+    }
+
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(key) >= 0) {
+      e.preventDefault();
+      if (state.selectedCell < 0) {
+        state.selectedCell = 40;
+      } else {
+        var r = Math.floor(state.selectedCell / 9);
+        var c = state.selectedCell % 9;
+        if (key === 'ArrowUp') r = Math.max(0, r - 1);
+        if (key === 'ArrowDown') r = Math.min(8, r + 1);
+        if (key === 'ArrowLeft') c = Math.max(0, c - 1);
+        if (key === 'ArrowRight') c = Math.min(8, c + 1);
+        state.selectedCell = r * 9 + c;
+      }
+      updateHighlights();
+      return;
+    }
+
+    if (key === 'Delete' || key === 'Backspace') { e.preventDefault(); doErase(); return; }
+    if (key === 'n' || key === 'N') { e.preventDefault(); toggleNotesMode(); return; }
+    if ((key === 'z' || key === 'Z') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doUndo(); return; }
+    if (key === 'h' || key === 'H') { e.preventDefault(); doHint(); return; }
+    if (key === 'Escape') { e.preventDefault(); state.selectedCell = -1; updateHighlights(); return; }
+  });
+
+  // ==================== EVENT LISTENERS ====================
+  document.querySelectorAll('.diff-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      startNewGame(this.getAttribute('data-diff'), false);
+    });
+  });
+
+  $dailyBtn.addEventListener('click', function() {
+    var daily = loadDaily();
+    if (daily.date === getTodayStr() && daily.completed) return;
+    startNewGame('medium', true);
+  });
+
+  $continueBtn.addEventListener('click', function() { continueSavedGame(); });
+  $backBtn.addEventListener('click', function() { stopTimer(); saveCurrent(); showStartScreen(); });
+  $undoBtn.addEventListener('click', doUndo);
+  $eraseBtn.addEventListener('click', doErase);
+  $notesBtn.addEventListener('click', toggleNotesMode);
+  $hintBtn.addEventListener('click', doHint);
+
+  document.getElementById('shareBtn').addEventListener('click', doShare);
+  document.getElementById('newGameBtn').addEventListener('click', function() {
+    startNewGame(state.difficulty, state.isDaily);
+  });
+  document.getElementById('menuBtn').addEventListener('click', showStartScreen);
+
+  window.addEventListener('resize', function() {
+    if ($gameScreen.classList.contains('active')) computeSizes();
+  });
+
+  // ==================== INIT ====================
+  buildGrid();
+  buildPad();
+  computeSizes();
+  showStartScreen();
+})();
+</script>
+</body>
+</html>
