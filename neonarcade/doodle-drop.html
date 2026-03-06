@@ -135,12 +135,7 @@ canvas { display: block; position: absolute; top: 0; left: 0; }
 @keyframes shake { 0%,100%{transform:translate(0)} 20%{transform:translate(-3px,1px)} 40%{transform:translate(2px,-2px)} 60%{transform:translate(-2px,2px)} 80%{transform:translate(3px,-1px)} }
 .shake { animation: shake 0.25s; }
 
-.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
-.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
-.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
-.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
-.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+.score-table { margin: 16px auto; max-width: 320px; }
 </style>
 </head>
 <body>
@@ -179,53 +174,10 @@ canvas { display: block; position: absolute; top: 0; left: 0; }
 
 <div class="copied-toast" id="copied-toast">COPIED TO CLIPBOARD</div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
-  // === LEADERBOARD UTILITIES ===
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
-  function renderScoreTable(scores) {
-    var el = document.querySelector('.score-table');
-    if (!el) return;
-    while (el.firstChild) el.removeChild(el.firstChild);
-    var title = document.createElement('div');
-    title.className = 'score-table-title';
-    title.textContent = '\u{1F3C6} YOUR BESTS';
-    el.appendChild(title);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'score-row';
-      var rank = document.createElement('span');
-      rank.className = 'score-rank';
-      rank.textContent = String(i + 1);
-      var val = document.createElement('span');
-      val.className = 'score-val';
-      val.textContent = String(s.score) + 'm';
-      var time = document.createElement('span');
-      time.className = 'score-time';
-      time.textContent = timeAgo(s.ts);
-      row.appendChild(rank);
-      row.appendChild(val);
-      row.appendChild(time);
-      el.appendChild(row);
-    });
-  }
+  Neon.init({ game: 'doodle-drop', mode: 'high' });
 
   // === CONFIG ===
   const GRAVITY = 0.35;
@@ -383,8 +335,7 @@ canvas { display: block; position: absolute; top: 0; left: 0; }
   let drawStart, drawCurrent, isDrawing;
   let lastTime, gameStartTime;
 
-  var _initScores = JSON.parse(localStorage.getItem('neonarcade_scores_doodle') || '[]');
-  bestDepth = _initScores.length > 0 ? _initScores[0].score : 0;
+  bestDepth = Neon.getHighScore();
   if (bestDepth > 0) startBest.textContent = 'BEST: ' + bestDepth + 'm';
 
   function initGame() {
@@ -1180,29 +1131,36 @@ canvas { display: block; position: absolute; top: 0; left: 0; }
 
     spawnParticles(orb.x, orb.y, '#ff2d7b', 20, 5);
 
-    const topScores = saveScore('neonarcade_scores_doodle', depth);
-    bestDepth = topScores[0].score;
-    const isNewBest = depth >= bestDepth;
-
     statDepth.textContent = depth + 'm';
     statStrokes.textContent = strokeCount;
-    statBest.textContent = bestDepth + 'm';
-
-    if (isNewBest) {
-      newBestLabel.classList.remove('hidden');
-    } else {
-      newBestLabel.classList.add('hidden');
-    }
 
     hud.style.display = 'none';
 
-    // Slight delay before showing game over to let the death feel impactful
-    setTimeout(() => {
-      if (state === 'over') {
-        gameOverScreen.classList.remove('hidden');
-        renderScoreTable(topScores);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(depth);
+    }).then(function(result) {
+      bestDepth = Neon.getHighScore();
+      statBest.textContent = bestDepth + 'm';
+
+      if (result.isNewBest) {
+        newBestLabel.classList.remove('hidden');
+      } else {
+        newBestLabel.classList.add('hidden');
       }
-    }, 400);
+
+      Neon.render(document.querySelector('.score-table'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+
+      // Slight delay before showing game over to let the death feel impactful
+      setTimeout(() => {
+        if (state === 'over') {
+          gameOverScreen.classList.remove('hidden');
+        }
+      }, 400);
+    });
   }
 
   // === SHARE ===

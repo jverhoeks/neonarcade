@@ -111,11 +111,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 /* LEADERBOARD */
 .leaderboard{width:100%;max-width:300px;margin:6px 0}
-.lb-title{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;text-align:center;margin-bottom:6px}
-.lb-row{display:flex;align-items:center;padding:3px 8px;gap:10px}
-.lb-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;color:#4a4a6a;width:20px;text-align:right}
-.lb-score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
-.lb-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
+/* Leaderboard row styles now provided by neon.js */
 
 /* Screen shake */
 @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
@@ -212,9 +208,26 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 <div class="toast" id="toast"></div>
 
+<script src="/neon.js"></script>
 <script>
 (function() {
 'use strict';
+
+// ── NEON INIT ──
+var neonFormatScore = function(s) {
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+function neonInitForSize(n) {
+  Neon.init({
+    game: 'queens',
+    mode: 'low',
+    key: 'neonarcade_neonmind_queens_scores_' + n,
+    formatScore: neonFormatScore
+  });
+}
+neonInitForSize(7);
 
 // ── REGION COLORS ──
 var REGION_COLORS = [
@@ -305,27 +318,7 @@ function loadStats() {
 function saveStats(s) {
   localStorage.setItem(STATS_KEY, JSON.stringify(s));
 }
-function saveScore(key, score) {
-  var scores = JSON.parse(localStorage.getItem(key) || '[]');
-  scores.push({ score: score, ts: Date.now() });
-  scores.sort(function(a, b) { return a.score - b.score; });
-  scores = scores.slice(0, 5);
-  localStorage.setItem(key, JSON.stringify(scores));
-  return scores;
-}
-function getScores(key) {
-  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
-}
-function timeAgo(ts) {
-  var diff = Date.now() - ts;
-  var mins = Math.floor(diff / 60000);
-  var hours = Math.floor(diff / 3600000);
-  var days = Math.floor(diff / 86400000);
-  if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
-  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-  if (mins > 0) return mins + (mins === 1 ? ' min ago' : ' mins ago');
-  return 'just now';
-}
+// saveScore, getScores, timeAgo now provided by neon.js
 function formatTime(secs) {
   var m = Math.floor(secs / 60);
   var s = Math.floor(secs % 60);
@@ -813,8 +806,8 @@ function updateStartScreen() {
   for (var i = 0; i < sizes.length; i++) {
     var btn = document.createElement('div');
     btn.className = 'diff-btn' + (i === sizes.length - 1 ? ' span2' : '');
-    var scores = getScores(scoreKey(sizes[i]));
-    var bestStr = scores.length > 0 ? 'Best: ' + formatTime(scores[0].score) : 'No record';
+    var lScores = JSON.parse(localStorage.getItem(scoreKey(sizes[i])) || '[]');
+    var bestStr = lScores.length > 0 ? 'Best: ' + formatTime(lScores[0].score) : 'No record';
     btn.appendChild(document.createTextNode(labels[i]));
     var bestSpan = document.createElement('span');
     bestSpan.className = 'diff-best';
@@ -827,42 +820,15 @@ function updateStartScreen() {
 
   // Leaderboard for most recently played size
   var lastSize = stats.lastSize || 7;
-  renderLeaderboard(document.getElementById('startLB'), lastSize);
-}
-
-function renderLeaderboard(el, n) {
-  while (el.firstChild) el.removeChild(el.firstChild);
-  var scores = getScores(scoreKey(n));
-  if (scores.length === 0) return;
-
-  var title = document.createElement('div');
-  title.className = 'lb-title';
-  title.textContent = 'TOP 5 \u2014 ' + n + 'x' + n;
-  el.appendChild(title);
-
-  for (var i = 0; i < scores.length; i++) {
-    var row = document.createElement('div');
-    row.className = 'lb-row';
-    var rank = document.createElement('span');
-    rank.className = 'lb-rank';
-    rank.textContent = (i + 1);
-    var score = document.createElement('span');
-    score.className = 'lb-score';
-    score.textContent = formatTime(scores[i].score);
-    var time = document.createElement('span');
-    time.className = 'lb-time';
-    time.textContent = timeAgo(scores[i].ts);
-    row.appendChild(rank);
-    row.appendChild(score);
-    row.appendChild(time);
-    el.appendChild(row);
-  }
+  neonInitForSize(lastSize);
+  Neon.render(document.getElementById('startLB'));
 }
 
 // ── START GAME ──
 function startGame(size, daily) {
   N = size;
   isDaily = daily;
+  neonInitForSize(size);
   solved = false;
   hintsLeft = 3;
   hintsUsed = 0;
@@ -1296,10 +1262,6 @@ function onPuzzleSolved() {
   if (hintsUsed === 0) stars = 2;
   if (hintsUsed === 0 && solveTimeSnap <= PAR_TIMES[N]) stars = 3;
 
-  // Save score
-  var scores = saveScore(scoreKey(N), Math.floor(solveTimeSnap));
-  var isBest = scores.length > 0 && scores[0].score === Math.floor(solveTimeSnap);
-
   // Update stats
   var stats = loadStats();
   stats.played = (stats.played || 0) + 1;
@@ -1329,16 +1291,21 @@ function onPuzzleSolved() {
   saveStats(stats);
 
   var capturedStars = stars;
-  var capturedIsBest = isBest;
-  var capturedScores = scores;
   var capturedStats = stats;
+  var capturedTime = Math.floor(solveTimeSnap);
 
   setTimeout(function() {
-    showComplete(solveTimeSnap, capturedStars, capturedIsBest, capturedScores, capturedStats);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(capturedTime);
+    }).then(function(neonResult) {
+      var isBest = neonResult.isNewBest;
+      showComplete(solveTimeSnap, capturedStars, isBest, capturedStats, neonResult);
+    });
   }, 800);
 }
 
-function showComplete(elapsed, stars, isBest, scores, stats) {
+function showComplete(elapsed, stars, isBest, stats, neonResult) {
   showScreen('completeScreen');
 
   var starsEl = document.getElementById('completeStars');
@@ -1372,7 +1339,12 @@ function showComplete(elapsed, stars, isBest, scores, stats) {
     document.getElementById('completeStreakInfo').textContent = '';
   }
 
-  renderLeaderboard(document.getElementById('completeLB'), N);
+  // Leaderboard via neon.js
+  Neon.render(document.getElementById('completeLB'));
+
+  if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
+    Neon.showGlobalSplash(neonResult.globalRank);
+  }
 }
 
 // ── SHARE ──
@@ -1458,6 +1430,7 @@ function tryResume() {
   }
 
   N = data.N;
+  neonInitForSize(N);
   board = data.board;
   regions = data.regions;
   solution = data.solution;

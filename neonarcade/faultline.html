@@ -64,12 +64,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 
 .daily-badge{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#ff8c00;border:1px solid rgba(255,140,0,0.3);background:rgba(255,140,0,0.06);padding:4px 12px;border-radius:2px;margin-bottom:20px}
 
-.score-table { margin: 16px auto; max-width: 320px; font-family: 'Rajdhani', sans-serif; }
-.score-table-title { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 3px; color: #ffd700; text-align: center; margin-bottom: 8px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
-.score-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.score-rank { color: #4a4a6a; font-size: 13px; width: 20px; }
-.score-val  { color: #00f0ff; font-size: 16px; font-weight: 700; text-shadow: 0 0 8px rgba(0,240,255,0.4); flex: 1; text-align: center; }
-.score-time { color: #4a4a6a; font-size: 12px; text-align: right; }
+.score-table { margin: 16px auto; max-width: 320px; }
 </style>
 </head>
 <body>
@@ -112,52 +107,10 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
   <div id="toast">COPIED TO CLIPBOARD</div>
 </div>
 
+<script src="/neon.js"></script>
 <script>
 (()=>{
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
-  function renderScoreTable(scores) {
-    var el = document.querySelector('.score-table');
-    if (!el) return;
-    while (el.firstChild) el.removeChild(el.firstChild);
-    var title = document.createElement('div');
-    title.className = 'score-table-title';
-    title.textContent = '\uD83C\uDFC6 YOUR BESTS';
-    el.appendChild(title);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'score-row';
-      var rank = document.createElement('span');
-      rank.className = 'score-rank';
-      rank.textContent = String(i + 1);
-      var val = document.createElement('span');
-      val.className = 'score-val';
-      val.textContent = String(s.score);
-      var time = document.createElement('span');
-      time.className = 'score-time';
-      time.textContent = timeAgo(s.ts);
-      row.appendChild(rank);
-      row.appendChild(val);
-      row.appendChild(time);
-      el.appendChild(row);
-    });
-  }
+  Neon.init({ game: 'faultline', mode: 'high' });
 
   const ROUNDS = 5;
   const ROUND_TIME = 10;
@@ -774,18 +727,23 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 
     $('totalScore').textContent = score + ' / ' + (ROUNDS*100);
 
-    var topScores = saveScore('neonarcade_scores_faultline', score);
-    var prevBest = topScores.length > 1 ? topScores.slice(1).reduce(function(m, s) { return s.score > m ? s.score : m; }, 0) : 0;
-    var isNewBest = score >= topScores[0].score;
-    var bestEl = $('bestScoreResult');
-    if(isNewBest && prevBest > 0){
-      bestEl.textContent = 'NEW BEST! (Previous: ' + prevBest + ')';
-      bestEl.className = 'best new-best';
-    } else {
-      bestEl.textContent = 'BEST: ' + topScores[0].score;
-      bestEl.className = 'best';
-    }
-    renderScoreTable(topScores);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      var bestEl = $('bestScoreResult');
+      if(result.isNewBest){
+        bestEl.textContent = 'NEW BEST!';
+        bestEl.className = 'best new-best';
+      } else {
+        bestEl.textContent = 'BEST: ' + Neon.getHighScore();
+        bestEl.className = 'best';
+      }
+      Neon.render(document.querySelector('.score-table'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
 
     ensureAudio();
     if(score >= 400) soundPerfect();
@@ -846,8 +804,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
   }
 
   function updateBestDisplay(){
-    var scores = JSON.parse(localStorage.getItem('neonarcade_scores_faultline') || '[]');
-    var best = scores.length > 0 ? scores[0].score : 0;
+    var best = Neon.getHighScore();
     $('bestScoreStart').textContent = best > 0 ? 'BEST: ' + best : '';
   }
 

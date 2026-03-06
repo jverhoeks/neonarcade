@@ -81,10 +81,6 @@ canvas{position:absolute;top:0;left:0;z-index:1}
 .level-btn.unlocked:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 10px rgba(0,240,255,0.2)}
 .level-btn.current{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.1)}
 .score-list{margin:12px 0;width:100%;max-width:280px}
-.score-row{display:flex;align-items:center;padding:4px 0;gap:8px}
-.score-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#4a4a6a;width:24px;text-align:right}
-.score-val{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
-.score-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
 .controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;text-transform:uppercase;color:#4a4a6a;margin-top:16px;text-align:center;line-height:1.6}
 .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:8px 0}
 .zone-progress{display:flex;gap:4px;margin:8px 0}
@@ -179,9 +175,12 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   </div>
 </div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
   'use strict';
+
+  Neon.init({ game: 'neurosort', mode: 'high', key: 'neonarcade_neongrind_neurosort' });
 
   // ============================================================
   // CONFIG
@@ -426,27 +425,6 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   // ============================================================
   // PERSISTENCE
   // ============================================================
-  function saveScore(key, score) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: score, ts: Date.now() });
-    scores.sort(function(a, b) { return b.score - a.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-  function getScores(key) {
-    return JSON.parse(localStorage.getItem(key) || '[]');
-  }
-  function timeAgo(ts) {
-    var diff = Date.now() - ts;
-    var mins  = Math.floor(diff / 60000);
-    var hours = Math.floor(diff / 3600000);
-    var days  = Math.floor(diff / 86400000);
-    if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-    return 'just now';
-  }
   function loadProgress() {
     var p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null');
     if (!p) return { maxLevel: 1, stars: {} };
@@ -1385,7 +1363,7 @@ canvas{position:absolute;top:0;left:0;z-index:1}
     if (stars > prevStars) progress.stars[level] = stars;
     if (level + 1 > progress.maxLevel) progress.maxLevel = Math.min(26, level + 1);
     saveProgress(progress);
-    saveScore(SCORE_KEY, score);
+    Neon.save(score);
 
     if (level >= 25) {
       showAllComplete(accuracy, avgTime);
@@ -1453,30 +1431,8 @@ canvas{position:absolute;top:0;left:0;z-index:1}
       statsEl.appendChild(div);
     });
 
-    var scores = getScores(SCORE_KEY);
     var scoresDiv = document.getElementById('allcomplete-scores');
-    while (scoresDiv.firstChild) scoresDiv.removeChild(scoresDiv.firstChild);
-    var header = document.createElement('div');
-    header.style.cssText = 'font-family:Orbitron,monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;margin-bottom:8px';
-    header.textContent = 'YOUR BESTS';
-    scoresDiv.appendChild(header);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'score-row';
-      var rank = document.createElement('span');
-      rank.className = 'score-rank';
-      rank.textContent = String(i + 1);
-      var val = document.createElement('span');
-      val.className = 'score-val';
-      val.textContent = s.score + ' pts';
-      var time = document.createElement('span');
-      time.className = 'score-time';
-      time.textContent = timeAgo(s.ts);
-      row.appendChild(rank);
-      row.appendChild(val);
-      row.appendChild(time);
-      scoresDiv.appendChild(row);
-    });
+    Neon.render(scoresDiv);
 
     showScreen('allcomplete');
   }
@@ -1486,8 +1442,6 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   // ============================================================
   function gameOver() {
     var accuracy = totalSorted > 0 ? Math.round((correctCount / totalSorted) * 100) : 0;
-    var scores = saveScore(SCORE_KEY, score);
-    var isNewBest = scores[0] && scores[0].score === score && scores[0].ts >= Date.now() - 2000;
 
     var statsEl = document.getElementById('gameover-stats');
     while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
@@ -1511,33 +1465,18 @@ canvas{position:absolute;top:0;left:0;z-index:1}
       statsEl.appendChild(div);
     });
 
-    document.getElementById('gameover-best').textContent = isNewBest ? 'NEW HIGH SCORE!' : '';
-
-    var scoresDiv = document.getElementById('gameover-scores');
-    while (scoresDiv.firstChild) scoresDiv.removeChild(scoresDiv.firstChild);
-    var header = document.createElement('div');
-    header.style.cssText = 'font-family:Orbitron,monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;margin-bottom:8px';
-    header.textContent = 'YOUR BESTS';
-    scoresDiv.appendChild(header);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'score-row';
-      var rank = document.createElement('span');
-      rank.className = 'score-rank';
-      rank.textContent = String(i + 1);
-      var val = document.createElement('span');
-      val.className = 'score-val';
-      val.textContent = s.score + ' pts';
-      var time = document.createElement('span');
-      time.className = 'score-time';
-      time.textContent = timeAgo(s.ts);
-      row.appendChild(rank);
-      row.appendChild(val);
-      row.appendChild(time);
-      scoresDiv.appendChild(row);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      var scoresDiv = document.getElementById('gameover-scores');
+      Neon.render(scoresDiv);
+      document.getElementById('gameover-best').textContent = result.isNewBest ? 'NEW HIGH SCORE!' : '';
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+      showScreen('gameover');
     });
-
-    showScreen('gameover');
   }
 
   // ============================================================

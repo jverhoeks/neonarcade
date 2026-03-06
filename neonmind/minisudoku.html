@@ -127,11 +127,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 /* LEADERBOARD */
 .leaderboard{width:100%;max-width:300px;margin:6px 0}
-.lb-title{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;text-align:center;margin-bottom:6px}
-.lb-row{display:flex;align-items:center;padding:3px 8px;gap:10px}
-.lb-rank{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;color:#4a4a6a;width:20px;text-align:right}
-.lb-score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;flex:1}
-.lb-time{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;color:#4a4a6a}
+/* Leaderboard row styles now provided by neon.js */
 
 /* Screen shake */
 @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
@@ -207,9 +203,26 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 <div class="toast" id="toast"></div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
 'use strict';
+
+// ============ NEON INIT ============
+var neonFormatScore = function(s) {
+  var m = Math.floor(s / 60);
+  var sec = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+function neonInitForDifficulty(diff) {
+  Neon.init({
+    game: 'minisudoku',
+    mode: 'low',
+    key: 'neonarcade_neonmind_minisudoku_scores_' + diff,
+    formatScore: neonFormatScore
+  });
+}
+neonInitForDifficulty('easy');
 
 // ============ PRNG (Seeded LCG) ============
 function createPRNG(seed) {
@@ -469,29 +482,7 @@ function saveStats(s) {
   try { localStorage.setItem(STORAGE_STATS, JSON.stringify(s)); } catch(e) {}
 }
 
-function saveScore(key, score) {
-  var scores = JSON.parse(localStorage.getItem(key) || '[]');
-  scores.push({ score: score, ts: Date.now() });
-  scores.sort(function(a, b) { return a.score - b.score; }); // Lower time = better
-  scores = scores.slice(0, 5);
-  localStorage.setItem(key, JSON.stringify(scores));
-  return scores;
-}
-
-function getScores(key) {
-  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
-}
-
-function timeAgo(ts) {
-  var diff = Date.now() - ts;
-  var mins  = Math.floor(diff / 60000);
-  var hours = Math.floor(diff / 3600000);
-  var days  = Math.floor(diff / 86400000);
-  if (days  > 0) return days  + (days  === 1 ? ' day ago'  : ' days ago');
-  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-  if (mins  > 0) return mins  + (mins  === 1 ? ' min ago'  : ' mins ago');
-  return 'just now';
-}
+// saveScore, getScores, timeAgo now provided by neon.js
 
 function formatTime(secs) {
   var m = Math.floor(secs / 60);
@@ -597,40 +588,14 @@ function updateStartScreen() {
 
   // Leaderboard for most recent difficulty played, default easy
   var lastDiff = (saved && saved.difficulty) || 'easy';
-  renderLeaderboard('startLB', scoreKey(lastDiff), lastDiff.toUpperCase());
-}
-
-function renderLeaderboard(elId, key, label) {
-  var scores = getScores(key);
-  var el = document.getElementById(elId);
-  el.textContent = '';
-  if (!scores.length) return;
-  var title = document.createElement('div');
-  title.className = 'lb-title';
-  title.textContent = 'YOUR BESTS' + (label ? ' (' + label + ')' : '');
-  el.appendChild(title);
-  scores.forEach(function(s, i) {
-    var row = document.createElement('div');
-    row.className = 'lb-row';
-    var rank = document.createElement('span');
-    rank.className = 'lb-rank';
-    rank.textContent = i + 1;
-    var score = document.createElement('span');
-    score.className = 'lb-score';
-    score.textContent = formatTime(s.score);
-    var time = document.createElement('span');
-    time.className = 'lb-time';
-    time.textContent = timeAgo(s.ts);
-    row.appendChild(rank);
-    row.appendChild(score);
-    row.appendChild(time);
-    el.appendChild(row);
-  });
+  neonInitForDifficulty(lastDiff);
+  Neon.render(document.getElementById('startLB'));
 }
 
 // ============ START GAME ============
 function startGame(difficulty, isDaily, dailyRng) {
   getAudioCtx(); // Unlock audio context
+  neonInitForDifficulty(difficulty);
 
   state.difficulty = difficulty;
   state.isDaily = !!isDaily;
@@ -685,6 +650,7 @@ function startDaily() {
 
 function restoreGame(data) {
   getAudioCtx();
+  neonInitForDifficulty(data.difficulty);
 
   state.puzzle = data.puzzle;
   state.solution = data.solution;
@@ -1233,14 +1199,22 @@ function onPuzzleSolved() {
 
   saveStats(stats);
 
-  var scores = saveScore(scoreKey(state.difficulty), state.timerSeconds);
-
   try { localStorage.removeItem(STORAGE_CURRENT); } catch(e) {}
 
-  setTimeout(function() { showCompleteScreen(scores); }, 1200);
+  neonInitForDifficulty(state.difficulty);
+  var capturedTimer = state.timerSeconds;
+
+  setTimeout(function() {
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(capturedTimer);
+    }).then(function(result) {
+      showCompleteScreen(result);
+    });
+  }, 1200);
 }
 
-function showCompleteScreen(scores) {
+function showCompleteScreen(neonResult) {
   // Star rating: 1=completed, 2=no hints, 3=no hints + under par
   var par = PAR_TIMES[state.difficulty] || 300;
   var stars = 1;
@@ -1283,8 +1257,12 @@ function showCompleteScreen(scores) {
     streakInfoEl.style.display = 'none';
   }
 
-  // Leaderboard
-  renderLeaderboard('completeLB', scoreKey(state.difficulty), state.difficulty.toUpperCase());
+  // Leaderboard via neon.js
+  Neon.render(document.getElementById('completeLB'));
+
+  if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
+    Neon.showGlobalSplash(neonResult.globalRank);
+  }
 
   // Buttons
   var btnsEl = document.getElementById('completeBtns');

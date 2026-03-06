@@ -73,12 +73,6 @@ canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
 
 /* Leaderboard */
 .leaderboard{margin:12px 0;width:100%;max-width:280px;}
-.leaderboard-title{font-family:'Rajdhani',sans-serif;font-size:13px;color:#ffd700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
-.lb-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.lb-rank{font-family:'Rajdhani',sans-serif;font-size:13px;color:#4a4a6a;width:24px;text-align:right;}
-.lb-score{font-family:'Orbitron',monospace;font-size:13px;color:#00f0ff;flex:1;}
-.lb-time{font-family:'Rajdhani',sans-serif;font-size:11px;color:#4a4a6a;}
-.lb-row.highlight .lb-score{color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.4);}
 
 /* Endless unlocked */
 #endless-unlock{z-index:25;}
@@ -172,9 +166,12 @@ canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
 
 <div id="share-toast">Copied to clipboard!</div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
 'use strict';
+
+Neon.init({ game: 'reflex-chain', mode: 'high', key: 'neonarcade_neongrind_reflexchain' });
 
 // ===== CONFIG =====
 const SCORE_KEY = 'neonarcade_neongrind_reflexchain';
@@ -427,29 +424,6 @@ function playGo() {
 }
 
 // ===== PERSISTENCE =====
-function saveScore(key, sc) {
-  var scores = JSON.parse(localStorage.getItem(key) || '[]');
-  scores.push({ score: sc, ts: Date.now() });
-  scores.sort(function(a, b) { return b.score - a.score; });
-  scores = scores.slice(0, 5);
-  localStorage.setItem(key, JSON.stringify(scores));
-  return scores;
-}
-
-function getScores(key) {
-  return JSON.parse(localStorage.getItem(key) || '[]');
-}
-
-function timeAgo(ts) {
-  var diff = Date.now() - ts;
-  var mins = Math.floor(diff / 60000);
-  var hours = Math.floor(diff / 3600000);
-  var days = Math.floor(diff / 86400000);
-  if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
-  if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-  if (mins > 0) return mins + (mins === 1 ? ' min ago' : ' mins ago');
-  return 'just now';
-}
 
 function loadProgress() {
   var def = { unlockedLevel: 1, completedLevels: {}, bestReaction: null, endlessUnlocked: false, bestEndless: 0 };
@@ -924,7 +898,6 @@ function endGame() {
   var avgReaction = levelReactions.length > 0 ? levelReactions.reduce(function(a,b){return a+b;},0) / levelReactions.length : 0;
   var accuracy = totalHits > 0 ? Math.round(totalHits / (totalHits + totalMisses + totalDecoyHits) * 100) : 0;
 
-  var scores = saveScore(SCORE_KEY, score);
   saveProgressData();
 
   goLevel.textContent = isEndless ? 'ENDLESS \u2014 ROUND ' + roundIndex : 'ZONE ' + (getZone(currentLevel) + 1) + ' \u2014 LEVEL ' + currentLevel;
@@ -949,35 +922,16 @@ function endGame() {
     goStats.appendChild(val);
   });
 
-  // Leaderboard
-  goLeaderboard.textContent = '';
-  var title = document.createElement('div');
-  title.className = 'leaderboard-title';
-  title.textContent = 'YOUR BESTS';
-  goLeaderboard.appendChild(title);
-
-  scores.forEach(function(s, i) {
-    var isNew = s.score === score && s.ts > Date.now() - 2000;
-    var row = document.createElement('div');
-    row.className = 'lb-row' + (isNew ? ' highlight' : '');
-
-    var rank = document.createElement('div');
-    rank.className = 'lb-rank';
-    rank.textContent = i + 1;
-    var sc = document.createElement('div');
-    sc.className = 'lb-score';
-    sc.textContent = s.score + ' pts';
-    var tm = document.createElement('div');
-    tm.className = 'lb-time';
-    tm.textContent = timeAgo(s.ts);
-
-    row.appendChild(rank);
-    row.appendChild(sc);
-    row.appendChild(tm);
-    goLeaderboard.appendChild(row);
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function() {
+    return Neon.save(score);
+  }).then(function(result) {
+    Neon.render(goLeaderboard);
+    if (result.globalRank >= 1 && result.globalRank <= 5) {
+      Neon.showGlobalSplash(result.globalRank);
+    }
+    showScreen(gameOver);
   });
-
-  showScreen(gameOver);
 }
 
 function showEndlessUnlockScreen() {

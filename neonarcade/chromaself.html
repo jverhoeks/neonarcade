@@ -638,8 +638,11 @@ body::after {
 
 <div class="share-toast" id="share-toast">PALETTE COPIED</div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
+  Neon.init({ game: 'chromaself', mode: 'high' });
+
   // ===== AUDIO =====
   const AudioCtxCtor = window.AudioContext || window.webkitAudioContext;
   let audioCtx = null;

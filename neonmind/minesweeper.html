@@ -375,17 +375,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 .leaderboard {
   width: 100%; max-width: 300px; margin: 8px 0;
 }
-.lb-title {
-  font-family: 'Orbitron', monospace; font-size: 11px;
-  letter-spacing: 3px; color: var(--text-dim); margin-bottom: 6px;
-}
-.lb-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 4px 0; font-size: 14px;
-}
-.lb-rank { width: 24px; color: var(--text-dim); font-family: 'Orbitron', monospace; font-size: 11px; }
-.lb-score { flex: 1; color: var(--neon-cyan); font-weight: 700; font-family: 'Orbitron', monospace; font-size: 13px; }
-.lb-when { color: var(--text-dim); font-size: 12px; }
+/* Leaderboard row styles now provided by neon.js */
 
 /* ---- ZOOM INDICATOR ---- */
 .zoom-indicator {
@@ -462,9 +452,26 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   </div>
 </div>
 
+<script src="/neon.js"></script>
 <script>
 (() => {
   'use strict';
+
+  // ============ NEON INIT ============
+  var neonFormatScore = function(s) {
+    var m = Math.floor(s / 60);
+    var sec = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  };
+  function neonInitForDifficulty(diffKey) {
+    Neon.init({
+      game: 'minesweeper',
+      mode: 'low',
+      key: 'neonarcade_neonmind_minesweeper_scores_' + diffKey,
+      formatScore: neonFormatScore
+    });
+  }
+  neonInitForDifficulty('tiny');
 
   // ============ CONFIG ============
   const DIFFICULTIES = [
@@ -583,29 +590,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     localStorage.setItem(STATS_KEY, JSON.stringify(stats));
   }
 
-  function saveScore(key, timeSec) {
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
-    scores.push({ score: timeSec, ts: Date.now() });
-    scores.sort(function(a, b) { return a.score - b.score; });
-    scores = scores.slice(0, 5);
-    localStorage.setItem(key, JSON.stringify(scores));
-    return scores;
-  }
-
-  function getScores(key) {
-    return JSON.parse(localStorage.getItem(key) || '[]');
-  }
-
-  function timeAgo(ts) {
-    var d = Date.now() - ts;
-    var mins = Math.floor(d / 60000);
-    var hours = Math.floor(d / 3600000);
-    var days = Math.floor(d / 86400000);
-    if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
-    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
-    if (mins > 0) return mins + (mins === 1 ? ' min ago' : ' mins ago');
-    return 'just now';
-  }
+  // saveScore, getScores, timeAgo now provided by neon.js
 
   function isUnlocked(idx) {
     if (idx === 0) return true;
@@ -838,31 +823,14 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     startLbEl.textContent = '';
     // Find difficulty with scores, starting from highest unlocked
     for (var i = maxIdx; i >= 0; i--) {
-      var scores = getScores(scoreKey(DIFFICULTIES[i].key));
-      if (scores.length > 0) {
-        buildLeaderboardDom(startLbEl, scores, DIFFICULTIES[i].name);
+      neonInitForDifficulty(DIFFICULTIES[i].key);
+      // Check if there are local scores by trying to read from localStorage
+      var testScores = JSON.parse(localStorage.getItem(scoreKey(DIFFICULTIES[i].key)) || '[]');
+      if (testScores.length > 0) {
+        Neon.render(startLbEl);
         return;
       }
     }
-  }
-
-  function buildLeaderboardDom(container, scores, diffName) {
-    var lbTitle = document.createElement('div');
-    lbTitle.className = 'lb-title';
-    lbTitle.textContent = '\uD83C\uDFC6 BEST TIMES \u2014 ' + diffName;
-    container.appendChild(lbTitle);
-    scores.forEach(function(s, i) {
-      var row = document.createElement('div');
-      row.className = 'lb-row';
-      var rank = document.createElement('span');
-      rank.className = 'lb-rank'; rank.textContent = i + 1;
-      var sc = document.createElement('span');
-      sc.className = 'lb-score'; sc.textContent = formatTime(s.score);
-      var when = document.createElement('span');
-      when.className = 'lb-when'; when.textContent = timeAgo(s.ts);
-      row.appendChild(rank); row.appendChild(sc); row.appendChild(when);
-      container.appendChild(row);
-    });
   }
 
   function formatTime(sec) {
@@ -928,6 +896,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   function startGame(idx) {
     diffIndex = idx;
     diff = DIFFICULTIES[idx];
+    neonInitForDifficulty(diff.key);
     firstClick = true;
     gameState = 'playing';
     flagMode = false;
@@ -970,6 +939,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   function restoreGame(saved) {
     diffIndex = saved.diffIndex;
     diff = DIFFICULTIES[diffIndex];
+    neonInitForDifficulty(diff.key);
     grid = saved.grid;
     cellStates = saved.cellStates;
     flagCount = saved.flagCount;
@@ -1313,52 +1283,67 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     if (starCount > ds.stars) ds.stars = starCount;
     saveStats();
 
-    // leaderboard
-    var scores = saveScore(scoreKey(diff.key), elapsed);
+    // leaderboard via neon.js
+    neonInitForDifficulty(diff.key);
+    var capturedStarCount = starCount;
+    var capturedNewBest = newBest;
+    var capturedElapsed = elapsed;
+    var capturedDiff = diff;
+    var capturedDiffIndex = diffIndex;
+    var capturedStats = { streak: stats.streak, bestStreak: stats.bestStreak };
 
     setTimeout(function() {
-      winStarsEl.textContent = '';
-      for (var i = 0; i < 3; i++) winStarsEl.textContent += (i < starCount ? '\u2605' : '\u2606');
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(capturedElapsed);
+      }).then(function(neonResult) {
+        winStarsEl.textContent = '';
+        for (var i = 0; i < 3; i++) winStarsEl.textContent += (i < capturedStarCount ? '\u2605' : '\u2606');
 
-      winStatsEl.textContent = '';
-      var items = [
-        { label: 'Time', val: formatTime(elapsed) },
-        { label: 'Mines', val: String(diff.mines) },
-        { label: 'Size', val: diff.cols + 'x' + diff.rows }
-      ];
-      items.forEach(function(item) {
-        var div = document.createElement('div');
-        div.textContent = item.label;
-        var sp = document.createElement('span');
-        sp.className = 'val';
-        sp.textContent = item.val;
-        div.appendChild(sp);
-        winStatsEl.appendChild(div);
+        winStatsEl.textContent = '';
+        var items = [
+          { label: 'Time', val: formatTime(capturedElapsed) },
+          { label: 'Mines', val: String(capturedDiff.mines) },
+          { label: 'Size', val: capturedDiff.cols + 'x' + capturedDiff.rows }
+        ];
+        items.forEach(function(item) {
+          var div = document.createElement('div');
+          div.textContent = item.label;
+          var sp = document.createElement('span');
+          sp.className = 'val';
+          sp.textContent = item.val;
+          div.appendChild(sp);
+          winStatsEl.appendChild(div);
+        });
+
+        if (capturedNewBest) {
+          bestNoteEl.style.display = 'block';
+          bestNoteEl.textContent = 'NEW PERSONAL BEST!';
+        } else {
+          bestNoteEl.style.display = 'none';
+        }
+
+        winStreakNote.textContent = 'STREAK: ' + capturedStats.streak + (capturedStats.streak > 1 ? ' \u2014 BEST: ' + capturedStats.bestStreak : '');
+
+        // build leaderboard via neon.js
+        winLbEl.textContent = '';
+        Neon.render(winLbEl);
+
+        if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
+          Neon.showGlobalSplash(neonResult.globalRank);
+        }
+
+        // next button
+        if (capturedDiffIndex < DIFFICULTIES.length - 1) {
+          nextBtn.style.display = '';
+          var nextIsUnlocked = isUnlocked(capturedDiffIndex + 1);
+          nextBtn.textContent = DIFFICULTIES[capturedDiffIndex + 1].name + (nextIsUnlocked ? '' : ' UNLOCKED!');
+        } else {
+          nextBtn.style.display = 'none';
+        }
+
+        winOverlay.classList.add('active');
       });
-
-      if (newBest) {
-        bestNoteEl.style.display = 'block';
-        bestNoteEl.textContent = 'NEW PERSONAL BEST!';
-      } else {
-        bestNoteEl.style.display = 'none';
-      }
-
-      winStreakNote.textContent = 'STREAK: ' + stats.streak + (stats.streak > 1 ? ' \u2014 BEST: ' + stats.bestStreak : '');
-
-      // build leaderboard
-      winLbEl.textContent = '';
-      buildLeaderboardDom(winLbEl, scores, diff.name);
-
-      // next button
-      if (diffIndex < DIFFICULTIES.length - 1) {
-        nextBtn.style.display = '';
-        var nextIsUnlocked = isUnlocked(diffIndex + 1);
-        nextBtn.textContent = DIFFICULTIES[diffIndex + 1].name + (nextIsUnlocked ? '' : ' UNLOCKED!');
-      } else {
-        nextBtn.style.display = 'none';
-      }
-
-      winOverlay.classList.add('active');
     }, 800);
   }
 
