@@ -1,4 +1,4 @@
-# BESMART — Progressive Puzzle/Skill Games
+# NEON GRIND — Progressive Skill Games
 
 5-10 minute engagement sessions. Each game has levels that get progressively harder and/or faster. Simple to start, rewarding to master. Practice makes you measurably better. Same NEON ARCADE visual style, mobile-first.
 
@@ -7,7 +7,7 @@
 ## Design Philosophy
 
 ### What makes these different from the viral games
-| Viral Games (existing) | BeSmart Games (new) |
+| Viral Games (existing) | Neon Grind Games (new) |
 |---|---|
 | 30-60 second sessions | 5-10 minute sessions |
 | Instant dopamine, share, leave | Flow state, "just one more level" |
@@ -124,17 +124,17 @@ Start easy (confidence) -> Get harder (challenge) -> Fail (learn) -> Retry (fast
 ## SHARING FORMAT
 
 ```
-BESMART: [GAME NAME]
+NEON GRIND: [GAME NAME]
 Level [X] / [total] | [star]  [star]  [star] streak
 [visual level progress bar using block emojis]
 [time or score stat]
 Can you beat level [X]?
-neonarcade.fun/besmart/[game]
+neonarcade.fun/neongrind/[game]
 ```
 
 Example:
 ```
-BESMART: NEUROSORT
+NEON GRIND: NEUROSORT
 Level 18 / 25 | 3-star streak: 7
 [][][][][][][][][][][][][][][][][]..........
 Avg sort time: 0.4s
@@ -162,7 +162,7 @@ Can you beat level 18?
 
 ### Progress Persistence
 - localStorage for level progress, stars, best times
-- Key: `neonarcade_besmart_[gamename]`
+- Key: `neonarcade_neongrind_[gamename]`
 - Track: levels cleared, stars per level, attempts per level, total playtime, fastest full run
 
 ---
@@ -188,7 +188,7 @@ Based on: engagement depth x build speed x mobile friendliness
 
 ### Why 5-10 minutes works differently than 30-60 seconds
 - Viral games optimize for **breadth** (many people, short sessions, share fast)
-- BeSmart optimizes for **depth** (fewer people, longer sessions, daily return)
+- Neon Grind optimizes for **depth** (fewer people, longer sessions, daily return)
 - The share moment shifts from "look at my score" to "look how far I got" — progression > performance
 - These games build **habit** (daily practice) rather than **impulse** (one-time play)
 
