@@ -158,15 +158,15 @@ Each game targets "[game name] free online" and "[game type] game no download" p
 ## File Reference
 
 ### New Files
-- `robots.txt` — Crawl directives and sitemap reference
-- `sitemap.xml` — Full site map with 39 URLs
+- `public/robots.txt` — Crawl directives and sitemap reference
+- `public/sitemap.xml` — Full site map with 39 URLs
 - `SEO_PLAN.md` — This document
 
 ### Modified Files (39 total)
-- `index.html` — Main hub
-- `neonarcade/index.html` — NEON ARCADE hub
-- `neonmind/index.html` — NEON MIND hub
-- `neongrind/index.html` — NEON GRIND hub
-- 18 games in `neonarcade/`
-- 8 games in `neonmind/`
-- 3 games in `neongrind/`
+- `public/index.html` — Main hub
+- `public/neonarcade/index.html` — NEON ARCADE hub
+- `public/neonmind/index.html` — NEON MIND hub
+- `public/neongrind/index.html` — NEON GRIND hub
+- 18 games in `public/neonarcade/`
+- 8 games in `public/neonmind/`
+- 3 games in `public/neongrind/`

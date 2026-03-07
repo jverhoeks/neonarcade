@@ -305,7 +305,7 @@ Same NEON ARCADE brand but with a calmer, more contemplative mood:
 
 ---
 
-## LANDING PAGE (neonmind/index.html)
+## LANDING PAGE (public/neonmind/index.html)
 
 ### Brand Identity
 - Title: "NEON MIND" — purple primary with cyan accent (like NEON GRIND but different split)
