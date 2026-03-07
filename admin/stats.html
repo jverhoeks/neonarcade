@@ -5,31 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEON ARCADE — Stats Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{min-height:100vh;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);z-index:9999}
 .header{text-align:center;padding:40px 20px 20px}
 .header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:28px;letter-spacing:6px;color:#b44dff;text-shadow:0 0 10px rgba(180,77,255,0.6),0 0 40px rgba(180,77,255,0.2)}
-.header .sub{font-weight:300;font-size:14px;letter-spacing:3px;color:#4a4a6a;text-transform:uppercase;margin-top:8px}
-.back-link{display:inline-block;margin:10px 20px;font-family:'Rajdhani',sans-serif;font-size:14px;color:#4a4a6a;text-decoration:none;letter-spacing:2px}
+.header .sub{font-weight:300;font-size:14px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-top:8px}
+.back-link{display:inline-block;margin:10px 20px;font-family:'Rajdhani',sans-serif;font-size:14px;color:#7a7a9a;text-decoration:none;letter-spacing:2px}
 .back-link:hover{color:#00f0ff}
 .summary{display:flex;justify-content:center;gap:30px;padding:20px;flex-wrap:wrap}
 .summary .stat-box{background:#12121f;border:1px solid #1a1a2e;border-radius:6px;padding:20px 30px;text-align:center;min-width:140px}
 .stat-box .val{font-family:'Orbitron',monospace;font-weight:900;font-size:28px;letter-spacing:2px}
-.stat-box .lbl{font-weight:300;font-size:12px;letter-spacing:3px;color:#4a4a6a;text-transform:uppercase;margin-top:4px}
+.stat-box .lbl{font-weight:300;font-size:12px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-top:4px}
 .val-plays{color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
 .val-likes{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
 .val-issues{color:#ff2d7b;text-shadow:0 0 8px rgba(255,45,123,0.4)}
 .val-games{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
 .controls{display:flex;justify-content:center;gap:12px;padding:10px 20px 20px;flex-wrap:wrap}
 .controls input{font-family:'Rajdhani',sans-serif;font-size:14px;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid #222;color:#fff;border-radius:3px;width:240px;letter-spacing:1px}
-.controls input::placeholder{color:#4a4a6a}
-.loading{text-align:center;padding:60px;color:#4a4a6a;font-size:16px;letter-spacing:2px}
+.controls input::placeholder{color:#7a7a9a}
+.loading{text-align:center;padding:60px;color:#7a7a9a;font-size:16px;letter-spacing:2px}
 .table-wrap{max-width:1100px;margin:0 auto;padding:0 20px 40px;overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-thead th{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid #1a1a2e;text-align:left;cursor:pointer;user-select:none;white-space:nowrap}
+thead th{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid #1a1a2e;text-align:left;cursor:pointer;user-select:none;white-space:nowrap}
 thead th:hover{color:#8888aa}
 thead th.sorted-asc::after{content:' \25B2';color:#00f0ff}
 thead th.sorted-desc::after{content:' \25BC';color:#00f0ff}
@@ -143,7 +143,7 @@ td.issues{color:#ff2d7b}
 
       var tdRank = document.createElement('td');
       tdRank.className = 'num';
-      tdRank.style.color = '#4a4a6a';
+      tdRank.style.color = '#7a7a9a';
       tdRank.textContent = i + 1;
 
       var tdName = document.createElement('td');

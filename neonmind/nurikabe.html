@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/neonmind/nurikabe.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 
 <!-- Open Graph / Facebook -->
@@ -87,8 +89,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
 body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
@@ -102,7 +104,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,18px);letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-bottom:30px}
 
 .diff-group{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
-.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #7a7a9a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
 .diff-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
 .diff-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.1);box-shadow:0 0 15px rgba(0,240,255,0.15)}
 
@@ -110,20 +112,20 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
 
 .best-times{text-align:center;margin-bottom:20px}
-.best-times h3{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#4a4a6a;margin-bottom:8px}
+.best-times h3{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#7a7a9a;margin-bottom:8px}
 .best-row{font-family:'Rajdhani',sans-serif;font-size:15px;color:#8888aa;margin:3px 0}
-.best-row .rank{color:#4a4a6a;width:24px;display:inline-block;text-align:right;margin-right:8px}
+.best-row .rank{color:#7a7a9a;width:24px;display:inline-block;text-align:right;margin-right:8px}
 .best-row .score{color:#00f0ff;margin-right:10px}
-.best-row .ago{color:#4a4a6a;font-size:13px}
+.best-row .ago{color:#7a7a9a;font-size:13px}
 
 .start-lb{width:100%;max-width:340px;margin-top:8px}
 
 /* CONTROLS HINT */
-.controls-hint{font-size:13px;color:#4a4a6a;letter-spacing:1px;margin-top:10px;text-align:center;line-height:1.6}
+.controls-hint{font-size:13px;color:#7a7a9a;letter-spacing:1px;margin-top:10px;text-align:center;line-height:1.6}
 
 /* GAME SCREEN */
 .game-top{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:500px;margin-bottom:10px;padding:0 4px}
-.game-top .back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#4a4a6a;background:none;border:1px solid #2a2a3a;padding:6px 14px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.game-top .back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#7a7a9a;background:none;border:1px solid #2a2a3a;padding:6px 14px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
 .game-top .back-btn:hover{color:#00f0ff;border-color:#00f0ff}
 .game-info{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;color:#8888aa}
 .timer{font-family:'Orbitron',monospace;font-size:16px;letter-spacing:2px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
@@ -150,10 +152,10 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .toolbar{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center}
 .tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#8888aa;background:rgba(255,255,255,0.03);border:1px solid #2a2a3a;padding:8px 16px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
 .tool-btn:hover{color:#00f0ff;border-color:#00f0ff;background:rgba(0,240,255,0.06)}
-.tool-btn:disabled{opacity:0.3;cursor:default;color:#4a4a6a;border-color:#1a1a2e}
-.tool-btn:disabled:hover{color:#4a4a6a;border-color:#1a1a2e;background:rgba(255,255,255,0.03)}
+.tool-btn:disabled{opacity:0.3;cursor:default;color:#7a7a9a;border-color:#1a1a2e}
+.tool-btn:disabled:hover{color:#7a7a9a;border-color:#1a1a2e;background:rgba(255,255,255,0.03)}
 
-.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:#4a4a6a;letter-spacing:1px;flex-wrap:wrap;justify-content:center}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:#7a7a9a;letter-spacing:1px;flex-wrap:wrap;justify-content:center}
 .legend-item{display:flex;align-items:center;gap:5px}
 .legend-swatch{width:16px;height:16px;border-radius:2px;border:1px solid #1a1a2e}
 .legend-swatch.sw-empty{background:#12121f}
@@ -166,7 +168,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .stats-row{display:flex;gap:30px;margin-bottom:20px}
 .stat{text-align:center}
 .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:24px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
-.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#4a4a6a;margin-top:2px}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#7a7a9a;margin-top:2px}
 .stars{font-size:32px;margin-bottom:16px;letter-spacing:4px}
 
 .complete-grid{display:grid;gap:1px;margin-bottom:20px}
@@ -195,7 +197,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 /* More Games Navigation */
 .na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .na-more-inner{max-width:600px;margin:0 auto}
-.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
 .na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}

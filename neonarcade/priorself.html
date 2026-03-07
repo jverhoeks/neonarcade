@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/neonarcade/priorself.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 
 <!-- Open Graph / Facebook -->
@@ -87,8 +89,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
 body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
@@ -105,10 +107,10 @@ canvas{display:block;position:absolute;top:0;left:0}
 .play-btn.pink:hover{background:rgba(255,45,123,0.15);box-shadow:0 0 20px rgba(255,45,123,0.2)}
 .play-btn.gold{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
 .play-btn.gold:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
-.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:18px}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:18px}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
 .level-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0;max-width:320px}
-.level-cell{width:60px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #4a4a6a;border-radius:4px;cursor:pointer;font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:#4a4a6a;background:rgba(18,18,31,0.8);transition:all 0.2s}
+.level-cell{width:60px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #7a7a9a;border-radius:4px;cursor:pointer;font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:#7a7a9a;background:rgba(18,18,31,0.8);transition:all 0.2s}
 .level-cell.unlocked{border-color:#00f0ff;color:#00f0ff}
 .level-cell.unlocked:hover{background:rgba(0,240,255,0.1);box-shadow:0 0 12px rgba(0,240,255,0.2)}
 .level-cell.cleared{border-color:#39ff14;color:#39ff14}
@@ -134,7 +136,7 @@ canvas{display:block;position:absolute;top:0;left:0}
 /* More Games Navigation */
 .na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .na-more-inner{max-width:600px;margin:0 auto}
-.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
 .na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}

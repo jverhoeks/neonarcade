@@ -1,0 +1,29 @@
+# NEON ARCADE
+
+> Free online browser games — no download, no login. Play instantly.
+
+NEON ARCADE is a collection of 35+ free HTML5 browser games organized in three categories:
+
+## Categories
+
+- [NEON ARCADE](https://neonarcade.net/neonarcade/) — Quick viral action games (30-60 seconds)
+- [NEON MIND](https://neonarcade.net/neonmind/) — Classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
+- [NEON GRIND](https://neonarcade.net/neongrind/) — Progressive skill challenges
+
+## Popular Games
+
+- [Neon Snake](https://neonarcade.net/neonarcade/neon-snake.html) — Classic snake with risk vs reward mechanics
+- [Sudoku](https://neonarcade.net/neonmind/sudoku.html) — 9x9 Sudoku with four difficulty levels
+- [Minesweeper](https://neonarcade.net/neonmind/minesweeper.html) — Six progressive grid sizes
+- [Queens](https://neonarcade.net/neonmind/queens.html) — Place queens on colored regions, no conflicts
+- [MathBlitz](https://neonarcade.net/neongrind/mathblitz.html) — Mental math speed challenge, 30 levels
+- [Tetris Betrayal](https://neonarcade.net/neonarcade/tetris-betrayal.html) — Play Tetris badly on purpose
+- [Impostor Pixel](https://neonarcade.net/neonarcade/impostor-pixel.html) — Spot the different tile
+
+## Features
+
+- All games are free, no account required
+- Every game runs in the browser (HTML5, no plugins)
+- Mobile and desktop support with touch and keyboard controls
+- Global leaderboards and score sharing
+- Neon-retro visual style with dark theme

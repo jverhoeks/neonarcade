@@ -62,6 +62,9 @@ window.Neon = (function() {
     api.leaderboard(cfg.game).then(function(data) {
       if (data && data.leaderboard) globalBoard = data.leaderboard;
     });
+
+    // Auto-inject floating feedback bar
+    _injectFeedbackBar(cfg.game);
   }
 
   function getHighScore() {
@@ -211,6 +214,16 @@ window.Neon = (function() {
       var inputRow = document.createElement('div');
       inputRow.className = 'ns-name-row';
 
+      // Hidden input to trigger mobile keyboard
+      var hiddenInput = document.createElement('input');
+      hiddenInput.className = 'ns-name-hidden';
+      hiddenInput.type = 'text';
+      hiddenInput.inputMode = 'text';
+      hiddenInput.autocomplete = 'off';
+      hiddenInput.autocapitalize = 'characters';
+      hiddenInput.maxLength = 3;
+      hiddenInput.setAttribute('aria-label', 'Enter 3-character name');
+
       var chars = ['', '', ''];
       var slots = [];
       var cursor = 0;
@@ -222,7 +235,11 @@ window.Neon = (function() {
         slots.push(slot);
         inputRow.appendChild(slot);
         (function(idx) {
-          slot.addEventListener('click', function() { cursor = idx; updateSlots(); });
+          slot.addEventListener('click', function() {
+            cursor = idx;
+            updateSlots();
+            hiddenInput.focus();
+          });
         })(i);
       }
 
@@ -259,6 +276,15 @@ window.Neon = (function() {
         }
       }
 
+      // Mobile: sync hidden input to slots
+      hiddenInput.addEventListener('input', function() {
+        var val = hiddenInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3);
+        chars = [val[0] || '', val[1] || '', val[2] || ''];
+        cursor = Math.min(val.length, 2);
+        updateSlots();
+        if (val.length >= 3) hiddenInput.blur();
+      });
+
       document.addEventListener('keydown', handleKey);
 
       function done(n) {
@@ -267,6 +293,7 @@ window.Neon = (function() {
         resolve(n);
       }
 
+      box.appendChild(hiddenInput);
       box.appendChild(label);
       box.appendChild(sub);
       box.appendChild(inputRow);
@@ -274,6 +301,8 @@ window.Neon = (function() {
       _overlay.appendChild(box);
       document.body.appendChild(_overlay);
       updateSlots();
+      // Focus hidden input after a tick so mobile keyboard appears
+      setTimeout(function() { hiddenInput.focus(); }, 100);
     });
   }
 
@@ -330,6 +359,80 @@ window.Neon = (function() {
     _splashEl.addEventListener('click', dismiss);
   }
 
+  // ========== UI: Feedback Buttons (Like / Issue) ==========
+  var _feedbackSent = {}; // session tracker: { 'game-slug:like': true, ... }
+  var _feedbackBar = null;
+
+  function _injectFeedbackBar(game) {
+    if (_feedbackBar) _feedbackBar.remove();
+    _feedbackBar = document.createElement('div');
+    _feedbackBar.className = 'ns-fb-bar';
+    renderFeedback(_feedbackBar, game);
+    document.body.appendChild(_feedbackBar);
+  }
+
+  function _fbKey(game, type) { return game + ':' + type; }
+
+  function _hasSentFeedback(game, type) {
+    var k = _fbKey(game, type);
+    if (_feedbackSent[k]) return true;
+    try { if (sessionStorage.getItem('neon_fb_' + k)) return true; } catch(e) {}
+    return false;
+  }
+
+  function _markFeedback(game, type) {
+    var k = _fbKey(game, type);
+    _feedbackSent[k] = true;
+    try { sessionStorage.setItem('neon_fb_' + k, '1'); } catch(e) {}
+  }
+
+  function renderFeedback(container, game) {
+    if (!container) return;
+    game = game || cfg.game;
+    if (!game) return;
+    container.textContent = '';
+
+    var row = document.createElement('div');
+    row.className = 'ns-fb-row';
+
+    var likeBtn = _makeFbBtn('like', game, '\uD83D\uDC4D', 'LIKE');
+    var issueBtn = _makeFbBtn('issue', game, '\u26A0\uFE0F', 'REPORT');
+
+    row.appendChild(likeBtn);
+    row.appendChild(issueBtn);
+    container.appendChild(row);
+  }
+
+  function _makeFbBtn(type, game, icon, label) {
+    var sent = _hasSentFeedback(game, type);
+    var btn = document.createElement('button');
+    btn.className = 'ns-fb-btn' + (type === 'issue' ? ' ns-fb-issue' : '') + (sent ? ' ns-fb-sent' : '');
+
+    var iconSpan = document.createElement('span');
+    iconSpan.className = 'ns-fb-icon';
+    iconSpan.textContent = icon;
+    var labelSpan = document.createElement('span');
+    labelSpan.className = 'ns-fb-label';
+    labelSpan.textContent = sent ? (type === 'like' ? 'LIKED' : 'REPORTED') : label;
+    btn.appendChild(iconSpan);
+    btn.appendChild(labelSpan);
+
+    if (sent) {
+      btn.disabled = true;
+    } else {
+      btn.addEventListener('click', function() {
+        if (_hasSentFeedback(game, type)) return;
+        _markFeedback(game, type);
+        if (type === 'like') api.like(game);
+        else api.issue(game);
+        btn.classList.add('ns-fb-sent');
+        btn.disabled = true;
+        btn.querySelector('.ns-fb-label').textContent = type === 'like' ? 'LIKED' : 'REPORTED';
+      });
+    }
+    return btn;
+  }
+
   // ========== INJECT STYLES ==========
   function injectStyles() {
     if (document.getElementById('neon-styles')) return;
@@ -339,21 +442,21 @@ window.Neon = (function() {
       // Score table
       '.ns-title{font-family:"Orbitron",monospace;font-size:11px;letter-spacing:3px;color:#ffd700;text-align:center;margin:12px 0 6px;text-shadow:0 0 8px rgba(255,215,0,.4)}' +
       '.ns-title-global{color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,.4);margin-top:16px}' +
-      '.ns-empty{font-family:"Rajdhani",sans-serif;font-size:13px;color:#4a4a6a;text-align:center}' +
+      '.ns-empty{font-family:"Rajdhani",sans-serif;font-size:13px;color:#7a7a9a;text-align:center}' +
       '.ns-row{display:flex;align-items:center;padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.04);font-family:"Rajdhani",sans-serif}' +
       '.ns-you{background:rgba(0,240,255,.06);border-radius:3px}' +
-      '.ns-rank{color:#4a4a6a;font-size:12px;width:24px;text-align:center}' +
+      '.ns-rank{color:#7a7a9a;font-size:12px;width:24px;text-align:center}' +
       '.ns-name{color:#8888aa;font-size:13px;font-weight:700;width:40px;letter-spacing:1px}' +
       '.ns-val{color:#00f0ff;font-size:15px;font-weight:700;text-shadow:0 0 6px rgba(0,240,255,.3);flex:1;text-align:center}' +
-      '.ns-time{color:#4a4a6a;font-size:11px;text-align:right;min-width:60px}' +
+      '.ns-time{color:#7a7a9a;font-size:11px;text-align:right;min-width:60px}' +
       // Name overlay
       '.ns-name-overlay{position:fixed;inset:0;z-index:9999;background:rgba(5,5,10,.92);display:flex;align-items:center;justify-content:center;animation:nsIn .3s ease}' +
       '@keyframes nsIn{from{opacity:0}to{opacity:1}}' +
       '.ns-name-box{text-align:center;padding:32px 40px;background:#0e0e1a;border:1px solid rgba(0,240,255,.15);border-radius:8px;box-shadow:0 0 40px rgba(0,240,255,.08)}' +
       '.ns-name-label{font-family:"Orbitron",monospace;font-weight:900;font-size:16px;letter-spacing:4px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,.5);margin-bottom:6px}' +
-      '.ns-name-sub{font-family:"Rajdhani",sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#4a4a6a;margin-bottom:20px}' +
+      '.ns-name-sub{font-family:"Rajdhani",sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;margin-bottom:20px}' +
       '.ns-name-row{display:flex;justify-content:center;gap:8px;margin-bottom:20px}' +
-      '.ns-name-slot{width:44px;height:56px;display:flex;align-items:center;justify-content:center;font-family:"Orbitron",monospace;font-weight:900;font-size:28px;color:#4a4a6a;border:2px solid rgba(255,255,255,.08);border-radius:4px;background:rgba(255,255,255,.02);cursor:pointer;transition:all .15s}' +
+      '.ns-name-slot{width:44px;height:56px;display:flex;align-items:center;justify-content:center;font-family:"Orbitron",monospace;font-weight:900;font-size:28px;color:#7a7a9a;border:2px solid rgba(255,255,255,.08);border-radius:4px;background:rgba(255,255,255,.02);cursor:pointer;transition:all .15s}' +
       '.ns-name-slot.active{border-color:rgba(0,240,255,.5);box-shadow:0 0 12px rgba(0,240,255,.15);color:#00f0ff}' +
       '.ns-name-slot.filled{color:#fff}' +
       '.ns-name-ok{font-family:"Orbitron",monospace;font-weight:700;font-size:13px;letter-spacing:3px;padding:10px 32px;border:1px solid #00f0ff;background:rgba(0,240,255,.06);color:#00f0ff;cursor:pointer;border-radius:3px;transition:all .2s}' +
@@ -370,7 +473,18 @@ window.Neon = (function() {
       '@keyframes nsGlow{from{text-shadow:0 0 20px rgba(255,215,0,.6),0 0 60px rgba(255,215,0,.2)}to{text-shadow:0 0 30px rgba(255,215,0,.8),0 0 80px rgba(255,215,0,.4),0 0 120px rgba(255,215,0,.15)}}' +
       '.ns-splash-sub{font-family:"Rajdhani",sans-serif;font-weight:300;font-size:14px;letter-spacing:3px;color:#8888aa;margin-top:8px}' +
       '.ns-splash-p{position:absolute;width:6px;height:6px;border-radius:50%;top:50%;left:50%;animation:nsPart 1s ease-out forwards;pointer-events:none}' +
-      '@keyframes nsPart{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}';
+      '@keyframes nsPart{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}' +
+      // Hidden input for mobile keyboard
+      '.ns-name-hidden{position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;font-size:16px}' +
+      // Feedback buttons
+      '.ns-fb-row{display:flex;justify-content:center;gap:12px;margin:10px 0 4px}' +
+      '.ns-fb-btn{display:inline-flex;align-items:center;gap:5px;font-family:"Rajdhani",sans-serif;font-weight:500;font-size:13px;letter-spacing:1px;padding:6px 14px;border:1px solid rgba(0,240,255,0.2);background:rgba(0,240,255,0.04);color:#8888aa;cursor:pointer;border-radius:3px;transition:all .2s;text-transform:uppercase}' +
+      '.ns-fb-btn:hover:not(:disabled){color:#00f0ff;border-color:rgba(0,240,255,0.4);background:rgba(0,240,255,0.1)}' +
+      '.ns-fb-btn.ns-fb-issue{border-color:rgba(255,45,123,0.2);background:rgba(255,45,123,0.04)}' +
+      '.ns-fb-btn.ns-fb-issue:hover:not(:disabled){color:#ff2d7b;border-color:rgba(255,45,123,0.4);background:rgba(255,45,123,0.1)}' +
+      '.ns-fb-btn.ns-fb-sent{opacity:0.5;cursor:default}' +
+      '.ns-fb-icon{font-size:15px}' +
+      '.ns-fb-bar{position:fixed;bottom:8px;left:8px;z-index:800;display:flex}';
     document.head.appendChild(el);
   }
 
@@ -385,10 +499,11 @@ window.Neon = (function() {
   window.NeonAPI = api;
   // So games using NeonScores.* still work during migration
   window.NeonScores = {
-    init: init, save: save, render: render, promptName: promptName,
-    showGlobalSplash: showGlobalSplash, getHighScore: getHighScore,
-    getName: getName, setName: setName, getGlobalRank: getGlobalRank,
-    getGlobalBoard: getGlobalBoard, timeAgo: timeAgo, fmtScore: fmtScore,
+    init: init, save: save, render: render, renderFeedback: renderFeedback,
+    promptName: promptName, showGlobalSplash: showGlobalSplash,
+    getHighScore: getHighScore, getName: getName, setName: setName,
+    getGlobalRank: getGlobalRank, getGlobalBoard: getGlobalBoard,
+    timeAgo: timeAgo, fmtScore: fmtScore,
   };
 
   return {
@@ -396,6 +511,7 @@ window.Neon = (function() {
     init: init,
     save: save,
     render: render,
+    renderFeedback: renderFeedback,
     promptName: promptName,
     showGlobalSplash: showGlobalSplash,
     getHighScore: getHighScore,

@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/neonarcade/faultline.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 
 <!-- Open Graph / Facebook -->
@@ -87,8 +89,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
 body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
@@ -101,8 +103,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 
 #startScreen .title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,8vw,64px);letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:8px}
 #startScreen .subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;margin-bottom:40px;max-width:400px;line-height:1.5}
-#startScreen .best-score{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#4a4a6a;letter-spacing:2px;margin-top:20px}
-#startScreen .controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;color:#4a4a6a;letter-spacing:2px;text-transform:uppercase;margin-top:12px}
+#startScreen .best-score{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#7a7a9a;letter-spacing:2px;margin-top:20px}
+#startScreen .controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;color:#7a7a9a;letter-spacing:2px;text-transform:uppercase;margin-top:12px}
 
 .play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
 .play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
@@ -129,9 +131,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 #resultsScreen .results-list li{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:16px;letter-spacing:1px}
 #resultsScreen .results-list .round-label{color:#b44dff}
 #resultsScreen .results-list .stars{color:#ffd700;font-size:18px;letter-spacing:2px}
-#resultsScreen .results-list .dist{color:#4a4a6a;font-size:13px;min-width:60px;text-align:right}
+#resultsScreen .results-list .dist{color:#7a7a9a;font-size:13px;min-width:60px;text-align:right}
 #resultsScreen .total{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(20px,4vw,32px);color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.4);margin-bottom:8px}
-#resultsScreen .best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#4a4a6a;letter-spacing:2px;margin-bottom:24px}
+#resultsScreen .best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#7a7a9a;letter-spacing:2px;margin-bottom:24px}
 #resultsScreen .new-best{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
 .btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
@@ -152,7 +154,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 /* More Games Navigation */
 .na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .na-more-inner{max-width:600px;margin:0 auto}
-.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
 .na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}

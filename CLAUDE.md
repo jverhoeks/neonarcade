@@ -15,9 +15,7 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 ## File Structure
 ```
 index.html                # Main hub page linking to 3 categories
-neon.js                   # Shared client library (API + scores + name + leaderboard UI)
-api.js                    # Legacy API client (backward compat)
-scores.js                 # Legacy scores (backward compat)
+neon.js                   # Shared client library (API + scores + name + leaderboard + feedback UI)
 src/worker.js             # Cloudflare Worker backend
 neonarcade/               # Action/arcade games
   index.html              # NEON ARCADE hub
@@ -46,12 +44,18 @@ VIRAL_GAME_IDEAS.md       # Full ideas backlog with 25+ ranked concepts
 --neon-pink: #ff2d7b        (danger, errors, game over)
 --neon-purple: #b44dff      (secondary accent)
 --neon-orange: #ff8c00      (warnings, power-ups)
---text-dim: #4a4a6a         (labels, hints)
---text-mid: #8888aa         (body text)
+--text-dim: #7a7a9a         (labels, hints — WCAG 4.5:1 on #0a0a12)
+--text-mid: #9999bb         (body text — WCAG 4.5:1 on #0a0a12)
 ```
+**Contrast rule:** All text must meet WCAG AA (4.5:1 ratio against its background). Never use colors darker than `#7a7a9a` for text on dark backgrounds.
 
 ### Typography
-- Google Fonts import: `@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');`
+- Google Fonts: use `<link>` tag in `<head>` (NOT `@import` — it's render-blocking):
+  ```html
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+  ```
 - Headings/titles/scores: `font-family: 'Orbitron', monospace;`
 - Body/labels/descriptions: `font-family: 'Rajdhani', sans-serif;`
 - Title weight: 900, letter-spacing: 4-8px
@@ -89,7 +93,8 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 1. **Start screen** — Game title (Orbitron 900), subtitle explaining the hook, START button, controls hint
 2. **Game over / completion screen** — Stats, high score comparison, SHARE button, PLAY AGAIN button
 3. **Share button** — Copies emoji-based result to clipboard via `navigator.clipboard.writeText()`. Use `navigator.share()` as primary on mobile with clipboard fallback
-4. **Neon.js integration (scores + leaderboard + name)** — Include shared library and use it for all score management:
+4. **Like/Report feedback** — Auto-injected by neon.js when `Neon.init()` is called (floating bar, bottom-left). Session-limited via sessionStorage. No game-side code needed — neon.js handles everything. For manual placement use `Neon.renderFeedback(containerEl, gameSlug)`.
+5. **Neon.js integration (scores + leaderboard + name)** — Include shared library and use it for all score management:
    ```html
    <!-- Include at end of body, BEFORE your game script -->
    <script src="/neon.js"></script>
@@ -133,11 +138,22 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
    - Storage key convention: `neonarcade_{category}_{game}_scores_{variant}` (e.g. `neonarcade_neonmind_queens_scores_7`)
    - Provide a `<div id="...LB"></div>` container — Neon.js renders the full score table + global leaderboard
    - Neon.js auto-injects its own CSS styles, no need to add leaderboard styling
-5. **Sound effects** — Web Audio API (oscillator-based, no external audio files). At minimum: action sound, success sound, fail/death sound
-6. **Mobile support** — Touch controls, `touch-action: none`, responsive canvas sizing, `user-scalable=no` in viewport meta
-7. **Desktop support** — Keyboard controls (arrows/WASD/space as appropriate)
-8. **HiDPI rendering** — Use `devicePixelRatio` for sharp canvas on Retina displays
-9. **60fps** — Use `requestAnimationFrame` with delta-time or fixed timestep (for games with animation loops)
+   - Neon.js auto-injects like/report feedback bar — no extra code needed
+6. **Sound effects** — Web Audio API (oscillator-based, no external audio files). At minimum: action sound, success sound, fail/death sound
+7. **Mobile support** — Touch controls, `touch-action: none`, responsive canvas sizing, `user-scalable=no` in viewport meta
+8. **Desktop support** — Keyboard controls (arrows/WASD/space as appropriate)
+9. **HiDPI rendering** — Use `devicePixelRatio` for sharp canvas on Retina displays
+10. **60fps** — Use `requestAnimationFrame` with delta-time or fixed timestep (for games with animation loops)
+11. **SEO & meta tags** — Every game page must include (see template below):
+    - `<title>` with format: `{Game Name} — Free Online {Genre} Game | NEON ARCADE`
+    - `<meta name="description">` with unique game description
+    - Preconnect hints for fonts.googleapis.com and fonts.gstatic.com
+    - `<link rel="canonical">` pointing to `https://neonarcade.net/{category}/{game}.html`
+    - `<link rel="manifest" href="/manifest.json">`
+    - Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`)
+    - Twitter Card tags (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
+    - Schema.org structured data: `VideoGame` type + `BreadcrumbList`
+12. **Accessibility** — Use `<main>` landmark on hub/landing pages. Ensure text meets WCAG AA contrast (4.5:1). Links must be distinguishable by more than color alone (use underline or border).
 
 ### Code Structure Pattern
 ```javascript
@@ -170,17 +186,90 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 - Simple to understand in 5 seconds, hard to master
 - Every game should produce a moment worth screenshotting or sharing
 
+### SEO Head Template (copy into every new game)
+```html
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>{Game Name} — Free Online {Genre} Game | NEON ARCADE</title>
+<meta name="description" content="Play {Game Name} free online — {unique description}. No download, no login.">
+<meta name="keywords" content="{game name}, free {genre} game online, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/{category}/{game-slug}.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/{category}/{game-slug}.html">
+<meta property="og:title" content="{Game Name} — Free Online {Genre} Game | NEON ARCADE">
+<meta property="og:description" content="Play {Game Name} free online — {unique description}.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/{game-slug}.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/{category}/{game-slug}.html">
+<meta name="twitter:title" content="{Game Name} — Free Online {Genre} Game | NEON ARCADE">
+<meta name="twitter:description" content="Play {Game Name} free online — {unique description}.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/{game-slug}.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "{Game Name}",
+  "url": "https://neonarcade.net/{category}/{game-slug}.html",
+  "description": "Play {Game Name} free online — {unique description}.",
+  "genre": "{Genre}",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/{game-slug}.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "{CATEGORY NAME}", "item": "https://neonarcade.net/{category}/" },
+    { "@type": "ListItem", "position": 3, "name": "{Game Name}", "item": "https://neonarcade.net/{category}/{game-slug}.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+  /* game styles here */
+</style>
+</head>
+```
+
 ## How to Add a New Game
 
 1. Create `{category}/{game-name}.html` in the appropriate category folder:
    - `neonarcade/` — action/arcade games
    - `neonmind/` — classic brain puzzles (sudoku, minesweeper, etc.)
    - `neongrind/` — skill/speed challenges
-2. Follow the visual style guide above exactly
-3. Include `<script src="/neon.js"></script>` and integrate with Neon.init/save/render (see Required Features #4)
-4. Include all required features (start screen, game over, share, neon.js scores, sound, mobile)
-5. Take a screenshot at 1280x800 and save as `screenshots/{game-name}.png`
-6. Add a card to the category's `index.html` hub page following the existing card pattern:
+2. Follow the visual style guide above exactly (colors, typography, effects, contrast)
+3. Copy the SEO head template above and fill in placeholders
+4. Include `<script src="/neon.js"></script>` and integrate with Neon.init/save/render (see Required Features #5)
+5. Include all required features (start screen, game over, share, neon.js scores, sound, mobile, SEO)
+6. Take a screenshot at 1280x800 and save as `screenshots/{game-name}.png`
+7. Add a card to the category's `index.html` hub page following the existing card pattern:
    ```html
    <a href="{game-name}.html" class="game-card" data-accent="{color}">
      <div class="card-screenshot">
@@ -205,9 +294,9 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
      </div>
    </a>
    ```
-7. Update the hub page game count in the stats section
-8. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
-9. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple)
+8. Update the hub page game count in the stats section
+9. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
+10. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple)
 
 ## Ideas Backlog
 See `VIRAL_GAME_IDEAS.md` for 25+ ranked game concepts organized in tiers:
@@ -231,7 +320,11 @@ See `VIRAL_GAME_IDEAS.md` for 25+ ranked game concepts organized in tiers:
 ## Testing
 - Serve locally: `python3 -m http.server 8777`
 - Test each game loads and is playable
-- Verify mobile touch controls work
+- Verify mobile touch controls work (including name input keyboard)
 - Check localStorage persistence
 - Test share button copies correct format
 - Screenshot at 1280x800 for landing page cards
+- Verify like/report buttons appear and are session-limited
+- Check SEO: `<title>`, meta description, OG tags, structured data, canonical URL
+- Run Lighthouse: no render-blocking @import, contrast meets 4.5:1, landmarks present
+- Links must be distinguishable without color (underline or border)
