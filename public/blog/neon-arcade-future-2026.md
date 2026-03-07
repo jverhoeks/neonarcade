@@ -150,6 +150,30 @@ When we asked the team what they were most excited about, the answers were split
 
 ---
 
+## How We Build: Agents Talking to Agents
+
+Here's something we haven't talked about publicly yet: **we use AI agents that collaborate with each other to build better games.**
+
+It started as an experiment. We had one agent brainstorming game concepts — generating mechanics, themes, viral hooks — and a second agent whose job was to tear those ideas apart. Find the flaws. Ask "why would anyone share this?" Challenge every assumption. The back-and-forth produced ideas that neither agent would have reached alone.
+
+Then we took it further.
+
+**The Designer Agent** proposes a game concept with mechanics, controls, and a share format. It thinks about what makes a 30-second session feel complete, what creates the "one more try" compulsion, and what the screenshot or share text looks like.
+
+**The Critic Agent** plays devil's advocate. It stress-tests the concept against our viral design principles. "Where's the emotional spike?" "Is this actually fun on mobile?" "Would you send this to a group chat?" It pushes back hard, and the Designer iterates.
+
+**The Builder Agent** takes the refined concept and writes the entire game — HTML, CSS, JavaScript — in a single file. It knows our visual style guide, our neon color palette, the Orbitron font, the scanline overlay, the particle effects. It produces a playable game from a conversation.
+
+**The Playtester Agent** reviews the built game for bugs, balance issues, and polish gaps. It checks touch controls, verifies the share button format, tests edge cases, and flags anything that breaks the "open link, playing in 3 seconds" promise.
+
+The result? Games go from idea to playable in a fraction of the time it would take a traditional team. And because the agents challenge each other — arguing about mechanics, debating difficulty curves, questioning whether a concept is actually shareable — the games that survive the process are stronger for it.
+
+This isn't AI replacing game designers. It's AI agents having the same heated creative arguments that good design teams have, just faster and more relentlessly. The best Neon Arcade games came out of conversations where one agent said "this isn't good enough" and another agent rose to the challenge.
+
+We think this multi-agent approach is the future of indie game development. Not one AI doing everything, but specialized agents collaborating — each with a different perspective, each pushing the others to do better work.
+
+---
+
 ## What's Next
 
 We're starting development this month. The first NEON DAILY games should be playable within weeks. Follow along as we build — every game is open source, single-file HTML5, and playable the second you open the link.
