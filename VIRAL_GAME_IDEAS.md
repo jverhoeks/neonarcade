@@ -319,3 +319,9 @@ One player lost at sea (fog of war). Other is lighthouse (sees full map, can onl
 **Type:** Tournament / 8P async | **Build:** 4/5
 8-player bracket. Eliminated players become Kingmakers who boost remaining players. Micro-challenges per round. Full tournament in 5 min.
 **Viral:** "Get the group chat in here." Winners share crowns.
+
+---
+
+## NEW CATEGORIES (March 2026)
+
+See **[NEW_CATEGORIES_AND_IDEAS.md](NEW_CATEGORIES_AND_IDEAS.md)** for the full expansion plan including 4 new categories (NEON DAILY, NEON CHILL, NEON CHAOS, NEON SOCIAL) and 54 new game concepts. Blog post: **[blog/neon-arcade-future-2026.md](blog/neon-arcade-future-2026.md)**
