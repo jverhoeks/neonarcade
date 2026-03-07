@@ -1,0 +1,2 @@
+# Redirect www to naked domain
+https://www.neonarcade.net/* https://neonarcade.net/:splat 301

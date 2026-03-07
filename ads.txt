@@ -1,0 +1,3 @@
+# ads.txt - Authorized Digital Sellers
+# neonarcade.net currently does not run ads.
+# This file exists to prevent unauthorized ad inventory sales.
