@@ -3,7 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>NEON SNAKE</title>
+<title>Neon Snake — Free Online Snake Game | NEON ARCADE</title>
+<meta name="description" content="Play Neon Snake free online — the classic snake game reimagined with neon visuals and smooth controls. Eat, grow, survive. How long can you last?">
+<meta name="keywords" content="snake game, free snake game online, neon snake, browser snake game, classic snake">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<!-- Preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/neon-snake.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/neon-snake.html">
+<meta property="og:title" content="Neon Snake — Free Online Snake Game | NEON ARCADE">
+<meta property="og:description" content="Play Neon Snake free online — the classic snake game reimagined with neon visuals and smooth controls. Eat, grow, survive. How long can you last?">
+<meta property="og:image" content="https://neonarcade.net/screenshots/neon-snake.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/neon-snake.html">
+<meta name="twitter:title" content="Neon Snake — Free Online Snake Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Neon Snake free online — the classic snake game reimagined with neon visuals and smooth controls. Eat, grow, survive. How long can you last?">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/neon-snake.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Neon Snake",
+  "url": "https://neonarcade.net/neonarcade/neon-snake.html",
+  "description": "Play Neon Snake free online — the classic snake game reimagined with neon visuals and smooth controls. Eat, grow, survive. How long can you last?",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  },
+  "image": "https://neonarcade.net/screenshots/neon-snake.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://neonarcade.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "NEON ARCADE",
+      "item": "https://neonarcade.net/neonarcade/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Neon Snake",
+      "item": "https://neonarcade.net/neonarcade/neon-snake.html"
+    }
+  ]
+}
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
@@ -316,6 +399,16 @@
   .shake {
     animation: shake 0.25s ease;
   }
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
 </style>
 </head>
 <body>
@@ -834,6 +927,22 @@
   }
   requestAnimationFrame(renderLoop);
 })();
+
+// Show More Games bar after game starts or on game over
+setTimeout(function(){var mg=document.getElementById('neonMoreGames');if(mg)mg.style.display='block';},3000);
 </script>
+<!-- More Games Navigation -->
+<div id="neonMoreGames" class="na-more-games" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+            <a href="faultline.html" class="na-more-link">📷 Faultline</a>
+      <a href="split-second.html" class="na-more-link">⚡ Split Second</a>
+      <a href="chromaself.html" class="na-more-link">🎨 Chromaself</a>
+      <a href="palette.html" class="na-more-link">🎨 Palette</a>
+      <a href="/neonarcade/" class="na-more-link na-more-hub">&larr; All NEON ARCADE Games</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -3,7 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON GRIND — Level Up Your Skills</title>
+<title>NEON GRIND — Free Skill & Speed Games | Test Your Reflexes</title>
+<meta name="description" content="Test your speed, reflexes and mental agility with free skill-based browser games. Math challenges, reaction tests and sorting puzzles. How fast can you go?">
+<meta name="keywords" content="skill games, speed games, reflex games, math games online, reaction time test, brain training games">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<!-- Preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neongrind/">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neongrind/">
+<meta property="og:title" content="NEON GRIND — Free Skill & Speed Games | Test Your Reflexes">
+<meta property="og:description" content="Test your speed, reflexes and mental agility with free skill-based browser games. Math challenges, reaction tests and sorting puzzles. How fast can you go?">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neongrind/">
+<meta name="twitter:title" content="NEON GRIND — Free Skill & Speed Games | Test Your Reflexes">
+<meta name="twitter:description" content="Test your speed, reflexes and mental agility with free skill-based browser games. Math challenges, reaction tests and sorting puzzles. How fast can you go?">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "NEON GRIND",
+  "url": "https://neonarcade.net/neongrind/",
+  "description": "Test your speed, reflexes and mental agility with free skill-based browser games. Math challenges, reaction tests and sorting puzzles. How fast can you go?",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are skill games?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Skill games test your speed, accuracy, and mental agility. Try MathBlitz for math speed, Reflex Chain for reaction time, or NeuroSort for sorting speed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I improve my score?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Practice! Each game tracks your personal best. Focus on accuracy first, then speed. Compete on the global leaderboard to see how you rank."
+      }
+    }
+  ]
+}
+</script>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
@@ -480,7 +549,7 @@
 
 <header>
   <a href="../index.html" class="back-link">&larr; NEON ARCADE</a>
-  <div class="logo">NEON<span>GRIND</span></div>
+  <h1 class="logo">NEON<span>GRIND</span></h1>
   <p class="tagline">Level up your skills — push your ceiling</p>
   <p class="header-desc">Progressive skill games that get harder every level. Practice to improve, grind to master. How far can you get?</p>
   <div class="header-line"></div>
@@ -506,7 +575,7 @@
   <!-- 1. MATHBLITZ -->
   <a href="mathblitz.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img src="screenshots/mathblitz.png" alt="MathBlitz" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img fetchpriority="high" src="/screenshots/mathblitz.png" alt="MathBlitz" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">+x</div>
       <span class="card-badge badge-brain">GRIND</span>
     </div>
@@ -531,7 +600,7 @@
   <!-- 2. REFLEX CHAIN -->
   <a href="reflex-chain.html" class="game-card" data-accent="green">
     <div class="card-screenshot">
-      <img src="screenshots/reflex-chain.png" alt="Reflex Chain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img fetchpriority="high" src="/screenshots/reflex-chain.png" alt="Reflex Chain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">&oplus;</div>
       <span class="card-badge badge-brain">GRIND</span>
     </div>
@@ -556,7 +625,7 @@
   <!-- 3. NEUROSORT -->
   <a href="neurosort.html" class="game-card" data-accent="orange">
     <div class="card-screenshot">
-      <img src="screenshots/neurosort.png" alt="NeuroSort" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img fetchpriority="high" src="/screenshots/neurosort.png" alt="NeuroSort" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">&darr;</div>
       <span class="card-badge badge-brain">GRIND</span>
     </div>

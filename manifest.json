@@ -1,0 +1,17 @@
+{
+  "name": "NEON ARCADE",
+  "short_name": "NEON ARCADE",
+  "description": "Play 30+ free online browser games instantly — action, puzzle, and skill games with neon-retro style.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a12",
+  "theme_color": "#0a0a12",
+  "icons": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1280x800",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["games", "entertainment"]
+}

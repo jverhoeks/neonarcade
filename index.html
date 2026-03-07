@@ -3,7 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON ARCADE — Play Instantly</title>
+<title>NEON ARCADE — Free Online Browser Games | Play Instantly</title>
+<meta name="description" content="Play 30+ free online browser games instantly — no download, no login. Action, puzzle, and skill games with neon-retro style. Snake, Sudoku, Tetris, Minesweeper and more.">
+<meta name="keywords" content="free online games, browser games, no download games, instant play games, arcade games, puzzle games, neon games, HTML5 games">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<!-- Preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/">
+<meta property="og:title" content="NEON ARCADE — Free Online Browser Games | Play Instantly">
+<meta property="og:description" content="Play 30+ free online browser games instantly — no download, no login. Action, puzzle, and skill games with neon-retro style. Snake, Sudoku, Tetris, Minesweeper and more.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/">
+<meta name="twitter:title" content="NEON ARCADE — Free Online Browser Games | Play Instantly">
+<meta name="twitter:description" content="Play 30+ free online browser games instantly — no download, no login. Action, puzzle, and skill games with neon-retro style. Snake, Sudoku, Tetris, Minesweeper and more.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "NEON ARCADE",
+  "url": "https://neonarcade.net",
+  "description": "Play 30+ free online browser games instantly — no download, no login. Action, puzzle, and skill games with neon-retro style. Snake, Sudoku, Tetris, Minesweeper and more.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net",
+    "logo": "https://neonarcade.net/og-image.png"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What games can I play for free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All 30+ games on NEON ARCADE are completely free to play — no download, no login, no ads. Just open your browser and start playing instantly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to download anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No downloads required! Every game runs directly in your browser on any device — desktop, tablet, or phone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are these games mobile-friendly?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! All NEON ARCADE games are optimized for both desktop and mobile. Use touch controls on your phone or keyboard/mouse on desktop."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I share my scores?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every game has a built-in share button that creates a visual emoji summary of your results. Share your scores on social media and challenge your friends!"
+      }
+    }
+  ]
+}
+</script>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
@@ -349,7 +435,7 @@
 <div class="bg-glow"></div>
 
 <header>
-  <div class="logo">NEON<span>ARCADE</span></div>
+  <h1 class="logo">NEON<span>ARCADE</span></h1>
   <p class="tagline">Instant browser games — zero install</p>
   <p class="header-desc">Three collections of neon-drenched games. Quick viral hits, progressive skill challenges, and classic brain puzzles. All run in your browser.</p>
   <div class="header-line"></div>
@@ -454,7 +540,7 @@
     ],
   };
 
-  function makeCard(game, basePath) {
+  function makeCard(game, basePath, priority) {
     var path = game.path || basePath;
     var a = document.createElement('a');
     a.href = '/' + path + game.slug + '.html';
@@ -465,6 +551,7 @@
     var img = document.createElement('img');
     img.src = '/' + game.img;
     img.alt = game.name;
+    if (priority) img.fetchPriority = 'high';
     img.onerror = function() { this.style.display = 'none'; };
     ssDiv.appendChild(img);
     if (game.plays) {
@@ -504,17 +591,17 @@
     return String(n);
   }
 
-  function renderCategory(containerId, games, basePath, limit) {
+  function renderCategory(containerId, games, basePath, limit, priorityCount) {
     var container = document.getElementById(containerId);
     container.textContent = '';
     var shown = games.slice(0, limit || 3);
-    shown.forEach(function(g) {
-      container.appendChild(makeCard(g, basePath));
+    shown.forEach(function(g, i) {
+      container.appendChild(makeCard(g, basePath, i < (priorityCount || 0)));
     });
   }
 
   // Initially render with default order
-  renderCategory('arcade-games', CATALOG.arcade, 'neonarcade/', 3);
+  renderCategory('arcade-games', CATALOG.arcade, 'neonarcade/', 3, 3);
   renderCategory('grind-games', CATALOG.grind, 'neongrind/', 3);
   renderCategory('mind-games', CATALOG.mind, 'neonmind/', 3);
 

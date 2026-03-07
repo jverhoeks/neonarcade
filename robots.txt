@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /src/
+
+Sitemap: https://neonarcade.net/sitemap.xml
