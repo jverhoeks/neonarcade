@@ -111,6 +111,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 5 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Security Audit — Hardening a Zero-Auth Game API",
+  "description": "How we found and fixed 15 security issues in a Cloudflare Worker API: leaderboard poisoning, rate limiting, mode injection, and more.",
+  "url": "https://neonarcade.net/blog.html#security-audit",
+  "datePublished": "2026-03-07",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#security-audit"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -682,6 +698,10 @@
       <span class="toc-num">04</span>
       <span class="toc-text">Global Leaderboards for $0 &mdash; The KV + Worker API</span>
     </a></li>
+    <li><a href="#security-audit">
+      <span class="toc-num">05</span>
+      <span class="toc-text">Security Audit &mdash; Hardening a Zero-Auth Game API</span>
+    </a></li>
   </ol>
 </nav>
 
@@ -1009,6 +1029,105 @@ Neon.getName() ? Promise.resolve() : Neon.promptName();
     <span class="hl-label">The Bottom Line</span>
     <p>175 lines of JavaScript. One KV namespace. Zero monthly cost. Global leaderboards that update in under a second and replicate to 300+ edge locations. Sometimes the simplest solution is the best one.</p>
   </div>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 5 -->
+<!-- ================================================================ -->
+<article class="article" id="security-audit">
+  <p class="article-num">Article 05 &mdash; March 7, 2026</p>
+  <h2 class="article-title">Security Audit</h2>
+
+  <p>We built 38 games and a global leaderboard API in three days. Then we asked the obvious question: <strong>how badly can someone break this?</strong> The answer was: pretty badly. Here is what we found and how we fixed it.</p>
+
+  <p>The entire backend is a 175-line Cloudflare Worker with no authentication. No user accounts, no API keys, no rate limiting. By design, anyone can play, anyone can submit scores, anyone can like a game. That simplicity is the product &mdash; but it is also the attack surface.</p>
+
+  <h3>The Kill Shot: Leaderboard Poisoning</h3>
+
+  <p>The most critical finding was embarrassingly simple. The score submission endpoint accepted any integer with no upper bound:</p>
+
+  <div class="code-block" data-lang="before">
+<code><span class="kw">const</span> score = parseInt(body.score, <span class="num">10</span>);
+<span class="kw">if</span> (isNaN(score) || score &lt; <span class="num">0</span>) <span class="kw">return</span> json({ error: <span class="str">'invalid'</span> });</code>
+  </div>
+
+  <p>One curl command could fill all 20 leaderboard slots with <code>score: 999999999</code>. Every game, every leaderboard, wiped out in seconds. The fix: <strong>server-side score caps</strong> per game and a known-game allowlist so you cannot create phantom leaderboards for games that do not exist.</p>
+
+  <h3>Mode Injection</h3>
+
+  <p>The leaderboard supports two sort modes: <code>"high"</code> (bigger is better) and <code>"low"</code> (faster is better). The mode was sent by the client and trusted by the server. An attacker could POST <code>mode: "low"</code> to an arcade game, causing the leaderboard to re-sort in ascending order &mdash; pushing real high scores to the bottom.</p>
+
+  <p>The fix: the server now stores and enforces the sort mode per game. The client's <code>mode</code> field is ignored.</p>
+
+  <h3>No Rate Limiting</h3>
+
+  <p>Every POST endpoint (play, like, issue, score submission) had zero rate limiting. A simple loop could:</p>
+
+  <ul>
+    <li>Inflate play counts to millions</li>
+    <li>Spam likes or issue reports</li>
+    <li>Flood leaderboards with entries</li>
+    <li>Drive up Cloudflare KV write costs</li>
+  </ul>
+
+  <p>The fix: per-IP rate limiting in the Worker using a KV-based sliding window. Each IP gets a budget of requests per minute across all POST endpoints. Exceeding the limit returns <code>429 Too Many Requests</code>.</p>
+
+  <h3>Phantom Games &amp; KV Pollution</h3>
+
+  <p>Anyone could POST to <code>/api/play/totally-fake-game</code> and create real KV entries. The stats dashboard would show hundreds of phantom games that never existed. The fix: a server-side allowlist of valid game slugs. Unknown games are rejected with a 404.</p>
+
+  <h3>Missing Security Headers</h3>
+
+  <p>The <code>_headers</code> file only set <code>Content-Type</code>. No <code>Content-Security-Policy</code>, no <code>X-Frame-Options</code>, no <code>Strict-Transport-Security</code>. Games could be embedded in iframes on malicious sites (clickjacking). Now every response includes security headers that prevent framing, enforce HTTPS, and restrict script sources.</p>
+
+  <h3>Internal Files Exposed</h3>
+
+  <p>The Wrangler config had <code>directory = "./"</code>, meaning the <em>entire repo root</em> was deployed as static assets. That included <code>security.md</code> (this very audit report), <code>CLAUDE.md</code> (the full project instructions), <code>VIRAL_GAME_IDEAS.md</code> (the ideas backlog), <code>wrangler.toml</code>, and even <code>src/worker.js</code>. Anyone could read the backend source code by visiting <code>/src/worker.js</code>.</p>
+
+  <p>The fix: restructured the entire project. All deployable web files now live in a <code>public/</code> directory. Control files (docs, config, source) stay in the root and are never uploaded. Wrangler config changed to <code>directory = "./public"</code>. Clean separation between what the world sees and what stays internal.</p>
+
+  <h3>Localhost CORS Origins</h3>
+
+  <p>The CORS allowlist included <code>http://localhost:8777</code> and <code>http://127.0.0.1:8777</code> from development. Not exploitable in practice (browsers enforce same-origin policy), but unnecessary in production. Removed.</p>
+
+  <h3>The Smaller Stuff</h3>
+
+  <ul>
+    <li><strong>Name sanitization mismatch</strong> &mdash; the client allowed A-Z and 0-9 in names, but the server stripped digits. A player named "A1B" became "AB" on the leaderboard. Aligned both to accept A-Z0-9, 3 characters.</li>
+    <li><strong>Duplicate name flooding</strong> &mdash; one player could fill all 20 leaderboard slots. Now the server keeps only the best score per name.</li>
+    <li><strong>Zero scores saved as high scores</strong> &mdash; dying immediately in a game still recorded a "high score" of 0. Client-side fix rejects zero scores before saving.</li>
+    <li><strong>No error logging</strong> &mdash; the catch block returned a generic 500 with no <code>console.error</code>. Production errors were invisible. Added logging.</li>
+    <li><strong>innerHTML usage</strong> &mdash; four game files used <code>innerHTML</code> to render content. While sourced from internal data, the pattern is fragile. Replaced with safe DOM methods (<code>createElement</code> + <code>textContent</code>).</li>
+    <li><strong>Admin pages public</strong> &mdash; stats and top scores dashboards were accessible to anyone. Accepted as low risk since they are read-only.</li>
+  </ul>
+
+  <h3>The Scorecard</h3>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val pink">17</div>
+      <div class="stat-label">Issues Found</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">4</div>
+      <div class="stat-label">Critical</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">4</div>
+      <div class="stat-label">High</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">5+4</div>
+      <div class="stat-label">Medium + Low</div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Lesson</span>
+    <p>A public API with no authentication is not "insecure by design" &mdash; it is insecure by neglect if you do not actively constrain it. Every input that crosses a trust boundary needs validation, even in a toy project. Especially in a toy project, because toy projects have a way of ending up on the front page of Hacker News with their leaderboards full of <code>999999999</code>.</p>
+  </div>
+
+  <p>The full audit report is in the repo as <code>security.md</code>. Every issue was found and fixed by the same AI that built the games in the first place. The irony continues: the robot audited its own work, found it wanting, and fixed the problems. At least it is honest about its mistakes.</p>
 </article>
 
 </div><!-- .articles -->

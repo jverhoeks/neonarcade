@@ -102,6 +102,11 @@ window.Neon = (function() {
   // Save locally (top 10) + submit to global if qualifying
   // Returns promise: { scores, isNewBest, globalRank }
   function save(score) {
+    // Reject zero/null/undefined/NaN scores — no achievement to record
+    if (!score) {
+      return Promise.resolve({ scores: localScores, isNewBest: false, globalRank: -1 });
+    }
+
     // Local
     localScores.push({ score: score, ts: Date.now(), name: playerName || '???' });
     if (cfg.mode === 'low') {

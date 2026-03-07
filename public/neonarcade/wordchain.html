@@ -1254,7 +1254,13 @@
 
       const bodyPart = word.slice(0, -2);
       const bridgePart = word.slice(-2);
-      wordEl.innerHTML = `<span>${bodyPart}</span><span class="word-bridge">${bridgePart}</span>`;
+      const bodySpan = document.createElement('span');
+      bodySpan.textContent = bodyPart;
+      const bridgeSpan = document.createElement('span');
+      bridgeSpan.className = 'word-bridge';
+      bridgeSpan.textContent = bridgePart;
+      wordEl.appendChild(bodySpan);
+      wordEl.appendChild(bridgeSpan);
 
       wrap.appendChild(wordEl);
       chainHistory.appendChild(wrap);
@@ -1438,15 +1444,29 @@
 
   function renderBestChain() {
     const display = chain.slice(0, 8);
-    let html = '';
+    bestChainWords.textContent = '';
     display.forEach((w, i) => {
-      if (i > 0) html += `<span class="bar">→</span>`;
-      const body = w.slice(0, -2);
-      const bridge = w.slice(-2);
-      html += `<span class="bw">${body}</span><span class="bb">${bridge}</span>`;
+      if (i > 0) {
+        const arrow = document.createElement('span');
+        arrow.className = 'bar';
+        arrow.textContent = '→';
+        bestChainWords.appendChild(arrow);
+      }
+      const body = document.createElement('span');
+      body.className = 'bw';
+      body.textContent = w.slice(0, -2);
+      bestChainWords.appendChild(body);
+      const bridge = document.createElement('span');
+      bridge.className = 'bb';
+      bridge.textContent = w.slice(-2);
+      bestChainWords.appendChild(bridge);
     });
-    if (chain.length > 8) html += `<span class="bar">+${chain.length - 8} more</span>`;
-    bestChainWords.innerHTML = html;
+    if (chain.length > 8) {
+      const more = document.createElement('span');
+      more.className = 'bar';
+      more.textContent = '+' + (chain.length - 8) + ' more';
+      bestChainWords.appendChild(more);
+    }
   }
 
   // ─── SHARE ───

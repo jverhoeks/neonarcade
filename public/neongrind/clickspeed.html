@@ -530,9 +530,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   function initNeon() {
     if (typeof Neon !== 'undefined') {
       Neon.init({
-        game: 'clickspeed',
+        game: 'clickspeed-' + currentMode,
         mode: 'high',
-        key: 'neonarcade_neongrind_clickspeed_scores',
+        key: 'neonarcade_neongrind_clickspeed_scores_' + currentMode,
         formatScore: function(s) { return (s / 10).toFixed(1) + ' CPS'; }
       });
       updateBestDisplay();
@@ -563,7 +563,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
         btn.classList.add('selected');
         currentMode = btn.getAttribute('data-mode');
         modeDescEl.textContent = MODES[currentMode].desc;
-        updateBestDisplay();
+        initNeon();
       });
     })(modeBtns[mi]);
   }
