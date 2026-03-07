@@ -622,15 +622,18 @@ function updateHud() {
   var l = isEndless ? 'ENDLESS R' + roundIndex : 'LEVEL ' + currentLevel;
   hudLevel.textContent = 'ZONE ' + z + ' \u2014 ' + l;
 
-  var hearts = '';
+  hudLives.textContent = '';
   for (var i = 0; i < maxLives; i++) {
+    var heart = document.createElement('span');
+    heart.textContent = '\u2764';
     if (i < lives) {
-      hearts += '<span style="color:#ff2d7b;text-shadow:0 0 6px rgba(255,45,123,0.5);">\u2764</span>';
+      heart.style.color = '#ff2d7b';
+      heart.style.textShadow = '0 0 6px rgba(255,45,123,0.5)';
     } else {
-      hearts += '<span style="color:#2a2a3a;">\u2764</span>';
+      heart.style.color = '#2a2a3a';
     }
+    hudLives.appendChild(heart);
   }
-  hudLives.innerHTML = hearts;
 
   if (combo >= 2) {
     hudCombo.textContent = combo + 'x COMBO';

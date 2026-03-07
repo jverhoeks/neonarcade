@@ -1464,7 +1464,7 @@ function showResults() {
 
   // Breakdown
   const breakdown = document.getElementById('results-breakdown');
-  breakdown.innerHTML = '';
+  breakdown.textContent = '';
   gameAnswers.forEach(a => {
     const item = document.createElement('div');
     item.className = 'breakdown-item ' + (a.correct ? 'correct-item' : 'wrong-item');

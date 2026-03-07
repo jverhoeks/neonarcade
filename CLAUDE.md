@@ -5,31 +5,40 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 
 ## Architecture
 - Each game = 1 HTML file (HTML + CSS + JS, all inline)
-- Shared client library: `neon.js` — unified API, scores, name input, global leaderboard UI
-- 3 categories: `neonarcade/` (action), `neonmind/` (puzzles), `neongrind/` (skill/speed)
-- Hub pages: `index.html` (main), `neonarcade/index.html`, `neonmind/index.html`, `neongrind/index.html`
-- Screenshots: `screenshots/{game-name}.png` — 1280x800 viewport captures
+- Shared client library: `public/neon.js` — unified API, scores, name input, global leaderboard UI
+- 3 categories: `public/neonarcade/` (action), `public/neonmind/` (puzzles), `public/neongrind/` (skill/speed)
+- Hub pages: `public/index.html` (main), plus category index pages
+- Screenshots: `public/screenshots/{game-name}.png` — 1280x800 viewport captures
 - Backend: Cloudflare Worker (`src/worker.js`) with KV storage at `neonarcade.net`
-- Admin dashboards: `admin/stats.html`, `admin/topscores.html`
+- Admin dashboards: `public/admin/stats.html`, `public/admin/topscores.html`
+- All deployable web files live in `public/` — control files stay in root
 
 ## File Structure
 ```
-index.html                # Main hub page linking to 3 categories
-neon.js                   # Shared client library (API + scores + name + leaderboard + feedback UI)
+public/                   # Deployed to Cloudflare Pages (wrangler assets directory)
+  index.html              # Main hub page linking to 3 categories
+  neon.js                 # Shared client library (API + scores + name + leaderboard + feedback UI)
+  blog.html               # Behind-the-scenes blog
+  updates.html            # Changelog
+  _headers                # Cloudflare Pages security + content-type headers
+  neonarcade/             # Action/arcade games
+    index.html            # NEON ARCADE hub
+    neon-snake.html, catalyst.html, pong-both-sides.html, ...
+  neonmind/               # Classic brain puzzles
+    index.html            # NEON MIND hub
+    sudoku.html, queens.html, minesweeper.html, ...
+  neongrind/              # Skill/speed games
+    index.html            # NEON GRIND hub
+    mathblitz.html, reflex-chain.html, ...
+  admin/                  # Admin dashboards
+    stats.html, topscores.html
+  screenshots/            # PNG screenshots for landing page cards
+
 src/worker.js             # Cloudflare Worker backend
-neonarcade/               # Action/arcade games
-  index.html              # NEON ARCADE hub
-  neon-snake.html, catalyst.html, pong-both-sides.html, ...
-neonmind/                 # Classic brain puzzles
-  index.html              # NEON MIND hub
-  sudoku.html, queens.html, minesweeper.html, ...
-neongrind/                # Skill/speed games
-  index.html              # NEON GRIND hub
-  mathblitz.html, reflex-chain.html, ...
-admin/                    # Admin dashboards
-  stats.html, topscores.html
-screenshots/              # PNG screenshots for landing page cards
-VIRAL_GAME_IDEAS.md       # Full ideas backlog with 25+ ranked concepts
+wrangler.toml             # Wrangler deployment config (assets.directory = "./public")
+CLAUDE.md                 # Project instructions (not deployed)
+VIRAL_GAME_IDEAS.md       # Ideas backlog (not deployed)
+security.md               # Security audit report (not deployed)
 ```
 
 ## Visual Style Guide (MANDATORY for all games)
@@ -260,15 +269,15 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 
 ## How to Add a New Game
 
-1. Create `{category}/{game-name}.html` in the appropriate category folder:
-   - `neonarcade/` — action/arcade games
-   - `neonmind/` — classic brain puzzles (sudoku, minesweeper, etc.)
-   - `neongrind/` — skill/speed challenges
+1. Create `public/{category}/{game-name}.html` in the appropriate category folder:
+   - `public/neonarcade/` — action/arcade games
+   - `public/neonmind/` — classic brain puzzles (sudoku, minesweeper, etc.)
+   - `public/neongrind/` — skill/speed challenges
 2. Follow the visual style guide above exactly (colors, typography, effects, contrast)
 3. Copy the SEO head template above and fill in placeholders
 4. Include `<script src="/neon.js"></script>` and integrate with Neon.init/save/render (see Required Features #5)
 5. Include all required features (start screen, game over, share, neon.js scores, sound, mobile, SEO)
-6. Take a screenshot at 1280x800 and save as `screenshots/{game-name}.png`
+6. Take a screenshot at 1280x800 and save as `public/screenshots/{game-name}.png`
 7. Add a card to the category's `index.html` hub page following the existing card pattern:
    ```html
    <a href="{game-name}.html" class="game-card" data-accent="{color}">
@@ -318,7 +327,7 @@ See `VIRAL_GAME_IDEAS.md` for 25+ ranked game concepts organized in tiers:
 - BREAKOUT ARCHITECT — Design levels, challenge friends (3/5)
 
 ## Testing
-- Serve locally: `python3 -m http.server 8777`
+- Serve locally: `cd public && python3 -m http.server 8777`
 - Test each game loads and is playable
 - Verify mobile touch controls work (including name input keyboard)
 - Check localStorage persistence

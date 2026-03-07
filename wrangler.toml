@@ -7,7 +7,7 @@ routes = [
 ]
 
 [assets]
-directory = "./"
+directory = "./public"
 binding = "ASSETS"
 
 [[kv_namespaces]]
