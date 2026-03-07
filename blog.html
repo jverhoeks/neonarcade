@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Behind the Scenes of NEON ARCADE | How AI Builds Viral Games</title>
+<meta name="description" content="Behind the scenes of NEON ARCADE: how AI agents build viral browser games in minutes, SEO automation, zero-cost Cloudflare deployment, and global leaderboards for $0.">
+<meta name="keywords" content="neon arcade blog, AI game development, cloudflare workers, browser games, game dev behind the scenes">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/blog.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/blog.html">
+<meta property="og:title" content="Blog — Behind the Scenes of NEON ARCADE">
+<meta property="og:description" content="How AI agents build viral browser games in minutes, SEO automation, zero-cost deployment, and global leaderboards for $0.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/blog.html">
+<meta name="twitter:title" content="Blog — Behind the Scenes of NEON ARCADE">
+<meta name="twitter:description" content="How AI agents build viral browser games in minutes, SEO automation, zero-cost deployment, and global leaderboards for $0.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://neonarcade.net/blog.html" }
+  ]
+}
+</script>
+
+<!-- Structured Data: Article 1 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "From Prompt to Playable — How AI Builds a Game in Minutes",
+  "description": "The pipeline behind NEON ARCADE: from a human idea to a fully playable browser game in 3-5 minutes, built entirely by AI agents.",
+  "url": "https://neonarcade.net/blog.html#prompt-to-playable",
+  "datePublished": "2026-03-07",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#prompt-to-playable"
+}
+</script>
+
+<!-- Structured Data: Article 2 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "SEO by AI — When Your Robot Does Its Own Marketing",
+  "description": "How an AI agent audited and fixed SEO across 39 HTML game pages: meta tags, structured data, accessibility, and Core Web Vitals.",
+  "url": "https://neonarcade.net/blog.html#seo-by-ai",
+  "datePublished": "2026-03-07",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#seo-by-ai"
+}
+</script>
+
+<!-- Structured Data: Article 3 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Zero-Cost Deployment — Cloudflare Workers + Pages",
+  "description": "How NEON ARCADE runs 38 games with global leaderboards on Cloudflare's free tier. Total monthly cost: $0.",
+  "url": "https://neonarcade.net/blog.html#zero-cost",
+  "datePublished": "2026-03-07",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#zero-cost"
+}
+</script>
+
+<!-- Structured Data: Article 4 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Global Leaderboards for $0 — The KV + Worker API",
+  "description": "A deep dive into building global leaderboards with Cloudflare KV and a 175-line Worker. No database, no server, no bill.",
+  "url": "https://neonarcade.net/blog.html#leaderboards",
+  "datePublished": "2026-03-07",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#leaderboards"
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-surface: #12121f;
+    --bg-card: #0e0e1a;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #7a7a9a;
+    --text-mid: #9999bb;
+    --text-bright: #cccce0;
+    --border: rgba(0,240,255,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- HEADER --- */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 20px;
+  }
+
+  .logo-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(28px, 6vw, 48px);
+    letter-spacing: 8px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2), 0 0 80px rgba(0,240,255,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px rgba(255,45,123,0.6), 0 0 40px rgba(255,45,123,0.2);
+  }
+
+  .page-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    margin: 30px auto 0;
+  }
+
+  /* --- TABLE OF CONTENTS --- */
+  .toc {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 40px auto 0;
+    padding: 0 24px;
+  }
+
+  .toc-label {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .toc-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 600px) {
+    .toc-list { grid-template-columns: 1fr; }
+  }
+
+  .toc-list a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-bright);
+    transition: all 0.25s;
+  }
+
+  .toc-list a:hover {
+    border-color: rgba(0,240,255,0.3);
+    background: rgba(0,240,255,0.04);
+    transform: translateX(4px);
+  }
+
+  .toc-num {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0,240,255,0.4);
+    min-width: 32px;
+  }
+
+  .toc-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+  }
+
+  /* --- ARTICLE SECTIONS --- */
+  .articles {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .article {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(0,240,255,0.08);
+  }
+
+  .article:first-child {
+    border-top: none;
+  }
+
+  .article-num {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--neon-purple);
+    text-shadow: 0 0 8px rgba(180,77,255,0.3);
+    margin-bottom: 8px;
+  }
+
+  .article-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(20px, 4vw, 30px);
+    letter-spacing: 2px;
+    line-height: 1.3;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.4), 0 0 40px rgba(0,240,255,0.15);
+    margin-bottom: 24px;
+  }
+
+  .article p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text-mid);
+    margin-bottom: 18px;
+  }
+
+  .article p strong {
+    color: var(--text-bright);
+    font-weight: 700;
+  }
+
+  .article h3 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--neon-gold);
+    text-shadow: 0 0 8px rgba(255,215,0,0.3);
+    margin: 32px 0 14px;
+  }
+
+  .article ul {
+    list-style: none;
+    margin: 0 0 18px 0;
+    padding: 0;
+  }
+
+  .article ul li {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-mid);
+    padding: 4px 0 4px 20px;
+    position: relative;
+  }
+
+  .article ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 13px;
+    width: 6px;
+    height: 6px;
+    background: var(--neon-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0,240,255,0.5);
+  }
+
+  /* Highlight box */
+  .highlight-box {
+    background: rgba(0,240,255,0.04);
+    border: 1px solid rgba(0,240,255,0.15);
+    border-left: 3px solid var(--neon-cyan);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin: 24px 0;
+  }
+
+  .highlight-box p {
+    margin-bottom: 0;
+    font-size: 16px;
+    color: var(--text-bright);
+  }
+
+  .highlight-box .hl-label {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--neon-cyan);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .stat-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 28px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0,240,255,0.4);
+    line-height: 1;
+  }
+
+  .stat-val.pink { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,45,123,0.4); }
+  .stat-val.green { color: var(--neon-green); text-shadow: 0 0 8px rgba(57,255,20,0.4); }
+  .stat-val.gold { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: #08080f;
+    border: 1px solid rgba(0,240,255,0.12);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .code-block code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-bright);
+    white-space: pre;
+    display: block;
+  }
+
+  .code-block code .kw { color: var(--neon-purple); }
+  .code-block code .fn { color: var(--neon-cyan); }
+  .code-block code .str { color: var(--neon-green); }
+  .code-block code .cm { color: var(--text-dim); }
+  .code-block code .num { color: var(--neon-orange); }
+
+  /* Architecture diagram */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 28px 0;
+    flex-wrap: wrap;
+  }
+
+  .arch-node {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 18px;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--neon-cyan);
+  }
+
+  .arch-arrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    color: var(--text-dim);
+    padding: 0 8px;
+  }
+
+  /* Inline code */
+  .article code:not(.code-block code) {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background: rgba(0,240,255,0.06);
+    border: 1px solid rgba(0,240,255,0.1);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: var(--neon-cyan);
+  }
+
+  /* API table */
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .api-table th {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(0,240,255,0.1);
+  }
+
+  .api-table td {
+    font-size: 14px;
+    color: var(--text-mid);
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    vertical-align: top;
+  }
+
+  .api-table td:first-child {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    color: var(--neon-green);
+    white-space: nowrap;
+  }
+
+  .api-table tr:hover td {
+    background: rgba(0,240,255,0.02);
+  }
+
+  .method {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+  }
+
+  .method-get {
+    background: rgba(57,255,20,0.1);
+    color: var(--neon-green);
+    border: 1px solid rgba(57,255,20,0.2);
+  }
+
+  .method-post {
+    background: rgba(0,240,255,0.1);
+    color: var(--neon-cyan);
+    border: 1px solid rgba(0,240,255,0.2);
+  }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    margin-top: 60px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #9999bb;
+    text-decoration: underline;
+    text-decoration-color: rgba(153,153,187,0.4);
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover { color: var(--neon-cyan); text-decoration-color: rgba(0,240,255,0.4); }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border: 1px solid rgba(0,240,255,0.15);
+    border-radius: 3px;
+    color: var(--neon-cyan);
+    background: rgba(0,240,255,0.03);
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+
+  .back-link:hover {
+    background: rgba(0,240,255,0.08);
+    border-color: rgba(0,240,255,0.35);
+    transform: translateX(-2px);
+  }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 700px) {
+    header { padding: 40px 16px 16px; }
+    .toc { padding: 0 16px; }
+    .articles { padding: 0 16px; }
+    .article { margin-top: 40px; padding-top: 30px; }
+    .code-block { padding: 14px; }
+    .code-block code { font-size: 11px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .arch-flow { flex-direction: column; gap: 4px; }
+    .arch-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .api-table { font-size: 12px; }
+    .api-table td:first-child { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <a href="/" class="logo-link"><h1 class="logo">NEON<span>ARCADE</span></h1></a>
+  <p class="page-title">Behind the Scenes</p>
+  <div class="header-line"></div>
+</header>
+
+<main>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc" aria-label="Article navigation">
+  <p class="toc-label">Contents</p>
+  <ol class="toc-list">
+    <li><a href="#prompt-to-playable">
+      <span class="toc-num">01</span>
+      <span class="toc-text">From Prompt to Playable &mdash; How AI Builds a Game in Minutes</span>
+    </a></li>
+    <li><a href="#seo-by-ai">
+      <span class="toc-num">02</span>
+      <span class="toc-text">SEO by AI &mdash; When Your Robot Does Its Own Marketing</span>
+    </a></li>
+    <li><a href="#zero-cost">
+      <span class="toc-num">03</span>
+      <span class="toc-text">Zero-Cost Deployment &mdash; Cloudflare Workers + Pages</span>
+    </a></li>
+    <li><a href="#leaderboards">
+      <span class="toc-num">04</span>
+      <span class="toc-text">Global Leaderboards for $0 &mdash; The KV + Worker API</span>
+    </a></li>
+  </ol>
+</nav>
+
+<div class="articles">
+
+<!-- ================================================================ -->
+<!-- ARTICLE 1 -->
+<!-- ================================================================ -->
+<article class="article" id="prompt-to-playable">
+  <p class="article-num">Article 01 &mdash; March 7, 2026</p>
+  <h2 class="article-title">From Prompt to Playable</h2>
+
+  <p>It starts with a sentence. Something like <strong>"build me a game where you play Tetris badly on purpose"</strong> or <strong>"Pac-Man but you can barely see the maze."</strong> That is the entire human contribution to the creative brief. From there, the robots take over.</p>
+
+  <p>NEON ARCADE uses a two-stage AI pipeline to go from idea to finished game. Stage one: a <strong>researcher agent</strong> takes the raw concept, studies what makes games shareable, analyzes viral mechanics (short sessions, emotional spikes, "one more try" hooks), and writes a detailed game specification. It decides the controls, the scoring system, the difficulty curve, the sharing format &mdash; everything.</p>
+
+  <p>Stage two: a <strong>builder agent</strong> takes that spec and produces the entire game. HTML structure, CSS styling, JavaScript game logic, sound effects (synthesized with the Web Audio API, no audio files), mobile touch support, keyboard controls, HiDPI canvas rendering, the share button, leaderboard integration &mdash; all in a single self-contained <code>.html</code> file.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val">38</div>
+      <div class="stat-label">Games Built</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">3</div>
+      <div class="stat-label">Days Total</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">~4min</div>
+      <div class="stat-label">Avg Per Game</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">1</div>
+      <div class="stat-label">Human</div>
+    </div>
+  </div>
+
+  <p>Average build time per game: roughly <strong>3 to 5 minutes</strong>. That includes sound effects, responsive layout, a start screen, a game-over screen with stats, a share button that generates emoji art, and integration with global leaderboards. Thirty-eight games were built between March 5 and March 7, 2026.</p>
+
+  <p>The secret weapon is <strong>parallel execution</strong>. Instead of building games one at a time, multiple builder agents run simultaneously. Five or six games materializing at once, each agent reading from the same style guide and producing output that looks like it came from the same studio. Because it did. Sort of.</p>
+
+  <h3>The Style Bible</h3>
+
+  <p>The consistency comes from <code>CLAUDE.md</code> &mdash; a project instructions file that every agent reads before writing a single line of code. It specifies exact hex colors, font families, glow effects, CSS patterns, required features, the SEO template, even the button hover states. Think of it as a 200-line brand manual that happens to be machine-readable.</p>
+
+  <p>Every game gets: Orbitron headings with cyan glow. Rajdhani body text. Scanline overlay. Particle effects on events. Screen shake on errors. The same dark-neon aesthetic from Snake to Sudoku to Tetris Betrayal. No game looks out of place, because no agent deviated from the spec.</p>
+
+  <h3>The Human in the Loop</h3>
+
+  <p>So what does the human actually do? <strong>Quality control.</strong> Playtesting. The "that is not fun enough" feedback. The "make it feel faster" note. The "this needs more screen shake" request. Sometimes the AI nails it on the first try. Sometimes a game needs two or three iterations before the feel is right.</p>
+
+  <p>There is something deeply ironic about an AI building games specifically designed to trigger human emotions strongly enough that humans will share them on social media. The games are engineered for dopamine spikes, frustration loops, and "I need to beat that score" moments &mdash; all by a system that has never felt any of those things.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Pipeline</span>
+    <p>Human idea &rarr; Researcher agent (viral analysis + game spec) &rarr; Builder agent (complete HTML/CSS/JS game) &rarr; Human playtesting &rarr; Ship it</p>
+  </div>
+
+  <p>The result is a collection of games that nobody would guess were each written in under five minutes. They have polish. They have juice. They have that satisfying feeling when you nail a high score and the screen erupts in particles. And they were built faster than you can order lunch.</p>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 2 -->
+<!-- ================================================================ -->
+<article class="article" id="seo-by-ai">
+  <p class="article-num">Article 02 &mdash; March 7, 2026</p>
+  <h2 class="article-title">SEO by AI</h2>
+
+  <p>After 38 games were built, we had a problem. They existed, they were fun, but search engines had no idea they were there. So we pointed the AI at itself: <strong>"audit every page for SEO issues and fix them."</strong></p>
+
+  <p>It found a lot. Across 39 HTML files (38 games plus the landing page), here is what the AI flagged and fixed:</p>
+
+  <h3>The Audit</h3>
+
+  <ul>
+    <li><strong>Missing meta descriptions</strong> &mdash; most game pages had a <code>&lt;title&gt;</code> but no description tag. Google had nothing to show in search results except guessed content.</li>
+    <li><strong>No Open Graph or Twitter Card tags</strong> &mdash; sharing a game link on social media produced a sad, featureless preview. Now every game has <code>og:title</code>, <code>og:description</code>, <code>og:image</code>, and matching Twitter Card tags.</li>
+    <li><strong>Render-blocking font imports</strong> &mdash; many games used <code>@import</code> inside <code>&lt;style&gt;</code> to load Google Fonts. This blocks rendering. Converted all of them to <code>&lt;link&gt;</code> tags in the <code>&lt;head&gt;</code> with <code>preconnect</code> hints.</li>
+    <li><strong>Missing canonical URLs</strong> &mdash; added <code>&lt;link rel="canonical"&gt;</code> to every page to prevent duplicate content issues.</li>
+    <li><strong>No structured data</strong> &mdash; added Schema.org <code>VideoGame</code> markup and <code>BreadcrumbList</code> to every game page. Added <code>FAQPage</code> schema to the landing page.</li>
+    <li><strong>WCAG contrast failures</strong> &mdash; several pages used text colors darker than <code>#7a7a9a</code> on the dark background. These failed the 4.5:1 contrast ratio. Brightened them all.</li>
+    <li><strong>Missing landmarks</strong> &mdash; hub pages lacked <code>&lt;main&gt;</code> tags. Accessibility tools need these for navigation.</li>
+    <li><strong>Links not distinguishable</strong> &mdash; some links relied on color alone. Added underlines and borders so they pass WCAG requirements.</li>
+    <li><strong>No image dimensions</strong> &mdash; screenshot <code>&lt;img&gt;</code> tags had no <code>width</code>/<code>height</code>, causing cumulative layout shift (CLS). Added explicit dimensions.</li>
+    <li><strong>Missing <code>fetchpriority</code></strong> &mdash; above-the-fold hero images were loading with the same priority as offscreen content.</li>
+    <li><strong>No favicon or apple-touch-icon</strong> &mdash; browsers showed the default blank icon. Created SVG and PNG favicons.</li>
+    <li><strong>No <code>manifest.json</code></strong> &mdash; added a PWA manifest for installability and proper mobile branding.</li>
+    <li><strong>Missing utility files</strong> &mdash; created <code>ads.txt</code>, <code>llms.txt</code>, and a custom 404 page.</li>
+  </ul>
+
+  <h3>The Results</h3>
+
+  <p>Lighthouse scores went from "embarrassing" to "actually good" across the board. Performance, Accessibility, Best Practices, and SEO categories all improved significantly. The biggest gains came from eliminating render-blocking resources and fixing contrast ratios.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Meta Humor</span>
+    <p>An AI is optimizing web content so that search engines &mdash; which are themselves increasingly powered by AI &mdash; will rank it higher and show it to humans. The machines are marketing to each other, and humans are the product. But at least the games are fun.</p>
+  </div>
+
+  <p>The best part: the AI didn't just flag problems. It fixed all of them in a single pass across every file. The kind of tedious, repetitive work that a human developer would have spread across a week was done in minutes. Every <code>@import</code> replaced. Every meta tag added. Every contrast ratio checked. Same agent, same rules, same consistency.</p>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 3 -->
+<!-- ================================================================ -->
+<article class="article" id="zero-cost">
+  <p class="article-num">Article 03 &mdash; March 7, 2026</p>
+  <h2 class="article-title">Zero-Cost Deployment</h2>
+
+  <p>NEON ARCADE runs 38 games with global leaderboards, play tracking, and a like/report system. The total monthly hosting cost is <strong>$0</strong>. The only expense is the domain name: about $10 per year. Here is how.</p>
+
+  <h3>The Stack</h3>
+
+  <p>There are exactly two components:</p>
+
+  <ul>
+    <li><strong>Static HTML files</strong> &mdash; served by Cloudflare Pages. Each game is a standalone <code>.html</code> file with inline CSS and JavaScript. No build step, no bundler, no framework. Just files.</li>
+    <li><strong>One Cloudflare Worker</strong> &mdash; a 175-line JavaScript file (<code>src/worker.js</code>) that handles API routes for play tracking, likes, issue reporting, and leaderboards. Everything else falls through to static assets.</li>
+  </ul>
+
+  <div class="arch-flow">
+    <div class="arch-node">Browser</div>
+    <span class="arch-arrow">&rarr;</span>
+    <div class="arch-node">Cloudflare Edge</div>
+    <span class="arch-arrow">&rarr;</span>
+    <div class="arch-node">Worker</div>
+    <span class="arch-arrow">&rarr;</span>
+    <div class="arch-node">KV Store</div>
+  </div>
+
+  <p>When a request hits the Cloudflare edge, the Worker checks if the path starts with <code>/api/</code>. If yes, it handles the request. If not, it falls through to <code>env.ASSETS.fetch(request)</code>, which serves the static HTML file. Simple routing, zero configuration.</p>
+
+  <h3>Deployment</h3>
+
+  <p>Deployment is literally one command:</p>
+
+  <div class="code-block" data-lang="shell">
+<code>npx wrangler deploy</code>
+  </div>
+
+  <p>That is it. No Docker image to build, no CI/CD pipeline to configure, no Kubernetes cluster to manage, no AWS bill to dread. Wrangler reads a <code>wrangler.toml</code> config that looks like this:</p>
+
+  <div class="code-block" data-lang="toml">
+<code><span class="cm"># wrangler.toml</span>
+name = <span class="str">"neonarcade"</span>
+main = <span class="str">"src/worker.js"</span>
+compatibility_date = <span class="str">"2024-12-01"</span>
+
+<span class="cm"># Bind KV namespace for persistent data</span>
+[[kv_namespaces]]
+binding = <span class="str">"GAME_DATA"</span>
+id = <span class="str">"your-kv-namespace-id"</span>
+
+<span class="cm"># Static assets served alongside the worker</span>
+[assets]
+directory = <span class="str">"./"</span></code>
+  </div>
+
+  <p>The Worker binds a KV namespace called <code>GAME_DATA</code>. That is the "database" &mdash; a key-value store running on Cloudflare's edge, replicated globally. More on that in the next article.</p>
+
+  <h3>Free Tier Limits</h3>
+
+  <p>Cloudflare's free tier is remarkably generous for a project like this:</p>
+
+  <ul>
+    <li><strong>Workers:</strong> 100,000 requests per day (about 1.15 requests per second sustained). More than enough for a hobby project &mdash; and honestly, for a lot of production MVPs.</li>
+    <li><strong>KV storage:</strong> 1 GB total. Our leaderboards, play counts, and like counts use a few kilobytes. We could run for centuries.</li>
+    <li><strong>Pages:</strong> unlimited bandwidth on the free tier. Static HTML files served from 300+ edge locations worldwide.</li>
+  </ul>
+
+  <h3>No Server</h3>
+
+  <p>There is no origin server. No EC2 instance, no Heroku dyno, no DigitalOcean droplet, no VPS. The Worker <em>is</em> the backend, and it runs on Cloudflare's edge &mdash; in whatever data center is closest to the user. The static files are cached globally. It is fast by default, not because of optimization, but because the architecture has no bottleneck to hit.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">Total Cost Breakdown</span>
+    <p>Hosting: $0/month. CDN: $0/month. Database: $0/month. SSL: $0/month. Domain: ~$10/year. Annual total: $10. That is less than a single month of the cheapest AWS EC2 instance.</p>
+  </div>
+
+  <p>For hobby projects, side projects, and MVPs, this is hard to beat. You get global distribution, edge computing, persistent storage, automatic HTTPS, DDoS protection, and zero ongoing cost. The catch? If your project explodes in popularity past 100K requests/day, you will need to upgrade to a paid plan. But that is a good problem to have.</p>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 4 -->
+<!-- ================================================================ -->
+<article class="article" id="leaderboards">
+  <p class="article-num">Article 04 &mdash; March 7, 2026</p>
+  <h2 class="article-title">Global Leaderboards for $0</h2>
+
+  <p>You want your browser game to have a global leaderboard. Players should see the top scores worldwide, and submitting a score should feel instant. You do <em>not</em> want to pay for a database. Here is how we solved it.</p>
+
+  <h3>The Problem</h3>
+
+  <p>Traditional approach: spin up a PostgreSQL database, write a REST API with Express or Django, deploy it somewhere, pay for hosting, handle connection pooling, worry about backups, deal with cold starts. For a hobby game site. No thanks.</p>
+
+  <h3>The Solution</h3>
+
+  <p><strong>Cloudflare KV</strong> is a globally distributed key-value store. You write a value, and within about 60 seconds it is readable from any Cloudflare edge location in the world. It is not a relational database. It is simpler than that &mdash; and for leaderboards, simpler is perfect.</p>
+
+  <p>The entire leaderboard API lives in <code>src/worker.js</code>, which is 175 lines of JavaScript. Here are the endpoints:</p>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th>Endpoint</th>
+        <th>What It Does</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="method method-post">POST</span>/api/play/:game</td>
+        <td>Increments the play counter for a game</td>
+      </tr>
+      <tr>
+        <td><span class="method method-post">POST</span>/api/like/:game</td>
+        <td>Increments the like counter</td>
+      </tr>
+      <tr>
+        <td><span class="method method-post">POST</span>/api/issue/:game</td>
+        <td>Increments the reported-issues counter</td>
+      </tr>
+      <tr>
+        <td><span class="method method-get">GET</span>/api/stats</td>
+        <td>Returns play/like/issue counts for all games</td>
+      </tr>
+      <tr>
+        <td><span class="method method-post">POST</span>/api/leaderboard/:game</td>
+        <td>Submits a score (name + score + mode)</td>
+      </tr>
+      <tr>
+        <td><span class="method method-get">GET</span>/api/leaderboard/:game</td>
+        <td>Fetches the top 20 scores</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>KV Key Design</h3>
+
+  <p>Every piece of data maps to a single key in KV:</p>
+
+  <ul>
+    <li><code>plays:neon-snake</code> &rarr; an integer (the play count)</li>
+    <li><code>likes:neon-snake</code> &rarr; an integer</li>
+    <li><code>issues:neon-snake</code> &rarr; an integer</li>
+    <li><code>lb:neon-snake</code> &rarr; a JSON array of the top 20 scores</li>
+  </ul>
+
+  <p>Leaderboard entries are stored as a JSON array in a single KV key. When a new score is submitted, the Worker reads the array, appends the new entry, sorts it, keeps the top 20, and writes it back. The whole operation takes a few milliseconds.</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="cm">// Submit a score — from src/worker.js</span>
+<span class="kw">const</span> key = <span class="str">`lb:${game}`</span>;
+<span class="kw">const</span> existing = JSON.parse(
+  <span class="kw">await</span> env.GAME_DATA.get(key) || <span class="str">'[]'</span>
+);
+
+existing.push({ name, score, ts: Date.now() });
+
+<span class="cm">// Sort by mode: "high" = arcade, "low" = timed puzzles</span>
+<span class="kw">const</span> mode = body.mode === <span class="str">'low'</span> ? <span class="str">'low'</span> : <span class="str">'high'</span>;
+<span class="kw">if</span> (mode === <span class="str">'low'</span>) {
+  existing.sort((a, b) =&gt; a.score - b.score);
+} <span class="kw">else</span> {
+  existing.sort((a, b) =&gt; b.score - a.score);
+}
+
+<span class="kw">const</span> top = existing.slice(<span class="num">0</span>, <span class="num">20</span>);
+<span class="kw">await</span> env.GAME_DATA.put(key, JSON.stringify(top));</code>
+  </div>
+
+  <p>The <code>mode</code> parameter is the key design choice. Arcade games use <code>"high"</code> (bigger is better). Timed puzzles like Sudoku and Minesweeper use <code>"low"</code> (faster is better). The client tells the server which sorting to use.</p>
+
+  <h3>Input Sanitization</h3>
+
+  <p>Since this is a public API with no authentication, input validation matters. Game slugs are stripped to lowercase alphanumeric characters and hyphens, max 50 characters. Player names are uppercase letters only, max 5 characters. Nothing fancy &mdash; just enough to prevent injection and keep things clean.</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="cm">// Sanitize game slug: only lowercase alphanumeric + hyphens</span>
+<span class="kw">function</span> <span class="fn">sanitizeGame</span>(game) {
+  <span class="kw">return</span> (game || <span class="str">''</span>).toLowerCase()
+    .replace(<span class="str">/[^a-z0-9-]/g</span>, <span class="str">''</span>).slice(<span class="num">0</span>, <span class="num">50</span>);
+}
+
+<span class="cm">// Sanitize player name: uppercase letters only, max 5</span>
+<span class="kw">function</span> <span class="fn">sanitizeName</span>(name) {
+  <span class="kw">return</span> (name || <span class="str">''</span>).toUpperCase()
+    .replace(<span class="str">/[^A-Z]/g</span>, <span class="str">''</span>).slice(<span class="num">0</span>, <span class="num">5</span>);
+}</code>
+  </div>
+
+  <p>CORS is restricted to <code>neonarcade.net</code> and <code>localhost</code>. If the request comes from an unknown origin, it defaults to the production domain.</p>
+
+  <h3>Client-Side Integration</h3>
+
+  <p>Games never talk to the API directly. They use <code>neon.js</code>, a shared client library that handles everything: local score storage (top 10 in localStorage), global score submission, the leaderboard UI, and even the player name input modal (a retro 3-5 character name picker).</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="cm">// In any game's script — that's it</span>
+Neon.init({
+  game: <span class="str">'neon-snake'</span>,
+  mode: <span class="str">'high'</span>,
+  key: <span class="str">'neonarcade_arcade_snake_scores'</span>
+});
+
+<span class="cm">// When the game ends:</span>
+Neon.getName() ? Promise.resolve() : Neon.promptName();
+  .then(<span class="kw">function</span>() { <span class="kw">return</span> Neon.save(score); })
+  .then(<span class="kw">function</span>(result) {
+    Neon.render(document.getElementById(<span class="str">'lb'</span>));
+    <span class="kw">if</span> (result.globalRank &gt;= <span class="num">1</span> &amp;&amp; result.globalRank &lt;= <span class="num">5</span>) {
+      Neon.showGlobalSplash(result.globalRank);
+    }
+  });</code>
+  </div>
+
+  <h3>The Trade-offs</h3>
+
+  <p><strong>Eventual consistency:</strong> KV is not a database. It is a cache with persistence. When you write a value, it takes up to 60 seconds to propagate to all edge locations. In practice this means two players submitting scores simultaneously might cause a race condition where one score overwrites the other. For a casual game leaderboard, this is fine. For a banking app, obviously not.</p>
+
+  <p><strong>No authentication:</strong> Players pick a 3-5 letter name and that is their identity. No login, no accounts, no OAuth flows. This is intentional. The point is zero friction &mdash; play a game, get a score, see it on the leaderboard. The anonymity keeps it fun and lightweight.</p>
+
+  <p><strong>No server-side score validation:</strong> A determined cheater could POST a fake score directly to the API. The current philosophy is "trust but display" &mdash; the fun is in playing and sharing, not in competitive integrity. If cheating becomes a problem, server-side validation can be added. But for a site where the high score on Snake is bragging rights among friends, it has not been an issue.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Bottom Line</span>
+    <p>175 lines of JavaScript. One KV namespace. Zero monthly cost. Global leaderboards that update in under a second and replicate to 300+ edge locations. Sometimes the simplest solution is the best one.</p>
+  </div>
+</article>
+
+</div><!-- .articles -->
+
+</main>
+
+<footer>
+  <a href="/" class="back-link">&larr; Back to Games</a>
+  <p style="margin-top:24px">ALL GAMES RUN IN YOUR BROWSER &mdash; NO INSTALL &mdash; NO SIGNUP &mdash; JUST PLAY</p>
+  <p class="credit">Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+<script src="/neon.js"></script>
+</body>
+</html>
