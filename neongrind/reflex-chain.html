@@ -87,8 +87,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none;}
 body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);}
@@ -103,7 +103,7 @@ canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
 #hud{position:absolute;top:0;left:0;width:100%;z-index:5;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;}
 #hud-left{display:flex;flex-direction:column;gap:2px;}
 #hud-score{font-family:'Orbitron',monospace;font-size:22px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6);}
-#hud-level{font-family:'Rajdhani',sans-serif;font-size:13px;color:#4a4a6a;letter-spacing:2px;text-transform:uppercase;}
+#hud-level{font-family:'Rajdhani',sans-serif;font-size:13px;color:#7a7a9a;letter-spacing:2px;text-transform:uppercase;}
 #hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
 #hud-lives{font-size:20px;letter-spacing:4px;}
 #hud-combo{font-family:'Orbitron',monospace;font-size:16px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6);opacity:0;transition:opacity 0.2s,transform 0.2s;transform:scale(1);}
@@ -126,14 +126,14 @@ canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
 
 /* Start screen */
 #start-screen .zone-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0;max-width:320px;width:100%;}
-.zone-dot{width:100%;aspect-ratio:1;border-radius:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:10px;color:#4a4a6a;transition:all 0.2s;cursor:pointer;}
+.zone-dot{width:100%;aspect-ratio:1;border-radius:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:10px;color:#7a7a9a;transition:all 0.2s;cursor:pointer;}
 .zone-dot.unlocked{border-color:rgba(0,240,255,0.3);color:#00f0ff;background:rgba(0,240,255,0.06);}
 .zone-dot.completed{border-color:rgba(57,255,20,0.3);color:#39ff14;background:rgba(57,255,20,0.06);}
 .zone-dot.current{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.1);box-shadow:0 0 8px rgba(255,215,0,0.3);}
 .zone-dot.locked{opacity:0.3;cursor:default;}
 .zone-labels{display:flex;justify-content:space-between;max-width:320px;width:100%;margin-bottom:4px;}
-.zone-label{font-size:10px;color:#4a4a6a;letter-spacing:1px;text-transform:uppercase;width:20%;text-align:center;}
-.best-stat{font-family:'Rajdhani',sans-serif;font-size:14px;color:#4a4a6a;margin-top:8px;}
+.zone-label{font-size:10px;color:#7a7a9a;letter-spacing:1px;text-transform:uppercase;width:20%;text-align:center;}
+.best-stat{font-family:'Rajdhani',sans-serif;font-size:14px;color:#7a7a9a;margin-top:8px;}
 .best-stat span{color:#ffd700;font-weight:700;}
 
 /* Level intro */
@@ -147,7 +147,7 @@ canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
 /* Level complete */
 #level-complete .stars{font-size:36px;margin:12px 0;letter-spacing:8px;}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin:16px 0;text-align:left;}
-.stat-label{font-size:12px;color:#4a4a6a;letter-spacing:1px;text-transform:uppercase;text-align:right;}
+.stat-label{font-size:12px;color:#7a7a9a;letter-spacing:1px;text-transform:uppercase;text-align:right;}
 .stat-value{font-family:'Orbitron',monospace;font-size:14px;color:#00f0ff;}
 
 /* Game over */
@@ -173,7 +173,7 @@ canvas{display:block;position:absolute;top:0;left:0;z-index:1;}
 /* More Games Navigation */
 .na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .na-more-inner{max-width:600px;margin:0 auto}
-.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
 .na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}

@@ -87,8 +87,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
 body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
@@ -107,7 +107,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;margin:6px 0}
 .diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:14px 10px;border:1px solid rgba(0,240,255,0.25);background:rgba(0,240,255,0.04);color:#00f0ff;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.2s;text-align:center}
 .diff-btn:hover{background:rgba(0,240,255,0.12);border-color:rgba(0,240,255,0.5);box-shadow:0 0 15px rgba(0,240,255,0.15)}
-.diff-btn .diff-best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#4a4a6a;margin-top:4px;display:block}
+.diff-btn .diff-best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#7a7a9a;margin-top:4px;display:block}
 .diff-btn.span2{grid-column:span 2}
 
 .daily-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:16px 40px;border:2px solid #ffd700;background:rgba(255,215,0,0.06);color:#ffd700;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.2s;width:100%;max-width:340px;text-align:center;box-shadow:0 0 15px rgba(255,215,0,0.1)}
@@ -118,7 +118,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
 .start-stat{text-align:center}
 .start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
-.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
 
 /* GAME SCREEN */
 #gameScreen{justify-content:flex-start;padding:10px;gap:0}
@@ -127,8 +127,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .top-diff{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;color:#8888aa;text-transform:uppercase}
 .top-diff.daily{color:#ffd700}
 .top-timer{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(14px,3vw,18px);letter-spacing:1px;color:#8888aa}
-.top-queens{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#4a4a6a;display:flex;align-items:center;gap:4px}
-.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#4a4a6a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
+.top-queens{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#7a7a9a;display:flex;align-items:center;gap:4px}
+.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#7a7a9a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
 .top-back:hover{color:#00f0ff}
 
 /* GRID */
@@ -176,11 +176,11 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .complete-stars{font-size:clamp(32px,8vw,48px);margin:4px 0}
 .complete-stat{text-align:center;margin:2px 0}
 .complete-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(20px,5vw,30px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
-.complete-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase}
+.complete-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
 .complete-best{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;margin:2px 0}
 .complete-daily{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
 .complete-streak{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#8888aa;margin-top:2px}
-.complete-par{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#4a4a6a;margin:2px 0}
+.complete-par{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#7a7a9a;margin:2px 0}
 
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
@@ -190,7 +190,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
 .play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
 
-.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:2px;text-align:center}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:2px;text-align:center}
 
 /* LEADERBOARD */
 .leaderboard{width:100%;max-width:300px;margin:6px 0}
@@ -209,13 +209,13 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 /* Legend */
 .legend{display:flex;gap:12px;justify-content:center;margin:4px 0;flex-wrap:wrap}
-.legend-item{display:flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#4a4a6a;text-transform:uppercase}
+.legend-item{display:flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#7a7a9a;text-transform:uppercase}
 .legend-icon{font-size:14px}
 
 /* More Games Navigation */
 .na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .na-more-inner{max-width:600px;margin:0 auto}
-.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
 .na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
@@ -1409,7 +1409,7 @@ function showComplete(elapsed, stars, isBest, stats, neonResult) {
       span.style.cssText = 'color:#ffd700;filter:drop-shadow(0 0 6px rgba(255,215,0,0.5))';
       span.textContent = '\u2605';
     } else {
-      span.style.color = '#4a4a6a';
+      span.style.color = '#7a7a9a';
       span.textContent = '\u2606';
     }
     starsEl.appendChild(span);

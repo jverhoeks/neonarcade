@@ -5,39 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEON ARCADE — Top Scores</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{min-height:100vh;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);z-index:9999}
 .header{text-align:center;padding:40px 20px 20px}
 .header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:28px;letter-spacing:6px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6),0 0 40px rgba(255,215,0,0.2)}
-.header .sub{font-weight:300;font-size:14px;letter-spacing:3px;color:#4a4a6a;text-transform:uppercase;margin-top:8px}
-.back-link{display:inline-block;margin:10px 20px;font-family:'Rajdhani',sans-serif;font-size:14px;color:#4a4a6a;text-decoration:none;letter-spacing:2px}
+.header .sub{font-weight:300;font-size:14px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-top:8px}
+.back-link{display:inline-block;margin:10px 20px;font-family:'Rajdhani',sans-serif;font-size:14px;color:#7a7a9a;text-decoration:none;letter-spacing:2px}
 .back-link:hover{color:#00f0ff}
 .controls{display:flex;justify-content:center;gap:12px;padding:10px 20px 20px;flex-wrap:wrap}
 .controls input{font-family:'Rajdhani',sans-serif;font-size:14px;padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid #222;color:#fff;border-radius:3px;width:240px;letter-spacing:1px}
-.controls input::placeholder{color:#4a4a6a}
+.controls input::placeholder{color:#7a7a9a}
 .controls select{font-family:'Rajdhani',sans-serif;font-size:14px;padding:8px 12px;background:#12121f;border:1px solid #222;color:#8888aa;border-radius:3px;cursor:pointer}
-.loading{text-align:center;padding:60px;color:#4a4a6a;font-size:16px;letter-spacing:2px}
+.loading{text-align:center;padding:60px;color:#7a7a9a;font-size:16px;letter-spacing:2px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;padding:0 20px 40px;max-width:1400px;margin:0 auto}
 .game-board{background:#12121f;border:1px solid #1a1a2e;border-radius:6px;overflow:hidden;transition:border-color 0.2s}
 .game-board:hover{border-color:#00f0ff33}
 .game-board .title-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1a1a2e}
 .game-board .title-bar h2{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.3)}
-.game-board .title-bar .count{font-size:12px;color:#4a4a6a;letter-spacing:1px}
+.game-board .title-bar .count{font-size:12px;color:#7a7a9a;letter-spacing:1px}
 .score-row{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.02);gap:12px}
 .score-row:last-child{border-bottom:none}
 .score-row .rank{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;width:28px;text-align:center}
 .rank-1{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
 .rank-2{color:#c0c0c0;text-shadow:0 0 6px rgba(192,192,192,0.3)}
 .rank-3{color:#cd7f32;text-shadow:0 0 6px rgba(205,127,50,0.3)}
-.rank-n{color:#4a4a6a}
+.rank-n{color:#7a7a9a}
 .score-row .name{font-family:'Orbitron',monospace;font-weight:400;font-size:13px;letter-spacing:2px;color:#8888aa;flex:0 0 auto}
 .score-row .score{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;color:#00f0ff;text-shadow:0 0 6px rgba(0,240,255,0.3);margin-left:auto}
-.score-row .time{font-size:11px;color:#4a4a6a;letter-spacing:1px;flex:0 0 auto;min-width:80px;text-align:right}
-.empty{padding:20px 16px;color:#4a4a6a;font-size:13px;text-align:center;letter-spacing:1px}
-.totals{text-align:center;padding:20px;color:#4a4a6a;font-size:13px;letter-spacing:2px}
+.score-row .time{font-size:11px;color:#7a7a9a;letter-spacing:1px;flex:0 0 auto;min-width:80px;text-align:right}
+.empty{padding:20px 16px;color:#7a7a9a;font-size:13px;text-align:center;letter-spacing:1px}
+.totals{text-align:center;padding:20px;color:#7a7a9a;font-size:13px;letter-spacing:2px}
 </style>
 </head>
 <body>

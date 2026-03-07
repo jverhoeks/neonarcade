@@ -87,8 +87,8 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
@@ -171,7 +171,7 @@
   .stat-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .stat-label {
     font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
-    letter-spacing: 3px; text-transform: uppercase; color: #4a4a6a;
+    letter-spacing: 3px; text-transform: uppercase; color: #7a7a9a;
   }
   .stat-val {
     font-family: 'Orbitron', monospace; font-weight: 700; font-size: 20px; color: #ff8c00;
@@ -184,7 +184,7 @@
 
   .best-time-display {
     font-family: 'Orbitron', monospace; font-size: 13px;
-    letter-spacing: 2px; color: #4a4a6a;
+    letter-spacing: 2px; color: #7a7a9a;
     display: flex; align-items: center; gap: 6px;
   }
   .best-time-val { color: #ffd700; }
@@ -203,7 +203,7 @@
 
   .controls-hint {
     font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
-    letter-spacing: 2px; text-transform: uppercase; color: #4a4a6a;
+    letter-spacing: 2px; text-transform: uppercase; color: #7a7a9a;
     text-align: center; line-height: 1.8;
   }
 
@@ -225,7 +225,7 @@
 
   .tower-label {
     font-family: 'Orbitron', monospace; font-size: 7px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase; color: #4a4a6a;
+    letter-spacing: 2px; text-transform: uppercase; color: #7a7a9a;
     writing-mode: vertical-rl; text-orientation: mixed;
     margin-bottom: 6px; flex-shrink: 0;
   }
@@ -322,7 +322,7 @@
   }
   .error-count {
     font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:300;
-    letter-spacing:2px; text-transform:uppercase; color:#4a4a6a; white-space:nowrap;
+    letter-spacing:2px; text-transform:uppercase; color:#7a7a9a; white-space:nowrap;
   }
   .error-count-val { color:#ff2d7b; }
 
@@ -347,7 +347,7 @@
 
   .task-type-label {
     font-family:'Rajdhani',sans-serif; font-weight:300; font-size:12px;
-    letter-spacing:4px; text-transform:uppercase; color:#4a4a6a; text-align:center;
+    letter-spacing:4px; text-transform:uppercase; color:#7a7a9a; text-align:center;
   }
   .task-question {
     font-family:'Orbitron',monospace; font-weight:700;
@@ -378,7 +378,7 @@
   }
   .task-hint {
     font-family:'Rajdhani',sans-serif; font-weight:300; font-size:12px;
-    letter-spacing:2px; color:#4a4a6a; text-transform:uppercase;
+    letter-spacing:2px; color:#7a7a9a; text-transform:uppercase;
   }
   .submit-btn {
     font-family:'Orbitron',monospace; font-weight:700; font-size:13px;
@@ -471,7 +471,7 @@
   .result-stat { display:flex; flex-direction:column; align-items:center; gap:3px; min-width:80px; }
   .result-stat-label {
     font-family:'Rajdhani',sans-serif; font-weight:300; font-size:10px;
-    letter-spacing:3px; text-transform:uppercase; color:#4a4a6a;
+    letter-spacing:3px; text-transform:uppercase; color:#7a7a9a;
   }
   .result-stat-val { font-family:'Orbitron',monospace; font-weight:700; font-size:20px; color:#fff; }
 
@@ -520,7 +520,7 @@
   }
   .home-link {
     font-family:'Rajdhani',sans-serif; font-weight:300; font-size:11px;
-    letter-spacing:3px; text-transform:uppercase; color:#4a4a6a;
+    letter-spacing:3px; text-transform:uppercase; color:#7a7a9a;
     text-decoration:none; transition:color 0.2s;
   }
   .home-link:hover { color:#8888aa; }
@@ -554,7 +554,7 @@
 /* More Games Navigation */
 .na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .na-more-inner{max-width:600px;margin:0 auto}
-.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
 .na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
@@ -802,7 +802,7 @@
   function refreshBest() {
     const b = getBest();
     bestValEl.textContent = b !== null ? b.toFixed(1) + 's' : '--';
-    bestValEl.style.color = b !== null ? '#ffd700' : '#4a4a6a';
+    bestValEl.style.color = b !== null ? '#ffd700' : '#7a7a9a';
   }
 
   // ── Tower ─────────────────────────────────────────────

@@ -90,9 +90,8 @@
 }
 </script>
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
@@ -105,8 +104,8 @@
     --neon-pink: #ff2d7b;
     --neon-purple: #b44dff;
     --neon-orange: #ff8c00;
-    --text-dim: #4a4a6a;
-    --text-mid: #8888aa;
+    --text-dim: #7a7a9a;
+    --text-mid: #9999bb;
     --text-bright: #cccce0;
     --border: rgba(0,240,255,0.1);
   }
@@ -405,12 +404,14 @@
   }
 
   .credit a {
-    color: #6a6a8a;
-    text-decoration: none;
+    color: #9999bb;
+    text-decoration: underline;
+    text-decoration-color: rgba(153,153,187,0.4);
+    text-underline-offset: 2px;
     transition: color 0.2s;
   }
 
-  .credit a:hover { color: var(--neon-cyan); }
+  .credit a:hover { color: var(--neon-cyan); text-decoration-color: rgba(0,240,255,0.4); }
 
   /* --- LOADING --- */
   .loading {
@@ -441,6 +442,7 @@
   <div class="header-line"></div>
 </header>
 
+<main>
 <!-- NEON ARCADE — Viral Games -->
 <div class="category">
   <div class="category-header">
@@ -486,6 +488,8 @@
     <div class="loading">Loading top games...</div>
   </div>
 </div>
+
+</main>
 
 <footer>
   <p>ALL GAMES RUN IN YOUR BROWSER &mdash; NO INSTALL &mdash; NO SIGNUP &mdash; JUST PLAY</p>
