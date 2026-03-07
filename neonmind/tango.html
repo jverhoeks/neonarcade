@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tango — Free Online Binary Logic Puzzle | NEON ARCADE</title>
+<meta name="description" content="Play Tango free online. Fill the grid with suns and moons. No three in a row, equal per line. Pure logic puzzle.">
+<meta name="keywords" content="tango puzzle, binary logic puzzle, sun moon puzzle, free online puzzle, brain game">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonmind/tango.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/tango.html">
+<meta property="og:title" content="Tango — Free Online Binary Logic Puzzle | NEON ARCADE">
+<meta property="og:description" content="Fill the grid with suns and moons. No three in a row. Pure logic.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/tango.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tango — Free Online Binary Logic Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Fill the grid with suns and moons. No three in a row. Pure logic.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/tango.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Tango","url":"https://neonarcade.net/neonmind/tango.html","description":"Binary logic puzzle. Fill grids with suns and moons following simple rules.","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/screenshots/tango.png","inLanguage":"en","isFamilyFriendly":true}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON MIND","item":"https://neonarcade.net/neonmind/"},{"@type":"ListItem","position":3,"name":"Tango","item":"https://neonarcade.net/neonmind/tango.html"}]}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:10px}
+.brand-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:3px;color:#b44dff;text-transform:uppercase;text-shadow:0 0 8px rgba(180,77,255,0.3)}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(40px,10vw,68px);letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.title-symbols{font-size:clamp(24px,6vw,36px);letter-spacing:6px;margin-bottom:2px}
+.title-symbols .sun-sym{color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.5)}
+.title-symbols .moon-sym{color:#b44dff;text-shadow:0 0 10px rgba(180,77,255,0.5)}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(13px,2.8vw,18px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:2px;max-width:380px;line-height:1.4}
+
+/* Difficulty grid */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:400px;margin:8px 0}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:14px 10px;border:1px solid rgba(0,240,255,0.25);background:rgba(0,240,255,0.04);color:#00f0ff;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.2s;text-align:center}
+.diff-btn:hover{background:rgba(0,240,255,0.12);border-color:rgba(0,240,255,0.5);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+.diff-btn.selected{border-color:#00f0ff;background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2)}
+.diff-btn .diff-size{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:12px;letter-spacing:1px;color:#7a7a9a;margin-top:2px;display:block}
+.diff-btn .diff-best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#7a7a9a;margin-top:4px;display:block}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:10px;gap:0}
+
+.game-top-bar{display:flex;width:100%;max-width:500px;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:4px}
+.top-diff{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;color:#8888aa;text-transform:uppercase}
+.top-timer{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(14px,3vw,18px);letter-spacing:1px;color:#8888aa}
+.top-progress{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#7a7a9a;display:flex;align-items:center;gap:4px}
+.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#7a7a9a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
+.top-back:hover{color:#00f0ff}
+
+/* GRID */
+.grid-wrap{position:relative;margin:4px 0 8px 0}
+.grid{display:grid;border:2px solid rgba(0,240,255,0.3);border-radius:4px;overflow:hidden;background:#0e0e1a}
+.cell{display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background 0.15s,box-shadow 0.15s;background:#0e0e1a;border:1px solid rgba(255,255,255,0.06)}
+.cell:hover{background:rgba(255,255,255,0.03)}
+.cell.given{cursor:default}
+.cell.given::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.02);pointer-events:none}
+
+.cell .symbol{font-size:clamp(18px,4.5vw,28px);line-height:1;position:relative;z-index:2;transition:transform 0.15s,opacity 0.15s}
+.cell .symbol.sun{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.5),0 0 20px rgba(255,215,0,0.2);filter:drop-shadow(0 0 4px rgba(255,215,0,0.4))}
+.cell .symbol.moon{color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.5),0 0 20px rgba(180,77,255,0.2);filter:drop-shadow(0 0 4px rgba(180,77,255,0.4))}
+.cell.given .symbol.sun{color:rgba(255,215,0,0.55);text-shadow:0 0 6px rgba(255,215,0,0.3);filter:none}
+.cell.given .symbol.moon{color:rgba(180,77,255,0.55);text-shadow:0 0 6px rgba(180,77,255,0.3);filter:none}
+.cell .symbol.pop-in{animation:popIn 0.2s ease-out}
+@keyframes popIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+
+/* Error highlight */
+.cell.error{background:rgba(255,45,123,0.2)!important}
+.cell.error .symbol{color:#ff2d7b!important;text-shadow:0 0 8px rgba(255,45,123,0.6)!important;animation:errorPulse 0.4s ease-in-out}
+@keyframes errorPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+/* Row/col indicators */
+.row-indicators{position:absolute;right:-24px;top:0;display:flex;flex-direction:column}
+.col-indicators{position:absolute;bottom:-24px;left:0;display:flex}
+.indicator{display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(57,255,20,0);transition:color 0.3s}
+.indicator.valid{color:rgba(57,255,20,0.7)}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:clamp(6px,1.5vw,12px);width:100%;max-width:500px;justify-content:center;margin:6px 0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(11px,2.5vw,13px);letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#8888aa;cursor:pointer;border-radius:4px;transition:all 0.15s;display:flex;align-items:center;gap:5px;flex:1;justify-content:center}
+.tool-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
+.tool-btn:active{transform:scale(0.96)}
+.tool-btn .tool-icon{font-size:16px}
+
+/* COMPLETE SCREEN */
+#completeScreen{gap:12px}
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,44px);color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5),0 0 40px rgba(57,255,20,0.2);letter-spacing:6px}
+.complete-symbols{font-size:clamp(28px,7vw,42px);margin:4px 0;letter-spacing:4px}
+.complete-stat{text-align:center;margin:2px 0}
+.complete-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(20px,5vw,30px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.complete-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.complete-best{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;margin:2px 0}
+.complete-streak{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#8888aa;margin-top:2px}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.play-btn.share-btn{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.share-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
+.play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:2px;text-align:center}
+
+/* LEADERBOARD */
+.leaderboard{width:100%;max-width:300px;margin:6px 0}
+
+/* Screen shake */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
+.shaking{animation:shake 0.3s ease-in-out}
+
+/* Particles */
+.particle{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:100}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:8px 20px;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* Legend */
+.legend{display:flex;gap:16px;justify-content:center;margin:4px 0;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#7a7a9a;text-transform:uppercase}
+.legend-icon{font-size:16px}
+
+/* Rules hint */
+.rules-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#5a5a7a;text-align:center;max-width:360px;line-height:1.5;margin:2px 0}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="brand-tag">NEON MIND</div>
+  <h1 class="main-title">TANGO</h1>
+  <div class="title-symbols"><span class="sun-sym">&#9728;</span> <span class="moon-sym">&#9790;</span></div>
+  <p class="subtitle">Fill the grid with suns and moons. Equal per line. No three in a row. Pure logic.</p>
+
+  <div class="diff-grid" id="diffGrid">
+    <button class="diff-btn" data-diff="easy" id="btnEasy">
+      EASY
+      <span class="diff-size">6 &times; 6</span>
+      <span class="diff-best" id="bestEasy">--:--</span>
+    </button>
+    <button class="diff-btn selected" data-diff="medium" id="btnMedium">
+      MEDIUM
+      <span class="diff-size">8 &times; 8</span>
+      <span class="diff-best" id="bestMedium">--:--</span>
+    </button>
+    <button class="diff-btn" data-diff="hard" id="btnHard">
+      HARD
+      <span class="diff-size">10 &times; 10</span>
+      <span class="diff-best" id="bestHard">--:--</span>
+    </button>
+  </div>
+
+  <button class="play-btn" id="startBtn">START</button>
+
+  <div class="start-stats" id="startStats">
+    <div class="start-stat">
+      <div class="stat-val" id="statPlayed">0</div>
+      <div class="stat-lbl">PLAYED</div>
+    </div>
+    <div class="start-stat">
+      <div class="stat-val" id="statStreak">0</div>
+      <div class="stat-lbl">STREAK</div>
+    </div>
+  </div>
+
+  <div class="leaderboard" id="startLB"></div>
+
+  <div class="controls-hint">TAP CELL: CYCLE SUN &rarr; MOON &rarr; EMPTY</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="game-top-bar">
+    <button class="top-back" id="backBtn">&#x2190;</button>
+    <span class="top-diff" id="topDiff">8x8 MEDIUM</span>
+    <span class="top-progress" id="topProgress"></span>
+    <span class="top-timer" id="topTimer">00:00</span>
+  </div>
+
+  <div class="grid-wrap" id="gridWrap">
+    <div class="grid" id="grid"></div>
+    <div class="row-indicators" id="rowIndicators"></div>
+    <div class="col-indicators" id="colIndicators"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn" id="validateBtn">
+      <span class="tool-icon">&#10003;</span> VALIDATE
+    </button>
+    <button class="tool-btn" id="clearBtn">
+      <span class="tool-icon">&#x21BA;</span> CLEAR
+    </button>
+    <button class="tool-btn" id="newBtn">
+      <span class="tool-icon">&#x2605;</span> NEW
+    </button>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-icon" style="color:#ffd700">&#9728;</span> Sun</span>
+    <span class="legend-item"><span class="legend-icon" style="color:#b44dff">&#9790;</span> Moon</span>
+    <span class="legend-item"><span class="legend-icon" style="color:#5a5a7a">&#8226;</span> Empty</span>
+  </div>
+
+  <div class="rules-hint">Each row &amp; column: equal suns &amp; moons. No 3 consecutive same symbols.</div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div class="screen" id="completeScreen">
+  <div class="complete-title">SOLVED</div>
+  <div class="complete-symbols" id="completeSymbols">&#9728;&#9790;&#9728;&#9790;</div>
+  <div class="complete-stat">
+    <div class="stat-val" id="completeTime"></div>
+    <div class="stat-lbl">SOLVE TIME</div>
+  </div>
+  <div class="complete-best" id="completeBest" style="display:none">NEW PERSONAL BEST!</div>
+  <div class="complete-streak" id="completeStreakInfo"></div>
+
+  <div class="btn-row">
+    <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="nextBtn">NEW PUZZLE</button>
+    <button class="play-btn menu-btn" id="menuBtn">MENU</button>
+  </div>
+
+  <div class="leaderboard" id="completeLB"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+'use strict';
+
+// ── CONSTANTS ──
+var SUN = 1;
+var MOON = 2;
+var EMPTY = 0;
+var SUN_CHAR = '\u2600';
+var MOON_CHAR = '\u263E';
+
+var DIFFICULTIES = {
+  easy:   { size: 6,  label: 'EASY',   givenRatio: 0.40 },
+  medium: { size: 8,  label: 'MEDIUM', givenRatio: 0.30 },
+  hard:   { size: 10, label: 'HARD',   givenRatio: 0.25 }
+};
+
+var STREAK_KEY = 'neonarcade_neonmind_tango_streak';
+var PLAYED_KEY = 'neonarcade_neonmind_tango_played';
+
+// ── NEON INIT ──
+var neonFormatScore = function(s) {
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+
+function neonInitForDiff(diff) {
+  var d = DIFFICULTIES[diff];
+  try {
+    Neon.init({
+      game: 'tango',
+      mode: 'low',
+      key: 'neonarcade_neonmind_tango_scores_' + d.size,
+      formatScore: neonFormatScore
+    });
+  } catch(e) {}
+}
+
+// ── STATE ──
+var currentDiff = 'medium';
+var N = 8;
+var solution = [];
+var given = [];
+var board = [];
+var timerStart = 0;
+var timerInterval = null;
+var elapsedSeconds = 0;
+var gameActive = false;
+var streak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10);
+var played = parseInt(localStorage.getItem(PLAYED_KEY) || '0', 10);
+
+// ── AUDIO ──
+var audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+function playTone(freq, dur, type, vol) {
+  try {
+    var ctx = getAudioCtx();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = vol || 0.08;
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function soundPlace() { playTone(880, 0.08, 'sine', 0.06); }
+function soundRemove() { playTone(440, 0.06, 'sine', 0.04); }
+function soundError() { playTone(150, 0.25, 'sawtooth', 0.06); }
+function soundLineComplete() {
+  playTone(1200, 0.15, 'sine', 0.07);
+  setTimeout(function(){ playTone(1500, 0.15, 'sine', 0.05); }, 80);
+}
+function soundWin() {
+  playTone(523, 0.15, 'sine', 0.08);
+  setTimeout(function(){ playTone(659, 0.15, 'sine', 0.08); }, 100);
+  setTimeout(function(){ playTone(784, 0.15, 'sine', 0.08); }, 200);
+  setTimeout(function(){ playTone(1047, 0.3, 'sine', 0.1); }, 300);
+}
+function soundBest() {
+  soundWin();
+  setTimeout(function(){
+    playTone(1047, 0.1, 'triangle', 0.08);
+    setTimeout(function(){ playTone(1319, 0.1, 'triangle', 0.08); }, 80);
+    setTimeout(function(){ playTone(1568, 0.2, 'triangle', 0.1); }, 160);
+  }, 500);
+}
+
+// ── PUZZLE GENERATION ──
+
+function checkTriple(grid, n, r, c, val) {
+  // Check horizontal triples
+  if (c >= 2 && grid[r][c-1] === val && grid[r][c-2] === val) return false;
+  if (c >= 1 && c < n-1 && grid[r][c-1] === val && grid[r][c+1] === val) return false;
+  if (c < n-2 && grid[r][c+1] === val && grid[r][c+2] === val) return false;
+  // Check vertical triples
+  if (r >= 2 && grid[r-1][c] === val && grid[r-2][c] === val) return false;
+  if (r >= 1 && r < n-1 && grid[r-1][c] === val && grid[r+1][c] === val) return false;
+  if (r < n-2 && grid[r+1][c] === val && grid[r+2][c] === val) return false;
+  return true;
+}
+
+function countValInRow(grid, n, r, val) {
+  var c2 = 0;
+  for (var c = 0; c < n; c++) { if (grid[r][c] === val) c2++; }
+  return c2;
+}
+
+function countValInCol(grid, n, col, val) {
+  var c2 = 0;
+  for (var r = 0; r < n; r++) { if (grid[r][col] === val) c2++; }
+  return c2;
+}
+
+// Generate a complete valid grid using backtracking with random order
+function generateComplete(n) {
+  var half = n / 2;
+  var grid = [];
+  for (var i = 0; i < n; i++) {
+    grid[i] = new Array(n);
+    for (var j = 0; j < n; j++) grid[i][j] = EMPTY;
+  }
+
+  function canPlace(r, c, val) {
+    if (countValInRow(grid, n, r, val) >= half) return false;
+    if (countValInCol(grid, n, c, val) >= half) return false;
+    if (!checkTriple(grid, n, r, c, val)) return false;
+    return true;
+  }
+
+  function solve(pos) {
+    if (pos >= n * n) return true;
+    var r = Math.floor(pos / n);
+    var c = pos % n;
+    var vals = Math.random() < 0.5 ? [SUN, MOON] : [MOON, SUN];
+    for (var i = 0; i < 2; i++) {
+      var val = vals[i];
+      if (canPlace(r, c, val)) {
+        grid[r][c] = val;
+        if (solve(pos + 1)) return true;
+        grid[r][c] = EMPTY;
+      }
+    }
+    return false;
+  }
+
+  function rowsUnique() {
+    for (var r1 = 0; r1 < n; r1++) {
+      for (var r2 = r1 + 1; r2 < n; r2++) {
+        var same = true;
+        for (var c = 0; c < n; c++) {
+          if (grid[r1][c] !== grid[r2][c]) { same = false; break; }
+        }
+        if (same) return false;
+      }
+    }
+    return true;
+  }
+
+  function colsUnique() {
+    for (var c1 = 0; c1 < n; c1++) {
+      for (var c2 = c1 + 1; c2 < n; c2++) {
+        var same = true;
+        for (var r = 0; r < n; r++) {
+          if (grid[r][c1] !== grid[r][c2]) { same = false; break; }
+        }
+        if (same) return false;
+      }
+    }
+    return true;
+  }
+
+  var attempts = 0;
+  do {
+    for (var ii = 0; ii < n; ii++)
+      for (var jj = 0; jj < n; jj++) grid[ii][jj] = EMPTY;
+    solve(0);
+    attempts++;
+    if (attempts > 500) break;
+  } while (!rowsUnique() || !colsUnique());
+
+  return grid;
+}
+
+// Count solutions using backtracking (stop at limit)
+function countSolutions(puzzle, n, limit) {
+  var half = n / 2;
+  var work = [];
+  for (var i = 0; i < n; i++) {
+    work[i] = new Array(n);
+    for (var j = 0; j < n; j++) work[i][j] = puzzle[i][j];
+  }
+
+  var count = 0;
+  var emptyCells = [];
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (work[r][c] === EMPTY) emptyCells.push(r * n + c);
+    }
+  }
+
+  function canPlace(r, c, val) {
+    if (countValInRow(work, n, r, val) >= half) return false;
+    if (countValInCol(work, n, c, val) >= half) return false;
+    if (!checkTriple(work, n, r, c, val)) return false;
+    return true;
+  }
+
+  function checkUniqueRows() {
+    for (var r1 = 0; r1 < n; r1++) {
+      for (var r2 = r1 + 1; r2 < n; r2++) {
+        var same = true;
+        for (var c = 0; c < n; c++) {
+          if (work[r1][c] !== work[r2][c]) { same = false; break; }
+        }
+        if (same) return false;
+      }
+    }
+    return true;
+  }
+
+  function checkUniqueCols() {
+    for (var c1 = 0; c1 < n; c1++) {
+      for (var c2 = c1 + 1; c2 < n; c2++) {
+        var same = true;
+        for (var r = 0; r < n; r++) {
+          if (work[r][c1] !== work[r][c2]) { same = false; break; }
+        }
+        if (same) return false;
+      }
+    }
+    return true;
+  }
+
+  function solve(idx) {
+    if (count >= limit) return;
+    if (idx >= emptyCells.length) {
+      if (checkUniqueRows() && checkUniqueCols()) count++;
+      return;
+    }
+    var pos = emptyCells[idx];
+    var r = Math.floor(pos / n);
+    var c = pos % n;
+    for (var val = 1; val <= 2; val++) {
+      if (canPlace(r, c, val)) {
+        work[r][c] = val;
+        solve(idx + 1);
+        work[r][c] = EMPTY;
+        if (count >= limit) return;
+      }
+    }
+  }
+
+  solve(0);
+  return count;
+}
+
+// Logic solver using constraint propagation
+function logicSolve(puzzle, n) {
+  var half = n / 2;
+  var cands = [];
+  for (var i = 0; i < n; i++) {
+    cands[i] = [];
+    for (var j = 0; j < n; j++) {
+      cands[i][j] = puzzle[i][j] !== EMPTY ? [puzzle[i][j]] : [SUN, MOON];
+    }
+  }
+
+  var contradiction = false;
+
+  function eliminate(r, c, val) {
+    if (contradiction) return;
+    var idx = cands[r][c].indexOf(val);
+    if (idx === -1) return;
+    cands[r][c].splice(idx, 1);
+    if (cands[r][c].length === 0) { contradiction = true; return; }
+    if (cands[r][c].length === 1) {
+      assignEffects(r, c, cands[r][c][0]);
+    }
+  }
+
+  function assignEffects(r, c, val) {
+    if (contradiction) return;
+    // Row count constraint
+    var rowCount = 0;
+    for (var cc = 0; cc < n; cc++) {
+      if (cands[r][cc].length === 1 && cands[r][cc][0] === val) rowCount++;
+    }
+    if (rowCount >= half) {
+      for (var cc2 = 0; cc2 < n; cc2++) {
+        if (cands[r][cc2].length > 1) eliminate(r, cc2, val);
+      }
+    }
+
+    // Col count constraint
+    var colCount = 0;
+    for (var rr = 0; rr < n; rr++) {
+      if (cands[rr][c].length === 1 && cands[rr][c][0] === val) colCount++;
+    }
+    if (colCount >= half) {
+      for (var rr2 = 0; rr2 < n; rr2++) {
+        if (cands[rr2][c].length > 1) eliminate(rr2, c, val);
+      }
+    }
+
+    // Triple prevention in row: if neighbor is same, prevent the one beyond
+    if (c >= 1 && cands[r][c-1].length === 1 && cands[r][c-1][0] === val) {
+      if (c >= 2) eliminate(r, c-2, val);
+      if (c < n-1) eliminate(r, c+1, val);
+    }
+    if (c < n-1 && cands[r][c+1].length === 1 && cands[r][c+1][0] === val) {
+      if (c < n-2) eliminate(r, c+2, val);
+      if (c >= 1) eliminate(r, c-1, val);
+    }
+
+    // Triple prevention in col
+    if (r >= 1 && cands[r-1][c].length === 1 && cands[r-1][c][0] === val) {
+      if (r >= 2) eliminate(r-2, c, val);
+      if (r < n-1) eliminate(r+1, c, val);
+    }
+    if (r < n-1 && cands[r+1][c].length === 1 && cands[r+1][c][0] === val) {
+      if (r < n-2) eliminate(r+2, c, val);
+      if (r >= 1) eliminate(r-1, c, val);
+    }
+  }
+
+  // Initial propagation
+  for (var r0 = 0; r0 < n; r0++) {
+    for (var c0 = 0; c0 < n; c0++) {
+      if (cands[r0][c0].length === 1) {
+        assignEffects(r0, c0, cands[r0][c0][0]);
+      }
+    }
+  }
+  if (contradiction) return { solved: false, grid: null };
+
+  // Iterate constraint propagation
+  var changed = true;
+  var iterations = 0;
+  while (changed && !contradiction && iterations < 100) {
+    changed = false;
+    iterations++;
+
+    // Row/col count constraints
+    for (var rr3 = 0; rr3 < n; rr3++) {
+      var rSun = 0, rMoon = 0, rOpen = [];
+      for (var cc3 = 0; cc3 < n; cc3++) {
+        if (cands[rr3][cc3].length === 1) {
+          if (cands[rr3][cc3][0] === SUN) rSun++; else rMoon++;
+        } else rOpen.push(cc3);
+      }
+      if (rSun >= half) {
+        for (var oi = 0; oi < rOpen.length; oi++) {
+          if (cands[rr3][rOpen[oi]].indexOf(SUN) !== -1) { eliminate(rr3, rOpen[oi], SUN); changed = true; }
+        }
+      }
+      if (rMoon >= half) {
+        for (var oi2 = 0; oi2 < rOpen.length; oi2++) {
+          if (cands[rr3][rOpen[oi2]].indexOf(MOON) !== -1) { eliminate(rr3, rOpen[oi2], MOON); changed = true; }
+        }
+      }
+    }
+
+    for (var cc4 = 0; cc4 < n; cc4++) {
+      var cSun = 0, cMoon = 0, cOpen = [];
+      for (var rr4 = 0; rr4 < n; rr4++) {
+        if (cands[rr4][cc4].length === 1) {
+          if (cands[rr4][cc4][0] === SUN) cSun++; else cMoon++;
+        } else cOpen.push(rr4);
+      }
+      if (cSun >= half) {
+        for (var oi3 = 0; oi3 < cOpen.length; oi3++) {
+          if (cands[cOpen[oi3]][cc4].indexOf(SUN) !== -1) { eliminate(cOpen[oi3], cc4, SUN); changed = true; }
+        }
+      }
+      if (cMoon >= half) {
+        for (var oi4 = 0; oi4 < cOpen.length; oi4++) {
+          if (cands[cOpen[oi4]][cc4].indexOf(MOON) !== -1) { eliminate(cOpen[oi4], cc4, MOON); changed = true; }
+        }
+      }
+    }
+
+    // Gap pattern: X_X forces middle to be opposite
+    for (var rr5 = 0; rr5 < n; rr5++) {
+      for (var cc5 = 0; cc5 < n - 2; cc5++) {
+        if (cands[rr5][cc5].length === 1 && cands[rr5][cc5+2].length === 1 &&
+            cands[rr5][cc5][0] === cands[rr5][cc5+2][0] && cands[rr5][cc5+1].length > 1) {
+          eliminate(rr5, cc5+1, cands[rr5][cc5][0]);
+          changed = true;
+        }
+      }
+    }
+    for (var cc6 = 0; cc6 < n; cc6++) {
+      for (var rr6 = 0; rr6 < n - 2; rr6++) {
+        if (cands[rr6][cc6].length === 1 && cands[rr6+2][cc6].length === 1 &&
+            cands[rr6][cc6][0] === cands[rr6+2][cc6][0] && cands[rr6+1][cc6].length > 1) {
+          eliminate(rr6+1, cc6, cands[rr6][cc6][0]);
+          changed = true;
+        }
+      }
+    }
+
+    // Adjacent pair: XX_ forces next to be opposite, _XX forces prev to be opposite
+    for (var rr7 = 0; rr7 < n; rr7++) {
+      for (var cc7 = 0; cc7 < n - 1; cc7++) {
+        if (cands[rr7][cc7].length === 1 && cands[rr7][cc7+1].length === 1 &&
+            cands[rr7][cc7][0] === cands[rr7][cc7+1][0]) {
+          var v = cands[rr7][cc7][0];
+          if (cc7 > 0 && cands[rr7][cc7-1].length > 1 && cands[rr7][cc7-1].indexOf(v) !== -1) {
+            eliminate(rr7, cc7-1, v); changed = true;
+          }
+          if (cc7+2 < n && cands[rr7][cc7+2].length > 1 && cands[rr7][cc7+2].indexOf(v) !== -1) {
+            eliminate(rr7, cc7+2, v); changed = true;
+          }
+        }
+      }
+    }
+    for (var cc8 = 0; cc8 < n; cc8++) {
+      for (var rr8 = 0; rr8 < n - 1; rr8++) {
+        if (cands[rr8][cc8].length === 1 && cands[rr8+1][cc8].length === 1 &&
+            cands[rr8][cc8][0] === cands[rr8+1][cc8][0]) {
+          var v2 = cands[rr8][cc8][0];
+          if (rr8 > 0 && cands[rr8-1][cc8].length > 1 && cands[rr8-1][cc8].indexOf(v2) !== -1) {
+            eliminate(rr8-1, cc8, v2); changed = true;
+          }
+          if (rr8+2 < n && cands[rr8+2][cc8].length > 1 && cands[rr8+2][cc8].indexOf(v2) !== -1) {
+            eliminate(rr8+2, cc8, v2); changed = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (contradiction) return { solved: false, grid: null };
+
+  var allSolved = true;
+  var result = [];
+  for (var r3 = 0; r3 < n; r3++) {
+    result[r3] = [];
+    for (var c3 = 0; c3 < n; c3++) {
+      result[r3][c3] = cands[r3][c3].length === 1 ? cands[r3][c3][0] : EMPTY;
+      if (cands[r3][c3].length !== 1) allSolved = false;
+    }
+  }
+
+  return { solved: allSolved, grid: result };
+}
+
+// Generate a puzzle with unique solution
+function generatePuzzle(diff) {
+  var d = DIFFICULTIES[diff];
+  N = d.size;
+  var targetGiven = Math.round(N * N * d.givenRatio);
+
+  var completeGrid = generateComplete(N);
+
+  var isGiven = [];
+  for (var i = 0; i < N; i++) {
+    isGiven[i] = new Array(N);
+    for (var j = 0; j < N; j++) isGiven[i][j] = true;
+  }
+
+  // Shuffle cell removal order
+  var cells = [];
+  for (var r = 0; r < N; r++) {
+    for (var c = 0; c < N; c++) cells.push(r * N + c);
+  }
+  for (var i2 = cells.length - 1; i2 > 0; i2--) {
+    var j2 = Math.floor(Math.random() * (i2 + 1));
+    var tmp = cells[i2]; cells[i2] = cells[j2]; cells[j2] = tmp;
+  }
+
+  var givenCount = N * N;
+
+  for (var ci = 0; ci < cells.length && givenCount > targetGiven; ci++) {
+    var pos = cells[ci];
+    var r2 = Math.floor(pos / N);
+    var c2 = pos % N;
+    if (!isGiven[r2][c2]) continue;
+
+    isGiven[r2][c2] = false;
+    givenCount--;
+
+    // Build puzzle for testing
+    var puzzle = [];
+    for (var rr = 0; rr < N; rr++) {
+      puzzle[rr] = new Array(N);
+      for (var cc = 0; cc < N; cc++) {
+        puzzle[rr][cc] = isGiven[rr][cc] ? completeGrid[rr][cc] : EMPTY;
+      }
+    }
+
+    // Try logic solver first (fast)
+    var logicResult = logicSolve(puzzle, N);
+    if (logicResult.solved) {
+      var matches = true;
+      for (var rr2 = 0; rr2 < N && matches; rr2++) {
+        for (var cc2 = 0; cc2 < N && matches; cc2++) {
+          if (logicResult.grid[rr2][cc2] !== completeGrid[rr2][cc2]) matches = false;
+        }
+      }
+      if (!matches) {
+        isGiven[r2][c2] = true;
+        givenCount++;
+        continue;
+      }
+      continue;
+    }
+
+    // Fall back to counting solutions
+    var solCount = countSolutions(puzzle, N, 2);
+    if (solCount !== 1) {
+      isGiven[r2][c2] = true;
+      givenCount++;
+    }
+  }
+
+  // Build final state
+  solution = [];
+  given = [];
+  board = [];
+  for (var r3 = 0; r3 < N; r3++) {
+    solution[r3] = [];
+    given[r3] = [];
+    board[r3] = [];
+    for (var c3 = 0; c3 < N; c3++) {
+      solution[r3][c3] = completeGrid[r3][c3];
+      given[r3][c3] = isGiven[r3][c3];
+      board[r3][c3] = isGiven[r3][c3] ? completeGrid[r3][c3] : EMPTY;
+    }
+  }
+}
+
+// ── DOM REFS ──
+var startScreen = document.getElementById('startScreen');
+var gameScreen = document.getElementById('gameScreen');
+var completeScreen = document.getElementById('completeScreen');
+var gridEl = document.getElementById('grid');
+var gridWrap = document.getElementById('gridWrap');
+var topTimer = document.getElementById('topTimer');
+var topDiff = document.getElementById('topDiff');
+var topProgress = document.getElementById('topProgress');
+var toastEl = document.getElementById('toast');
+var rowIndicators = document.getElementById('rowIndicators');
+var colIndicators = document.getElementById('colIndicators');
+
+function showScreen(screen) {
+  startScreen.classList.remove('active');
+  gameScreen.classList.remove('active');
+  completeScreen.classList.remove('active');
+  screen.classList.add('active');
+}
+
+// ── DIFFICULTY SELECTION ──
+function selectDiff(diff) {
+  currentDiff = diff;
+  var btns = document.querySelectorAll('.diff-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('selected', btns[i].getAttribute('data-diff') === diff);
+  }
+  neonInitForDiff(diff);
+  updateBestTimes();
+  try { Neon.render(document.getElementById('startLB')); } catch(e) {}
+}
+
+document.getElementById('btnEasy').addEventListener('click', function() { selectDiff('easy'); });
+document.getElementById('btnMedium').addEventListener('click', function() { selectDiff('medium'); });
+document.getElementById('btnHard').addEventListener('click', function() { selectDiff('hard'); });
+
+function updateBestTimes() {
+  var diffs = ['easy', 'medium', 'hard'];
+  var ids = ['bestEasy', 'bestMedium', 'bestHard'];
+  for (var i = 0; i < diffs.length; i++) {
+    var key = 'neonarcade_neonmind_tango_scores_' + DIFFICULTIES[diffs[i]].size;
+    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    document.getElementById(ids[i]).textContent = scores.length > 0 ? neonFormatScore(scores[0].score) : '--:--';
+  }
+}
+
+// ── TOAST ──
+var toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { toastEl.classList.remove('show'); }, 2000);
+}
+
+// ── TIMER ──
+function startTimer() {
+  timerStart = Date.now();
+  elapsedSeconds = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(function() {
+    elapsedSeconds = Math.floor((Date.now() - timerStart) / 1000);
+    topTimer.textContent = neonFormatScore(elapsedSeconds);
+  }, 250);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  elapsedSeconds = Math.floor((Date.now() - timerStart) / 1000);
+}
+
+// ── RENDER GRID ──
+function renderGrid() {
+  // Clear grid
+  while (gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+
+  var maxW = Math.min(window.innerWidth - 80, 460);
+  var maxH = window.innerHeight - 220;
+  var gridMax = Math.min(maxW, maxH);
+  var cellSize = Math.max(36, Math.floor(gridMax / N));
+  var gridPx = cellSize * N;
+
+  gridEl.style.gridTemplateColumns = 'repeat(' + N + ', ' + cellSize + 'px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + N + ', ' + cellSize + 'px)';
+  gridEl.style.width = gridPx + 'px';
+  gridEl.style.height = gridPx + 'px';
+
+  for (var r = 0; r < N; r++) {
+    for (var c = 0; c < N; c++) {
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.setAttribute('data-r', String(r));
+      cell.setAttribute('data-c', String(c));
+      if (given[r][c]) cell.classList.add('given');
+      setCellSymbol(cell, board[r][c]);
+      gridEl.appendChild(cell);
+    }
+  }
+
+  // Row indicators
+  while (rowIndicators.firstChild) rowIndicators.removeChild(rowIndicators.firstChild);
+  rowIndicators.style.height = gridPx + 'px';
+  for (var r2 = 0; r2 < N; r2++) {
+    var ind = document.createElement('div');
+    ind.className = 'indicator';
+    ind.style.height = cellSize + 'px';
+    ind.style.width = '20px';
+    ind.textContent = '\u2713';
+    ind.setAttribute('data-row', String(r2));
+    rowIndicators.appendChild(ind);
+  }
+
+  // Col indicators
+  while (colIndicators.firstChild) colIndicators.removeChild(colIndicators.firstChild);
+  colIndicators.style.width = gridPx + 'px';
+  for (var c2 = 0; c2 < N; c2++) {
+    var ind2 = document.createElement('div');
+    ind2.className = 'indicator';
+    ind2.style.width = cellSize + 'px';
+    ind2.style.height = '20px';
+    ind2.textContent = '\u2713';
+    ind2.setAttribute('data-col', String(c2));
+    colIndicators.appendChild(ind2);
+  }
+
+  updateIndicators();
+}
+
+function setCellSymbol(cell, val) {
+  // Remove existing symbol
+  var existing = cell.querySelector('.symbol');
+  if (existing) cell.removeChild(existing);
+
+  if (val === SUN) {
+    var span = document.createElement('span');
+    span.className = 'symbol sun';
+    span.textContent = SUN_CHAR;
+    cell.appendChild(span);
+  } else if (val === MOON) {
+    var span2 = document.createElement('span');
+    span2.className = 'symbol moon';
+    span2.textContent = MOON_CHAR;
+    cell.appendChild(span2);
+  }
+}
+
+function getCellEl(r, c) {
+  return gridEl.querySelector('[data-r="' + r + '"][data-c="' + c + '"]');
+}
+
+// ── INDICATORS ──
+function isRowComplete(r) {
+  var half = N / 2;
+  var sunC = 0, moonC = 0;
+  for (var c = 0; c < N; c++) {
+    if (board[r][c] === SUN) sunC++;
+    else if (board[r][c] === MOON) moonC++;
+    else return false;
+  }
+  if (sunC !== half || moonC !== half) return false;
+  for (var c2 = 0; c2 < N - 2; c2++) {
+    if (board[r][c2] === board[r][c2+1] && board[r][c2+1] === board[r][c2+2]) return false;
+  }
+  return true;
+}
+
+function isColComplete(c) {
+  var half = N / 2;
+  var sunC = 0, moonC = 0;
+  for (var r = 0; r < N; r++) {
+    if (board[r][c] === SUN) sunC++;
+    else if (board[r][c] === MOON) moonC++;
+    else return false;
+  }
+  if (sunC !== half || moonC !== half) return false;
+  for (var r2 = 0; r2 < N - 2; r2++) {
+    if (board[r2][c] === board[r2+1][c] && board[r2+1][c] === board[r2+2][c]) return false;
+  }
+  return true;
+}
+
+var prevRowValid = [];
+var prevColValid = [];
+
+function updateIndicators() {
+  var rInds = rowIndicators.children;
+  for (var r = 0; r < N; r++) {
+    if (r < rInds.length) {
+      var valid = isRowComplete(r);
+      rInds[r].classList.toggle('valid', valid);
+      if (valid && !prevRowValid[r] && gameActive) soundLineComplete();
+      prevRowValid[r] = valid;
+    }
+  }
+  var cInds = colIndicators.children;
+  for (var c = 0; c < N; c++) {
+    if (c < cInds.length) {
+      var valid2 = isColComplete(c);
+      cInds[c].classList.toggle('valid', valid2);
+      if (valid2 && !prevColValid[c] && gameActive) soundLineComplete();
+      prevColValid[c] = valid2;
+    }
+  }
+
+  // Progress
+  var filled = 0, total = 0;
+  for (var r2 = 0; r2 < N; r2++) {
+    for (var c2 = 0; c2 < N; c2++) {
+      if (!given[r2][c2]) {
+        total++;
+        if (board[r2][c2] !== EMPTY) filled++;
+      }
+    }
+  }
+  topProgress.textContent = filled + '/' + total;
+}
+
+// ── ERROR HIGHLIGHTING ──
+function clearErrors() {
+  var errs = gridEl.querySelectorAll('.cell.error');
+  for (var i = 0; i < errs.length; i++) errs[i].classList.remove('error');
+}
+
+function highlightTriples() {
+  clearErrors();
+  var hasError = false;
+
+  for (var r = 0; r < N; r++) {
+    for (var c = 0; c < N - 2; c++) {
+      if (board[r][c] !== EMPTY && board[r][c] === board[r][c+1] && board[r][c+1] === board[r][c+2]) {
+        getCellEl(r, c).classList.add('error');
+        getCellEl(r, c+1).classList.add('error');
+        getCellEl(r, c+2).classList.add('error');
+        hasError = true;
+      }
+    }
+  }
+
+  for (var c2 = 0; c2 < N; c2++) {
+    for (var r2 = 0; r2 < N - 2; r2++) {
+      if (board[r2][c2] !== EMPTY && board[r2][c2] === board[r2+1][c2] && board[r2+1][c2] === board[r2+2][c2]) {
+        getCellEl(r2, c2).classList.add('error');
+        getCellEl(r2+1, c2).classList.add('error');
+        getCellEl(r2+2, c2).classList.add('error');
+        hasError = true;
+      }
+    }
+  }
+
+  if (hasError) soundError();
+  return hasError;
+}
+
+// ── CELL INTERACTION ──
+function onCellClick(r, c) {
+  if (!gameActive) return;
+  if (given[r][c]) return;
+
+  if (board[r][c] === EMPTY) {
+    board[r][c] = SUN;
+    soundPlace();
+  } else if (board[r][c] === SUN) {
+    board[r][c] = MOON;
+    soundPlace();
+  } else {
+    board[r][c] = EMPTY;
+    soundRemove();
+  }
+
+  var cell = getCellEl(r, c);
+  setCellSymbol(cell, board[r][c]);
+  if (board[r][c] !== EMPTY) {
+    var sym = cell.querySelector('.symbol');
+    if (sym) sym.classList.add('pop-in');
+  }
+
+  highlightTriples();
+  updateIndicators();
+  checkWin();
+}
+
+gridEl.addEventListener('click', function(e) {
+  var cell = e.target.closest('.cell');
+  if (!cell) return;
+  var r = parseInt(cell.getAttribute('data-r'), 10);
+  var c = parseInt(cell.getAttribute('data-c'), 10);
+  onCellClick(r, c);
+});
+
+gridEl.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+// ── VALIDATE ──
+function validatePuzzle() {
+  clearErrors();
+  var hasError = false;
+  var half = N / 2;
+
+  for (var r = 0; r < N; r++) {
+    var rSun = 0, rMoon = 0;
+    for (var c = 0; c < N; c++) {
+      if (board[r][c] === SUN) rSun++;
+      else if (board[r][c] === MOON) rMoon++;
+    }
+    if (rSun > half || rMoon > half) {
+      for (var c2 = 0; c2 < N; c2++) {
+        if (board[r][c2] !== EMPTY) getCellEl(r, c2).classList.add('error');
+      }
+      hasError = true;
+    }
+  }
+
+  for (var c3 = 0; c3 < N; c3++) {
+    var cSun = 0, cMoon = 0;
+    for (var r3 = 0; r3 < N; r3++) {
+      if (board[r3][c3] === SUN) cSun++;
+      else if (board[r3][c3] === MOON) cMoon++;
+    }
+    if (cSun > half || cMoon > half) {
+      for (var r4 = 0; r4 < N; r4++) {
+        if (board[r4][c3] !== EMPTY) getCellEl(r4, c3).classList.add('error');
+      }
+      hasError = true;
+    }
+  }
+
+  // Check triples
+  for (var r5 = 0; r5 < N; r5++) {
+    for (var c5 = 0; c5 < N - 2; c5++) {
+      if (board[r5][c5] !== EMPTY && board[r5][c5] === board[r5][c5+1] && board[r5][c5+1] === board[r5][c5+2]) {
+        getCellEl(r5, c5).classList.add('error');
+        getCellEl(r5, c5+1).classList.add('error');
+        getCellEl(r5, c5+2).classList.add('error');
+        hasError = true;
+      }
+    }
+  }
+  for (var c6 = 0; c6 < N; c6++) {
+    for (var r6 = 0; r6 < N - 2; r6++) {
+      if (board[r6][c6] !== EMPTY && board[r6][c6] === board[r6+1][c6] && board[r6+1][c6] === board[r6+2][c6]) {
+        getCellEl(r6, c6).classList.add('error');
+        getCellEl(r6+1, c6).classList.add('error');
+        getCellEl(r6+2, c6).classList.add('error');
+        hasError = true;
+      }
+    }
+  }
+
+  // Check against solution
+  for (var r7 = 0; r7 < N; r7++) {
+    for (var c7 = 0; c7 < N; c7++) {
+      if (board[r7][c7] !== EMPTY && board[r7][c7] !== solution[r7][c7]) {
+        getCellEl(r7, c7).classList.add('error');
+        hasError = true;
+      }
+    }
+  }
+
+  if (hasError) {
+    soundError();
+    gridWrap.classList.add('shaking');
+    setTimeout(function() { gridWrap.classList.remove('shaking'); }, 300);
+    showToast('ERRORS FOUND');
+  } else {
+    showToast('LOOKING GOOD!');
+    soundLineComplete();
+  }
+}
+
+document.getElementById('validateBtn').addEventListener('click', validatePuzzle);
+
+// ── CLEAR ──
+function clearBoard() {
+  for (var r = 0; r < N; r++) {
+    for (var c = 0; c < N; c++) {
+      if (!given[r][c]) board[r][c] = EMPTY;
+    }
+  }
+  prevRowValid = [];
+  prevColValid = [];
+  renderGrid();
+}
+
+document.getElementById('clearBtn').addEventListener('click', clearBoard);
+
+// ── CHECK WIN ──
+function checkWin() {
+  for (var r = 0; r < N; r++) {
+    for (var c = 0; c < N; c++) {
+      if (board[r][c] !== solution[r][c]) return;
+    }
+  }
+  gameComplete();
+}
+
+function gameComplete() {
+  gameActive = false;
+  stopTimer();
+
+  played++;
+  streak++;
+  localStorage.setItem(PLAYED_KEY, String(played));
+  localStorage.setItem(STREAK_KEY, String(streak));
+
+  soundWin();
+  spawnParticles();
+
+  setTimeout(function() {
+    document.getElementById('completeTime').textContent = neonFormatScore(elapsedSeconds);
+    var diffLabel = DIFFICULTIES[currentDiff].label;
+    document.getElementById('completeStreakInfo').textContent = 'Streak: ' + streak + ' | ' + N + 'x' + N + ' ' + diffLabel;
+
+    var nameReady;
+    try {
+      nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    } catch(e) {
+      nameReady = Promise.resolve();
+    }
+    nameReady.then(function() {
+      return Neon.save(elapsedSeconds);
+    }).then(function(result) {
+      if (result && result.isNewBest) {
+        document.getElementById('completeBest').style.display = 'block';
+        soundBest();
+      } else {
+        document.getElementById('completeBest').style.display = 'none';
+      }
+      try { Neon.render(document.getElementById('completeLB')); } catch(e2) {}
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        try { Neon.showGlobalSplash(result.globalRank); } catch(e3) {}
+      }
+    }).catch(function() {
+      document.getElementById('completeBest').style.display = 'none';
+    });
+
+    showScreen(completeScreen);
+  }, 600);
+}
+
+// ── PARTICLES ──
+function spawnParticles() {
+  var colors = ['#ffd700', '#b44dff', '#00f0ff', '#39ff14', '#ff2d7b'];
+  var cx = window.innerWidth / 2;
+  var cy = window.innerHeight / 2;
+  for (var i = 0; i < 20; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var color = colors[i % colors.length];
+    p.style.background = color;
+    p.style.boxShadow = '0 0 6px ' + color;
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    var size = (3 + Math.random() * 4) + 'px';
+    p.style.width = size;
+    p.style.height = size;
+    document.body.appendChild(p);
+
+    var angle = (Math.PI * 2 * i) / 20 + (Math.random() - 0.5) * 0.5;
+    var dist = 80 + Math.random() * 160;
+    var dx = Math.cos(angle) * dist;
+    var dy = Math.sin(angle) * dist;
+    var dur = 600 + Math.random() * 400;
+
+    (function(el, ddx, ddy, ddur) {
+      el.style.transition = 'transform ' + ddur + 'ms ease-out, opacity ' + ddur + 'ms ease-out';
+      requestAnimationFrame(function() {
+        el.style.transform = 'translate(' + ddx + 'px, ' + ddy + 'px) scale(0)';
+        el.style.opacity = '0';
+      });
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, ddur + 50);
+    })(p, dx, dy, dur);
+  }
+}
+
+// ── SHARE ──
+function shareResult() {
+  var d = DIFFICULTIES[currentDiff];
+  var rows = Math.min(N, 8);
+  var cols = Math.min(N, 8);
+  var gridStr = '';
+  for (var r = 0; r < rows; r++) {
+    var row = '';
+    for (var c = 0; c < cols; c++) {
+      row += solution[r][c] === SUN ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    }
+    gridStr += row + '\n';
+  }
+
+  var text = '\u2600\uFE0F\uD83C\uDF19 TANGO\n' +
+    N + 'x' + N + ' ' + d.label + ' | ' + neonFormatScore(elapsedSeconds) + '\n' +
+    gridStr +
+    'Streak: ' + streak + ' \uD83D\uDD25\n' +
+    'neonarcade.net/neonmind/tango.html';
+
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function() {
+      clipCopy(text);
+    });
+  } else {
+    clipCopy(text);
+  }
+}
+
+function clipCopy(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('COPIED TO CLIPBOARD!');
+  }).catch(function() {
+    showToast('SHARE FAILED');
+  });
+}
+
+document.getElementById('shareBtn').addEventListener('click', shareResult);
+
+// ── START / NEW / MENU ──
+function startGame() {
+  neonInitForDiff(currentDiff);
+  var d = DIFFICULTIES[currentDiff];
+  N = d.size;
+  topDiff.textContent = N + 'x' + N + ' ' + d.label;
+
+  prevRowValid = new Array(N);
+  prevColValid = new Array(N);
+  for (var i = 0; i < N; i++) { prevRowValid[i] = false; prevColValid[i] = false; }
+
+  generatePuzzle(currentDiff);
+  renderGrid();
+  startTimer();
+  gameActive = true;
+
+  showScreen(gameScreen);
+}
+
+function goToMenu() {
+  gameActive = false;
+  clearInterval(timerInterval);
+  showScreen(startScreen);
+  updateBestTimes();
+  updateStartStats();
+  neonInitForDiff(currentDiff);
+  try { Neon.render(document.getElementById('startLB')); } catch(e) {}
+}
+
+function updateStartStats() {
+  document.getElementById('statPlayed').textContent = String(played);
+  document.getElementById('statStreak').textContent = String(streak);
+}
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('nextBtn').addEventListener('click', startGame);
+document.getElementById('newBtn').addEventListener('click', startGame);
+document.getElementById('backBtn').addEventListener('click', goToMenu);
+document.getElementById('menuBtn').addEventListener('click', goToMenu);
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', function(e) {
+  if (!gameActive) return;
+  if (e.key === 'Escape') goToMenu();
+});
+
+// ── INIT ──
+neonInitForDiff(currentDiff);
+updateBestTimes();
+updateStartStats();
+try { Neon.render(document.getElementById('startLB')); } catch(e) {}
+
+})();
+
+// Show More Games bar after delay
+setTimeout(function(){ var mg = document.getElementById('neonMoreGames'); if (mg) mg.style.display = 'block'; }, 3000);
+</script>
+<!-- More Games Navigation -->
+<div id="neonMoreGames" class="na-more-games" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+      <a href="sudoku.html" class="na-more-link">Sudoku</a>
+      <a href="queens.html" class="na-more-link">Queens</a>
+      <a href="minesweeper.html" class="na-more-link">Minesweeper</a>
+      <a href="nonogram.html" class="na-more-link">Nonogram</a>
+      <a href="/neonmind/" class="na-more-link na-more-hub">&larr; All NEON MIND Games</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

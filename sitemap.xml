@@ -146,6 +146,12 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://neonarcade.net/neonarcade/chimp.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- NEON MIND Games -->
   <url>
     <loc>https://neonarcade.net/neonmind/sudoku.html</loc>
@@ -188,6 +194,12 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://neonarcade.net/neonmind/tango.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- NEON GRIND Games -->
   <url>
     <loc>https://neonarcade.net/neongrind/mathblitz.html</loc>
@@ -201,6 +213,11 @@
   </url>
   <url>
     <loc>https://neonarcade.net/neongrind/neurosort.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neongrind/clickspeed.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

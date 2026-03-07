@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Chimp Test — Free Online Memory Game | NEON ARCADE</title>
+<meta name="description" content="Play the Chimp Memory Test free online. Numbers flash, then hide. Tap in order. Can you beat a chimpanzee? No download needed.">
+<meta name="keywords" content="chimp test, chimp memory test, free memory game online, human benchmark, brain game">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonarcade/chimp.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/chimp.html">
+<meta property="og:title" content="Chimp Test — Free Online Memory Game | NEON ARCADE">
+<meta property="og:description" content="Play the Chimp Memory Test free online. Can you beat a chimpanzee?">
+<meta property="og:image" content="https://neonarcade.net/screenshots/chimp.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chimp Test — Free Online Memory Game | NEON ARCADE">
+<meta name="twitter:description" content="Play the Chimp Memory Test free online. Can you beat a chimpanzee?">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/chimp.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Chimp Test","url":"https://neonarcade.net/neonarcade/chimp.html","description":"Play the Chimp Memory Test free online. Numbers flash, then hide. Tap in order.","genre":"Memory","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/screenshots/chimp.png","inLanguage":"en","isFamilyFriendly":true}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON ARCADE","item":"https://neonarcade.net/neonarcade/"},{"@type":"ListItem","position":3,"name":"Chimp Test","item":"https://neonarcade.net/neonarcade/chimp.html"}]}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 40% 0%, rgba(0,240,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.05) 0%, transparent 50%),
+    var(--bg-deep);
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* --- OVERLAYS --- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  background: rgba(10,10,18,0.94);
+  transition: opacity 0.3s;
+  overflow-y: auto;
+  padding: 24px 16px;
+}
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(13px, 2.8vw, 20px);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 6px;
+  text-align: center;
+  max-width: 480px;
+  padding: 0 16px;
+}
+
+.chimp-hint {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(11px, 2vw, 15px);
+  letter-spacing: 2px;
+  color: var(--neon-gold);
+  margin-bottom: 24px;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+}
+
+.chimp-emoji {
+  font-size: clamp(40px, 8vw, 64px);
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 12px rgba(0,240,255,0.3));
+}
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 20px;
+  text-align: center;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.play-btn.pink {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(255,45,123,0.06);
+}
+.play-btn.pink:hover {
+  background: rgba(255,45,123,0.15);
+  box-shadow: 0 0 20px rgba(255,45,123,0.2);
+  transform: scale(1.04);
+}
+
+/* --- HUD --- */
+#hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(20px, 5vw, 60px);
+  padding: 10px 16px;
+  z-index: 200;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(10,10,18,0.8), transparent);
+}
+.hud-block { text-align: center; }
+.hud-block .lbl {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.hud-block .val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 3vw, 26px);
+  color: var(--neon-cyan);
+}
+.hud-block .val.green { color: var(--neon-green); }
+.hud-block .val.gold { color: var(--neon-gold); }
+
+/* --- GRID --- */
+#grid-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 60px 12px 52px 12px;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: clamp(3px, 0.6vw, 6px);
+  width: min(90vw, 380px);
+  height: min(80vh, 620px);
+  max-height: calc(100vh - 120px);
+}
+
+.cell {
+  position: relative;
+  border-radius: 4px;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(14px, 3vw, 24px);
+  color: transparent;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cell.active {
+  background: var(--bg-surface);
+  border-color: rgba(0,240,255,0.2);
+  cursor: pointer;
+}
+
+.cell.showing {
+  color: var(--neon-cyan);
+  background: rgba(0,240,255,0.08);
+  border-color: rgba(0,240,255,0.4);
+  text-shadow: 0 0 8px rgba(0,240,255,0.5);
+}
+
+.cell.hidden-tile {
+  background: var(--bg-surface);
+  border-color: rgba(0,240,255,0.15);
+  color: transparent;
+  box-shadow: inset 0 0 12px rgba(0,240,255,0.04);
+  cursor: pointer;
+}
+.cell.hidden-tile:hover {
+  border-color: rgba(0,240,255,0.35);
+  background: rgba(18,18,31,0.9);
+  box-shadow: 0 0 12px rgba(0,240,255,0.1);
+}
+
+.cell.correct {
+  color: var(--neon-green);
+  background: rgba(57,255,20,0.12);
+  border-color: rgba(57,255,20,0.5);
+  text-shadow: 0 0 10px rgba(57,255,20,0.6);
+  cursor: default;
+}
+
+.cell.wrong {
+  color: var(--neon-pink);
+  background: rgba(255,45,123,0.15);
+  border-color: rgba(255,45,123,0.6);
+  text-shadow: 0 0 10px rgba(255,45,123,0.6);
+  cursor: default;
+}
+
+.cell.reveal-wrong {
+  color: var(--neon-pink);
+  background: rgba(255,45,123,0.06);
+  border-color: rgba(255,45,123,0.2);
+  text-shadow: none;
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Level transition flash */
+.level-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,10,18,0.85);
+  pointer-events: none;
+  animation: flashIn 0.6s ease-out forwards;
+}
+.level-flash-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(32px, 8vw, 56px);
+  letter-spacing: 6px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 20px rgba(0,240,255,0.7), 0 0 60px rgba(0,240,255,0.3);
+}
+@keyframes flashIn {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* --- GAME OVER STATS --- */
+.go-verdict {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(18px, 4vw, 30px);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 12px currentColor;
+}
+.go-verdict.win { color: var(--neon-green); }
+.go-verdict.lose { color: var(--neon-pink); }
+
+.go-stats {
+  display: flex;
+  gap: clamp(16px, 4vw, 32px);
+  margin: 16px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.go-stat { text-align: center; }
+.go-stat .val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(24px, 5vw, 42px);
+  color: var(--neon-cyan);
+}
+.go-stat .val.green { color: var(--neon-green); }
+.go-stat .val.gold { color: var(--neon-gold); }
+.go-stat .val.pink { color: var(--neon-pink); }
+.go-stat .lbl {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.go-best {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--neon-gold);
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.score-table {
+  width: 100%;
+  max-width: 420px;
+  margin: 8px auto;
+}
+
+/* Progress bar for display time */
+#timer-bar-wrap {
+  position: fixed;
+  top: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(80vw, 360px);
+  height: 3px;
+  background: rgba(0,240,255,0.1);
+  border-radius: 2px;
+  z-index: 300;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#timer-bar-wrap.visible { opacity: 1; }
+#timer-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--neon-cyan);
+  border-radius: 2px;
+  transform-origin: left;
+  box-shadow: 0 0 6px rgba(0,240,255,0.5);
+}
+
+/* Shake */
+@keyframes shake {
+  0%,100% { transform: translate(0,0); }
+  10% { transform: translate(-3px, -1px); }
+  20% { transform: translate(3px, 2px); }
+  30% { transform: translate(-2px, -3px); }
+  40% { transform: translate(2px, 1px); }
+  50% { transform: translate(-1px, 3px); }
+  60% { transform: translate(3px, -2px); }
+  70% { transform: translate(-3px, 1px); }
+  80% { transform: translate(1px, -2px); }
+  90% { transform: translate(-2px, 3px); }
+}
+.shake { animation: shake 0.3s ease; }
+
+/* Particles */
+.particle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 800;
+}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+</style>
+</head>
+<body>
+
+<!-- HUD -->
+<div id="hud" style="display:none">
+  <div class="hud-block">
+    <div class="lbl">LEVEL</div>
+    <div class="val green" id="hud-level">4</div>
+  </div>
+  <div class="hud-block">
+    <div class="lbl">NUMBERS</div>
+    <div class="val" id="hud-numbers">4</div>
+  </div>
+  <div class="hud-block">
+    <div class="lbl">BEST</div>
+    <div class="val gold" id="hud-best">-</div>
+  </div>
+</div>
+
+<!-- Timer bar -->
+<div id="timer-bar-wrap">
+  <div id="timer-bar"></div>
+</div>
+
+<!-- Grid -->
+<div id="grid-container" style="display:none">
+  <div id="grid"></div>
+</div>
+
+<!-- Start Screen -->
+<div id="start-screen" class="overlay">
+  <div class="chimp-emoji">&#x1F9E0;</div>
+  <h1 class="title">CHIMP</h1>
+  <div class="subtitle">ARE YOU SMARTER THAN A CHIMPANZEE?</div>
+  <div class="chimp-hint">&#x1F412; CHIMPS AVERAGE LEVEL 9</div>
+  <div id="startLB" class="score-table"></div>
+  <button class="play-btn" id="start-btn">START</button>
+  <div class="controls-hint">TAP NUMBERS IN ORDER &#x2022; 1, 2, 3...</div>
+</div>
+
+<!-- Game Over Screen -->
+<div id="gameover-screen" class="overlay hidden">
+  <div class="go-verdict" id="go-verdict"></div>
+  <div class="go-stats">
+    <div class="go-stat">
+      <div class="val green" id="go-level">4</div>
+      <div class="lbl">LEVEL</div>
+    </div>
+    <div class="go-stat">
+      <div class="val" id="go-correct">0</div>
+      <div class="lbl">CORRECT</div>
+    </div>
+    <div class="go-stat">
+      <div class="val gold" id="go-best">0</div>
+      <div class="lbl">BEST</div>
+    </div>
+  </div>
+  <div class="go-best" id="go-newbest" style="display:none">&#x2B50; NEW PERSONAL BEST!</div>
+  <div id="goLB" class="score-table"></div>
+  <div class="btn-row">
+    <button class="play-btn" id="share-btn">SHARE</button>
+    <button class="play-btn pink" id="retry-btn">PLAY AGAIN</button>
+  </div>
+  <div class="controls-hint">PRESS SPACE OR TAP PLAY AGAIN</div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ============ CONFIG ============
+  var COLS = 5;
+  var ROWS = 8;
+  var START_LEVEL = 4;
+  var START_DISPLAY_TIME = 1200;
+  var DISPLAY_TIME_DECREASE = 80;
+  var MIN_DISPLAY_TIME = 400;
+  var CHIMP_LEVEL = 9;
+
+  // ============ AUDIO ============
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playRevealSound() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } catch(e) {}
+  }
+
+  function playCorrectSound(num, total) {
+    try {
+      var ctx = getAudio();
+      var baseFreq = 800 + (num / total) * 400;
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(baseFreq * 1.2, ctx.currentTime + 0.06);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
+
+  function playWrongSound() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var osc2 = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      osc2.type = 'square';
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.35);
+      osc2.frequency.setValueAtTime(190, ctx.currentTime);
+      osc2.frequency.linearRampToValueAtTime(70, ctx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc2.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+      osc2.stop(ctx.currentTime + 0.4);
+    } catch(e) {}
+  }
+
+  function playLevelComplete() {
+    try {
+      var ctx = getAudio();
+      var notes = [523, 659, 784, 1047];
+      notes.forEach(function(freq, i) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.08);
+        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.08);
+        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + i * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.2);
+        osc.start(ctx.currentTime + i * 0.08);
+        osc.stop(ctx.currentTime + i * 0.08 + 0.2);
+      });
+    } catch(e) {}
+  }
+
+  function playNewBestSound() {
+    try {
+      var ctx = getAudio();
+      var notes = [523, 659, 784, 1047, 1319];
+      notes.forEach(function(freq, i) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.1);
+        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + i * 0.1 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.3);
+        osc.start(ctx.currentTime + i * 0.1);
+        osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+      });
+    } catch(e) {}
+  }
+
+  // ============ PARTICLES ============
+  function spawnParticles(x, y, color, count) {
+    count = count || 12;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
+      var speed = 60 + Math.random() * 80;
+      var dx = Math.cos(angle) * speed;
+      var dy = Math.sin(angle) * speed;
+      (function(el, pdx, pdy) {
+        var startX = x, startY = y;
+        var startTime = performance.now();
+        var duration = 500 + Math.random() * 300;
+        function animate(now) {
+          var t = (now - startTime) / duration;
+          if (t >= 1) { el.remove(); return; }
+          el.style.left = (startX + pdx * t) + 'px';
+          el.style.top = (startY + pdy * t + 30 * t * t) + 'px';
+          el.style.opacity = String(1 - t);
+          el.style.transform = 'scale(' + (1 - t * 0.5) + ')';
+          requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+      })(p, dx, dy);
+    }
+  }
+
+  // ============ DOM REFS ============
+  var startScreen = document.getElementById('start-screen');
+  var gameoverScreen = document.getElementById('gameover-screen');
+  var gridContainer = document.getElementById('grid-container');
+  var grid = document.getElementById('grid');
+  var hud = document.getElementById('hud');
+  var hudLevel = document.getElementById('hud-level');
+  var hudNumbers = document.getElementById('hud-numbers');
+  var hudBest = document.getElementById('hud-best');
+  var timerBarWrap = document.getElementById('timer-bar-wrap');
+  var timerBar = document.getElementById('timer-bar');
+  var startBtn = document.getElementById('start-btn');
+  var retryBtn = document.getElementById('retry-btn');
+  var shareBtn = document.getElementById('share-btn');
+  var goVerdict = document.getElementById('go-verdict');
+  var goLevel = document.getElementById('go-level');
+  var goCorrect = document.getElementById('go-correct');
+  var goBest = document.getElementById('go-best');
+  var goNewBest = document.getElementById('go-newbest');
+
+  // ============ STATE ============
+  var level = START_LEVEL;
+  var nextNum = 1;
+  var totalCorrect = 0;
+  var cells = [];
+  var numberMap = {};
+  var phase = 'idle'; // idle | showing | playing | gameover
+  var displayTimeout = null;
+  var bestLevel = 0;
+
+  // ============ INIT ============
+  Neon.init({ game: 'chimp', mode: 'high' });
+  bestLevel = Neon.getHighScore() || 0;
+
+  function buildGrid() {
+    grid.textContent = '';
+    cells = [];
+    for (var i = 0; i < COLS * ROWS; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = String(i);
+      cell.addEventListener('click', onCellClick);
+      cell.addEventListener('touchend', onCellTouch);
+      grid.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  buildGrid();
+
+  // Render start screen leaderboard
+  try { Neon.render(document.getElementById('startLB')); } catch(e) {}
+
+  if (bestLevel > 0) {
+    hudBest.textContent = String(bestLevel);
+  }
+
+  // ============ GAME FLOW ============
+  function startGame() {
+    startScreen.classList.add('hidden');
+    gameoverScreen.classList.add('hidden');
+    gridContainer.style.display = 'flex';
+    hud.style.display = 'flex';
+    level = START_LEVEL;
+    nextNum = 1;
+    totalCorrect = 0;
+    phase = 'idle';
+    bestLevel = Neon.getHighScore() || 0;
+    hudBest.textContent = bestLevel > 0 ? String(bestLevel) : '-';
+    startRound();
+  }
+
+  function startRound() {
+    // Reset all cells
+    for (var c = 0; c < cells.length; c++) {
+      cells[c].className = 'cell';
+      cells[c].textContent = '';
+    }
+    numberMap = {};
+    nextNum = 1;
+
+    // Update HUD
+    hudLevel.textContent = String(level);
+    hudNumbers.textContent = String(level);
+
+    // Place numbers randomly
+    var positions = [];
+    var totalCells = COLS * ROWS;
+    while (positions.length < level) {
+      var pos = Math.floor(Math.random() * totalCells);
+      if (positions.indexOf(pos) === -1) {
+        positions.push(pos);
+      }
+    }
+
+    // Shuffle and assign numbers
+    for (var s = positions.length - 1; s > 0; s--) {
+      var j = Math.floor(Math.random() * (s + 1));
+      var tmp = positions[s];
+      positions[s] = positions[j];
+      positions[j] = tmp;
+    }
+
+    for (var i = 0; i < level; i++) {
+      var idx = positions[i];
+      numberMap[idx] = i + 1;
+      cells[idx].textContent = String(i + 1);
+      cells[idx].className = 'cell showing';
+    }
+
+    phase = 'showing';
+    playRevealSound();
+
+    // Timer bar animation
+    var displayTime = getDisplayTime();
+    timerBarWrap.classList.add('visible');
+    timerBar.style.transition = 'none';
+    timerBar.style.transform = 'scaleX(1)';
+    // Force reflow
+    void timerBar.offsetWidth;
+    timerBar.style.transition = 'transform ' + displayTime + 'ms linear';
+    timerBar.style.transform = 'scaleX(0)';
+
+    // Hide numbers after display time
+    if (displayTimeout) clearTimeout(displayTimeout);
+    displayTimeout = setTimeout(function() {
+      hideNumbers();
+    }, displayTime);
+  }
+
+  function getDisplayTime() {
+    var t = START_DISPLAY_TIME - (level - START_LEVEL) * DISPLAY_TIME_DECREASE;
+    return Math.max(t, MIN_DISPLAY_TIME);
+  }
+
+  function hideNumbers() {
+    timerBarWrap.classList.remove('visible');
+    phase = 'playing';
+
+    for (var i = 0; i < cells.length; i++) {
+      if (numberMap[i] !== undefined) {
+        if (!cells[i].classList.contains('correct')) {
+          cells[i].className = 'cell hidden-tile active';
+          cells[i].textContent = '';
+        }
+      } else {
+        cells[i].className = 'cell';
+      }
+    }
+  }
+
+  function onCellTouch(e) {
+    e.preventDefault();
+    handleTap(this);
+  }
+
+  function onCellClick(e) {
+    if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+    handleTap(this);
+  }
+
+  function handleTap(cell) {
+    if (phase === 'showing') {
+      // Player taps during showing phase: hide immediately and process
+      if (displayTimeout) { clearTimeout(displayTimeout); displayTimeout = null; }
+      hideNumbers();
+      processTap(cell);
+      return;
+    }
+    if (phase !== 'playing') return;
+    processTap(cell);
+  }
+
+  function processTap(cell) {
+    var idx = parseInt(cell.dataset.index, 10);
+    var num = numberMap[idx];
+
+    if (num === undefined) return;
+    if (cell.classList.contains('correct')) return;
+
+    if (num === nextNum) {
+      // CORRECT
+      cell.className = 'cell correct';
+      cell.textContent = String(num);
+      totalCorrect++;
+
+      var rect = cell.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      spawnParticles(cx, cy, '#39ff14', 8);
+      playCorrectSound(num, level);
+
+      nextNum++;
+
+      if (nextNum > level) {
+        // Level complete!
+        phase = 'idle';
+        playLevelComplete();
+        level++;
+        showLevelFlash(level);
+        setTimeout(function() {
+          startRound();
+        }, 700);
+      }
+    } else {
+      // WRONG
+      gameOver(cell, idx);
+    }
+  }
+
+  function showLevelFlash(lvl) {
+    var flash = document.createElement('div');
+    flash.className = 'level-flash';
+    var span = document.createElement('span');
+    span.className = 'level-flash-text';
+    span.textContent = lvl > CHIMP_LEVEL ? 'LEVEL ' + lvl + ' \uD83D\uDC12' : 'LEVEL ' + lvl;
+    flash.appendChild(span);
+    document.body.appendChild(flash);
+    setTimeout(function() { flash.remove(); }, 650);
+  }
+
+  function gameOver(wrongCell, wrongIdx) {
+    phase = 'gameover';
+    playWrongSound();
+    document.body.classList.add('shake');
+    setTimeout(function() { document.body.classList.remove('shake'); }, 300);
+
+    // Show the wrong cell
+    wrongCell.className = 'cell wrong';
+    wrongCell.textContent = String(numberMap[wrongIdx]);
+
+    var rect = wrongCell.getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff2d7b', 16);
+
+    // Reveal all remaining hidden tiles
+    for (var i = 0; i < cells.length; i++) {
+      var num = numberMap[i];
+      if (num !== undefined && !cells[i].classList.contains('correct') && i !== wrongIdx) {
+        cells[i].className = 'cell reveal-wrong';
+        cells[i].textContent = String(num);
+      }
+    }
+
+    var levelReached = level;
+
+    setTimeout(function() {
+      showGameOver(levelReached);
+    }, 1200);
+  }
+
+  function showGameOver(levelReached) {
+    hud.style.display = 'none';
+    gridContainer.style.display = 'none';
+    timerBarWrap.classList.remove('visible');
+
+    var beatChimp = levelReached > CHIMP_LEVEL;
+
+    if (beatChimp) {
+      goVerdict.textContent = 'YOU WIN!';
+      goVerdict.className = 'go-verdict win';
+    } else {
+      goVerdict.textContent = 'CHIMP WINS';
+      goVerdict.className = 'go-verdict lose';
+    }
+
+    goLevel.textContent = String(levelReached);
+    goLevel.className = 'val' + (beatChimp ? ' green' : ' pink');
+    goCorrect.textContent = String(totalCorrect);
+    goBest.textContent = String(Math.max(bestLevel, levelReached));
+
+    if (levelReached > bestLevel) {
+      goNewBest.style.display = 'block';
+      playNewBestSound();
+    } else {
+      goNewBest.style.display = 'none';
+    }
+
+    gameoverScreen.classList.remove('hidden');
+
+    // Save score via Neon.js
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(levelReached);
+    }).then(function(result) {
+      bestLevel = Math.max(bestLevel, levelReached);
+      Neon.render(document.getElementById('goLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    }).catch(function() {});
+  }
+
+  // ============ SHARE ============
+  function buildShareText(levelReached) {
+    var beatChimp = levelReached > CHIMP_LEVEL;
+    var squares = '';
+    var levelsCleared = levelReached - START_LEVEL;
+    for (var i = 0; i < levelsCleared; i++) {
+      squares += '\uD83D\uDFE9';
+    }
+    squares += '\uD83D\uDFE5';
+
+    var lines = [
+      '\uD83E\uDDE0 CHIMP TEST',
+      'Level ' + levelReached + ' | ' + (beatChimp ? 'Beat the chimp! \uD83D\uDC12' : 'Chimp wins \uD83D\uDC12'),
+      squares,
+      'neonarcade.net/neonarcade/chimp.html'
+    ];
+    return lines.join('\n');
+  }
+
+  shareBtn.addEventListener('click', function() {
+    var levelReached = parseInt(goLevel.textContent, 10);
+    var text = buildShareText(levelReached);
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  });
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showCopiedFeedback();
+      }).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showCopiedFeedback(); } catch(e) {}
+    ta.remove();
+  }
+
+  function showCopiedFeedback() {
+    var orig = shareBtn.textContent;
+    shareBtn.textContent = 'COPIED!';
+    shareBtn.style.borderColor = '#39ff14';
+    shareBtn.style.color = '#39ff14';
+    setTimeout(function() {
+      shareBtn.textContent = orig;
+      shareBtn.style.borderColor = '';
+      shareBtn.style.color = '';
+    }, 1500);
+  }
+
+  // ============ INPUT ============
+  startBtn.addEventListener('click', function() {
+    startGame();
+  });
+  retryBtn.addEventListener('click', function() {
+    startGame();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      if (phase === 'idle' && !startScreen.classList.contains('hidden')) {
+        e.preventDefault();
+        startGame();
+      } else if (phase === 'gameover') {
+        e.preventDefault();
+        startGame();
+      }
+    }
+  });
+
+  // Show more games bar after delay
+  setTimeout(function() {
+    var mg = document.getElementById('neonMoreGames');
+    if (mg) mg.style.display = 'block';
+  }, 3000);
+
+})();
+</script>
+<!-- More Games Navigation -->
+<div id="neonMoreGames" class="na-more-games" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+      <a href="impostor-pixel.html" class="na-more-link">Impostor Pixel</a>
+      <a href="catalyst.html" class="na-more-link">Catalyst</a>
+      <a href="neon-snake.html" class="na-more-link">Neon Snake</a>
+      <a href="tetris-betrayal.html" class="na-more-link">Tetris Betrayal</a>
+      <a href="/neonarcade/" class="na-more-link na-more-hub">&larr; All NEON ARCADE Games</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
