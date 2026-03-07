@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Updates & Changelog — NEON ARCADE | Every Game We've Shipped</title>
+<meta name="description" content="Full changelog of every NEON ARCADE game release. 38 free browser games shipped in 3 days — arcade, puzzle, and skill games with dates, descriptions, and links.">
+<meta name="keywords" content="neon arcade changelog, game updates, new browser games, free online games, game releases">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/updates.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/updates.html">
+<meta property="og:title" content="Updates & Changelog — NEON ARCADE">
+<meta property="og:description" content="Full changelog of every NEON ARCADE game release. 38 free browser games shipped in 3 days.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/updates.html">
+<meta name="twitter:title" content="Updates & Changelog — NEON ARCADE">
+<meta name="twitter:description" content="Full changelog of every NEON ARCADE game release. 38 free browser games shipped in 3 days.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Updates & Changelog",
+  "url": "https://neonarcade.net/updates.html",
+  "description": "Full changelog of every NEON ARCADE game release. 38 free browser games shipped in 3 days.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "Updates", "item": "https://neonarcade.net/updates.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-surface: #12121f;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #7a7a9a;
+    --text-mid: #9999bb;
+    --text-bright: #cccce0;
+    --border: rgba(0,240,255,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- NAV BAR --- */
+  .nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.4);
+    text-decoration: none;
+  }
+
+  .nav-logo span {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px rgba(255,45,123,0.4);
+  }
+
+  .nav-back {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border: 1px solid rgba(0,240,255,0.2);
+    border-radius: 3px;
+    color: var(--neon-cyan);
+    transition: all 0.2s;
+  }
+
+  .nav-back:hover {
+    background: rgba(0,240,255,0.06);
+    border-color: rgba(0,240,255,0.4);
+  }
+
+  /* --- HEADER --- */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 20px 20px 40px;
+  }
+
+  .page-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(28px, 7vw, 56px);
+    letter-spacing: 6px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2), 0 0 80px rgba(0,240,255,0.1);
+    line-height: 1.1;
+  }
+
+  .page-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 18px);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 28px;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px rgba(255,215,0,0.4);
+  }
+
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    margin: 32px auto 0;
+  }
+
+  /* --- TIMELINE --- */
+  .timeline {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* Vertical line */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 43px;
+    top: 0;
+    bottom: 60px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--neon-cyan), rgba(0,240,255,0.1) 90%, transparent);
+  }
+
+  /* --- DATE SECTION --- */
+  .date-section {
+    position: relative;
+    margin-bottom: 48px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeSlideIn 0.5s ease forwards;
+  }
+
+  .date-section:nth-child(1) { animation-delay: 0.05s; }
+  .date-section:nth-child(2) { animation-delay: 0.1s; }
+  .date-section:nth-child(3) { animation-delay: 0.15s; }
+  .date-section:nth-child(4) { animation-delay: 0.2s; }
+  .date-section:nth-child(5) { animation-delay: 0.25s; }
+  .date-section:nth-child(6) { animation-delay: 0.3s; }
+  .date-section:nth-child(7) { animation-delay: 0.35s; }
+  .date-section:nth-child(8) { animation-delay: 0.4s; }
+  .date-section:nth-child(9) { animation-delay: 0.45s; }
+  .date-section:nth-child(10) { animation-delay: 0.5s; }
+
+  @keyframes fadeSlideIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .date-marker {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-left: 0;
+  }
+
+  .date-dot {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 8px rgba(0,240,255,0.4), 0 0 20px rgba(0,240,255,0.15);
+    position: relative;
+    left: -6px;
+    margin-left: 37px;
+  }
+
+  .date-dot.pink { border-color: var(--neon-pink); box-shadow: 0 0 8px rgba(255,45,123,0.4), 0 0 20px rgba(255,45,123,0.15); }
+  .date-dot.green { border-color: var(--neon-green); box-shadow: 0 0 8px rgba(57,255,20,0.4), 0 0 20px rgba(57,255,20,0.15); }
+  .date-dot.purple { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(180,77,255,0.4), 0 0 20px rgba(180,77,255,0.15); }
+  .date-dot.gold { border-color: var(--neon-gold); box-shadow: 0 0 8px rgba(255,215,0,0.4), 0 0 20px rgba(255,215,0,0.15); }
+
+  .date-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .date-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: clamp(13px, 2.5vw, 16px);
+    letter-spacing: 3px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0,240,255,0.3);
+  }
+
+  .date-text.pink { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,45,123,0.3); }
+  .date-text.green { color: var(--neon-green); text-shadow: 0 0 8px rgba(57,255,20,0.3); }
+  .date-text.purple { color: var(--neon-purple); text-shadow: 0 0 8px rgba(180,77,255,0.3); }
+  .date-text.gold { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.3); }
+
+  .wave-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* --- GAME ENTRIES --- */
+  .game-list {
+    padding-left: 68px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .game-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .game-entry:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(0,240,255,0.25);
+    transform: translateX(4px);
+    box-shadow: 0 4px 20px rgba(0,240,255,0.06), 0 0 0 1px rgba(0,240,255,0.08);
+  }
+
+  .game-entry::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .game-entry.cat-arcade::before { background: var(--neon-cyan); }
+  .game-entry.cat-grind::before { background: var(--neon-purple); }
+  .game-entry.cat-mind::before { background: var(--neon-green); }
+
+  .game-num {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-dim);
+    min-width: 28px;
+    text-align: right;
+    padding-top: 3px;
+    letter-spacing: 1px;
+  }
+
+  .game-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .game-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .game-name {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--text-bright);
+    transition: color 0.2s;
+  }
+
+  .game-entry:hover .game-name { color: #fff; }
+
+  .cat-tag {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .cat-tag.arcade {
+    color: var(--neon-cyan);
+    background: rgba(0,240,255,0.08);
+    border: 1px solid rgba(0,240,255,0.2);
+  }
+
+  .cat-tag.grind {
+    color: var(--neon-purple);
+    background: rgba(180,77,255,0.08);
+    border: 1px solid rgba(180,77,255,0.2);
+  }
+
+  .cat-tag.mind {
+    color: var(--neon-green);
+    background: rgba(57,255,20,0.08);
+    border: 1px solid rgba(57,255,20,0.2);
+  }
+
+  .game-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-mid);
+    margin-top: 4px;
+  }
+
+  .game-quip {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+
+  .game-play {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--neon-cyan);
+    opacity: 0;
+    transition: opacity 0.2s;
+    padding-top: 4px;
+    min-width: 60px;
+    text-align: right;
+    align-self: center;
+  }
+
+  .game-entry:hover .game-play { opacity: 1; }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #9999bb;
+    text-decoration: underline;
+    text-decoration-color: rgba(153,153,187,0.4);
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover { color: var(--neon-cyan); text-decoration-color: rgba(0,240,255,0.4); }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 700px) {
+    .timeline::before { left: 23px; }
+    .date-dot { margin-left: 17px; }
+    .game-list { padding-left: 48px; }
+    .game-entry { padding: 12px 14px; gap: 10px; }
+    .game-num { display: none; }
+    .game-play { display: none; }
+    header { padding: 12px 16px 30px; }
+    .nav { padding: 16px 16px; }
+    .header-stats { gap: 20px; }
+    .stat-num { font-size: 22px; }
+  }
+
+  @media (max-width: 420px) {
+    .game-header { gap: 6px; }
+    .game-name { font-size: 12px; letter-spacing: 1px; }
+    .cat-tag { font-size: 7px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">NEON<span>ARCADE</span></a>
+  <a href="/" class="nav-back">&larr; All Games</a>
+</nav>
+
+<header>
+  <h1 class="page-title">CHANGELOG</h1>
+  <p class="page-subtitle">Every game we shipped, in order</p>
+  <div class="header-stats">
+    <div class="stat-item">
+      <div class="stat-num">38</div>
+      <div class="stat-label">Games</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Days</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Regrets</div>
+    </div>
+  </div>
+  <div class="header-line"></div>
+</header>
+
+<main class="timeline">
+
+  <!-- MARCH 7, 2026 — LATEST ADDITIONS -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot gold"></div>
+      <div class="date-info">
+        <div class="date-text gold">MARCH 7, 2026</div>
+        <div class="wave-label">Latest Additions</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonmind/tango.html" class="game-entry cat-mind">
+        <div class="game-num">#38</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">TANGO</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Fill the grid with suns and moons. No three in a row. Celestial logic at its finest.</div>
+          <div class="game-quip">"Perfectly balanced, as all things should be. Except your win rate."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neongrind/clickspeed.html" class="game-entry cat-grind">
+        <div class="game-num">#37</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">CLICK SPEED TEST</span>
+            <span class="cat-tag grind">GRIND</span>
+          </div>
+          <div class="game-desc">How fast can you click? CPS test with standard, precision, and burst modes.</div>
+          <div class="game-quip">"Repetitive stress injury speedrun. Your mouse did not consent to this."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/chimp.html" class="game-entry cat-arcade">
+        <div class="game-num">#36</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">CHIMP TEST</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Are you smarter than a chimpanzee? Numbers flash then hide. Tap in order.</div>
+          <div class="game-quip">"Spoiler: the chimp usually wins. Your ego will never fully recover."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 6 EVENING — PUZZLE EXPANSION -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot green"></div>
+      <div class="date-info">
+        <div class="date-text green">MARCH 6, 2026 &mdash; EVENING</div>
+        <div class="wave-label">Puzzle Expansion</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonmind/nurikabe.html" class="game-entry cat-mind">
+        <div class="game-num">#35</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">NURIKABE</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Shade cells around numbered islands. Connected walls, no 2x2 blocks.</div>
+          <div class="game-quip">"Japanese puzzle mastery. You'll feel cultured and confused simultaneously."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonmind/nonogram.html" class="game-entry cat-mind">
+        <div class="game-num">#34</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">NONOGRAM</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Reveal pixel art from row and column clues. Logic meets art school dropout.</div>
+          <div class="game-quip">"Every finished puzzle looks like a duck. We don't know why either."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonmind/kakuro.html" class="game-entry cat-mind">
+        <div class="game-num">#33</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">KAKURO</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Cross-sum puzzles. Sudoku meets crosswords. Math teachers weep with joy.</div>
+          <div class="game-quip">"Finally, a game where being good at math makes you cool. Just kidding."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonmind/bridges.html" class="game-entry cat-mind">
+        <div class="game-num">#32</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">BRIDGES</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Connect islands with bridges. Match the numbers. No crossings.</div>
+          <div class="game-quip">"Surprisingly zen until you realize you've been staring at it for 40 minutes."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 6 AFTERNOON — PUZZLE DROP -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot green"></div>
+      <div class="date-info">
+        <div class="date-text green">MARCH 6, 2026 &mdash; AFTERNOON</div>
+        <div class="wave-label">Afternoon Puzzle Drop</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonmind/queens.html" class="game-entry cat-mind">
+        <div class="game-num">#31</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">QUEENS</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Place queens on a colored grid. One per region, row, column. No touching.</div>
+          <div class="game-quip">"It's harder than it sounds. We said that about every game, but this time we mean it."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 6 — NEON MIND DEBUTS -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot green"></div>
+      <div class="date-info">
+        <div class="date-text green">MARCH 6, 2026</div>
+        <div class="wave-label">Neon Mind Debuts</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonmind/minesweeper.html" class="game-entry cat-mind">
+        <div class="game-num">#30</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">MINESWEEPER</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">Six progressive sizes. First-click safety guaranteed. After that, you're on your own.</div>
+          <div class="game-quip">"The original 'I'll just play one more' game. Since 1990 and still going."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonmind/sudoku.html" class="game-entry cat-mind">
+        <div class="game-num">#29</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">SUDOKU</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">The classic 9x9, beautifully reimagined in neon. Four difficulty levels to destroy your evening.</div>
+          <div class="game-quip">"Your grandma's favorite game, but make it cyberpunk."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonmind/minisudoku.html" class="game-entry cat-mind">
+        <div class="game-num">#28</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">MINI SUDOKU</span>
+            <span class="cat-tag mind">MIND</span>
+          </div>
+          <div class="game-desc">6x6 logic puzzle. 4 difficulties. Perfect gateway drug to full Sudoku.</div>
+          <div class="game-quip">"We put 'mini' in the name so you'd feel less guilty. It didn't work."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 6 — NEON GRIND LAUNCHES -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot purple"></div>
+      <div class="date-info">
+        <div class="date-text purple">MARCH 6, 2026</div>
+        <div class="wave-label">Neon Grind Launches</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neongrind/reflex-chain.html" class="game-entry cat-grind">
+        <div class="game-num">#27</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">REFLEX CHAIN</span>
+            <span class="cat-tag grind">GRIND</span>
+          </div>
+          <div class="game-desc">Tap targets before they vanish. 25 levels of escalating madness.</div>
+          <div class="game-quip">"25 levels of 'that was totally lag, not me'. Sure it was."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neongrind/neurosort.html" class="game-entry cat-grind">
+        <div class="game-num">#26</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">NEUROSORT</span>
+            <span class="cat-tag grind">GRIND</span>
+          </div>
+          <div class="game-desc">Sort falling items by color, shape, then both. Rules invert randomly.</div>
+          <div class="game-quip">"Chaos theory in action. Your brain's task manager will crash."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neongrind/mathblitz.html" class="game-entry cat-grind">
+        <div class="game-num">#25</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">MATHBLITZ</span>
+            <span class="cat-tag grind">GRIND</span>
+          </div>
+          <div class="game-desc">Mental math at speed. 30 levels from "this is easy" to "why did I do this to myself".</div>
+          <div class="game-quip">"Calculator manufacturers hate this one weird trick."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 5 LATE NIGHT -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot pink"></div>
+      <div class="date-info">
+        <div class="date-text pink">MARCH 5, 2026 &mdash; LATE NIGHT</div>
+        <div class="wave-label">Late Night Drop</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonarcade/chromaself.html" class="game-entry cat-arcade">
+        <div class="game-num">#24</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">CHROMASELF</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Personality quiz that reveals your unique color palette. Very shareable, very unscientific.</div>
+          <div class="game-quip">"Astrology for people who think they're too smart for astrology."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/curfew.html" class="game-entry cat-arcade">
+        <div class="game-num">#23</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">CURFEW</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Stealth puzzle. Get home before curfew. We've all been there.</div>
+          <div class="game-quip">"A game about consequences. Something we clearly don't understand, given the shipping pace."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 5 EVENING — WAVE 3 -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot"></div>
+      <div class="date-info">
+        <div class="date-text">MARCH 5, 2026 &mdash; EVENING</div>
+        <div class="wave-label">Wave 3</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonarcade/wordchain.html" class="game-entry cat-arcade">
+        <div class="game-num">#22</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">WORDCHAIN</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Word chain puzzle. Each word starts with the last letter of the previous one.</div>
+          <div class="game-quip">"Simple? Try it. Then try explaining to your boss why you're 2 hours late."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/truecolor.html" class="game-entry cat-arcade">
+        <div class="game-num">#21</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">TRUECOLOR</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Advanced color perception test. Discover you've been lying about seeing teal.</div>
+          <div class="game-quip">"The dress was blue and black. This game will prove you wrong about everything else too."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/split-second.html" class="game-entry cat-arcade">
+        <div class="game-num">#20</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">SPLIT SECOND</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Split-second reaction challenges. Blink and you literally lose.</div>
+          <div class="game-quip">"Your reaction time reveals your true age. Sorry in advance."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/gridlock.html" class="game-entry cat-arcade">
+        <div class="game-num">#19</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">GRIDLOCK</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Sliding puzzle speedrun. Race your own ghost. Existential crisis included.</div>
+          <div class="game-quip">"Competing against yourself sounds deep until you lose to yourself."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 5 AFTERNOON — WAVE 2 -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot"></div>
+      <div class="date-info">
+        <div class="date-text">MARCH 5, 2026 &mdash; AFTERNOON</div>
+        <div class="wave-label">Wave 2</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonarcade/breakout-architect.html" class="game-entry cat-arcade">
+        <div class="game-num">#18</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">BREAKOUT ARCHITECT</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Design breakout levels, challenge friends. Bob the Brick Builder.</div>
+          <div class="game-quip">"Build things just to watch them get destroyed. Basically architecture school."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/wordchain-duel.html" class="game-entry cat-arcade">
+        <div class="game-num">#17</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">WORDCHAIN DUEL</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Async 1v1 word chain challenge. Vocabulary violence.</div>
+          <div class="game-quip">"Finally, a PvP game where an English degree is the meta."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/mine-finder.html" class="game-entry cat-arcade">
+        <div class="game-num">#16</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">MINE FINDER</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Reverse minesweeper: place mines to fool the AI. Big brain energy.</div>
+          <div class="game-quip">"You ARE the danger. Walter White would be proud."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/burndown.html" class="game-entry cat-arcade">
+        <div class="game-num">#15</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">BURNDOWN</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Speedrun a tower of micro-tasks. Race the clock. The only burndown chart that goes UP.</div>
+          <div class="game-quip">"Agile methodology as a game. Somehow less painful than actual sprints."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/priorself.html" class="game-entry cat-arcade">
+        <div class="game-num">#14</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">PRIORSELF</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Cooperate with your past selves as ghosts. It's teamwork, but lonely.</div>
+          <div class="game-quip">"The only co-op game where your teammate is always disappointing. It's you."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/doodle-drop.html" class="game-entry cat-arcade">
+        <div class="game-num">#13</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">DOODLE DROP</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Draw platforms while falling. Bob Ross meets terminal velocity.</div>
+          <div class="game-quip">"Happy little platforms. Happy little... oh no, you fell."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/faultline.html" class="game-entry cat-arcade">
+        <div class="game-num">#12</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">FAULTLINE</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Find the shifted pixel row. Turns out your eyes lie to you constantly.</div>
+          <div class="game-quip">"Optometrists don't want you to know this one weird trick. Actually, they do."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/signal.html" class="game-entry cat-arcade">
+        <div class="game-num">#11</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">SIGNAL</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Daily cipher puzzle. Decode hidden messages. Feel like a spy, look like a nerd.</div>
+          <div class="game-quip">"MI6 called. They said you took too long on level 2."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/tetris-betrayal.html" class="game-entry cat-arcade">
+        <div class="game-num">#10</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">TETRIS BETRAYAL</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Play Tetris badly ON PURPOSE. Stack high, survive long. Your brain fights itself.</div>
+          <div class="game-quip">"Decades of muscle memory, undone. This game is psychological warfare."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/territory.html" class="game-entry cat-arcade">
+        <div class="game-num">#9</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">TERRITORY</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Claim grid squares, surround enemies. Daily strategy puzzle with a "just one more game" problem.</div>
+          <div class="game-quip">"Risk, but you can finish in under a minute. Equally addictive, less friendship-ending."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARCH 5 — THE FIRST WAVE -->
+  <div class="date-section">
+    <div class="date-marker">
+      <div class="date-dot"></div>
+      <div class="date-info">
+        <div class="date-text">MARCH 5, 2026</div>
+        <div class="wave-label">The First Wave &mdash; Day One</div>
+      </div>
+    </div>
+    <div class="game-list">
+      <a href="/neonarcade/pacman-amnesia.html" class="game-entry cat-arcade">
+        <div class="game-num">#8</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">PAC-MAN AMNESIA</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Pac-Man but you can barely see the maze. Fog of war meets classic arcade panic.</div>
+          <div class="game-quip">"Pac-Man with anxiety. Which is honestly just regular Pac-Man."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/palette.html" class="game-entry cat-arcade">
+        <div class="game-num">#7</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">PALETTE</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Think you know colors? Match hues precisely. Spoiler: you don't.</div>
+          <div class="game-quip">"Graphic designers will dominate. Everyone else will question their eyesight."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/flappy-rewind.html" class="game-entry cat-arcade">
+        <div class="game-num">#6</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">FLAPPY REWIND</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Fly forward through pipes, then rewind with inverted gravity through the same ones.</div>
+          <div class="game-quip">"Tenet, but with a bird. Equally confusing. More rage-inducing."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/afterglow.html" class="game-entry cat-arcade">
+        <div class="game-num">#5</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">AFTERGLOW</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Navigate a dark maze. Your trail glows beautifully -- then kills you if you touch it.</div>
+          <div class="game-quip">"Beauty is pain. Literally. Your trail is gorgeous and lethal."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/pong-both-sides.html" class="game-entry cat-arcade">
+        <div class="game-num">#4</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">PONG: BOTH SIDES</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Control BOTH paddles simultaneously. Your brain will short-circuit around 30 seconds in.</div>
+          <div class="game-quip">"Multitasking is a myth. This game is the proof."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/catalyst.html" class="game-entry cat-arcade">
+        <div class="game-num">#3</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">CATALYST</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">One touch triggers infinite chaos. Chain reactions with exploders and attractors.</div>
+          <div class="game-quip">"One click, maximum destruction. The Michael Bay of browser games."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/impostor-pixel.html" class="game-entry cat-arcade">
+        <div class="game-num">#2</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">IMPOSTOR PIXEL</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Spot the different tile in a grid. Each round the difference shrinks until you're questioning reality.</div>
+          <div class="game-quip">"Among Us, but for color-blind people. (We're sorry.)"</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+      <a href="/neonarcade/neon-snake.html" class="game-entry cat-arcade">
+        <div class="game-num">#1</div>
+        <div class="game-details">
+          <div class="game-header">
+            <span class="game-name">NEON SNAKE</span>
+            <span class="cat-tag arcade">ARCADE</span>
+          </div>
+          <div class="game-desc">Classic snake with a twist: gold food near walls is worth 5x. Risk vs reward at its finest.</div>
+          <div class="game-quip">"Where it all began. The OG. The one that started the neon madness."</div>
+        </div>
+        <div class="game-play">PLAY &rarr;</div>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>ALL GAMES RUN IN YOUR BROWSER &mdash; NO INSTALL &mdash; NO SIGNUP &mdash; JUST PLAY</p>
+  <p class="credit">Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+<script src="/neon.js"></script>
+</body>
+</html>

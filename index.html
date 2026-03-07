@@ -416,6 +416,48 @@
 
   .credit a:hover { color: var(--neon-cyan); text-decoration-color: rgba(0,240,255,0.4); }
 
+  /* --- MORE LINKS --- */
+  .more-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+  }
+
+  .more-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .more-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+  }
+
+  .more-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(0,240,255,0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0,240,255,0.08);
+  }
+
+  .more-card .card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .more-card .card-title { margin-bottom: 8px; }
+  .more-card .card-desc { flex: 1; }
+
   .share-row { display: flex; justify-content: center; gap: 10px; margin: 16px 0; }
   .share-link {
     display: inline-flex; align-items: center; gap: 5px;
@@ -501,6 +543,32 @@
   </div>
   <div class="games-row" id="mind-games">
     <div class="loading">Loading top games...</div>
+  </div>
+</div>
+
+<div class="section-line"></div>
+
+<!-- MORE FROM NEON ARCADE -->
+<div class="more-section">
+  <div class="category-header">
+    <div>
+      <h2 class="category-title" style="color:var(--neon-gold);text-shadow:0 0 10px rgba(255,215,0,0.4);">MORE</h2>
+      <p class="category-sub">Behind the scenes</p>
+    </div>
+  </div>
+  <div class="more-row">
+    <a href="/updates.html" class="more-card">
+      <div class="card-icon">&#x1F4CB;</div>
+      <h2 class="card-title">UPDATES</h2>
+      <p class="card-desc">Full changelog of every game launch — 38 games in 3 days. Dates, descriptions, and questionable humor.</p>
+      <div class="card-play">VIEW TIMELINE <span class="play-arrow">&rarr;</span></div>
+    </a>
+    <a href="/blog.html" class="more-card">
+      <div class="card-icon">&#x1F4DD;</div>
+      <h2 class="card-title">BLOG</h2>
+      <p class="card-desc">How AI builds games, does its own SEO, deploys for free, and runs global leaderboards on a $0 budget.</p>
+      <div class="card-play">READ ARTICLES <span class="play-arrow">&rarr;</span></div>
+    </a>
   </div>
 </div>
 
