@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SIGNAL DAILY — Neon Arcade</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { display: flex; }
+
+/* ===== START SCREEN ===== */
+#start-screen {
+  justify-content: center;
+  gap: 20px;
+  padding: 30px 20px;
+}
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(28px, 7vw, 52px);
+  letter-spacing: 6px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  text-align: center;
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 20px);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  text-align: center;
+}
+
+.signal-icon {
+  font-size: 48px;
+  margin-bottom: 6px;
+}
+
+.streak-display {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255,140,0,0.4);
+  letter-spacing: 2px;
+}
+
+.streak-display span {
+  font-size: 28px;
+  color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+.puzzle-number {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+
+.already-solved {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--neon-green);
+  text-shadow: 0 0 8px rgba(57,255,20,0.3);
+  letter-spacing: 1px;
+}
+
+.countdown-start {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+#startLB { width: 100%; max-width: 400px; margin-top: 10px; }
+
+/* ===== GAME SCREEN ===== */
+#game-screen {
+  padding: 10px 10px 0;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  padding: 8px 4px;
+  margin-bottom: 8px;
+}
+
+.timer {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+
+.hint-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 8px 16px;
+  border: 1px solid var(--neon-gold);
+  background: rgba(255,215,0,0.06);
+  color: var(--neon-gold);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+.hint-btn:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 12px rgba(255,215,0,0.2); }
+.hint-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.cipher-area {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px 2px;
+  padding: 10px 4px;
+  margin-bottom: 8px;
+}
+
+.cipher-word {
+  display: flex;
+  gap: 2px;
+  margin: 3px 6px;
+}
+
+.cipher-cell {
+  width: clamp(28px, 7vw, 38px);
+  height: clamp(48px, 10vw, 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.cipher-cell.selected {
+  border-color: var(--neon-cyan);
+  background: rgba(0,240,255,0.08);
+  box-shadow: 0 0 12px rgba(0,240,255,0.3);
+}
+
+.cipher-cell.solved {
+  border-color: var(--neon-green);
+  background: rgba(57,255,20,0.06);
+}
+
+.cipher-cell.hinted {
+  border-color: var(--neon-gold);
+  background: rgba(255,215,0,0.06);
+}
+
+.cipher-cell .encrypted {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: clamp(10px, 2.2vw, 12px);
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.cipher-cell .decoded {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(14px, 3.5vw, 20px);
+  color: #fff;
+  min-height: 1.2em;
+}
+
+.cipher-cell.solved .decoded {
+  color: var(--neon-green);
+  text-shadow: 0 0 8px rgba(57,255,20,0.4);
+}
+
+.cipher-cell.hinted .decoded {
+  color: var(--neon-gold);
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+}
+
+@keyframes flash-wrong {
+  0%, 100% { background: rgba(255,255,255,0.03); }
+  50% { background: rgba(255,45,123,0.25); border-color: var(--neon-pink); }
+}
+.cipher-cell.wrong {
+  animation: flash-wrong 0.3s ease;
+}
+
+@keyframes flash-correct {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.cipher-cell.just-solved {
+  animation: flash-correct 0.3s ease;
+}
+
+.mapping-display {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  margin-bottom: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.mapping-item {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 5px;
+  border-radius: 2px;
+  color: var(--text-dim);
+}
+.mapping-item.revealed {
+  color: var(--neon-green);
+  background: rgba(57,255,20,0.06);
+}
+
+.keyboard {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+}
+
+.kb-row {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+
+.kb-key {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(12px, 3vw, 16px);
+  width: clamp(28px, 8vw, 38px);
+  height: clamp(34px, 9vw, 44px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.kb-key:active, .kb-key:hover {
+  background: rgba(0,240,255,0.12);
+  border-color: var(--neon-cyan);
+}
+.kb-key.used {
+  color: var(--neon-green);
+  border-color: rgba(57,255,20,0.3);
+  background: rgba(57,255,20,0.06);
+}
+.kb-key.kb-backspace {
+  width: clamp(50px, 12vw, 70px);
+  font-size: clamp(10px, 2.5vw, 13px);
+  letter-spacing: 1px;
+}
+
+/* ===== COMPLETE SCREEN ===== */
+#complete-screen {
+  justify-content: center;
+  gap: 16px;
+  padding: 30px 20px;
+}
+
+.decoded-message {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(14px, 3.5vw, 22px);
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(57,255,20,0.4), 0 0 30px rgba(57,255,20,0.15);
+  text-align: center;
+  letter-spacing: 2px;
+  max-width: 550px;
+  line-height: 1.6;
+}
+
+.stats-row {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 12px 36px;
+  border: 1px solid var(--neon-green);
+  background: rgba(57,255,20,0.06);
+  color: var(--neon-green);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+  transform: scale(1.04);
+}
+
+.share-copied {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  color: var(--neon-green);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.share-copied.show { opacity: 1; }
+
+.countdown-section {
+  text-align: center;
+}
+.countdown-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.countdown-time {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--neon-purple);
+  text-shadow: 0 0 10px rgba(180,77,255,0.4);
+}
+
+#completeLB { width: 100%; max-width: 400px; margin-top: 6px; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+.shake { animation: shake 0.25s ease; }
+
+</style>
+</head>
+<body>
+
+<!-- ===== START SCREEN ===== -->
+<div id="start-screen" class="screen active">
+  <div class="signal-icon">📡</div>
+  <div class="title">SIGNAL DAILY</div>
+  <div class="subtitle">One cipher. Every day. Decode the signal.</div>
+  <div class="puzzle-number" id="puzzle-number"></div>
+  <div class="streak-display" id="streak-display"></div>
+  <div id="already-solved-msg"></div>
+  <button class="play-btn" id="play-btn">PLAY TODAY</button>
+  <div id="startLB"></div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen" class="screen">
+  <div class="game-header">
+    <div class="timer" id="timer">00:00</div>
+    <button class="hint-btn" id="hint-btn">💡 HINT (3)</button>
+  </div>
+  <div class="cipher-area" id="cipher-area"></div>
+  <div class="mapping-display" id="mapping-display"></div>
+  <div class="keyboard" id="keyboard"></div>
+</div>
+
+<!-- ===== COMPLETE SCREEN ===== -->
+<div id="complete-screen" class="screen">
+  <div class="signal-icon">📡</div>
+  <div class="title" style="font-size: clamp(22px, 5vw, 36px);">SIGNAL DECODED</div>
+  <div class="decoded-message" id="decoded-message"></div>
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-value" id="stat-time">00:00</div>
+      <div class="stat-label">TIME</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-hints">0</div>
+      <div class="stat-label">HINTS</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-streak">0</div>
+      <div class="stat-label">STREAK</div>
+    </div>
+  </div>
+  <button class="share-btn" id="share-btn">📋 SHARE RESULT</button>
+  <div class="share-copied" id="share-copied">Copied to clipboard!</div>
+  <div class="countdown-section">
+    <div class="countdown-label">NEXT SIGNAL IN</div>
+    <div class="countdown-time" id="countdown-time">--:--:--</div>
+  </div>
+  <div id="completeLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== MESSAGES (60+) =====
+  const MESSAGES = [
+    "MY PET GOLDFISH RUNS A SECRET PODCAST",
+    "SOCKS ARE JUST FOOT SLEEPING BAGS",
+    "PIGEONS ARE GOVERNMENT SURVEILLANCE DRONES",
+    "I TOLD MY WIFI WE NEED TO CONNECT MORE",
+    "CATS INVENTED THE INTERNET TO SHARE MEMES",
+    "TOASTERS FEAR BREAD MORE THAN BREAD FEARS THEM",
+    "CLOUDS ARE JUST SKY PILLOWS HAVING A NAP",
+    "MY REFRIGERATOR HUMS BETTER THAN I SING",
+    "OCTOPUSES WOULD DOMINATE ROCK PAPER SCISSORS",
+    "PENGUINS IN TUXEDOS STILL GET DENIED ENTRY",
+    "THE FLOOR IS LAVA BUT MY RENT IS STILL DUE",
+    "DINOSAURS NEVER GOT TO TRY PIZZA AND THAT IS SAD",
+    "GRAVITY IS JUST THE EARTH BEING CLINGY",
+    "DOLPHINS ARE JUST WET DOGS WITH COLLEGE DEGREES",
+    "MY ALARM CLOCK IS MY OLDEST ENEMY",
+    "ELEVATORS ARE JUST ROOMS THAT HAVE AMBITION",
+    "BANANAS ARE JUST FRUIT SHAPED PHONE PROPS",
+    "ASTRONAUTS ARE JUST TOURISTS WITH BETTER VIEWS",
+    "MIRRORS WOULD BE TERRIFYING IF THEY HAD A DELAY",
+    "SOMEONE SOMEWHERE IS MICROWAVING A FORK RIGHT NOW",
+    "TREES ARE JUST REALLY PATIENT WOOD FACTORIES",
+    "WATER PARKS ARE JUST ORGANIZED PUDDLE CHAOS",
+    "PILLOWS KNOW ALL YOUR SECRETS AND JUDGE SILENTLY",
+    "OWLS ROTATE HEADS BECAUSE THEY LOST THE MANUAL",
+    "MY SHADOW IS THE MOST LOYAL FRIEND I HAVE EVER HAD",
+    "SNOWMEN ARE JUST TEMPORARY OUTDOOR ART PROJECTS",
+    "VOLCANOES ARE JUST MOUNTAINS WITH ANGER ISSUES",
+    "SHARKS HAVE BEEN AROUND LONGER THAN TREES SOMEHOW",
+    "RAIN IS JUST THE SKY RETURNING BORROWED WATER",
+    "SQUIRRELS HIDE NUTS THEN FORGET CREATING FORESTS",
+    "CHAMELEONS HAVE THE ULTIMATE SOCIAL CAMOUFLAGE",
+    "MY COUCH HAS MORE PERSONALITY THAN MOST PEOPLE",
+    "WIFI PASSWORDS ARE THE NEW KEYS TO THE KINGDOM",
+    "MOSQUITOES ARE TINY VAMPIRES WITHOUT THE ROMANCE",
+    "THE MOON IS JUST PRACTICING FOR ITS FULL REVEAL",
+    "FLAMINGOS STAND ON ONE LEG TO SAVE BOOT MONEY",
+    "TIME FLIES BUT IT NEVER BUYS A RETURN TICKET",
+    "CHICKENS CROSSING ROADS IS STILL UNEXPLAINED SCIENCE",
+    "BUBBLE WRAP IS JUST STRESS RELIEF IN PACKAGING FORM",
+    "ANTS CAN LIFT FIFTY TIMES THEIR WEIGHT AT THE GYM",
+    "SNAILS CARRY THEIR HOME AND NEVER PAY RENT",
+    "TURTLES ARE LIVING PROOF THAT SLOW GETS YOU THERE",
+    "DRAGONS WOULD MAKE TERRIBLE FIREFIGHTERS HONESTLY",
+    "MY PLANTS ARE ALIVE DESPITE MY BEST EFFORTS",
+    "COFFEE IS JUST BEAN SOUP FOR TIRED ADULTS",
+    "SPIDERS HAVE EIGHT LEGS BUT ZERO DANCE SKILLS",
+    "MOUNTAINS ARE JUST EARTH FLEXING ITS MUSCLES",
+    "CLOCKS HAVE HANDS BUT NEVER WAVE HELLO BACK",
+    "THUNDER IS JUST CLOUDS BOWLING ON A TUESDAY NIGHT",
+    "BATTERIES DIE AT THE WORST POSSIBLE MOMENT ALWAYS",
+    "MY DOG THINKS THE MAILMAN IS A DAILY INTRUDER",
+    "ROBOTS WILL NEVER UNDERSTAND THE JOY OF SNEEZING",
+    "THE OCEAN IS JUST REALLY AMBITIOUS SOUP",
+    "STAIRS ARE JUST FLOORS THAT TRIED REALLY HARD",
+    "GIRAFFES ARE PROOF THAT EVOLUTION HAS A SENSE OF HUMOR",
+    "BLANKETS ARE PORTABLE FORCE FIELDS FOR SLEEPING",
+    "SHOELACES EXIST SOLELY TO BETRAY YOU IN PUBLIC",
+    "COCONUTS ARE JUST HAIRY TROPICAL BOWLING BALLS",
+    "LIBRARIES ARE JUST REALLY QUIET BOOK WAREHOUSES",
+    "SUNGLASSES ARE JUST TINY WINDOW BLINDS FOR FACES",
+    "BEES MAKE HONEY AND NEVER CHARGE FOR THE SERVICE",
+    "CACTUS PLANTS HUG WITH CONSEQUENCES EVERY TIME",
+    "MY PHONE BATTERY DROPS FASTER THAN MY MOTIVATION",
+    "UNICORNS ARE JUST HORSES WITH BETTER MARKETING",
+    "SANDWICHES WERE INVENTED BECAUSE PLATES WERE BUSY",
+    "FISH NEVER CLOSE THEIR EYES AND THATS TERRIFYING",
+    "THE SUN IS JUST A GIANT LAMP NOBODY CAN REACH",
+    "FROGS WENT FROM TADPOLES TO HOPPING AND CHOSE CHAOS",
+    "MY SOCKS DISAPPEAR IN THE WASH LIKE TINY MAGICIANS",
+    "POPCORN IS JUST CORN THAT HAD A PANIC ATTACK",
+    "KANGAROOS HAVE BUILT IN POCKETS AND I AM JEALOUS",
+    "YAWNING IS YOUR BRAIN REBOOTING IN PUBLIC",
+    "WATERFALLS ARE JUST RIVERS BEING DRAMATIC",
+    "PENGUINS WADDLE BECAUSE RUNNING WOULD BE OFF BRAND",
+    "CAMELS STORE WATER BECAUSE THEY PLAN AHEAD UNLIKE ME"
+  ];
+
+  // ===== SEEDED PRNG =====
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function dateToSeed(dateStr) {
+    let h = 0;
+    for (let i = 0; i < dateStr.length; i++) {
+      h = Math.imul(31, h) + dateStr.charCodeAt(i) | 0;
+    }
+    return h;
+  }
+
+  function getTodayStr() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + dd;
+  }
+
+  function getDayNumber() {
+    const epoch = new Date('2025-01-01').getTime();
+    const now = new Date(getTodayStr()).getTime();
+    return Math.floor((now - epoch) / 86400000) + 1;
+  }
+
+  // ===== GENERATE DAILY PUZZLE =====
+  function generatePuzzle(dateStr) {
+    const seed = dateToSeed(dateStr);
+    const rng = mulberry32(seed);
+
+    // Pick message
+    const msgIdx = Math.floor(rng() * MESSAGES.length);
+    const message = MESSAGES[msgIdx];
+
+    // Generate cipher: shuffle alphabet
+    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const shuffled = alpha.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    // Ensure no letter maps to itself
+    for (let i = 0; i < 26; i++) {
+      if (shuffled[i] === alpha[i]) {
+        const next = (i + 1) % 26;
+        [shuffled[i], shuffled[next]] = [shuffled[next], shuffled[i]];
+      }
+    }
+
+    // plainToEncrypted: maps plain letter to cipher letter
+    const plainToEnc = {};
+    const encToPlain = {};
+    for (let i = 0; i < 26; i++) {
+      plainToEnc[alpha[i]] = shuffled[i];
+      encToPlain[shuffled[i]] = alpha[i];
+    }
+
+    // Encrypt message
+    let encrypted = '';
+    for (const ch of message) {
+      if (ch >= 'A' && ch <= 'Z') {
+        encrypted += plainToEnc[ch];
+      } else {
+        encrypted += ch;
+      }
+    }
+
+    return { message, encrypted, plainToEnc, encToPlain };
+  }
+
+  // ===== AUDIO =====
+  let audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playTone(freq, dur, type, vol) {
+    try {
+      const ctx = getAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.value = vol || 0.1;
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function soundClick() { playTone(800, 0.06, 'square', 0.05); }
+  function soundCorrect() { playTone(660, 0.1, 'sine', 0.08); playTone(880, 0.15, 'sine', 0.06); }
+  function soundWrong() { playTone(200, 0.2, 'sawtooth', 0.08); }
+  function soundHint() { playTone(520, 0.1, 'triangle', 0.07); setTimeout(() => playTone(780, 0.15, 'triangle', 0.07), 100); }
+  function soundVictory() {
+    const notes = [523, 659, 784, 1047];
+    notes.forEach((f, i) => setTimeout(() => playTone(f, 0.25, 'sine', 0.1), i * 120));
+  }
+
+  // ===== STATE =====
+  const STORAGE_PREFIX = 'signal_daily_';
+  let puzzle = null;
+  let dayStr = '';
+  let dayNum = 0;
+  let selectedCell = null;
+  let guesses = {}; // encLetter -> guessedPlainLetter
+  let revealedMappings = {}; // encLetter -> plainLetter (hints)
+  let lockedLetters = {}; // encLetter -> true (correctly solved)
+  let hintsUsed = 0;
+  let timerStart = 0;
+  let timerInterval = null;
+  let solved = false;
+  let solveTimeSeconds = 0;
+
+  // ===== STREAK =====
+  function getCompletion(ds) {
+    return localStorage.getItem(STORAGE_PREFIX + 'done_' + ds);
+  }
+  function setCompletion(ds, time, hints) {
+    localStorage.setItem(STORAGE_PREFIX + 'done_' + ds, JSON.stringify({ time, hints }));
+  }
+
+  function calcStreak() {
+    let streak = 0;
+    const d = new Date();
+    // Check if today is solved; if so include it
+    const todayDone = !!getCompletion(getTodayStr());
+    if (todayDone) {
+      streak = 1;
+      d.setDate(d.getDate() - 1);
+    } else {
+      // Check yesterday as the start
+      d.setDate(d.getDate() - 1);
+    }
+    while (true) {
+      const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      if (getCompletion(ds)) {
+        streak++;
+        d.setDate(d.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  // ===== DOM =====
+  const $startScreen = document.getElementById('start-screen');
+  const $gameScreen = document.getElementById('game-screen');
+  const $completeScreen = document.getElementById('complete-screen');
+  const $puzzleNum = document.getElementById('puzzle-number');
+  const $streakDisp = document.getElementById('streak-display');
+  const $solvedMsg = document.getElementById('already-solved-msg');
+  const $playBtn = document.getElementById('play-btn');
+  const $timer = document.getElementById('timer');
+  const $hintBtn = document.getElementById('hint-btn');
+  const $cipherArea = document.getElementById('cipher-area');
+  const $mappingDisp = document.getElementById('mapping-display');
+  const $keyboard = document.getElementById('keyboard');
+  const $decodedMsg = document.getElementById('decoded-message');
+  const $statTime = document.getElementById('stat-time');
+  const $statHints = document.getElementById('stat-hints');
+  const $statStreak = document.getElementById('stat-streak');
+  const $shareBtn = document.getElementById('share-btn');
+  const $shareCopied = document.getElementById('share-copied');
+  const $countdownTime = document.getElementById('countdown-time');
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ===== INIT =====
+  function init() {
+    dayStr = getTodayStr();
+    dayNum = getDayNumber();
+    puzzle = generatePuzzle(dayStr);
+
+    $puzzleNum.textContent = 'PUZZLE #' + dayNum;
+
+    const streak = calcStreak();
+    if (streak > 0) {
+      $streakDisp.innerHTML = '🔥 STREAK: <span>' + streak + '</span> DAY' + (streak !== 1 ? 'S' : '');
+    } else {
+      $streakDisp.textContent = '';
+    }
+
+    const done = getCompletion(dayStr);
+    if (done) {
+      const data = JSON.parse(done);
+      const m = Math.floor(data.time / 60);
+      const s = Math.floor(data.time % 60);
+      $solvedMsg.innerHTML = '<div class="already-solved">✅ SOLVED TODAY IN ' +
+        (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s + '</div>' +
+        '<div class="countdown-start">NEXT SIGNAL IN <span id="start-countdown"></span></div>';
+      $playBtn.textContent = 'VIEW RESULT';
+      updateStartCountdown();
+    } else {
+      $solvedMsg.textContent = '';
+      $playBtn.textContent = 'PLAY TODAY';
+    }
+
+    Neon.init({
+      game: 'signal-daily',
+      mode: 'low',
+      key: 'neonarcade_neondaily_signaldaily_scores',
+      formatScore: function(s) {
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+      }
+    });
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  function updateStartCountdown() {
+    const el = document.getElementById('start-countdown');
+    if (!el) return;
+    const update = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const diff = tomorrow - now;
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    };
+    update();
+    setInterval(update, 1000);
+  }
+
+  // ===== START GAME =====
+  $playBtn.addEventListener('click', () => {
+    soundClick();
+    const done = getCompletion(dayStr);
+    if (done) {
+      const data = JSON.parse(done);
+      showComplete(data.time, data.hints, false);
+      return;
+    }
+    startGame();
+  });
+
+  function startGame() {
+    guesses = {};
+    revealedMappings = {};
+    lockedLetters = {};
+    hintsUsed = 0;
+    solved = false;
+    selectedCell = null;
+    solveTimeSeconds = 0;
+
+    showScreen('game-screen');
+    buildCipher();
+    buildMapping();
+    buildKeyboard();
+    startTimer();
+  }
+
+  // ===== BUILD CIPHER DISPLAY =====
+  function buildCipher() {
+    $cipherArea.innerHTML = '';
+    const words = puzzle.encrypted.split(' ');
+    words.forEach((word, wi) => {
+      const wordDiv = document.createElement('div');
+      wordDiv.className = 'cipher-word';
+      for (let ci = 0; ci < word.length; ci++) {
+        const ch = word[ci];
+        const cell = document.createElement('div');
+        cell.className = 'cipher-cell';
+        cell.dataset.enc = ch;
+        cell.dataset.wordIdx = wi;
+        cell.dataset.charIdx = ci;
+
+        const encSpan = document.createElement('div');
+        encSpan.className = 'encrypted';
+        encSpan.textContent = ch;
+
+        const decSpan = document.createElement('div');
+        decSpan.className = 'decoded';
+        decSpan.textContent = '';
+
+        cell.appendChild(decSpan);
+        cell.appendChild(encSpan);
+
+        if (ch >= 'A' && ch <= 'Z') {
+          cell.addEventListener('click', () => selectCell(cell));
+        } else {
+          cell.style.opacity = '0.3';
+          cell.style.cursor = 'default';
+        }
+
+        wordDiv.appendChild(cell);
+      }
+      $cipherArea.appendChild(wordDiv);
+    });
+  }
+
+  function selectCell(cell) {
+    if (solved) return;
+    const enc = cell.dataset.enc;
+    if (lockedLetters[enc]) return;
+    soundClick();
+
+    document.querySelectorAll('.cipher-cell.selected').forEach(c => c.classList.remove('selected'));
+
+    // Select all cells with this encrypted letter
+    document.querySelectorAll('.cipher-cell').forEach(c => {
+      if (c.dataset.enc === enc && !lockedLetters[enc]) {
+        c.classList.add('selected');
+      }
+    });
+    selectedCell = enc;
+  }
+
+  // ===== MAPPING DISPLAY =====
+  function buildMapping() {
+    $mappingDisp.innerHTML = '';
+    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (const ch of alpha) {
+      const item = document.createElement('div');
+      item.className = 'mapping-item';
+      item.id = 'map-' + ch;
+      item.textContent = ch + '→?';
+      $mappingDisp.appendChild(item);
+    }
+  }
+
+  function updateMapping() {
+    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (const ch of alpha) {
+      const el = document.getElementById('map-' + ch);
+      if (lockedLetters[ch]) {
+        el.textContent = ch + '→' + puzzle.encToPlain[ch];
+        el.className = 'mapping-item revealed';
+      } else if (guesses[ch]) {
+        el.textContent = ch + '→' + guesses[ch];
+        el.className = 'mapping-item';
+        el.style.color = 'var(--neon-cyan)';
+      } else {
+        el.textContent = ch + '→?';
+        el.className = 'mapping-item';
+        el.style.color = '';
+      }
+    }
+  }
+
+  // ===== KEYBOARD =====
+  function buildKeyboard() {
+    $keyboard.innerHTML = '';
+    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    rows.forEach((row, ri) => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'kb-row';
+      for (const ch of row) {
+        const key = document.createElement('div');
+        key.className = 'kb-key';
+        key.dataset.letter = ch;
+        key.textContent = ch;
+        key.addEventListener('click', () => inputLetter(ch));
+        rowDiv.appendChild(key);
+      }
+      if (ri === 2) {
+        const bk = document.createElement('div');
+        bk.className = 'kb-key kb-backspace';
+        bk.textContent = '⌫';
+        bk.addEventListener('click', () => inputBackspace());
+        rowDiv.appendChild(bk);
+      }
+      $keyboard.appendChild(rowDiv);
+    });
+  }
+
+  function updateKeyboard() {
+    const usedPlainLetters = new Set();
+    for (const enc of Object.keys(lockedLetters)) {
+      usedPlainLetters.add(puzzle.encToPlain[enc]);
+    }
+    document.querySelectorAll('.kb-key').forEach(k => {
+      if (k.dataset.letter && usedPlainLetters.has(k.dataset.letter)) {
+        k.classList.add('used');
+      } else {
+        k.classList.remove('used');
+      }
+    });
+  }
+
+  // ===== INPUT =====
+  function inputLetter(letter) {
+    if (solved || !selectedCell) return;
+    const enc = selectedCell;
+    const correctPlain = puzzle.encToPlain[enc];
+
+    if (letter === correctPlain) {
+      // Correct!
+      soundCorrect();
+      lockedLetters[enc] = true;
+      guesses[enc] = letter;
+
+      // Update all cells with this encrypted letter
+      document.querySelectorAll('.cipher-cell').forEach(c => {
+        if (c.dataset.enc === enc) {
+          c.classList.remove('selected');
+          c.classList.add('solved', 'just-solved');
+          c.querySelector('.decoded').textContent = letter;
+          setTimeout(() => c.classList.remove('just-solved'), 300);
+        }
+      });
+
+      // Clear any other guesses that used this plain letter (one-to-one mapping)
+      for (const e of Object.keys(guesses)) {
+        if (e !== enc && guesses[e] === letter && !lockedLetters[e]) {
+          delete guesses[e];
+          document.querySelectorAll('.cipher-cell').forEach(c => {
+            if (c.dataset.enc === e && !lockedLetters[e]) {
+              c.querySelector('.decoded').textContent = '';
+            }
+          });
+        }
+      }
+
+      selectedCell = null;
+      updateMapping();
+      updateKeyboard();
+      checkWin();
+    } else {
+      // Wrong
+      soundWrong();
+      guesses[enc] = letter;
+      document.querySelectorAll('.cipher-cell').forEach(c => {
+        if (c.dataset.enc === enc) {
+          c.classList.add('wrong');
+          c.querySelector('.decoded').textContent = letter;
+          setTimeout(() => c.classList.remove('wrong'), 300);
+        }
+      });
+      updateMapping();
+    }
+  }
+
+  function inputBackspace() {
+    if (solved || !selectedCell) return;
+    soundClick();
+    const enc = selectedCell;
+    if (lockedLetters[enc]) return;
+    delete guesses[enc];
+    document.querySelectorAll('.cipher-cell').forEach(c => {
+      if (c.dataset.enc === enc) {
+        c.querySelector('.decoded').textContent = '';
+      }
+    });
+    updateMapping();
+  }
+
+  // Keyboard input
+  document.addEventListener('keydown', (e) => {
+    if ($gameScreen.classList.contains('active') && !solved) {
+      const key = e.key.toUpperCase();
+      if (key >= 'A' && key <= 'Z' && key.length === 1) {
+        e.preventDefault();
+        inputLetter(key);
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        inputBackspace();
+      }
+    }
+  });
+
+  // ===== HINT =====
+  $hintBtn.addEventListener('click', () => {
+    if (solved || hintsUsed >= 3) return;
+    soundHint();
+
+    // Find unrevealed encrypted letters that appear in the puzzle
+    const unrevealed = [];
+    const lettersInPuzzle = new Set();
+    for (const ch of puzzle.encrypted) {
+      if (ch >= 'A' && ch <= 'Z') lettersInPuzzle.add(ch);
+    }
+    for (const enc of lettersInPuzzle) {
+      if (!lockedLetters[enc] && !revealedMappings[enc]) {
+        unrevealed.push(enc);
+      }
+    }
+    if (unrevealed.length === 0) return;
+
+    // Pick random unrevealed
+    const pick = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+    const plain = puzzle.encToPlain[pick];
+
+    revealedMappings[pick] = plain;
+    lockedLetters[pick] = true;
+    guesses[pick] = plain;
+    hintsUsed++;
+
+    // Update cells
+    document.querySelectorAll('.cipher-cell').forEach(c => {
+      if (c.dataset.enc === pick) {
+        c.classList.remove('selected');
+        c.classList.add('hinted', 'just-solved');
+        c.querySelector('.decoded').textContent = plain;
+        setTimeout(() => c.classList.remove('just-solved'), 300);
+      }
+    });
+
+    if (selectedCell === pick) selectedCell = null;
+    $hintBtn.textContent = '💡 HINT (' + (3 - hintsUsed) + ')';
+    if (hintsUsed >= 3) $hintBtn.disabled = true;
+
+    updateMapping();
+    updateKeyboard();
+    checkWin();
+  });
+
+  // ===== TIMER =====
+  function startTimer() {
+    timerStart = Date.now();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+      const m = Math.floor(elapsed / 60);
+      const s = elapsed % 60;
+      $timer.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }, 200);
+  }
+
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    solveTimeSeconds = Math.floor((Date.now() - timerStart) / 1000);
+  }
+
+  // ===== WIN CHECK =====
+  function checkWin() {
+    const lettersInPuzzle = new Set();
+    for (const ch of puzzle.encrypted) {
+      if (ch >= 'A' && ch <= 'Z') lettersInPuzzle.add(ch);
+    }
+    for (const enc of lettersInPuzzle) {
+      if (!lockedLetters[enc]) return;
+    }
+    // All solved!
+    solved = true;
+    stopTimer();
+    soundVictory();
+    setCompletion(dayStr, solveTimeSeconds, hintsUsed);
+
+    setTimeout(() => {
+      showComplete(solveTimeSeconds, hintsUsed, true);
+    }, 600);
+  }
+
+  // ===== COMPLETE SCREEN =====
+  function showComplete(time, hints, isNew) {
+    showScreen('complete-screen');
+    $decodedMsg.textContent = '"' + puzzle.message + '"';
+
+    const m = Math.floor(time / 60);
+    const s = Math.floor(time % 60);
+    $statTime.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    $statHints.textContent = hints;
+
+    const streak = calcStreak();
+    $statStreak.textContent = streak;
+
+    // Countdown to next puzzle
+    function updateCountdown() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const diff = tomorrow - now;
+      const h = Math.floor(diff / 3600000);
+      const mm = Math.floor((diff % 3600000) / 60000);
+      const ss = Math.floor((diff % 60000) / 1000);
+      $countdownTime.textContent = (h < 10 ? '0' : '') + h + ':' + (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Neon.js score save
+    if (isNew) {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(time);
+      }).then(function(result) {
+        Neon.render(document.getElementById('completeLB'));
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      });
+    } else {
+      Neon.render(document.getElementById('completeLB'));
+    }
+  }
+
+  // ===== SHARE =====
+  $shareBtn.addEventListener('click', () => {
+    soundClick();
+    const streak = calcStreak();
+    const done = getCompletion(dayStr);
+    const data = done ? JSON.parse(done) : { time: solveTimeSeconds, hints: hintsUsed };
+    const m = Math.floor(data.time / 60);
+    const s = Math.floor(data.time % 60);
+    const timeStr = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+
+    const text = '📡 SIGNAL DAILY #' + dayNum + '\n' +
+      '⏱️ ' + timeStr + ' · 💡 ' + data.hints + ' hints\n' +
+      '🔥 Streak: ' + streak + ' days\n' +
+      'neonarcade.net/neondaily/signal-daily.html';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(() => {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  });
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      $shareCopied.classList.add('show');
+      setTimeout(() => $shareCopied.classList.remove('show'), 2000);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      $shareCopied.classList.add('show');
+      setTimeout(() => $shareCopied.classList.remove('show'), 2000);
+    });
+  }
+
+  // ===== GO =====
+  init();
+})();
+</script>
+</body>
+</html>

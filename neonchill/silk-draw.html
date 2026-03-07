@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Silk Draw — Generative Light Painting | NEON ARCADE</title>
+<meta name="description" content="Paint with light in this zen generative art tool. Create beautiful symmetrical neon patterns with mouse or touch. No score, no timer — just flow.">
+<meta name="keywords" content="silk draw, generative art, light painting, symmetry drawing, zen game, neon art, creative tool">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonchill/silk-draw.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonchill/silk-draw.html">
+<meta property="og:title" content="Silk Draw — Generative Light Painting | NEON ARCADE">
+<meta property="og:description" content="Paint with light in this zen generative art tool. Create beautiful symmetrical neon patterns.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/silk-draw.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Silk Draw — Generative Light Painting | NEON ARCADE">
+<meta name="twitter:description" content="Paint with light in this zen generative art tool. Create beautiful symmetrical neon patterns.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/silk-draw.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Silk Draw",
+  "url": "https://neonarcade.net/neonchill/silk-draw.html",
+  "description": "Paint with light in this zen generative art tool. Create beautiful symmetrical neon patterns with mouse or touch.",
+  "genre": "Creative",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/silk-draw.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* START SCREEN */
+#startScreen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 50% 20%, rgba(0,240,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,45,123,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 70%, rgba(180,77,255,0.05) 0%, transparent 50%);
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#startScreen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.start-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 8vw, 72px);
+  letter-spacing: 8px;
+  color: var(--neon-cyan);
+  text-shadow:
+    0 0 10px rgba(0,240,255,0.6),
+    0 0 40px rgba(0,240,255,0.2),
+    0 0 80px rgba(0,240,255,0.1);
+  margin-bottom: 12px;
+}
+
+.start-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(16px, 3vw, 24px);
+  letter-spacing: 3px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  margin-bottom: 48px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+
+.start-hint {
+  margin-top: 32px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* PREVIEW CANVAS on start screen */
+#previewCanvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* DRAWING CANVAS */
+#drawCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  z-index: 1;
+}
+
+/* TOOLBAR */
+#toolbar {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(10,10,18,0.85);
+  border: 1px solid rgba(0,240,255,0.15);
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#toolbar.visible { opacity: 1; }
+
+.tb-btn {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 8px 14px;
+  border: 1px solid rgba(0,240,255,0.25);
+  background: rgba(0,240,255,0.04);
+  color: var(--text-mid);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.tb-btn:hover {
+  background: rgba(0,240,255,0.12);
+  color: var(--neon-cyan);
+  border-color: rgba(0,240,255,0.4);
+}
+
+.tb-btn.active {
+  background: rgba(0,240,255,0.15);
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0,240,255,0.15);
+}
+
+.tb-sep {
+  width: 1px;
+  background: rgba(0,240,255,0.1);
+  margin: 0 4px;
+}
+
+/* SIZE SLIDER */
+.tb-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tb-slider-wrap label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#brushSize {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60px;
+  height: 4px;
+  background: rgba(0,240,255,0.15);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+#brushSize::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0,240,255,0.4);
+  cursor: pointer;
+}
+
+#brushSize::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0,240,255,0.4);
+  cursor: pointer;
+  border: none;
+}
+
+/* BACK BUTTON */
+#backBtn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 50;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,10,18,0.7);
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+#backBtn.visible { opacity: 1; }
+#backBtn:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+
+/* SOUND TOGGLE */
+#soundBtn {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 50;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,10,18,0.7);
+  color: var(--text-mid);
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+#soundBtn.visible { opacity: 1; }
+#soundBtn:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+
+@media (max-width: 600px) {
+  .tb-btn { font-size: 9px; padding: 6px 10px; letter-spacing: 1px; }
+  #toolbar { gap: 4px; padding: 6px 8px; top: 10px; }
+  .tb-sep { display: none; }
+  #brushSize { width: 45px; }
+}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <canvas id="previewCanvas"></canvas>
+  <h1 class="start-title">SILK DRAW</h1>
+  <p class="start-subtitle">Paint with light. Mirror your flow.</p>
+  <button class="play-btn" id="startBtn">START</button>
+  <p class="start-hint">Mouse or touch to draw</p>
+</div>
+
+<!-- DRAWING CANVAS -->
+<canvas id="drawCanvas"></canvas>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <button class="tb-btn active" data-sym="2">2-FOLD</button>
+  <button class="tb-btn" data-sym="4">4-FOLD</button>
+  <button class="tb-btn" data-sym="6">6-FOLD</button>
+  <button class="tb-btn" data-sym="12">RADIAL</button>
+  <div class="tb-sep"></div>
+  <div class="tb-slider-wrap">
+    <label for="brushSize">Size</label>
+    <input type="range" id="brushSize" min="1" max="12" value="4">
+  </div>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="clearBtn">CLEAR</button>
+  <button class="tb-btn" id="saveBtn">SAVE</button>
+  <button class="tb-btn" id="shareBtn">SHARE</button>
+</div>
+
+<button id="backBtn">&larr; Back</button>
+<button id="soundBtn">&#9835;</button>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== NEON.JS INIT =====
+  if (typeof Neon !== 'undefined') {
+    Neon.init({ game: 'silk-draw', mode: 'high', key: 'neonarcade_neonchill_silkdraw_scores' });
+  }
+
+  // ===== DOM REFS =====
+  const startScreen = document.getElementById('startScreen');
+  const startBtn = document.getElementById('startBtn');
+  const drawCanvas = document.getElementById('drawCanvas');
+  const previewCanvas = document.getElementById('previewCanvas');
+  const toolbar = document.getElementById('toolbar');
+  const backBtn = document.getElementById('backBtn');
+  const soundBtn = document.getElementById('soundBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const brushSlider = document.getElementById('brushSize');
+  const symBtns = toolbar.querySelectorAll('[data-sym]');
+
+  const ctx = drawCanvas.getContext('2d');
+  const pCtx = previewCanvas.getContext('2d');
+
+  // ===== STATE =====
+  let W, H, dpr;
+  let symmetry = 2;
+  let brushRadius = 4;
+  let hue = 180;
+  let isDrawing = false;
+  let lastX = null, lastY = null;
+  let inGame = false;
+  let soundEnabled = true;
+  let audioCtx = null;
+  let oscillator = null;
+  let gainNode = null;
+  let drawStrokes = 0;
+
+  // ===== NEON PALETTE =====
+  const neonHues = [180, 135, 50, 340, 275, 30]; // cyan, green, gold, pink, purple, orange
+
+  // ===== SIZING =====
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    drawCanvas.width = W * dpr;
+    drawCanvas.height = H * dpr;
+    drawCanvas.style.width = W + 'px';
+    drawCanvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    previewCanvas.width = W * dpr;
+    previewCanvas.height = H * dpr;
+    previewCanvas.style.width = W + 'px';
+    previewCanvas.style.height = H + 'px';
+    pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener('resize', () => {
+    // Save current drawing
+    const imageData = ctx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+    resize();
+    ctx.putImageData(imageData, 0, 0);
+  });
+
+  resize();
+
+  // ===== AUDIO =====
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0;
+    gainNode.connect(audioCtx.destination);
+
+    oscillator = audioCtx.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 220;
+    oscillator.connect(gainNode);
+    oscillator.start();
+  }
+
+  function updateSound(x, y) {
+    if (!soundEnabled || !audioCtx || !oscillator) return;
+    const nx = x / W;
+    const ny = y / H;
+    const freq = 150 + nx * 400 + ny * 200;
+    oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+    gainNode.gain.setTargetAtTime(0.04, audioCtx.currentTime, 0.02);
+  }
+
+  function fadeSound() {
+    if (!gainNode) return;
+    gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.15);
+  }
+
+  soundBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    soundBtn.textContent = soundEnabled ? '\u266B' : '\u2715';
+    if (!soundEnabled) fadeSound();
+  });
+
+  // ===== DRAWING CORE =====
+  function drawDot(x, y, radius, color, alpha) {
+    const cx = W / 2;
+    const cy = H / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const angleStep = (Math.PI * 2) / symmetry;
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (let i = 0; i < symmetry; i++) {
+      const angle = angleStep * i;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+
+      // Normal rotation
+      const rx = cx + dx * cos - dy * sin;
+      const ry = cy + dx * sin + dy * cos;
+
+      // Draw glow layers
+      drawGlowDot(rx, ry, radius, color, alpha);
+
+      // Mirror (reflection) for each fold
+      const mx = cx + dx * cos + dy * sin;
+      const my = cy + dx * sin - dy * cos;
+      drawGlowDot(mx, my, radius, color, alpha);
+    }
+  }
+
+  function drawGlowDot(x, y, radius, color, alpha) {
+    // Outer glow
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius * 3);
+    grad.addColorStop(0, hsla(color, 1.0, 0.7, alpha * 0.3));
+    grad.addColorStop(0.4, hsla(color, 0.9, 0.6, alpha * 0.1));
+    grad.addColorStop(1, hsla(color, 0.8, 0.5, 0));
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Core
+    const coreGrad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    coreGrad.addColorStop(0, hsla(color, 1.0, 0.9, alpha * 0.8));
+    coreGrad.addColorStop(0.5, hsla(color, 0.95, 0.7, alpha * 0.5));
+    coreGrad.addColorStop(1, hsla(color, 0.9, 0.5, alpha * 0.1));
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function hsla(h, s, l, a) {
+    return 'hsla(' + h + ',' + (s * 100) + '%,' + (l * 100) + '%,' + a + ')';
+  }
+
+  function interpolateDraw(x0, y0, x1, y1) {
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const steps = Math.max(1, Math.floor(dist / (brushRadius * 0.4)));
+
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const x = x0 + dx * t;
+      const y = y0 + dy * t;
+
+      // Shift hue gradually
+      hue = (hue + 0.15) % 360;
+
+      drawDot(x, y, brushRadius, hue, 0.6);
+    }
+  }
+
+  // ===== INPUT HANDLERS =====
+  function getPos(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function onStart(e) {
+    if (!inGame) return;
+    e.preventDefault();
+    initAudio();
+    isDrawing = true;
+    const p = getPos(e);
+    lastX = p.x;
+    lastY = p.y;
+    drawDot(p.x, p.y, brushRadius, hue, 0.5);
+    updateSound(p.x, p.y);
+    drawStrokes++;
+  }
+
+  function onMove(e) {
+    if (!inGame || !isDrawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    if (lastX !== null) {
+      interpolateDraw(lastX, lastY, p.x, p.y);
+    }
+    lastX = p.x;
+    lastY = p.y;
+    updateSound(p.x, p.y);
+  }
+
+  function onEnd(e) {
+    if (!inGame) return;
+    isDrawing = false;
+    lastX = null;
+    lastY = null;
+    fadeSound();
+  }
+
+  drawCanvas.addEventListener('mousedown', onStart);
+  drawCanvas.addEventListener('mousemove', onMove);
+  drawCanvas.addEventListener('mouseup', onEnd);
+  drawCanvas.addEventListener('mouseleave', onEnd);
+  drawCanvas.addEventListener('touchstart', onStart, { passive: false });
+  drawCanvas.addEventListener('touchmove', onMove, { passive: false });
+  drawCanvas.addEventListener('touchend', onEnd);
+  drawCanvas.addEventListener('touchcancel', onEnd);
+
+  // ===== TOOLBAR =====
+  symBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      symBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      symmetry = parseInt(btn.dataset.sym);
+    });
+  });
+
+  brushSlider.addEventListener('input', () => {
+    brushRadius = parseInt(brushSlider.value);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+    drawStrokes = 0;
+  });
+
+  saveBtn.addEventListener('click', () => {
+    // Create a temporary canvas without the background for compositing
+    const saveCanvas = document.createElement('canvas');
+    saveCanvas.width = drawCanvas.width;
+    saveCanvas.height = drawCanvas.height;
+    const sCtx = saveCanvas.getContext('2d');
+    // Draw background
+    sCtx.fillStyle = '#0a0a12';
+    sCtx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+    // Draw the art
+    sCtx.drawImage(drawCanvas, 0, 0);
+
+    saveCanvas.toBlob(function(blob) {
+      if (!blob) return;
+      try {
+        navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]).then(() => {
+          flashButton(saveBtn, 'COPIED!');
+        }).catch(() => {
+          // Fallback: download
+          downloadCanvas(saveCanvas);
+        });
+      } catch (e) {
+        downloadCanvas(saveCanvas);
+      }
+    }, 'image/png');
+  });
+
+  function downloadCanvas(canvas) {
+    const link = document.createElement('a');
+    link.download = 'silk-draw-' + Date.now() + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    flashButton(saveBtn, 'SAVED!');
+  }
+
+  function flashButton(btn, text) {
+    const orig = btn.textContent;
+    btn.textContent = text;
+    btn.style.color = '#39ff14';
+    btn.style.borderColor = '#39ff14';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1500);
+  }
+
+  shareBtn.addEventListener('click', () => {
+    const text = '\u2728 SILK DRAW\nGenerative light painting\nEvery creation is unique\nneonarcade.net/neonchill/silk-draw.html';
+
+    if (navigator.share) {
+      navigator.share({ title: 'SILK DRAW', text: text }).catch(() => {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  });
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      flashButton(shareBtn, 'COPIED!');
+    }).catch(() => {
+      flashButton(shareBtn, 'FAILED');
+    });
+  }
+
+  backBtn.addEventListener('click', () => {
+    inGame = false;
+    toolbar.classList.remove('visible');
+    backBtn.classList.remove('visible');
+    soundBtn.classList.remove('visible');
+    startScreen.classList.remove('hidden');
+    fadeSound();
+  });
+
+  // ===== START =====
+  startBtn.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    toolbar.classList.add('visible');
+    backBtn.classList.add('visible');
+    soundBtn.classList.add('visible');
+    inGame = true;
+
+    // Clear canvas with background
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+    hue = 180;
+    drawStrokes = 0;
+  });
+
+  // ===== PREVIEW ANIMATION (start screen) =====
+  let previewTime = 0;
+  let previewHue = 180;
+
+  function drawPreview() {
+    previewTime += 0.008;
+    pCtx.globalCompositeOperation = 'source-over';
+    pCtx.fillStyle = 'rgba(10,10,18,0.03)';
+    pCtx.fillRect(0, 0, W, H);
+
+    pCtx.globalCompositeOperation = 'lighter';
+
+    const cx = W / 2;
+    const cy = H / 2;
+
+    // Animate a flowing curve
+    for (let j = 0; j < 3; j++) {
+      const t = previewTime + j * 2.1;
+      const r = 80 + Math.sin(t * 0.7) * 120;
+      const angle = t * 0.5;
+      const x = cx + Math.cos(angle) * r + Math.sin(t * 1.3) * 40;
+      const y = cy + Math.sin(angle) * r + Math.cos(t * 0.9) * 30;
+
+      previewHue = (previewHue + 0.3) % 360;
+      const folds = 6;
+      const step = (Math.PI * 2) / folds;
+
+      for (let i = 0; i < folds; i++) {
+        const a = step * i;
+        const cos = Math.cos(a);
+        const sin = Math.sin(a);
+        const dx = x - cx;
+        const dy = y - cy;
+        const rx = cx + dx * cos - dy * sin;
+        const ry = cy + dx * sin + dy * cos;
+
+        const grad = pCtx.createRadialGradient(rx, ry, 0, rx, ry, 12);
+        grad.addColorStop(0, hsla(previewHue, 1, 0.8, 0.4));
+        grad.addColorStop(1, hsla(previewHue, 0.8, 0.5, 0));
+        pCtx.fillStyle = grad;
+        pCtx.beginPath();
+        pCtx.arc(rx, ry, 12, 0, Math.PI * 2);
+        pCtx.fill();
+
+        // Mirror
+        const mx = cx + dx * cos + dy * sin;
+        const my = cy + dx * sin - dy * cos;
+        const mGrad = pCtx.createRadialGradient(mx, my, 0, mx, my, 12);
+        mGrad.addColorStop(0, hsla(previewHue, 1, 0.8, 0.3));
+        mGrad.addColorStop(1, hsla(previewHue, 0.8, 0.5, 0));
+        pCtx.fillStyle = mGrad;
+        pCtx.beginPath();
+        pCtx.arc(mx, my, 12, 0, Math.PI * 2);
+        pCtx.fill();
+      }
+    }
+
+    if (!inGame) {
+      requestAnimationFrame(drawPreview);
+    }
+  }
+
+  // ===== MAIN LOOP =====
+  function mainLoop() {
+    requestAnimationFrame(mainLoop);
+    // No per-frame fade — art persists
+    // Could add subtle vignette pulse here if desired
+  }
+
+  // ===== INIT =====
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0, 0, W, H);
+  pCtx.fillStyle = '#0a0a12';
+  pCtx.fillRect(0, 0, W, H);
+
+  drawPreview();
+  mainLoop();
+})();
+</script>
+</body>
+</html>

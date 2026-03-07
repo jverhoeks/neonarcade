@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>VETO — Bracket Elimination | NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden; background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif; color: #fff;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+}
+
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 50%);
+}
+
+#app {
+  position: relative; z-index: 1; width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  overflow-y: auto;
+}
+
+.screen { display: none; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 700px; padding: 20px; }
+.screen.active { display: flex; }
+
+h1.game-title {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(48px, 12vw, 80px);
+  letter-spacing: 8px; color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+
+h2.screen-title {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: clamp(20px, 5vw, 30px);
+  letter-spacing: 4px; color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.5), 0 0 30px rgba(0,240,255,0.15);
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(14px, 3vw, 18px);
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-mid);
+  margin-bottom: 30px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+.play-btn:active { transform: scale(0.97); }
+
+.play-btn.pink { border-color: var(--neon-pink); color: var(--neon-pink); background: rgba(255,45,123,0.06); }
+.play-btn.pink:hover { background: rgba(255,45,123,0.15); box-shadow: 0 0 20px rgba(255,45,123,0.2); }
+
+.play-btn.green { border-color: var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.06); }
+.play-btn.green:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+
+.play-btn.gold { border-color: var(--neon-gold); color: var(--neon-gold); background: rgba(255,215,0,0.06); }
+.play-btn.gold:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+
+.play-btn.purple { border-color: var(--neon-purple); color: var(--neon-purple); background: rgba(180,77,255,0.06); }
+.play-btn.purple:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 20px rgba(180,77,255,0.2); }
+
+/* Category grid */
+.category-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px; width: 100%; max-width: 500px; margin-bottom: 24px;
+}
+.cat-btn {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 16px;
+  letter-spacing: 1px; padding: 18px 10px; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--text-dim); background: rgba(255,255,255,0.02);
+  color: #fff; transition: all 0.2s; display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+}
+.cat-btn .cat-emoji { font-size: 28px; }
+.cat-btn:hover { border-color: var(--neon-cyan); background: rgba(0,240,255,0.06); color: var(--neon-cyan); transform: scale(1.04); }
+
+/* Bracket progress */
+.bracket-progress {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+  font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 2px; color: var(--text-dim);
+}
+.bracket-progress .round { padding: 4px 10px; border-radius: 3px; border: 1px solid var(--text-dim); transition: all 0.3s; }
+.bracket-progress .round.active { border-color: var(--neon-cyan); color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.5); }
+.bracket-progress .round.done { border-color: var(--neon-green); color: var(--neon-green); }
+.bracket-progress .arrow { color: var(--text-dim); }
+
+/* Matchup */
+.matchup-label {
+  font-family: 'Orbitron', monospace; font-weight: 400; font-size: 11px;
+  letter-spacing: 3px; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase;
+}
+
+.matchup-count {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 14px;
+  color: var(--text-mid); margin-bottom: 16px;
+}
+
+.matchup-cards {
+  display: flex; gap: 16px; align-items: stretch; justify-content: center;
+  width: 100%; margin-bottom: 20px;
+}
+
+.matchup-card {
+  flex: 1; max-width: 260px; min-height: 160px; padding: 24px 16px;
+  border: 2px solid var(--text-dim); border-radius: 6px;
+  background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.25s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px;
+}
+.matchup-card:hover {
+  border-color: var(--neon-cyan); background: rgba(0,240,255,0.05);
+  transform: translateY(-4px); box-shadow: 0 0 25px rgba(0,240,255,0.15);
+}
+.matchup-card.picked {
+  border-color: var(--neon-green); background: rgba(57,255,20,0.08);
+  box-shadow: 0 0 25px rgba(57,255,20,0.2);
+}
+.matchup-card .item-name {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: clamp(16px, 4vw, 22px); letter-spacing: 2px; text-align: center;
+}
+.matchup-card .vs-or {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase;
+}
+
+.vs-divider {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 18px;
+  color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.5);
+  padding: 0 4px;
+}
+
+/* Veto button */
+.veto-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 3px; padding: 10px 28px; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--neon-orange); background: rgba(255,140,0,0.06);
+  color: var(--neon-orange); text-transform: uppercase; transition: all 0.2s;
+  margin-bottom: 10px;
+}
+.veto-btn:hover { background: rgba(255,140,0,0.15); box-shadow: 0 0 20px rgba(255,140,0,0.3); transform: scale(1.04); }
+.veto-btn.used { opacity: 0.3; pointer-events: none; border-color: var(--text-dim); color: var(--text-dim); background: none; }
+
+.veto-hint {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  color: var(--text-dim); letter-spacing: 1px;
+}
+
+/* Winner reveal */
+.winner-card {
+  padding: 30px 40px; border: 2px solid var(--neon-gold); border-radius: 8px;
+  background: rgba(255,215,0,0.05); margin: 16px 0;
+  box-shadow: 0 0 30px rgba(255,215,0,0.15);
+}
+.winner-card .winner-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--neon-gold); margin-bottom: 8px;
+}
+.winner-card .winner-name {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(24px, 7vw, 40px);
+  letter-spacing: 4px; color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.5), 0 0 40px rgba(255,215,0,0.2);
+}
+
+/* Reveal comparison */
+.reveal-container { width: 100%; max-width: 650px; }
+
+.reveal-players {
+  display: flex; justify-content: space-around; margin-bottom: 16px;
+}
+.reveal-player {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 2px; padding: 6px 16px; border-radius: 3px;
+}
+.reveal-player.p1 { color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+.reveal-player.p2 { color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+
+.reveal-round {
+  margin-bottom: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 4px; background: rgba(255,255,255,0.01);
+}
+.reveal-round-title {
+  font-family: 'Orbitron', monospace; font-weight: 400; font-size: 10px;
+  letter-spacing: 3px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase;
+}
+.reveal-matchup {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 8px; margin-bottom: 4px; border-radius: 3px; font-size: 14px;
+}
+.reveal-matchup .rm-item { flex: 1; text-align: center; padding: 3px 6px; border-radius: 2px; }
+.reveal-matchup .rm-item.p1pick { color: var(--neon-cyan); background: rgba(0,240,255,0.08); }
+.reveal-matchup .rm-item.p2pick { color: var(--neon-pink); background: rgba(255,45,123,0.08); }
+.reveal-matchup .rm-item.agree { color: var(--neon-green); background: rgba(57,255,20,0.08); }
+.reveal-matchup .rm-vs { width: 30px; text-align: center; color: var(--text-dim); font-size: 10px; font-family: 'Orbitron', monospace; }
+
+.compat-score {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(36px, 10vw, 60px); letter-spacing: 4px; margin: 12px 0;
+}
+
+.compat-bar {
+  width: 80%; max-width: 400px; height: 8px; border-radius: 4px;
+  background: rgba(255,255,255,0.05); margin: 0 auto 20px; overflow: hidden;
+}
+.compat-bar-fill {
+  height: 100%; border-radius: 4px; transition: width 1.5s ease;
+}
+
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+
+/* Shake animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+.shake { animation: shake 0.25s ease; }
+
+/* Particles */
+.particle {
+  position: fixed; pointer-events: none; z-index: 9998; border-radius: 50%;
+}
+
+/* Scrollable reveal */
+.screen.active.scroll-ok { overflow-y: auto; max-height: 100vh; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .matchup-cards { flex-direction: column; align-items: center; }
+  .matchup-card { max-width: 90%; min-height: 100px; }
+  .vs-divider { padding: 4px 0; }
+  .category-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="screen active">
+    <h1 class="game-title">VETO</h1>
+    <div class="subtitle">16 items. 1 winner. 1 veto. Do you agree?</div>
+    <button class="play-btn" id="btn-start">START</button>
+  </div>
+
+  <!-- CATEGORY SCREEN -->
+  <div id="screen-category" class="screen">
+    <h2 class="screen-title">CHOOSE CATEGORY</h2>
+    <div class="subtitle">Pick your battleground</div>
+    <div class="category-grid" id="cat-grid"></div>
+  </div>
+
+  <!-- BRACKET PLAY SCREEN -->
+  <div id="screen-play" class="screen">
+    <div class="bracket-progress" id="bracket-progress"></div>
+    <div class="matchup-label" id="matchup-label">ROUND OF 16</div>
+    <div class="matchup-count" id="matchup-count">Match 1 of 8</div>
+    <div class="matchup-cards" id="matchup-cards"></div>
+    <button class="veto-btn" id="veto-btn">⚡ VETO</button>
+    <div class="veto-hint" id="veto-hint">Skip this matchup — auto-advance your pick (1 use)</div>
+  </div>
+
+  <!-- P1 DONE SCREEN -->
+  <div id="screen-done" class="screen">
+    <h2 class="screen-title">YOUR WINNER</h2>
+    <div class="winner-card">
+      <div class="winner-label">Champion</div>
+      <div class="winner-name" id="p1-winner"></div>
+    </div>
+    <div class="subtitle" id="done-subtitle">Challenge a friend to see if they agree!</div>
+    <div class="btn-row">
+      <button class="play-btn" id="btn-copy-link">COPY CHALLENGE LINK</button>
+      <button class="play-btn pink" id="btn-play-again">PLAY AGAIN</button>
+    </div>
+    <div id="copy-status" style="margin-top:12px;font-size:13px;color:var(--neon-green);min-height:20px;"></div>
+  </div>
+
+  <!-- REVEAL SCREEN -->
+  <div id="screen-reveal" class="screen scroll-ok">
+    <h2 class="screen-title">THE REVEAL</h2>
+    <div class="reveal-players">
+      <div class="reveal-player p1">PLAYER 1</div>
+      <div class="reveal-player p2">YOU</div>
+    </div>
+    <div class="compat-score" id="compat-score">0%</div>
+    <div class="compat-bar"><div class="compat-bar-fill" id="compat-fill" style="width:0%"></div></div>
+    <div class="subtitle" id="compat-label">Calculating compatibility...</div>
+    <div class="reveal-container" id="reveal-container"></div>
+    <div class="btn-row" style="margin-top:20px;margin-bottom:40px;">
+      <button class="play-btn green" id="btn-share-result">SHARE RESULT</button>
+      <button class="play-btn pink" id="btn-reveal-again">PLAY AGAIN</button>
+    </div>
+    <div id="share-status" style="margin-bottom:20px;font-size:13px;color:var(--neon-green);min-height:20px;"></div>
+  </div>
+
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== CATEGORIES =====
+  const CATEGORIES = [
+    { name: 'Movies', emoji: '🎬', items: ['The Matrix','Titanic','Inception','The Lion King','Pulp Fiction','Harry Potter','Jurassic Park','The Dark Knight','Forrest Gump','Shrek','Star Wars','Avatar','Gladiator','Toy Story','The Godfather','Interstellar'] },
+    { name: 'Foods', emoji: '🍕', items: ['Pizza','Sushi','Tacos','Burger','Pasta','Ramen','Steak','Ice Cream','Curry','Fried Chicken','Chocolate','Pancakes','BBQ Ribs','Pad Thai','Falafel','Mac & Cheese'] },
+    { name: 'Travel', emoji: '✈️', items: ['Tokyo','Paris','New York','Bali','London','Rome','Iceland','Maldives','Barcelona','Sydney','Santorini','Dubai','Machu Picchu','Safari','Swiss Alps','Kyoto'] },
+    { name: 'Music', emoji: '🎵', items: ['Rock','Hip Hop','Pop','Jazz','Electronic','Classical','R&B','Country','Indie','Metal','Reggae','Latin','K-Pop','Folk','Punk','Blues'] },
+    { name: 'Animals', emoji: '🐾', items: ['Dog','Cat','Dolphin','Eagle','Wolf','Panda','Tiger','Penguin','Elephant','Horse','Owl','Fox','Otter','Lion','Rabbit','Whale'] },
+    { name: 'Hobbies', emoji: '🎮', items: ['Gaming','Cooking','Hiking','Reading','Photography','Music','Painting','Travel','Gardening','Yoga','Dancing','Cycling','Writing','Surfing','Chess','Pottery'] }
+  ];
+
+  // ===== AUDIO =====
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let actx = null;
+  function ensureAudio() { if (!actx) actx = new AudioCtx(); }
+
+  function playPick() {
+    ensureAudio();
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(660, actx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(880, actx.currentTime + 0.08);
+    g.gain.setValueAtTime(0.15, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.15);
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + 0.15);
+  }
+
+  function playVeto() {
+    ensureAudio();
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(200, actx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(60, actx.currentTime + 0.3);
+    g.gain.setValueAtTime(0.2, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.35);
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + 0.35);
+  }
+
+  function playReveal() {
+    ensureAudio();
+    [0, 100, 200].forEach((delay, i) => {
+      const o = actx.createOscillator();
+      const g = actx.createGain();
+      const t = actx.currentTime + delay / 1000;
+      o.type = 'sine'; o.frequency.setValueAtTime([523, 659, 784][i], t);
+      g.gain.setValueAtTime(0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t); o.stop(t + 0.25);
+    });
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const sz = 3 + Math.random() * 5;
+      p.style.width = sz + 'px'; p.style.height = sz + 'px';
+      p.style.background = color;
+      p.style.left = x + 'px'; p.style.top = y + 'px';
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 60 + Math.random() * 120;
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed;
+      let ox = 0, oy = 0, opacity = 1;
+      const start = performance.now();
+      function anim(now) {
+        const t = (now - start) / 1000;
+        if (t > 0.6) { p.remove(); return; }
+        ox = dx * t; oy = dy * t + 100 * t * t;
+        opacity = 1 - t / 0.6;
+        p.style.transform = `translate(${ox}px, ${oy}px)`;
+        p.style.opacity = opacity;
+        requestAnimationFrame(anim);
+      }
+      requestAnimationFrame(anim);
+    }
+  }
+
+  // ===== SCREENS =====
+  const screens = {
+    start: document.getElementById('screen-start'),
+    category: document.getElementById('screen-category'),
+    play: document.getElementById('screen-play'),
+    done: document.getElementById('screen-done'),
+    reveal: document.getElementById('screen-reveal')
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+    // Scroll to top for reveal
+    if (name === 'reveal') screens[name].scrollTop = 0;
+  }
+
+  // ===== STATE =====
+  let catIdx = -1;
+  let seed = 0;
+  let items = [];  // shuffled 16 items
+  let bracket = []; // rounds: bracket[0] = 16 items, bracket[1] = 8 winners, etc.
+  let picks = [];   // flat array of pick indices (0=left, 1=right) for all 15 matchups
+  let vetoUsed = false;
+  let vetoRound = -1; // which matchup index the veto was used on
+  let currentRound = 0; // 0=round16, 1=quarter, 2=semi, 3=final
+  let currentMatchup = 0; // within current round
+  let isP2 = false;
+  let p1Data = null; // decoded from URL for P2 mode
+
+  const ROUND_NAMES = ['ROUND OF 16', 'QUARTERFINALS', 'SEMIFINALS', 'FINAL'];
+  const ROUND_SIZES = [8, 4, 2, 1];
+
+  // ===== SEEDED SHUFFLE =====
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffleWithSeed(arr, s) {
+    const rng = mulberry32(s);
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // ===== URL ENCODING/DECODING =====
+  // Format: #c{catIdx}s{seed}p{picks as hex}v{vetoMatchupIdx or -1}
+  function encodeState() {
+    // picks: 15 bits (0 or 1 for each matchup)
+    let bits = 0;
+    for (let i = 0; i < picks.length; i++) {
+      if (picks[i] === 1) bits |= (1 << i);
+    }
+    const hex = bits.toString(16);
+    const v = vetoRound >= 0 ? vetoRound : 'x';
+    return `c${catIdx}s${seed}p${hex}v${v}`;
+  }
+
+  function decodeHash(hash) {
+    const m = hash.match(/^c(\d+)s(\d+)p([0-9a-f]+)v(\d+|x)$/);
+    if (!m) return null;
+    const ci = parseInt(m[1]);
+    const s = parseInt(m[2]);
+    const bits = parseInt(m[3], 16);
+    const v = m[4] === 'x' ? -1 : parseInt(m[4]);
+    if (ci < 0 || ci >= CATEGORIES.length) return null;
+    const p = [];
+    for (let i = 0; i < 15; i++) {
+      p.push((bits >> i) & 1);
+    }
+    return { catIdx: ci, seed: s, picks: p, vetoRound: v };
+  }
+
+  // ===== BRACKET LOGIC =====
+  function initBracket(catIndex, s) {
+    catIdx = catIndex;
+    seed = s;
+    items = shuffleWithSeed(CATEGORIES[catIdx].items.slice(), seed);
+    bracket = [items.slice()];
+    picks = [];
+    vetoUsed = false;
+    vetoRound = -1;
+    currentRound = 0;
+    currentMatchup = 0;
+  }
+
+  function totalMatchupIndex() {
+    let idx = 0;
+    for (let r = 0; r < currentRound; r++) idx += ROUND_SIZES[r];
+    return idx + currentMatchup;
+  }
+
+  function getCurrentPair() {
+    const roundItems = bracket[currentRound];
+    const i = currentMatchup * 2;
+    return [roundItems[i], roundItems[i + 1]];
+  }
+
+  function advanceMatchup(pickIdx) {
+    picks.push(pickIdx);
+    const pair = getCurrentPair();
+    const winner = pair[pickIdx];
+
+    // Build next round if needed
+    if (!bracket[currentRound + 1] && currentRound < 4) {
+      bracket[currentRound + 1] = [];
+    }
+    if (currentRound < 4) {
+      bracket[currentRound + 1].push(winner);
+    }
+
+    currentMatchup++;
+    if (currentMatchup >= ROUND_SIZES[currentRound]) {
+      currentRound++;
+      currentMatchup = 0;
+    }
+  }
+
+  function isComplete() {
+    return currentRound >= 4 || (currentRound === 3 && currentMatchup >= 1);
+  }
+
+  function getWinner() {
+    return bracket[4] ? bracket[4][0] : null;
+  }
+
+  // Rebuild bracket from picks array
+  function rebuildBracket(catIndex, s, picksArr) {
+    catIdx = catIndex;
+    seed = s;
+    items = shuffleWithSeed(CATEGORIES[catIdx].items.slice(), seed);
+    bracket = [items.slice()];
+    let pIdx = 0;
+    for (let round = 0; round < 4; round++) {
+      bracket[round + 1] = [];
+      const rItems = bracket[round];
+      for (let m = 0; m < rItems.length / 2; m++) {
+        const pick = picksArr[pIdx++];
+        bracket[round + 1].push(rItems[m * 2 + pick]);
+      }
+    }
+    return bracket;
+  }
+
+  // ===== UI RENDERING =====
+  function renderProgress() {
+    const el = document.getElementById('bracket-progress');
+    el.innerHTML = '';
+    const labels = ['16', '8', '4', '2', '1'];
+    for (let i = 0; i < 5; i++) {
+      if (i > 0) {
+        const arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.textContent = '→';
+        el.appendChild(arrow);
+      }
+      const rd = document.createElement('span');
+      rd.className = 'round';
+      rd.textContent = labels[i];
+      if (i < currentRound) rd.classList.add('done');
+      else if (i === currentRound) rd.classList.add('active');
+      el.appendChild(rd);
+    }
+  }
+
+  function renderMatchup() {
+    if (isComplete()) {
+      finishBracket();
+      return;
+    }
+
+    renderProgress();
+    document.getElementById('matchup-label').textContent = ROUND_NAMES[currentRound];
+    document.getElementById('matchup-count').textContent =
+      `Match ${currentMatchup + 1} of ${ROUND_SIZES[currentRound]}`;
+
+    const pair = getCurrentPair();
+    const container = document.getElementById('matchup-cards');
+    container.innerHTML = '';
+
+    const cardL = createMatchupCard(pair[0], 0);
+    const vs = document.createElement('div');
+    vs.className = 'vs-divider';
+    vs.textContent = 'VS';
+    const cardR = createMatchupCard(pair[1], 1);
+
+    container.appendChild(cardL);
+    container.appendChild(vs);
+    container.appendChild(cardR);
+
+    // Veto button
+    const vetoBtn = document.getElementById('veto-btn');
+    const vetoHint = document.getElementById('veto-hint');
+    if (vetoUsed) {
+      vetoBtn.classList.add('used');
+      vetoHint.textContent = 'Veto already used';
+    } else {
+      vetoBtn.classList.remove('used');
+      vetoHint.textContent = 'Skip this matchup — auto-advance left pick (1 use)';
+    }
+  }
+
+  function createMatchupCard(itemName, pickIdx) {
+    const card = document.createElement('div');
+    card.className = 'matchup-card';
+    const name = document.createElement('div');
+    name.className = 'item-name';
+    name.textContent = itemName;
+    card.appendChild(name);
+
+    card.addEventListener('click', (e) => {
+      playPick();
+      const rect = card.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#00f0ff', 10);
+      card.classList.add('picked');
+      setTimeout(() => {
+        advanceMatchup(pickIdx);
+        renderMatchup();
+      }, 300);
+    });
+
+    return card;
+  }
+
+  function handleVeto() {
+    if (vetoUsed || isComplete()) return;
+    vetoUsed = true;
+    vetoRound = totalMatchupIndex();
+    playVeto();
+
+    const container = document.getElementById('matchup-cards');
+    container.classList.add('shake');
+    setTimeout(() => container.classList.remove('shake'), 300);
+
+    // Auto-advance left item (index 0)
+    setTimeout(() => {
+      advanceMatchup(0);
+      renderMatchup();
+    }, 400);
+  }
+
+  function finishBracket() {
+    const winner = getWinner();
+    if (isP2) {
+      showReveal();
+    } else {
+      document.getElementById('p1-winner').textContent = winner;
+      showScreen('done');
+      playReveal();
+      const rect = document.getElementById('p1-winner').getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ffd700', 20);
+
+      // Save compatibility as score (only meaningful in P2 mode, but track plays)
+      if (typeof Neon !== 'undefined') {
+        Neon.init({ game: 'veto', mode: 'high', key: 'neonarcade_neonsocial_veto_scores' });
+      }
+    }
+  }
+
+  // ===== CHALLENGE LINK =====
+  function getChallengeURL() {
+    const encoded = encodeState();
+    const base = window.location.origin + window.location.pathname;
+    return base + '#' + encoded;
+  }
+
+  // ===== REVEAL =====
+  function showReveal() {
+    const p1Bracket = rebuildBracket(p1Data.catIdx, p1Data.seed, p1Data.picks);
+    const p2Bracket = bracket; // current state
+
+    const p1Winner = p1Bracket[4][0];
+    const p2Winner = p2Bracket[4][0];
+
+    // Calculate compatibility: compare picks at each of the 15 matchups
+    let agreements = 0;
+    for (let i = 0; i < 15; i++) {
+      if (p1Data.picks[i] === picks[i]) agreements++;
+    }
+    const compat = Math.round((agreements / 15) * 100);
+
+    // Color based on compat
+    let compatColor;
+    if (compat >= 70) compatColor = 'var(--neon-green)';
+    else if (compat >= 40) compatColor = 'var(--neon-gold)';
+    else compatColor = 'var(--neon-pink)';
+
+    showScreen('reveal');
+
+    // Animate compat score
+    const scoreEl = document.getElementById('compat-score');
+    const fillEl = document.getElementById('compat-fill');
+    const labelEl = document.getElementById('compat-label');
+
+    scoreEl.style.color = compatColor;
+    scoreEl.style.textShadow = `0 0 10px ${compatColor}, 0 0 40px ${compatColor}`;
+    fillEl.style.background = compatColor;
+    fillEl.style.boxShadow = `0 0 10px ${compatColor}`;
+
+    let labels;
+    if (compat >= 80) labels = 'Mind-meld! 🧠';
+    else if (compat >= 60) labels = 'Pretty aligned! ✨';
+    else if (compat >= 40) labels = 'Some common ground 🤝';
+    else if (compat >= 20) labels = 'Agree to disagree 🤷';
+    else labels = 'Total opposites! 🔥';
+
+    // Animate counting
+    let count = 0;
+    const countInterval = setInterval(() => {
+      count += 2;
+      if (count >= compat) { count = compat; clearInterval(countInterval); }
+      scoreEl.textContent = count + '%';
+    }, 30);
+
+    setTimeout(() => {
+      fillEl.style.width = compat + '%';
+      labelEl.textContent = labels;
+    }, 100);
+
+    playReveal();
+
+    // Render bracket comparison
+    const revealEl = document.getElementById('reveal-container');
+    revealEl.innerHTML = '';
+
+    // Winner comparison
+    const winnerDiv = document.createElement('div');
+    winnerDiv.style.cssText = 'display:flex;justify-content:space-around;align-items:center;margin-bottom:20px;padding:16px;border:1px solid rgba(255,255,255,0.05);border-radius:6px;background:rgba(255,255,255,0.01);';
+    const w1 = document.createElement('div');
+    w1.style.cssText = 'text-align:center;';
+    w1.innerHTML = `<div style="font-family:Rajdhani;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:4px;">P1 WINNER</div><div style="font-family:Orbitron;font-weight:700;font-size:18px;color:var(--neon-cyan);text-shadow:0 0 8px rgba(0,240,255,0.4);">${p1Winner}</div>`;
+    const wvs = document.createElement('div');
+    wvs.style.cssText = 'font-family:Orbitron;font-weight:900;font-size:16px;color:var(--neon-pink);';
+    wvs.textContent = 'VS';
+    const w2 = document.createElement('div');
+    w2.style.cssText = 'text-align:center;';
+    w2.innerHTML = `<div style="font-family:Rajdhani;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:4px;">P2 WINNER</div><div style="font-family:Orbitron;font-weight:700;font-size:18px;color:var(--neon-pink);text-shadow:0 0 8px rgba(255,45,123,0.4);">${p2Winner}</div>`;
+
+    if (p1Winner === p2Winner) {
+      w1.querySelector('div:last-child').style.color = 'var(--neon-green)';
+      w2.querySelector('div:last-child').style.color = 'var(--neon-green)';
+      wvs.textContent = '=';
+      wvs.style.color = 'var(--neon-green)';
+    }
+
+    winnerDiv.appendChild(w1);
+    winnerDiv.appendChild(wvs);
+    winnerDiv.appendChild(w2);
+    revealEl.appendChild(winnerDiv);
+
+    // Round by round comparison
+    let pickIdx = 0;
+    for (let round = 0; round < 4; round++) {
+      const roundDiv = document.createElement('div');
+      roundDiv.className = 'reveal-round';
+      const title = document.createElement('div');
+      title.className = 'reveal-round-title';
+      title.textContent = ROUND_NAMES[round];
+      roundDiv.appendChild(title);
+
+      const rItems = p1Bracket[round]; // same items for both
+      for (let m = 0; m < rItems.length / 2; m++) {
+        const left = rItems[m * 2];
+        const right = rItems[m * 2 + 1];
+        const p1Pick = p1Data.picks[pickIdx];
+        const p2Pick = picks[pickIdx];
+        const agree = p1Pick === p2Pick;
+
+        const row = document.createElement('div');
+        row.className = 'reveal-matchup';
+
+        const itemL = document.createElement('span');
+        itemL.className = 'rm-item';
+        itemL.textContent = left;
+        if (p1Pick === 0 && p2Pick === 0) itemL.classList.add('agree');
+        else if (p1Pick === 0) itemL.classList.add('p1pick');
+        else if (p2Pick === 0) itemL.classList.add('p2pick');
+
+        const vs = document.createElement('span');
+        vs.className = 'rm-vs';
+        vs.textContent = 'vs';
+
+        const itemR = document.createElement('span');
+        itemR.className = 'rm-item';
+        itemR.textContent = right;
+        if (p1Pick === 1 && p2Pick === 1) itemR.classList.add('agree');
+        else if (p1Pick === 1) itemR.classList.add('p1pick');
+        else if (p2Pick === 1) itemR.classList.add('p2pick');
+
+        row.appendChild(itemL);
+        row.appendChild(vs);
+        row.appendChild(itemR);
+        roundDiv.appendChild(row);
+
+        pickIdx++;
+      }
+
+      revealEl.appendChild(roundDiv);
+    }
+
+    // Store data for sharing
+    window._revealData = { cat: CATEGORIES[catIdx].name, p1Winner, p2Winner, compat };
+  }
+
+  // ===== SHARE =====
+  function shareResult() {
+    const d = window._revealData;
+    if (!d) return;
+    const text = `⚡ VETO — ${d.cat}\n👤 P1: ${d.p1Winner}\n👤 P2: ${d.p2Winner}\n${d.compat}% compatible\nneonarcade.net/neonsocial/veto.html`;
+
+    if (navigator.share) {
+      navigator.share({ title: 'VETO Result', text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('share-status').textContent = 'Copied to clipboard!';
+        setTimeout(() => document.getElementById('share-status').textContent = '', 2000);
+      });
+    }
+  }
+
+  // ===== CATEGORY GRID =====
+  function buildCategoryGrid() {
+    const grid = document.getElementById('cat-grid');
+    grid.innerHTML = '';
+    CATEGORIES.forEach((cat, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'cat-btn';
+      btn.innerHTML = `<span class="cat-emoji">${cat.emoji}</span><span>${cat.name}</span>`;
+      btn.addEventListener('click', () => {
+        playPick();
+        const s = Date.now() % 100000;
+        initBracket(i, s);
+        showScreen('play');
+        renderMatchup();
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  // ===== EVENT LISTENERS =====
+  document.getElementById('btn-start').addEventListener('click', () => {
+    playPick();
+    // Check if P2 mode
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const data = decodeHash(hash);
+      if (data) {
+        isP2 = true;
+        p1Data = data;
+        initBracket(data.catIdx, data.seed);
+        document.getElementById('screen-category').querySelector('.subtitle').textContent =
+          `Category: ${CATEGORIES[data.catIdx].name} — Make your picks!`;
+        showScreen('play');
+        renderMatchup();
+        return;
+      }
+    }
+    isP2 = false;
+    p1Data = null;
+    buildCategoryGrid();
+    showScreen('category');
+  });
+
+  document.getElementById('veto-btn').addEventListener('click', handleVeto);
+
+  document.getElementById('btn-copy-link').addEventListener('click', () => {
+    const url = getChallengeURL();
+    if (navigator.share) {
+      navigator.share({ title: 'VETO Challenge', text: 'Can you beat my bracket?', url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        document.getElementById('copy-status').textContent = 'Link copied to clipboard!';
+        setTimeout(() => document.getElementById('copy-status').textContent = '', 2500);
+      });
+    }
+  });
+
+  document.getElementById('btn-play-again').addEventListener('click', () => {
+    window.location.hash = '';
+    isP2 = false;
+    p1Data = null;
+    buildCategoryGrid();
+    showScreen('category');
+  });
+
+  document.getElementById('btn-reveal-again').addEventListener('click', () => {
+    window.location.hash = '';
+    isP2 = false;
+    p1Data = null;
+    buildCategoryGrid();
+    showScreen('category');
+  });
+
+  document.getElementById('btn-share-result').addEventListener('click', shareResult);
+
+  // ===== KEYBOARD SUPPORT =====
+  document.addEventListener('keydown', (e) => {
+    if (screens.play.classList.contains('active') && !isComplete()) {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === '1') {
+        const cards = document.querySelectorAll('.matchup-card');
+        if (cards[0]) cards[0].click();
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === '2') {
+        const cards = document.querySelectorAll('.matchup-card');
+        if (cards[1]) cards[1].click();
+      } else if (e.key === 'v' || e.key === 'V') {
+        handleVeto();
+      }
+    }
+  });
+
+  // ===== INIT =====
+  // Check for P2 mode on load
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    const data = decodeHash(hash);
+    if (data) {
+      // Show start screen with P2 context
+      document.querySelector('#screen-start .subtitle').textContent =
+        `You've been challenged! Category: ${CATEGORIES[data.catIdx].name}`;
+      document.getElementById('btn-start').textContent = 'ACCEPT CHALLENGE';
+      document.getElementById('btn-start').classList.add('pink');
+    }
+  }
+
+  // Neon.js init
+  if (typeof Neon !== 'undefined') {
+    Neon.init({ game: 'veto', mode: 'high', key: 'neonarcade_neonsocial_veto_scores' });
+  }
+
+})();
+</script>
+</body>
+</html>

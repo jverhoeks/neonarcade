@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Territory Daily — Daily Grid Strategy Puzzle | NEON ARCADE</title>
+<meta name="description" content="Claim your territory on an 8x8 grid. Same puzzle for everyone, every day. Assign colors, build territories, compete globally.">
+<meta name="keywords" content="territory, daily puzzle, grid strategy, color puzzle, territory game, daily game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neondaily/territory-daily.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neondaily/territory-daily.html">
+<meta property="og:title" content="Territory Daily — Daily Grid Strategy Puzzle | NEON ARCADE">
+<meta property="og:description" content="Claim your territory on an 8x8 grid. Same puzzle for everyone, every day.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/territory-daily.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Territory Daily — Daily Grid Strategy Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Claim your territory on an 8x8 grid. Same puzzle for everyone, every day.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/territory-daily.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Territory Daily",
+  "url": "https://neonarcade.net/neondaily/territory-daily.html",
+  "description": "Daily grid strategy puzzle. Claim your territory on an 8x8 grid. Same puzzle for everyone, every day.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/territory-daily.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden; background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif; color: #fff;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+}
+
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 50%);
+}
+
+.screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: 16px; overflow-y: auto; }
+.screen.active { display: flex; }
+
+/* START SCREEN */
+#startScreen { gap: 20px; }
+.title {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(28px, 6vw, 48px);
+  letter-spacing: 6px; text-transform: uppercase; text-align: center;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+}
+.subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(14px, 3vw, 20px);
+  letter-spacing: 3px; text-transform: uppercase; color: var(--text-mid); text-align: center;
+}
+.streak-display {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 16px;
+  color: var(--neon-orange); letter-spacing: 2px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+.already-played {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 16px;
+  color: var(--neon-green); letter-spacing: 1px; text-align: center;
+}
+#startLB { width: 100%; max-width: 400px; margin-top: 8px; }
+
+/* GAME SCREEN */
+#gameScreen { gap: 12px; justify-content: flex-start; padding-top: 12px; }
+.game-header {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; max-width: 420px;
+}
+.game-header .cell-counter {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  color: var(--neon-cyan); letter-spacing: 2px;
+}
+.game-header .score-live {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  color: var(--neon-gold); letter-spacing: 2px;
+}
+
+.grid-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  width: min(90vw, min(90vh - 200px, 400px));
+  height: min(90vw, min(90vh - 200px, 400px));
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 4px;
+  padding: 3px;
+}
+.cell {
+  border-radius: 2px;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+  position: relative;
+}
+.cell.unrevealed { background: rgba(255,255,255,0.03); }
+.cell.revealed-current {
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 12px rgba(255,255,255,0.3), inset 0 0 8px rgba(255,255,255,0.1);
+  animation: pulse-cell 1s ease-in-out infinite;
+}
+@keyframes pulse-cell {
+  0%, 100% { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+  50% { box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+}
+.cell.color-cyan { background: rgba(0,240,255,0.5); box-shadow: inset 0 0 6px rgba(0,240,255,0.3); }
+.cell.color-pink { background: rgba(255,45,123,0.5); box-shadow: inset 0 0 6px rgba(255,45,123,0.3); }
+.cell.color-green { background: rgba(57,255,20,0.5); box-shadow: inset 0 0 6px rgba(57,255,20,0.3); }
+.cell.color-gold { background: rgba(255,215,0,0.5); box-shadow: inset 0 0 6px rgba(255,215,0,0.3); }
+
+.cell.merge-flash { animation: merge-pop 0.3s ease-out; }
+@keyframes merge-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.color-buttons {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  max-width: 420px; width: 100%;
+}
+.color-btn {
+  flex: 1; min-width: 70px; max-width: 100px;
+  padding: 12px 8px; border-radius: 4px; cursor: pointer;
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px;
+  letter-spacing: 1px; text-transform: uppercase; text-align: center;
+  transition: all 0.15s; border: 2px solid;
+}
+.color-btn:hover { transform: scale(1.06); }
+.color-btn:active { transform: scale(0.96); }
+.color-btn.cb-cyan { border-color: var(--neon-cyan); background: rgba(0,240,255,0.1); color: var(--neon-cyan); }
+.color-btn.cb-cyan:hover { background: rgba(0,240,255,0.25); box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+.color-btn.cb-pink { border-color: var(--neon-pink); background: rgba(255,45,123,0.1); color: var(--neon-pink); }
+.color-btn.cb-pink:hover { background: rgba(255,45,123,0.25); box-shadow: 0 0 15px rgba(255,45,123,0.3); }
+.color-btn.cb-green { border-color: var(--neon-green); background: rgba(57,255,20,0.1); color: var(--neon-green); }
+.color-btn.cb-green:hover { background: rgba(57,255,20,0.25); box-shadow: 0 0 15px rgba(57,255,20,0.3); }
+.color-btn.cb-gold { border-color: var(--neon-gold); background: rgba(255,215,0,0.1); color: var(--neon-gold); }
+.color-btn.cb-gold:hover { background: rgba(255,215,0,0.25); box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+
+.territory-scores {
+  display: flex; gap: 12px; font-family: 'Orbitron', monospace; font-size: 12px;
+  letter-spacing: 1px;
+}
+.territory-scores span { opacity: 0.8; }
+.ts-cyan { color: var(--neon-cyan); }
+.ts-pink { color: var(--neon-pink); }
+.ts-green { color: var(--neon-green); }
+.ts-gold { color: var(--neon-gold); }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
+  color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* END SCREEN */
+#endScreen { gap: 16px; overflow-y: auto; justify-content: flex-start; padding-top: 20px; padding-bottom: 40px; }
+.end-title {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(22px, 5vw, 36px);
+  color: var(--neon-gold); letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.2);
+}
+.end-grid-container {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  width: min(70vw, 280px);
+  height: min(70vw, 280px);
+  border-radius: 4px;
+  padding: 2px;
+}
+.end-cell { border-radius: 2px; }
+
+.score-breakdown {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  width: 100%; max-width: 360px;
+}
+.score-row {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 6px 16px;
+  background: rgba(255,255,255,0.03); border-radius: 3px;
+  font-family: 'Orbitron', monospace; font-size: 13px; letter-spacing: 1px;
+}
+.score-row .color-label { display: flex; align-items: center; gap: 8px; }
+.color-dot { width: 12px; height: 12px; border-radius: 2px; }
+.score-total {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 28px;
+  color: var(--neon-gold); letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+.score-total-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 14px;
+  color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase;
+}
+
+.end-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.08);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.2); box-shadow: 0 0 15px rgba(57,255,20,0.2); }
+.copied-msg {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px;
+  color: var(--neon-green); letter-spacing: 1px; min-height: 20px;
+}
+
+.countdown {
+  font-family: 'Orbitron', monospace; font-weight: 400; font-size: 13px;
+  color: var(--text-dim); letter-spacing: 2px;
+}
+.countdown span { color: var(--neon-cyan); }
+
+#endLB { width: 100%; max-width: 400px; margin-top: 4px; }
+
+/* Keyboard shortcut hints in buttons */
+.key-hint {
+  display: inline-block; margin-left: 4px;
+  font-size: 10px; opacity: 0.5;
+}
+
+@media (max-width: 500px) {
+  .color-btn { padding: 14px 6px; font-size: 10px; min-width: 60px; }
+  .key-hint { display: none; }
+}
+
+/* Screen shake */
+@keyframes shake {
+  0%, 100% { transform: translate(0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, -3px); }
+}
+.shake { animation: shake 0.25s ease; }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="title">TERRITORY</div>
+  <div class="title" style="font-size: clamp(14px, 3vw, 22px); color: var(--neon-gold); letter-spacing: 8px; margin-top: -8px;">DAILY</div>
+  <div class="subtitle">Claim your territory. Same board. Every day.</div>
+  <div class="streak-display" id="startStreak"></div>
+  <div class="already-played" id="alreadyPlayed" style="display:none;"></div>
+  <button class="play-btn" id="playBtn">PLAY TODAY</button>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="game-header">
+    <div class="cell-counter" id="cellCounter">CELL 1/64</div>
+    <div class="score-live" id="scoreLive">SCORE: 0</div>
+  </div>
+  <div class="grid-container" id="gameGrid"></div>
+  <div class="territory-scores" id="territoryScores">
+    <span class="ts-cyan">C:0</span>
+    <span class="ts-pink">P:0</span>
+    <span class="ts-green">G:0</span>
+    <span class="ts-gold">D:0</span>
+  </div>
+  <div class="color-buttons">
+    <button class="color-btn cb-cyan" data-color="cyan">CYAN<span class="key-hint">[1]</span></button>
+    <button class="color-btn cb-pink" data-color="pink">PINK<span class="key-hint">[2]</span></button>
+    <button class="color-btn cb-green" data-color="green">GREEN<span class="key-hint">[3]</span></button>
+    <button class="color-btn cb-gold" data-color="gold">GOLD<span class="key-hint">[4]</span></button>
+  </div>
+  <div class="controls-hint">Press 1-4 or tap a color</div>
+</div>
+
+<!-- END SCREEN -->
+<div id="endScreen" class="screen">
+  <div class="end-title">TERRITORY CLAIMED</div>
+  <div class="end-grid-container" id="endGrid"></div>
+  <div class="score-breakdown" id="scoreBreakdown"></div>
+  <div class="score-total-label">TOTAL SCORE</div>
+  <div class="score-total" id="finalScore">0</div>
+  <div class="streak-display" id="endStreak"></div>
+  <div class="end-buttons">
+    <button class="share-btn" id="shareBtn">SHARE RESULT</button>
+  </div>
+  <div class="copied-msg" id="copiedMsg"></div>
+  <div class="countdown" id="countdown">NEXT PUZZLE IN <span id="countdownTime">--:--:--</span></div>
+  <div id="endLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ====== CONFIG ======
+  const GRID_SIZE = 8;
+  const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
+  const COLORS = ['cyan', 'pink', 'green', 'gold'];
+  const COLOR_MAP = {
+    cyan: { hex: '#00f0ff', rgb: [0,240,255], emoji: '\u{1f7e6}' },
+    pink: { hex: '#ff2d7b', rgb: [255,45,123], emoji: '\u{1f7ea}' },
+    green: { hex: '#39ff14', rgb: [57,255,20], emoji: '\u{1f7e9}' },
+    gold: { hex: '#ffd700', rgb: [255,215,0], emoji: '\u{1f7e8}' }
+  };
+  const STORAGE_KEY_PREFIX = 'territory_daily_';
+
+  // ====== SEEDED PRNG ======
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function getDayNumber() {
+    var epoch = new Date(2024, 0, 1);
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.floor((today - epoch) / 86400000);
+  }
+
+  function getDateStr() {
+    var now = new Date();
+    return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  }
+
+  function generateRevealOrder(dayNum) {
+    var rng = mulberry32(dayNum * 31337 + 42);
+    var arr = [];
+    for (var i = 0; i < TOTAL_CELLS; i++) arr.push(i);
+    // Fisher-Yates shuffle
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  // ====== AUDIO ======
+  var audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playPlace() {
+    try {
+      var ctx = getAudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
+
+  function playMerge() {
+    try {
+      var ctx = getAudioCtx();
+      [440, 660, 880].forEach(function(freq, i) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.06);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.15);
+        osc.start(ctx.currentTime + i * 0.06);
+        osc.stop(ctx.currentTime + i * 0.06 + 0.15);
+      });
+    } catch(e) {}
+  }
+
+  function playComplete() {
+    try {
+      var ctx = getAudioCtx();
+      [523, 659, 784, 1047].forEach(function(freq, i) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.3);
+        osc.start(ctx.currentTime + i * 0.1);
+        osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+      });
+    } catch(e) {}
+  }
+
+  // ====== DOM REFS ======
+  var startScreen = document.getElementById('startScreen');
+  var gameScreen = document.getElementById('gameScreen');
+  var endScreen = document.getElementById('endScreen');
+  var playBtn = document.getElementById('playBtn');
+  var gameGrid = document.getElementById('gameGrid');
+  var cellCounter = document.getElementById('cellCounter');
+  var scoreLive = document.getElementById('scoreLive');
+  var territoryScoresEl = document.getElementById('territoryScores');
+  var endGrid = document.getElementById('endGrid');
+  var scoreBreakdown = document.getElementById('scoreBreakdown');
+  var finalScoreEl = document.getElementById('finalScore');
+  var shareBtn = document.getElementById('shareBtn');
+  var copiedMsg = document.getElementById('copiedMsg');
+  var startStreak = document.getElementById('startStreak');
+  var endStreak = document.getElementById('endStreak');
+  var alreadyPlayed = document.getElementById('alreadyPlayed');
+  var countdownTimeEl = document.getElementById('countdownTime');
+
+  // ====== GAME STATE ======
+  var grid = []; // 2D array [row][col] = null | 'cyan' | 'pink' | 'green' | 'gold'
+  var revealOrder = [];
+  var currentStep = 0;
+  var dayNumber = 0;
+  var dateStr = '';
+  var gameActive = false;
+
+  // ====== TERRITORY CALC ======
+  function calcTerritories() {
+    var visited = [];
+    for (var r = 0; r < GRID_SIZE; r++) {
+      visited[r] = [];
+      for (var c = 0; c < GRID_SIZE; c++) visited[r][c] = false;
+    }
+    var largest = { cyan: 0, pink: 0, green: 0, gold: 0 };
+
+    for (var r = 0; r < GRID_SIZE; r++) {
+      for (var c = 0; c < GRID_SIZE; c++) {
+        if (visited[r][c] || !grid[r][c]) continue;
+        var color = grid[r][c];
+        var size = 0;
+        var stack = [[r, c]];
+        visited[r][c] = true;
+        while (stack.length) {
+          var p = stack.pop();
+          size++;
+          var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+          for (var d = 0; d < dirs.length; d++) {
+            var nr = p[0] + dirs[d][0], nc = p[1] + dirs[d][1];
+            if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && !visited[nr][nc] && grid[nr][nc] === color) {
+              visited[nr][nc] = true;
+              stack.push([nr, nc]);
+            }
+          }
+        }
+        if (size > largest[color]) largest[color] = size;
+      }
+    }
+    return largest;
+  }
+
+  function calcScore() {
+    var t = calcTerritories();
+    return t.cyan + t.pink + t.green + t.gold;
+  }
+
+  // ====== STREAK ======
+  function getStreakData() {
+    try {
+      var d = JSON.parse(localStorage.getItem(STORAGE_KEY_PREFIX + 'streak'));
+      if (d && typeof d.count === 'number') return d;
+    } catch(e) {}
+    return { count: 0, lastDate: '' };
+  }
+
+  function updateStreak(dateStr) {
+    var sd = getStreakData();
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
+
+    if (sd.lastDate === dateStr) return sd.count; // already updated today
+    if (sd.lastDate === yStr) {
+      sd.count++;
+    } else {
+      sd.count = 1;
+    }
+    sd.lastDate = dateStr;
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'streak', JSON.stringify(sd));
+    return sd.count;
+  }
+
+  function getStreak() {
+    var sd = getStreakData();
+    var today = getDateStr();
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
+    if (sd.lastDate === today || sd.lastDate === yStr) return sd.count;
+    return 0;
+  }
+
+  // ====== DAILY RESULT STORAGE ======
+  function getTodayResult() {
+    try {
+      var d = JSON.parse(localStorage.getItem(STORAGE_KEY_PREFIX + 'result_' + getDateStr()));
+      return d;
+    } catch(e) { return null; }
+  }
+
+  function saveTodayResult(score, territories, gridData) {
+    var obj = { score: score, territories: territories, grid: gridData, date: getDateStr() };
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'result_' + getDateStr(), JSON.stringify(obj));
+  }
+
+  // ====== GRID RENDERING ======
+  function buildGrid(container, interactive) {
+    container.innerHTML = '';
+    for (var i = 0; i < TOTAL_CELLS; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'cell unrevealed';
+      cell.dataset.index = i;
+      container.appendChild(cell);
+    }
+  }
+
+  function updateGridDisplay() {
+    var cells = gameGrid.children;
+    for (var i = 0; i < TOTAL_CELLS; i++) {
+      var r = Math.floor(i / GRID_SIZE), c = i % GRID_SIZE;
+      var cell = cells[i];
+      cell.className = 'cell';
+      if (grid[r][c]) {
+        cell.classList.add('color-' + grid[r][c]);
+      } else if (currentStep < TOTAL_CELLS && revealOrder[currentStep] === i) {
+        cell.classList.add('revealed-current');
+      } else {
+        cell.classList.add('unrevealed');
+      }
+    }
+  }
+
+  function updateScoreDisplay() {
+    var t = calcTerritories();
+    var total = t.cyan + t.pink + t.green + t.gold;
+    scoreLive.textContent = 'SCORE: ' + total;
+    territoryScoresEl.innerHTML =
+      '<span class="ts-cyan">C:' + t.cyan + '</span>' +
+      '<span class="ts-pink">P:' + t.pink + '</span>' +
+      '<span class="ts-green">G:' + t.green + '</span>' +
+      '<span class="ts-gold">D:' + t.gold + '</span>';
+  }
+
+  // ====== PLACE COLOR ======
+  function placeColor(colorName) {
+    if (!gameActive || currentStep >= TOTAL_CELLS) return;
+    var idx = revealOrder[currentStep];
+    var r = Math.floor(idx / GRID_SIZE), c = idx % GRID_SIZE;
+    grid[r][c] = colorName;
+
+    // Check if this forms/extends a territory
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    var merges = false;
+    for (var d = 0; d < dirs.length; d++) {
+      var nr = r + dirs[d][0], nc = c + dirs[d][1];
+      if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && grid[nr][nc] === colorName) {
+        merges = true; break;
+      }
+    }
+
+    if (merges) {
+      playMerge();
+      // Flash merged neighbors
+      var cell = gameGrid.children[idx];
+      cell.classList.add('merge-flash');
+      setTimeout(function() { cell.classList.remove('merge-flash'); }, 300);
+    } else {
+      playPlace();
+    }
+
+    currentStep++;
+    cellCounter.textContent = 'CELL ' + Math.min(currentStep + 1, TOTAL_CELLS) + '/' + TOTAL_CELLS;
+    updateGridDisplay();
+    updateScoreDisplay();
+
+    if (currentStep >= TOTAL_CELLS) {
+      gameActive = false;
+      setTimeout(finishGame, 600);
+    }
+  }
+
+  // ====== FINISH GAME ======
+  function finishGame() {
+    playComplete();
+    var t = calcTerritories();
+    var total = t.cyan + t.pink + t.green + t.gold;
+    var streak = updateStreak(dateStr);
+
+    // Save grid data for result storage
+    var gridData = [];
+    for (var r = 0; r < GRID_SIZE; r++) {
+      gridData[r] = [];
+      for (var c = 0; c < GRID_SIZE; c++) gridData[r][c] = grid[r][c];
+    }
+    saveTodayResult(total, t, gridData);
+
+    showEndScreen(total, t, streak, gridData);
+
+    // Neon.js
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(total);
+    }).then(function(result) {
+      Neon.render(document.getElementById('endLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    }).catch(function() {
+      Neon.render(document.getElementById('endLB'));
+    });
+  }
+
+  function showEndScreen(total, territories, streak, gridData) {
+    showScreen('end');
+
+    // Render end grid
+    endGrid.innerHTML = '';
+    for (var r = 0; r < GRID_SIZE; r++) {
+      for (var c = 0; c < GRID_SIZE; c++) {
+        var cell = document.createElement('div');
+        cell.className = 'end-cell color-' + (gridData[r][c] || 'cyan');
+        endGrid.appendChild(cell);
+      }
+    }
+
+    // Score breakdown
+    scoreBreakdown.innerHTML = '';
+    COLORS.forEach(function(color) {
+      var row = document.createElement('div');
+      row.className = 'score-row';
+      row.innerHTML =
+        '<div class="color-label"><div class="color-dot" style="background:' + COLOR_MAP[color].hex + '"></div>' +
+        '<span style="color:' + COLOR_MAP[color].hex + '">' + color.toUpperCase() + '</span></div>' +
+        '<span style="color:' + COLOR_MAP[color].hex + '">' + territories[color] + '</span>';
+      scoreBreakdown.appendChild(row);
+    });
+
+    finalScoreEl.textContent = total;
+    endStreak.textContent = streak > 0 ? 'STREAK: ' + streak + ' \uD83D\uDD25' : '';
+
+    startCountdown();
+  }
+
+  // ====== SHARE ======
+  function buildShareText() {
+    var result = getTodayResult();
+    if (!result) return '';
+    var t = result.territories;
+    var streak = getStreak();
+    var text = '\uD83D\uDDFA\uFE0F TERRITORY DAILY #' + dayNumber + '\n';
+    text += COLOR_MAP.cyan.emoji + ' ' + t.cyan + ' ';
+    text += COLOR_MAP.green.emoji + ' ' + t.green + ' ';
+    text += COLOR_MAP.gold.emoji + ' ' + t.gold + ' ';
+    text += COLOR_MAP.pink.emoji + ' ' + t.pink + '\n';
+    text += 'Score: ' + result.score;
+    if (streak > 0) text += ' \u00B7 Streak: ' + streak + ' \uD83D\uDD25';
+    text += '\nneonarcade.net/neondaily/territory-daily.html';
+    return text;
+  }
+
+  shareBtn.addEventListener('click', function() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  });
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      copiedMsg.textContent = 'COPIED TO CLIPBOARD!';
+      setTimeout(function() { copiedMsg.textContent = ''; }, 2500);
+    }).catch(function() {
+      copiedMsg.textContent = 'COULD NOT COPY';
+      setTimeout(function() { copiedMsg.textContent = ''; }, 2500);
+    });
+  }
+
+  // ====== COUNTDOWN ======
+  var countdownInterval = null;
+  function startCountdown() {
+    if (countdownInterval) clearInterval(countdownInterval);
+    function tick() {
+      var now = new Date();
+      var tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      var diff = tomorrow - now;
+      var h = Math.floor(diff / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      countdownTimeEl.textContent =
+        String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
+
+  // ====== SCREEN MANAGEMENT ======
+  function showScreen(name) {
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    endScreen.classList.remove('active');
+    if (name === 'start') startScreen.classList.add('active');
+    else if (name === 'game') gameScreen.classList.add('active');
+    else if (name === 'end') endScreen.classList.add('active');
+  }
+
+  // ====== START GAME ======
+  function startGame() {
+    dayNumber = getDayNumber();
+    dateStr = getDateStr();
+    revealOrder = generateRevealOrder(dayNumber);
+
+    // Init grid
+    grid = [];
+    for (var r = 0; r < GRID_SIZE; r++) {
+      grid[r] = [];
+      for (var c = 0; c < GRID_SIZE; c++) grid[r][c] = null;
+    }
+    currentStep = 0;
+    gameActive = true;
+
+    buildGrid(gameGrid, true);
+    cellCounter.textContent = 'CELL 1/' + TOTAL_CELLS;
+    scoreLive.textContent = 'SCORE: 0';
+    updateGridDisplay();
+    updateScoreDisplay();
+    showScreen('game');
+  }
+
+  // ====== INIT ======
+  function init() {
+    dayNumber = getDayNumber();
+    dateStr = getDateStr();
+
+    // Init Neon.js
+    Neon.init({
+      game: 'territory-daily',
+      mode: 'high',
+      key: 'neonarcade_neondaily_territorydaily_scores'
+    });
+
+    // Show streak
+    var streak = getStreak();
+    if (streak > 0) {
+      startStreak.textContent = 'STREAK: ' + streak + ' \uD83D\uDD25';
+    } else {
+      startStreak.textContent = '';
+    }
+
+    // Check if already played today
+    var todayResult = getTodayResult();
+    if (todayResult) {
+      alreadyPlayed.style.display = 'block';
+      alreadyPlayed.textContent = 'TODAY\'S SCORE: ' + todayResult.score + ' \u2014 COME BACK TOMORROW!';
+      playBtn.textContent = 'VIEW RESULT';
+      playBtn.onclick = function() {
+        var t = todayResult.territories;
+        showEndScreen(todayResult.score, t, getStreak(), todayResult.grid);
+      };
+    } else {
+      alreadyPlayed.style.display = 'none';
+      playBtn.textContent = 'PLAY TODAY';
+      playBtn.onclick = startGame;
+    }
+
+    // Render start leaderboard
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  // ====== INPUT HANDLERS ======
+  // Color buttons
+  document.querySelectorAll('.color-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      placeColor(btn.dataset.color);
+    });
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    if (!gameActive) return;
+    var key = e.key;
+    if (key === '1' || key === 'q' || key === 'Q') placeColor('cyan');
+    else if (key === '2' || key === 'w' || key === 'W') placeColor('pink');
+    else if (key === '3' || key === 'e' || key === 'E') placeColor('green');
+    else if (key === '4' || key === 'r' || key === 'R') placeColor('gold');
+  });
+
+  // ====== START ======
+  init();
+})();
+</script>
+</body>
+</html>

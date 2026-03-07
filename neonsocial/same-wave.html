@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SAME WAVE — NEON ARCADE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app {
+  position: relative; z-index: 1;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  padding: 20px;
+  text-align: center;
+}
+.screen.active { display: flex; }
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(32px, 8vw, 56px);
+  letter-spacing: 6px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 20px);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 30px;
+  max-width: 500px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.play-btn:active { transform: scale(0.97); }
+
+.play-btn.pink {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(255,45,123,0.06);
+}
+.play-btn.pink:hover {
+  background: rgba(255,45,123,0.15);
+  box-shadow: 0 0 20px rgba(255,45,123,0.2);
+}
+
+.play-btn.green {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(57,255,20,0.06);
+}
+.play-btn.green:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+}
+
+.play-btn.gold {
+  border-color: var(--neon-gold);
+  color: var(--neon-gold);
+  background: rgba(255,215,0,0.06);
+}
+.play-btn.gold:hover {
+  background: rgba(255,215,0,0.15);
+  box-shadow: 0 0 20px rgba(255,215,0,0.2);
+}
+
+/* Name input */
+.name-input {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  padding: 12px 20px;
+  background: rgba(0,240,255,0.04);
+  border: 1px solid rgba(0,240,255,0.3);
+  border-radius: 3px;
+  color: var(--neon-cyan);
+  text-align: center;
+  outline: none;
+  width: 260px;
+  margin-bottom: 20px;
+}
+.name-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0,240,255,0.15);
+}
+.name-input::placeholder { color: var(--text-dim); }
+
+/* Round screen */
+.round-indicator {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  margin-bottom: 15px;
+}
+
+.concept-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: clamp(22px, 5vw, 34px);
+  color: #fff;
+  margin-bottom: 8px;
+  max-width: 600px;
+}
+
+.spectrum-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--neon-purple);
+  margin-bottom: 30px;
+}
+
+.spectrum-container {
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.spectrum-bar {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+  border-radius: 3px;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0,240,255,0.2), 0 0 20px rgba(180,77,255,0.1);
+}
+
+.spectrum-endpoints {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.endpoint {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(10px, 2vw, 12px);
+  letter-spacing: 1px;
+  color: var(--text-mid);
+  max-width: 45%;
+}
+.endpoint.left { text-align: left; }
+.endpoint.right { text-align: right; }
+
+.slider-thumb {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  border: 2px solid #fff;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  box-shadow: 0 0 15px rgba(0,240,255,0.5), 0 0 30px rgba(0,240,255,0.2);
+  z-index: 10;
+  transition: box-shadow 0.2s;
+}
+.slider-thumb:active { cursor: grabbing; }
+.slider-thumb.dragging {
+  box-shadow: 0 0 25px rgba(0,240,255,0.8), 0 0 50px rgba(0,240,255,0.3);
+}
+
+.lock-btn-wrap { margin-top: 10px; }
+
+/* Challenge screen */
+.challenge-link-box {
+  background: rgba(0,240,255,0.04);
+  border: 1px solid rgba(0,240,255,0.2);
+  border-radius: 3px;
+  padding: 12px 18px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  color: var(--text-mid);
+  word-break: break-all;
+  max-width: 450px;
+  margin-bottom: 20px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.copied-toast {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--neon-green);
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-top: 8px;
+}
+.copied-toast.show { opacity: 1; }
+
+/* Reveal screen */
+.reveal-container {
+  width: 90%;
+  max-width: 520px;
+  overflow-y: auto;
+  max-height: 70vh;
+  padding: 10px 0;
+}
+
+.reveal-round {
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+.reveal-round.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-round-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.reveal-concept {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+  text-align: left;
+}
+
+.reveal-score {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.reveal-spectrum {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-align: left;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.reveal-bar-wrap {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  margin-bottom: 4px;
+}
+
+.reveal-bar {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(0,240,255,0.3), rgba(180,77,255,0.3), rgba(255,45,123,0.3));
+  border-radius: 2px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.reveal-marker {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.reveal-marker.p1 {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0,240,255,0.6);
+}
+.reveal-marker.p2 {
+  background: var(--neon-pink);
+  box-shadow: 0 0 8px rgba(255,45,123,0.6);
+}
+
+.reveal-names {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+/* Score summary */
+.total-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(40px, 10vw, 64px);
+  margin: 10px 0 5px;
+}
+
+.rating-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(14px, 3vw, 20px);
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+}
+
+.player-names-summary {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--text-mid);
+  margin-bottom: 15px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+/* Particles */
+.particle {
+  position: fixed;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+.shake { animation: shake 0.25s ease; }
+
+/* Wave decoration */
+.wave-emoji {
+  font-size: clamp(40px, 10vw, 60px);
+  margin-bottom: 10px;
+}
+
+/* Leaderboard container */
+#startLB { margin-top: 20px; width: 90%; max-width: 400px; }
+
+/* Responsive */
+@media (max-height: 600px) {
+  .subtitle { margin-bottom: 15px; }
+  .concept-text { font-size: 22px; margin-bottom: 4px; }
+  .spectrum-label { margin-bottom: 20px; }
+  .spectrum-container { margin-bottom: 25px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="screen active">
+    <div class="wave-emoji">🌊</div>
+    <h1 class="title">SAME WAVE</h1>
+    <p class="subtitle">Place it on the spectrum. Are you on the same wave?</p>
+    <input id="nameInput" class="name-input" type="text" placeholder="YOUR NAME" maxlength="16" autocomplete="off">
+    <button id="btnStart" class="play-btn">START</button>
+    <div id="startLB"></div>
+  </div>
+
+  <!-- ROUND SCREEN -->
+  <div id="screen-round" class="screen">
+    <div id="roundIndicator" class="round-indicator">ROUND 1 / 5</div>
+    <div id="conceptText" class="concept-text"></div>
+    <div id="spectrumLabel" class="spectrum-label"></div>
+    <div class="spectrum-container" id="spectrumContainer">
+      <div class="spectrum-bar" id="spectrumBar">
+        <div class="slider-thumb" id="sliderThumb"></div>
+      </div>
+      <div class="spectrum-endpoints">
+        <span id="endpointLeft" class="endpoint left"></span>
+        <span id="endpointRight" class="endpoint right"></span>
+      </div>
+    </div>
+    <div class="lock-btn-wrap">
+      <button id="btnLock" class="play-btn green">LOCK IN</button>
+    </div>
+  </div>
+
+  <!-- CHALLENGE SCREEN (P1 done) -->
+  <div id="screen-challenge" class="screen">
+    <div class="wave-emoji">🌊</div>
+    <h1 class="title" style="font-size:clamp(24px,6vw,40px);">CHALLENGE A FRIEND</h1>
+    <p class="subtitle">Send this link and see if they're on the same wave as you</p>
+    <div id="challengeLink" class="challenge-link-box"></div>
+    <button id="btnCopyLink" class="play-btn">COPY LINK</button>
+    <div id="copiedToast" class="copied-toast">COPIED!</div>
+  </div>
+
+  <!-- REVEAL SCREEN -->
+  <div id="screen-reveal" class="screen">
+    <div class="player-names-summary" id="revealNames"></div>
+    <div class="reveal-container" id="revealContainer"></div>
+    <div class="total-score" id="totalScore"></div>
+    <div class="rating-text" id="ratingText"></div>
+    <div class="btn-row">
+      <button id="btnShare" class="play-btn pink">SHARE</button>
+      <button id="btnPlayAgain" class="play-btn">PLAY AGAIN</button>
+    </div>
+    <div id="copiedToast2" class="copied-toast">COPIED!</div>
+  </div>
+
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== PROMPTS =====
+  const ALL_PROMPTS = [
+    { left: "Boring", right: "Exciting", concept: "Doing your taxes" },
+    { left: "Boring", right: "Exciting", concept: "A surprise road trip" },
+    { left: "Cold", right: "Hot", concept: "Revenge" },
+    { left: "Cold", right: "Hot", concept: "A cup of coffee at 3pm" },
+    { left: "Easy", right: "Hard", concept: "Making small talk at parties" },
+    { left: "Easy", right: "Hard", concept: "Parallel parking" },
+    { left: "Overrated", right: "Underrated", concept: "Breakfast for dinner" },
+    { left: "Overrated", right: "Underrated", concept: "Going to the gym" },
+    { left: "Scary", right: "Cute", concept: "A spider wearing a tiny hat" },
+    { left: "Scary", right: "Cute", concept: "A robot that follows you around" },
+    { left: "Guilty Pleasure", right: "Proud Hobby", concept: "Watching reality TV" },
+    { left: "Guilty Pleasure", right: "Proud Hobby", concept: "Playing video games" },
+    { left: "Normal", right: "Weird", concept: "Talking to your plants" },
+    { left: "Normal", right: "Weird", concept: "Eating cereal for dinner" },
+    { left: "Worst", right: "Best", concept: "Monday mornings" },
+    { left: "Worst", right: "Best", concept: "Finding money in your pocket" },
+    { left: "Useless", right: "Essential", concept: "A Swiss Army knife" },
+    { left: "Useless", right: "Essential", concept: "Emojis in work emails" },
+    { left: "Ancient", right: "Futuristic", concept: "Libraries" },
+    { left: "Ancient", right: "Futuristic", concept: "Electric scooters" },
+    { left: "Chill", right: "Intense", concept: "Board game night" },
+    { left: "Chill", right: "Intense", concept: "Black Friday shopping" },
+    { left: "Forgettable", right: "Unforgettable", concept: "Your first concert" },
+    { left: "Forgettable", right: "Unforgettable", concept: "Airport food" },
+    { left: "Awkward", right: "Smooth", concept: "First dates" },
+    { left: "Awkward", right: "Smooth", concept: "Leaving a party" },
+    { left: "Illegal", right: "Should Be Mandatory", concept: "Naps at work" },
+    { left: "Illegal", right: "Should Be Mandatory", concept: "Putting pineapple on pizza" },
+    { left: "Disaster", right: "Masterpiece", concept: "Your cooking" },
+    { left: "Disaster", right: "Masterpiece", concept: "Your dance moves" }
+  ];
+
+  const ROUNDS = 5;
+
+  // ===== AUDIO =====
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playTone(freq, dur, type, vol) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol || 0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  }
+
+  function soundSlide(val) {
+    playTone(200 + val * 4, 0.06, 'sine', 0.04);
+  }
+
+  function soundLock() {
+    playTone(600, 0.08, 'square', 0.06);
+    setTimeout(() => playTone(900, 0.12, 'square', 0.06), 80);
+  }
+
+  function soundReveal(i) {
+    setTimeout(() => {
+      playTone(300 + i * 100, 0.15, 'triangle', 0.07);
+      setTimeout(() => playTone(400 + i * 100, 0.2, 'sine', 0.06), 100);
+    }, 0);
+  }
+
+  function soundFinalReveal(score) {
+    const base = score >= 400 ? 500 : score >= 300 ? 400 : 300;
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => playTone(base + i * 80, 0.15, 'triangle', 0.07), i * 100);
+    }
+  }
+
+  // ===== SEEDED RANDOM =====
+  function seededRandom(seed) {
+    let s = seed;
+    return function() {
+      s = (s * 16807 + 0) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  function generateSeed() {
+    return Math.floor(Math.random() * 999999) + 1;
+  }
+
+  function pickPrompts(seed) {
+    const rng = seededRandom(seed);
+    const indices = [];
+    const available = ALL_PROMPTS.map((_, i) => i);
+    for (let i = 0; i < ROUNDS; i++) {
+      const idx = Math.floor(rng() * available.length);
+      indices.push(available[idx]);
+      available.splice(idx, 1);
+    }
+    return indices.map(i => ALL_PROMPTS[i]);
+  }
+
+  // ===== URL HASH PARSING =====
+  function parseHash() {
+    const hash = location.hash.substring(1);
+    if (!hash) return null;
+    const params = {};
+    hash.split('&').forEach(p => {
+      const [k, v] = p.split('=');
+      if (k && v) params[decodeURIComponent(k)] = decodeURIComponent(v);
+    });
+    if (params.n && params.s && params.v) {
+      const vals = params.v.split(',').map(Number);
+      if (vals.length === ROUNDS && vals.every(v => !isNaN(v) && v >= 0 && v <= 100)) {
+        return { name: params.n, seed: parseInt(params.s), values: vals };
+      }
+    }
+    return null;
+  }
+
+  function buildHash(name, seed, values) {
+    return '#n=' + encodeURIComponent(name) + '&s=' + seed + '&v=' + values.join(',');
+  }
+
+  // ===== STATE =====
+  let playerName = '';
+  let isP2 = false;
+  let p1Data = null; // { name, seed, values }
+  let seed = 0;
+  let prompts = [];
+  let currentRound = 0;
+  let sliderValue = 50;
+  let myValues = [];
+  let isDragging = false;
+
+  // ===== DOM =====
+  const $start = document.getElementById('screen-start');
+  const $round = document.getElementById('screen-round');
+  const $challenge = document.getElementById('screen-challenge');
+  const $reveal = document.getElementById('screen-reveal');
+  const $nameInput = document.getElementById('nameInput');
+  const $btnStart = document.getElementById('btnStart');
+  const $roundIndicator = document.getElementById('roundIndicator');
+  const $conceptText = document.getElementById('conceptText');
+  const $spectrumLabel = document.getElementById('spectrumLabel');
+  const $spectrumBar = document.getElementById('spectrumBar');
+  const $spectrumContainer = document.getElementById('spectrumContainer');
+  const $sliderThumb = document.getElementById('sliderThumb');
+  const $endpointLeft = document.getElementById('endpointLeft');
+  const $endpointRight = document.getElementById('endpointRight');
+  const $btnLock = document.getElementById('btnLock');
+  const $challengeLink = document.getElementById('challengeLink');
+  const $btnCopyLink = document.getElementById('btnCopyLink');
+  const $copiedToast = document.getElementById('copiedToast');
+  const $revealContainer = document.getElementById('revealContainer');
+  const $revealNames = document.getElementById('revealNames');
+  const $totalScore = document.getElementById('totalScore');
+  const $ratingText = document.getElementById('ratingText');
+  const $btnShare = document.getElementById('btnShare');
+  const $btnPlayAgain = document.getElementById('btnPlayAgain');
+  const $copiedToast2 = document.getElementById('copiedToast2');
+  const $startLB = document.getElementById('startLB');
+
+  // ===== SCREENS =====
+  function showScreen(el) {
+    [$start, $round, $challenge, $reveal].forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < (count || 12); i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 40 + Math.random() * 80;
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed;
+      const dur = 400 + Math.random() * 400;
+      p.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx}px,${dy}px) scale(0)`, opacity: 0 }
+      ], { duration: dur, easing: 'ease-out' });
+      setTimeout(() => p.remove(), dur);
+    }
+  }
+
+  // ===== INIT =====
+  function init() {
+    if (typeof Neon !== 'undefined') {
+      Neon.init({
+        game: 'same-wave',
+        mode: 'high',
+        key: 'neonarcade_neonsocial_samewave_scores'
+      });
+      Neon.render($startLB);
+    }
+
+    p1Data = parseHash();
+    if (p1Data) {
+      isP2 = true;
+      $btnStart.textContent = 'ACCEPT CHALLENGE';
+      $btnStart.classList.add('pink');
+      // Pre-fill name from localStorage if available
+      const savedName = localStorage.getItem('neonarcade_player_name') || '';
+      $nameInput.value = savedName;
+    } else {
+      const savedName = localStorage.getItem('neonarcade_player_name') || '';
+      $nameInput.value = savedName;
+    }
+
+    showScreen($start);
+  }
+
+  // ===== START GAME =====
+  $btnStart.addEventListener('click', startGame);
+  $nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
+
+  function startGame() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    playerName = $nameInput.value.trim();
+    if (!playerName) {
+      $nameInput.style.borderColor = 'var(--neon-pink)';
+      $nameInput.classList.add('shake');
+      setTimeout(() => { $nameInput.classList.remove('shake'); $nameInput.style.borderColor = ''; }, 300);
+      return;
+    }
+    localStorage.setItem('neonarcade_player_name', playerName);
+
+    if (isP2) {
+      seed = p1Data.seed;
+    } else {
+      seed = generateSeed();
+    }
+    prompts = pickPrompts(seed);
+    currentRound = 0;
+    myValues = [];
+    sliderValue = 50;
+    showRound();
+  }
+
+  // ===== ROUND =====
+  function showRound() {
+    showScreen($round);
+    const prompt = prompts[currentRound];
+    $roundIndicator.textContent = 'ROUND ' + (currentRound + 1) + ' / ' + ROUNDS;
+    $conceptText.textContent = '"' + prompt.concept + '"';
+    $spectrumLabel.textContent = prompt.left + ' \u2190\u2192 ' + prompt.right;
+    $endpointLeft.textContent = prompt.left;
+    $endpointRight.textContent = prompt.right;
+    sliderValue = 50;
+    updateSliderPosition();
+  }
+
+  function updateSliderPosition() {
+    $sliderThumb.style.left = sliderValue + '%';
+  }
+
+  // ===== SLIDER DRAG =====
+  function getSliderValueFromEvent(e) {
+    const rect = $spectrumBar.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    let pct = (clientX - rect.left) / rect.width * 100;
+    pct = Math.max(0, Math.min(100, pct));
+    return Math.round(pct);
+  }
+
+  $sliderThumb.addEventListener('mousedown', e => {
+    isDragging = true;
+    $sliderThumb.classList.add('dragging');
+    e.preventDefault();
+  });
+  $sliderThumb.addEventListener('touchstart', e => {
+    isDragging = true;
+    $sliderThumb.classList.add('dragging');
+    e.preventDefault();
+  }, { passive: false });
+
+  // Also start drag on bar click
+  $spectrumBar.addEventListener('mousedown', e => {
+    isDragging = true;
+    $sliderThumb.classList.add('dragging');
+    sliderValue = getSliderValueFromEvent(e);
+    updateSliderPosition();
+    soundSlide(sliderValue);
+  });
+  $spectrumBar.addEventListener('touchstart', e => {
+    isDragging = true;
+    $sliderThumb.classList.add('dragging');
+    sliderValue = getSliderValueFromEvent(e);
+    updateSliderPosition();
+    soundSlide(sliderValue);
+  }, { passive: false });
+
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    sliderValue = getSliderValueFromEvent(e);
+    updateSliderPosition();
+    soundSlide(sliderValue);
+  });
+  document.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    sliderValue = getSliderValueFromEvent(e);
+    updateSliderPosition();
+    soundSlide(sliderValue);
+    e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    $sliderThumb.classList.remove('dragging');
+  });
+  document.addEventListener('touchend', () => {
+    isDragging = false;
+    $sliderThumb.classList.remove('dragging');
+  });
+
+  // Keyboard controls
+  document.addEventListener('keydown', e => {
+    if (!$round.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') {
+      sliderValue = Math.max(0, sliderValue - 2);
+      updateSliderPosition();
+      soundSlide(sliderValue);
+    } else if (e.key === 'ArrowRight') {
+      sliderValue = Math.min(100, sliderValue + 2);
+      updateSliderPosition();
+      soundSlide(sliderValue);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      lockIn();
+      e.preventDefault();
+    }
+  });
+
+  // ===== LOCK IN =====
+  $btnLock.addEventListener('click', lockIn);
+
+  function lockIn() {
+    if (!$round.classList.contains('active')) return;
+    myValues.push(sliderValue);
+    soundLock();
+
+    const rect = $btnLock.getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top, 'var(--neon-green)', 10);
+
+    currentRound++;
+    if (currentRound < ROUNDS) {
+      sliderValue = 50;
+      setTimeout(showRound, 300);
+    } else {
+      setTimeout(() => {
+        if (isP2) {
+          showReveal();
+        } else {
+          showChallenge();
+        }
+      }, 300);
+    }
+  }
+
+  // ===== CHALLENGE (P1 DONE) =====
+  function showChallenge() {
+    showScreen($challenge);
+    const baseUrl = location.origin + location.pathname;
+    const hash = buildHash(playerName, seed, myValues);
+    const fullLink = baseUrl + hash;
+    $challengeLink.textContent = fullLink;
+
+    $btnCopyLink.onclick = () => {
+      navigator.clipboard.writeText(fullLink).then(() => {
+        $copiedToast.classList.add('show');
+        setTimeout(() => $copiedToast.classList.remove('show'), 2000);
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = fullLink;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        $copiedToast.classList.add('show');
+        setTimeout(() => $copiedToast.classList.remove('show'), 2000);
+      });
+    };
+  }
+
+  // ===== REVEAL =====
+  function showReveal() {
+    showScreen($reveal);
+
+    const p1Name = p1Data.name;
+    const p2Name = playerName;
+    const p1Vals = p1Data.values;
+    const p2Vals = myValues;
+
+    $revealNames.textContent = p1Name + ' & ' + p2Name;
+    $revealContainer.innerHTML = '';
+
+    let totalScore = 0;
+    const roundScores = [];
+    const roundEmojis = [];
+
+    for (let i = 0; i < ROUNDS; i++) {
+      const diff = Math.abs(p1Vals[i] - p2Vals[i]);
+      const score = Math.max(0, Math.round(100 - diff));
+      totalScore += score;
+      roundScores.push(score);
+      roundEmojis.push(score >= 90 ? '\uD83C\uDFAF' : score >= 60 ? '\u2705' : '\u274C');
+
+      const prompt = prompts[i];
+      const div = document.createElement('div');
+      div.className = 'reveal-round';
+      div.innerHTML =
+        '<div class="reveal-round-header">' +
+          '<span class="reveal-concept">"' + prompt.concept + '"</span>' +
+          '<span class="reveal-score" style="color:' + (score >= 90 ? 'var(--neon-green)' : score >= 60 ? 'var(--neon-gold)' : 'var(--neon-pink)') + '">+' + score + '</span>' +
+        '</div>' +
+        '<div class="reveal-spectrum">' + prompt.left + ' \u2190\u2192 ' + prompt.right + '</div>' +
+        '<div class="reveal-bar-wrap">' +
+          '<div class="reveal-bar"></div>' +
+          '<div class="reveal-marker p1" style="left:0%" data-target="' + p1Vals[i] + '"></div>' +
+          '<div class="reveal-marker p2" style="left:0%" data-target="' + p2Vals[i] + '"></div>' +
+        '</div>' +
+        '<div class="reveal-names"><span style="color:var(--neon-cyan)">' + p1Name + '</span><span style="color:var(--neon-pink)">' + p2Name + '</span></div>';
+
+      $revealContainer.appendChild(div);
+    }
+
+    // Animate reveal
+    const rounds = $revealContainer.querySelectorAll('.reveal-round');
+    rounds.forEach((rd, i) => {
+      setTimeout(() => {
+        rd.classList.add('visible');
+        soundReveal(i);
+        // Animate markers
+        const markers = rd.querySelectorAll('.reveal-marker');
+        setTimeout(() => {
+          markers.forEach(m => {
+            m.style.left = m.dataset.target + '%';
+          });
+        }, 100);
+      }, i * 600);
+    });
+
+    // Show total after all rounds
+    setTimeout(() => {
+      $totalScore.textContent = totalScore + ' / 500';
+      const { rating, color } = getRating(totalScore);
+      $ratingText.textContent = rating;
+      $ratingText.style.color = color;
+      $totalScore.style.color = color;
+      $totalScore.style.textShadow = '0 0 15px ' + color + ', 0 0 40px ' + color + '80';
+      soundFinalReveal(totalScore);
+
+      const rect = $totalScore.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, color, 20);
+
+      // Save score via Neon
+      if (typeof Neon !== 'undefined') {
+        const nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+        nameReady.then(() => Neon.save(totalScore)).then(result => {
+          if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+            Neon.showGlobalSplash(result.globalRank);
+          }
+        }).catch(() => {});
+      }
+
+      // Share button
+      $btnShare.onclick = () => {
+        const shareText = '\uD83C\uDF0A SAME WAVE\n' +
+          p1Name + ' & ' + p2Name + ' \u2014 ' + totalScore + '/500\n' +
+          rating + '\n' +
+          roundEmojis.join('') + '\n' +
+          'neonarcade.net/neonsocial/same-wave.html';
+
+        if (navigator.share) {
+          navigator.share({ text: shareText }).catch(() => {
+            copyText(shareText);
+          });
+        } else {
+          copyText(shareText);
+        }
+      };
+    }, ROUNDS * 600 + 400);
+  }
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      $copiedToast2.classList.add('show');
+      setTimeout(() => $copiedToast2.classList.remove('show'), 2000);
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      $copiedToast2.classList.add('show');
+      setTimeout(() => $copiedToast2.classList.remove('show'), 2000);
+    });
+  }
+
+  function getRating(score) {
+    if (score >= 500) return { rating: 'TELEPATHIC', color: 'var(--neon-green)' };
+    if (score >= 400) return { rating: 'SAME WAVE', color: 'var(--neon-cyan)' };
+    if (score >= 300) return { rating: 'CLOSE', color: 'var(--neon-gold)' };
+    if (score >= 200) return { rating: 'DRIFTING', color: 'var(--neon-orange)' };
+    return { rating: 'DIFFERENT WAVELENGTH', color: 'var(--neon-pink)' };
+  }
+
+  // ===== PLAY AGAIN =====
+  $btnPlayAgain.addEventListener('click', () => {
+    isP2 = false;
+    p1Data = null;
+    history.replaceState(null, '', location.pathname);
+    $btnStart.textContent = 'START';
+    $btnStart.classList.remove('pink');
+    $nameInput.value = playerName;
+    myValues = [];
+    currentRound = 0;
+    showScreen($start);
+  });
+
+  // ===== GO =====
+  init();
+})();
+</script>
+</body>
+</html>

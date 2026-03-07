@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MIMIC — How Well Do They Know You?</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #4a4a6a;
+  --text-mid: #8888aa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0,240,255,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(255,45,123,0.04) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+
+.screen {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  padding: 20px; z-index: 1; overflow-y: auto;
+}
+.screen.active { display: flex; }
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900; font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: 8px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: clamp(16px, 3vw, 22px);
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 30px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+
+.name-input {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 22px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--text-dim);
+  color: #fff; padding: 12px 20px; border-radius: 3px;
+  text-align: center; width: min(300px, 80vw); margin-bottom: 20px;
+  outline: none; transition: border-color 0.2s;
+}
+.name-input:focus { border-color: var(--neon-cyan); }
+.name-input::placeholder { color: var(--text-dim); }
+
+.question-num {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.question-text {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: clamp(22px, 5vw, 34px);
+  text-align: center; margin-bottom: 40px;
+  color: #fff; max-width: 500px;
+}
+
+.friend-hint {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--neon-purple); margin-bottom: 8px;
+}
+
+.choices {
+  display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+  width: 100%; max-width: 520px;
+}
+
+.choice-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: clamp(14px, 3vw, 18px); letter-spacing: 2px;
+  padding: 20px 10px; width: min(240px, 42vw);
+  border-radius: 4px; cursor: pointer;
+  text-transform: uppercase; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 70px; text-align: center;
+}
+
+.choice-a {
+  border: 2px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+}
+.choice-a:hover {
+  background: rgba(0,240,255,0.18);
+  box-shadow: 0 0 25px rgba(0,240,255,0.25);
+  transform: scale(1.05);
+}
+
+.choice-b {
+  border: 2px solid var(--neon-pink); background: rgba(255,45,123,0.06);
+  color: var(--neon-pink);
+}
+.choice-b:hover {
+  background: rgba(255,45,123,0.18);
+  box-shadow: 0 0 25px rgba(255,45,123,0.25);
+  transform: scale(1.05);
+}
+
+.progress-dots {
+  display: flex; gap: 8px; margin-top: 30px;
+}
+.dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--text-dim); transition: all 0.3s;
+}
+.dot.answered { background: var(--neon-cyan); box-shadow: 0 0 8px rgba(0,240,255,0.5); }
+.dot.current { background: var(--neon-gold); box-shadow: 0 0 8px rgba(255,215,0,0.5); transform: scale(1.3); }
+
+/* Challenge screen */
+.challenge-link-box {
+  background: var(--bg-surface); border: 1px solid var(--text-dim);
+  border-radius: 4px; padding: 14px 20px; margin: 16px 0;
+  max-width: min(500px, 85vw); width: 100%; word-break: break-all;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px;
+  color: var(--text-mid); text-align: center;
+  max-height: 80px; overflow: hidden;
+}
+
+.copy-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; padding: 12px 30px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.08);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.copy-btn:hover {
+  background: rgba(57,255,20,0.2);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+}
+
+/* Reveal screen */
+.reveal-header {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(28px, 6vw, 48px); letter-spacing: 4px;
+  margin-bottom: 4px;
+}
+.reveal-pct { color: var(--neon-green); }
+.reveal-pct.low { color: var(--neon-pink); }
+.reveal-pct.mid { color: var(--neon-gold); }
+
+.reveal-names {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: 16px; letter-spacing: 2px; color: var(--text-mid);
+  text-transform: uppercase; margin-bottom: 24px;
+}
+
+.reveal-list {
+  width: min(500px, 90vw); max-height: 45vh; overflow-y: auto;
+  margin-bottom: 20px;
+  scrollbar-width: thin; scrollbar-color: var(--text-dim) transparent;
+}
+
+.reveal-row {
+  display: flex; align-items: center; padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  gap: 10px;
+}
+
+.reveal-icon {
+  font-size: 20px; width: 28px; text-align: center; flex-shrink: 0;
+}
+
+.reveal-q {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500;
+  font-size: 13px; color: var(--text-dim); flex: 1; min-width: 0;
+}
+
+.reveal-answers {
+  display: flex; gap: 6px; flex-shrink: 0;
+}
+
+.reveal-ans {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: 12px; letter-spacing: 1px; padding: 3px 8px;
+  border-radius: 3px; text-transform: uppercase;
+}
+.reveal-ans.match { background: rgba(57,255,20,0.12); color: var(--neon-green); border: 1px solid rgba(57,255,20,0.3); }
+.reveal-ans.mismatch { background: rgba(255,45,123,0.1); color: var(--neon-pink); border: 1px solid rgba(255,45,123,0.2); }
+.reveal-ans.original { background: rgba(0,240,255,0.1); color: var(--neon-cyan); border: 1px solid rgba(0,240,255,0.2); }
+
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid var(--neon-purple); background: rgba(180,77,255,0.08);
+  color: var(--neon-purple); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover {
+  background: rgba(180,77,255,0.2);
+  box-shadow: 0 0 20px rgba(180,77,255,0.2);
+}
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 20px;
+}
+
+#startLB { margin-top: 20px; width: min(400px, 85vw); }
+
+.particles-container {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 100;
+}
+.particle {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+}
+.shake { animation: shake 0.25s ease-in-out; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeInUp 0.4s ease-out; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+</style>
+</head>
+<body>
+
+<div class="particles-container" id="particles"></div>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="title">MIMIC</div>
+  <div class="subtitle">How well do they know you?</div>
+  <input class="name-input" id="nameInput" placeholder="Enter your name" maxlength="20" autocomplete="off">
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">Answer 10 questions &middot; Challenge your friends</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- FRIEND START SCREEN (Phase 2 entry) -->
+<div class="screen" id="friendStartScreen">
+  <div class="title" style="font-size:clamp(28px,6vw,48px)">MIMIC</div>
+  <div class="subtitle" style="margin-bottom:12px">Challenge Mode</div>
+  <div class="friend-hint" id="friendPromptName" style="font-size:16px;margin-bottom:20px"></div>
+  <input class="name-input" id="friendNameInput" placeholder="Enter your name" maxlength="20" autocomplete="off">
+  <button class="play-btn" id="friendStartBtn">ACCEPT CHALLENGE</button>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div class="screen" id="questionScreen">
+  <div class="friend-hint" id="friendHint" style="display:none"></div>
+  <div class="question-num" id="questionNum">QUESTION 1 OF 10</div>
+  <div class="question-text" id="questionText"></div>
+  <div class="choices">
+    <button class="choice-btn choice-a" id="choiceA"></button>
+    <button class="choice-btn choice-b" id="choiceB"></button>
+  </div>
+  <div class="progress-dots" id="progressDots"></div>
+</div>
+
+<!-- CHALLENGE SCREEN (after Phase 1) -->
+<div class="screen" id="challengeScreen">
+  <div class="title" style="font-size:clamp(24px,5vw,40px)">CHALLENGE</div>
+  <div class="subtitle">Send this link to a friend!</div>
+  <div class="question-text" style="font-size:clamp(16px,3.5vw,22px);margin-bottom:10px;color:var(--text-mid)">
+    They'll guess your answers.<br>See how well they know you!
+  </div>
+  <div class="challenge-link-box" id="challengeLink"></div>
+  <button class="copy-btn" id="copyLinkBtn">COPY LINK</button>
+  <div class="controls-hint" id="copyStatus" style="margin-top:12px"></div>
+  <div style="margin-top:30px">
+    <button class="play-btn" id="newGameBtn" style="font-size:12px;padding:10px 24px">NEW GAME</button>
+  </div>
+</div>
+
+<!-- REVEAL SCREEN -->
+<div class="screen" id="revealScreen">
+  <div class="reveal-header"><span class="reveal-pct" id="revealPct">80%</span></div>
+  <div class="subtitle" style="margin-bottom:4px">MATCH</div>
+  <div class="reveal-names" id="revealNames"></div>
+  <div class="reveal-list" id="revealList"></div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE RESULT</button>
+    <button class="play-btn" id="playAgainBtn" style="font-size:12px;padding:10px 24px">PLAY AGAIN</button>
+  </div>
+  <div class="controls-hint" id="shareStatus" style="margin-top:10px"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== QUESTIONS (30+ pairs) =====
+  const ALL_QUESTIONS = [
+    ["Beach", "Mountains"],
+    ["Morning", "Night"],
+    ["Dogs", "Cats"],
+    ["Sweet", "Savory"],
+    ["City", "Country"],
+    ["Summer", "Winter"],
+    ["Books", "Movies"],
+    ["Coffee", "Tea"],
+    ["Early Bird", "Night Owl"],
+    ["Introvert", "Extrovert"],
+    ["Pizza", "Sushi"],
+    ["Text", "Call"],
+    ["Rain", "Sunshine"],
+    ["Comedy", "Drama"],
+    ["Past", "Future"],
+    ["Messy", "Tidy"],
+    ["Cook", "Order In"],
+    ["Road Trip", "Fly"],
+    ["Music", "Podcasts"],
+    ["Spicy", "Mild"],
+    ["Planner", "Spontaneous"],
+    ["Hot Shower", "Cold Shower"],
+    ["Window", "Aisle"],
+    ["Ice Cream", "Cake"],
+    ["Horror", "Romance"],
+    ["Sunrise", "Sunset"],
+    ["Camping", "Hotel"],
+    ["Board Games", "Video Games"],
+    ["Chocolate", "Vanilla"],
+    ["Silence", "Background Noise"],
+    ["Pancakes", "Waffles"],
+    ["Stay In", "Go Out"],
+    ["Sneakers", "Boots"],
+    ["Fiction", "Non-Fiction"],
+    ["Solo Travel", "Group Travel"]
+  ];
+
+  // ===== AUDIO =====
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+  }
+
+  function playTone(freq, duration, type, vol) {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol || 0.12;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + duration);
+  }
+
+  function sndClick() { playTone(600, 0.08, 'square', 0.08); }
+  function sndMatch() { playTone(800, 0.15, 'sine', 0.1); setTimeout(() => playTone(1200, 0.2, 'sine', 0.1), 100); }
+  function sndMismatch() { playTone(200, 0.2, 'sawtooth', 0.08); }
+  function sndReveal() {
+    [0,80,160,240,320].forEach((d,i) => setTimeout(() => playTone(400 + i*150, 0.2, 'sine', 0.1), d));
+  }
+
+  // ===== PARTICLES =====
+  const particlesEl = document.getElementById('particles');
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < (count || 12); i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 3 + Math.random() * 5;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      particlesEl.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 60 + Math.random() * 120;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      let opacity = 1;
+      const start = performance.now();
+      function anim(t) {
+        const dt = (t - start) / 1000;
+        opacity = Math.max(0, 1 - dt * 2);
+        p.style.left = (x + vx * dt) + 'px';
+        p.style.top = (y + vy * dt - 30 * dt) + 'px';
+        p.style.opacity = opacity;
+        if (opacity > 0) requestAnimationFrame(anim);
+        else p.remove();
+      }
+      requestAnimationFrame(anim);
+    }
+  }
+
+  // ===== SEEDED RANDOM =====
+  function seededRandom(seed) {
+    let s = seed;
+    return function() {
+      s = (s * 16807 + 0) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  function selectQuestions(seed) {
+    const rng = seededRandom(seed);
+    const indices = ALL_QUESTIONS.map((_, i) => i);
+    // Fisher-Yates shuffle with seeded rng
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices.slice(0, 10);
+  }
+
+  // ===== URL ENCODING / DECODING =====
+  function encodeChallenge(name, seed, answers) {
+    // answers is array of 0/1
+    const bits = answers.map(a => a.toString()).join('');
+    const data = name + '|' + seed + '|' + bits;
+    // Base64 URL-safe
+    return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function decodeChallenge(hash) {
+    try {
+      let b64 = hash.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      const data = atob(b64);
+      const parts = data.split('|');
+      if (parts.length !== 3) return null;
+      const name = parts[0];
+      const seed = parseInt(parts[1], 10);
+      const bits = parts[2];
+      if (isNaN(seed) || bits.length !== 10) return null;
+      const answers = bits.split('').map(Number);
+      return { name, seed, answers };
+    } catch (e) { return null; }
+  }
+
+  // ===== DOM REFS =====
+  const screens = {
+    start: document.getElementById('startScreen'),
+    friendStart: document.getElementById('friendStartScreen'),
+    question: document.getElementById('questionScreen'),
+    challenge: document.getElementById('challengeScreen'),
+    reveal: document.getElementById('revealScreen')
+  };
+
+  const nameInput = document.getElementById('nameInput');
+  const startBtn = document.getElementById('startBtn');
+  const friendNameInput = document.getElementById('friendNameInput');
+  const friendStartBtn = document.getElementById('friendStartBtn');
+  const friendPromptName = document.getElementById('friendPromptName');
+  const friendHint = document.getElementById('friendHint');
+  const questionNum = document.getElementById('questionNum');
+  const questionText = document.getElementById('questionText');
+  const choiceA = document.getElementById('choiceA');
+  const choiceB = document.getElementById('choiceB');
+  const progressDots = document.getElementById('progressDots');
+  const challengeLink = document.getElementById('challengeLink');
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  const copyStatus = document.getElementById('copyStatus');
+  const newGameBtn = document.getElementById('newGameBtn');
+  const revealPct = document.getElementById('revealPct');
+  const revealNames = document.getElementById('revealNames');
+  const revealList = document.getElementById('revealList');
+  const shareBtn = document.getElementById('shareBtn');
+  const shareStatus = document.getElementById('shareStatus');
+  const playAgainBtn = document.getElementById('playAgainBtn');
+
+  // ===== GAME STATE =====
+  let mode = 'creator'; // 'creator' or 'guesser'
+  let playerName = '';
+  let friendName = '';
+  let seed = 0;
+  let questionIndices = [];
+  let currentQ = 0;
+  let answers = [];
+  let originalAnswers = []; // for guesser mode
+  let originalName = '';
+
+  // ===== SCREEN MANAGEMENT =====
+  function showScreen(id) {
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[id].classList.add('active');
+    screens[id].classList.add('fade-in');
+  }
+
+  // ===== INIT =====
+  function init() {
+    // Check URL hash for challenge data
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const challenge = decodeChallenge(hash);
+      if (challenge) {
+        mode = 'guesser';
+        originalName = challenge.name;
+        seed = challenge.seed;
+        originalAnswers = challenge.answers;
+        questionIndices = selectQuestions(seed);
+        friendPromptName.textContent = 'Think you know ' + originalName + '?';
+        showScreen('friendStart');
+        return;
+      }
+    }
+    mode = 'creator';
+    showScreen('start');
+  }
+
+  // ===== NEON.JS INIT =====
+  if (typeof Neon !== 'undefined') {
+    Neon.init({
+      game: 'mimic',
+      mode: 'high',
+      key: 'neonarcade_neonsocial_mimic_scores'
+    });
+    try { Neon.render(document.getElementById('startLB')); } catch(e) {}
+  }
+
+  // ===== START GAME (Creator) =====
+  startBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameInput.style.borderColor = 'var(--neon-pink)';
+      nameInput.classList.add('shake');
+      setTimeout(() => { nameInput.classList.remove('shake'); nameInput.style.borderColor = ''; }, 300);
+      return;
+    }
+    sndClick();
+    playerName = name;
+    seed = Math.floor(Math.random() * 2147483646) + 1;
+    questionIndices = selectQuestions(seed);
+    currentQ = 0;
+    answers = [];
+    showScreen('question');
+    renderQuestion();
+  });
+
+  // ===== START GAME (Guesser) =====
+  friendStartBtn.addEventListener('click', () => {
+    const name = friendNameInput.value.trim();
+    if (!name) {
+      friendNameInput.style.borderColor = 'var(--neon-pink)';
+      friendNameInput.classList.add('shake');
+      setTimeout(() => { friendNameInput.classList.remove('shake'); friendNameInput.style.borderColor = ''; }, 300);
+      return;
+    }
+    sndClick();
+    friendName = name;
+    currentQ = 0;
+    answers = [];
+    friendHint.style.display = 'block';
+    friendHint.textContent = 'What would ' + originalName + ' choose?';
+    showScreen('question');
+    renderQuestion();
+  });
+
+  // Allow Enter key on name inputs
+  nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startBtn.click(); });
+  friendNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') friendStartBtn.click(); });
+
+  // ===== RENDER QUESTION =====
+  function renderQuestion() {
+    const qi = questionIndices[currentQ];
+    const q = ALL_QUESTIONS[qi];
+    questionNum.textContent = 'QUESTION ' + (currentQ + 1) + ' OF 10';
+    questionText.textContent = q[0] + ' or ' + q[1] + '?';
+    choiceA.textContent = q[0];
+    choiceB.textContent = q[1];
+
+    // Progress dots
+    progressDots.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if (i < currentQ) dot.classList.add('answered');
+      if (i === currentQ) dot.classList.add('current');
+      progressDots.appendChild(dot);
+    }
+  }
+
+  // ===== CHOICE HANDLERS =====
+  function makeChoice(choice) {
+    sndClick();
+    const btn = choice === 0 ? choiceA : choiceB;
+    const rect = btn.getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2,
+      choice === 0 ? '#00f0ff' : '#ff2d7b', 10);
+
+    answers.push(choice);
+    currentQ++;
+
+    if (currentQ >= 10) {
+      if (mode === 'creator') {
+        showChallengeScreen();
+      } else {
+        showRevealScreen();
+      }
+    } else {
+      // Brief delay for visual feedback
+      setTimeout(renderQuestion, 150);
+    }
+  }
+
+  choiceA.addEventListener('click', () => makeChoice(0));
+  choiceB.addEventListener('click', () => makeChoice(1));
+
+  // Keyboard support: left/right or 1/2
+  document.addEventListener('keydown', (e) => {
+    if (!screens.question.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft' || e.key === '1') makeChoice(0);
+    else if (e.key === 'ArrowRight' || e.key === '2') makeChoice(1);
+  });
+
+  // ===== CHALLENGE SCREEN =====
+  function showChallengeScreen() {
+    const encoded = encodeChallenge(playerName, seed, answers);
+    const url = window.location.origin + window.location.pathname + '#' + encoded;
+    challengeLink.textContent = url;
+    copyStatus.textContent = '';
+    showScreen('challenge');
+    sndReveal();
+
+    // Save a score based on completion (for leaderboard presence)
+    if (typeof Neon !== 'undefined') {
+      try {
+        var nameReady = Neon.getName() ? Promise.resolve() : Promise.resolve(); // don't re-prompt
+        nameReady.then(function() {
+          return Neon.save(10);
+        }).catch(function() {});
+      } catch(e) {}
+    }
+  }
+
+  copyLinkBtn.addEventListener('click', () => {
+    const encoded = encodeChallenge(playerName, seed, answers);
+    const url = window.location.origin + window.location.pathname + '#' + encoded;
+    sndClick();
+    if (navigator.share) {
+      navigator.share({
+        title: 'MIMIC — How well do you know me?',
+        text: playerName + ' challenges you! How well do you know them?',
+        url: url
+      }).catch(() => {
+        fallbackCopy(url);
+      });
+    } else {
+      fallbackCopy(url);
+    }
+  });
+
+  function fallbackCopy(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      copyStatus.textContent = 'LINK COPIED!';
+      copyStatus.style.color = 'var(--neon-green)';
+    }).catch(() => {
+      copyStatus.textContent = 'COULD NOT COPY — SELECT LINK ABOVE';
+      copyStatus.style.color = 'var(--neon-pink)';
+    });
+  }
+
+  // ===== REVEAL SCREEN =====
+  function showRevealScreen() {
+    sndReveal();
+
+    let matches = 0;
+    revealList.innerHTML = '';
+    const matchEmojis = [];
+
+    for (let i = 0; i < 10; i++) {
+      const qi = questionIndices[i];
+      const q = ALL_QUESTIONS[qi];
+      const orig = originalAnswers[i];
+      const guess = answers[i];
+      const isMatch = orig === guess;
+      if (isMatch) matches++;
+      matchEmojis.push(isMatch ? '🟢' : '🔴');
+
+      const row = document.createElement('div');
+      row.className = 'reveal-row';
+      row.style.animationDelay = (i * 0.08) + 's';
+
+      const icon = document.createElement('div');
+      icon.className = 'reveal-icon';
+      icon.textContent = isMatch ? '✅' : '❌';
+
+      const qText = document.createElement('div');
+      qText.className = 'reveal-q';
+      qText.textContent = q[0] + ' / ' + q[1];
+
+      const ansBox = document.createElement('div');
+      ansBox.className = 'reveal-answers';
+
+      const origAns = document.createElement('span');
+      origAns.className = 'reveal-ans original';
+      origAns.textContent = q[orig];
+      origAns.title = originalName + "'s answer";
+
+      const guessAns = document.createElement('span');
+      guessAns.className = 'reveal-ans ' + (isMatch ? 'match' : 'mismatch');
+      guessAns.textContent = q[guess];
+      guessAns.title = friendName + "'s guess";
+
+      ansBox.appendChild(origAns);
+      if (!isMatch) ansBox.appendChild(guessAns);
+
+      row.appendChild(icon);
+      row.appendChild(qText);
+      row.appendChild(ansBox);
+      revealList.appendChild(row);
+
+      // Sound per row with delay
+      setTimeout(() => {
+        if (isMatch) sndMatch(); else sndMismatch();
+      }, 200 + i * 120);
+    }
+
+    const pct = matches * 10;
+    revealPct.textContent = pct + '%';
+    revealPct.className = 'reveal-pct' + (pct >= 70 ? '' : pct >= 40 ? ' mid' : ' low');
+    revealNames.textContent = originalName + ' & ' + friendName;
+
+    showScreen('reveal');
+
+    // Particles burst for score
+    setTimeout(() => {
+      const el = revealPct;
+      const rect = el.getBoundingClientRect();
+      const color = pct >= 70 ? '#39ff14' : pct >= 40 ? '#ffd700' : '#ff2d7b';
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, color, 20);
+    }, 300);
+
+    // Save match score
+    if (typeof Neon !== 'undefined') {
+      try {
+        Neon.save(pct).catch(function() {});
+      } catch(e) {}
+    }
+
+    // Store share data
+    window._mimicShareData = {
+      originalName, friendName, pct, matchEmojis
+    };
+  }
+
+  // ===== SHARE RESULT =====
+  shareBtn.addEventListener('click', () => {
+    sndClick();
+    const d = window._mimicShareData;
+    if (!d) return;
+    const text = '🎭 MIMIC\n' +
+      d.originalName + ' & ' + d.friendName + ' — ' + d.pct + '% match!\n' +
+      d.matchEmojis.join('') + '\n' +
+      'neonarcade.net/neonsocial/mimic.html';
+
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => fallbackShareCopy(text));
+    } else {
+      fallbackShareCopy(text);
+    }
+  });
+
+  function fallbackShareCopy(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      shareStatus.textContent = 'COPIED TO CLIPBOARD!';
+      shareStatus.style.color = 'var(--neon-green)';
+    }).catch(() => {
+      shareStatus.textContent = 'COULD NOT COPY';
+      shareStatus.style.color = 'var(--neon-pink)';
+    });
+  }
+
+  // ===== PLAY AGAIN / NEW GAME =====
+  function resetGame() {
+    window.location.hash = '';
+    mode = 'creator';
+    playerName = '';
+    friendName = '';
+    answers = [];
+    currentQ = 0;
+    nameInput.value = '';
+    friendHint.style.display = 'none';
+    showScreen('start');
+  }
+
+  newGameBtn.addEventListener('click', () => { sndClick(); resetGame(); });
+  playAgainBtn.addEventListener('click', () => { sndClick(); resetGame(); });
+
+  // ===== LAUNCH =====
+  init();
+})();
+</script>
+</body>
+</html>

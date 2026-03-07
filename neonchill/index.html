@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON CHILL — Free Relaxing Online Games | Zen Browser Games</title>
+<meta name="description" content="Unwind with beautiful, pressure-free browser games. Draw with light, grow neon gardens, connect constellations. No timer. No score. Just vibes.">
+<meta name="keywords" content="relaxing games, zen games, chill browser games, creative games, no pressure games, generative art games">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonchill/">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonchill/">
+<meta property="og:title" content="NEON CHILL — Free Relaxing Online Games | Zen Browser Games">
+<meta property="og:description" content="Unwind with beautiful, pressure-free browser games. Draw with light, grow neon gardens, connect constellations. No timer. No score. Just vibes.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonchill/">
+<meta name="twitter:title" content="NEON CHILL — Free Relaxing Online Games | Zen Browser Games">
+<meta name="twitter:description" content="Unwind with beautiful, pressure-free browser games. Draw with light, grow neon gardens, connect constellations. No timer. No score. Just vibes.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "NEON CHILL",
+  "url": "https://neonarcade.net/neonchill/",
+  "description": "Unwind with beautiful, pressure-free browser games. Draw with light, grow neon gardens, connect constellations.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #4a4a6a;
+    --text-mid: #8888aa;
+    --text-bright: #cccce0;
+    --border: rgba(57,255,20,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(57,255,20,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,240,255,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--neon-green); }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 72px);
+    letter-spacing: 8px;
+    color: var(--neon-green);
+    text-shadow:
+      0 0 10px rgba(57,255,20,0.6),
+      0 0 40px rgba(57,255,20,0.2),
+      0 0 80px rgba(57,255,20,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-cyan);
+    text-shadow:
+      0 0 10px rgba(0,240,255,0.6),
+      0 0 40px rgba(0,240,255,0.2);
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 2.5vw, 16px);
+    color: var(--text-mid);
+    max-width: 600px;
+    margin: 16px auto 0;
+    line-height: 1.6;
+    letter-spacing: 1px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+    margin: 30px auto 0;
+  }
+
+  .stats-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(57,255,20,0.4);
+  }
+
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .games-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(57,255,20,0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(57,255,20,0.08), 0 0 0 1px rgba(57,255,20,0.1);
+  }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-screenshot img { transform: scale(1.03); }
+
+  .card-screenshot .placeholder {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-new {
+    background: rgba(57,255,20,0.15);
+    color: var(--neon-green);
+    border: 1px solid rgba(57,255,20,0.3);
+  }
+
+  .badge-chill {
+    background: rgba(0,240,255,0.12);
+    color: var(--neon-cyan);
+    border: 1px solid rgba(0,240,255,0.3);
+  }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+
+  .meta-item { display: flex; align-items: center; gap: 4px; }
+  .meta-item strong { color: var(--neon-green); font-weight: 700; }
+
+  .card-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--neon-green);
+    transition: all 0.2s;
+  }
+
+  .game-card:hover .card-play { letter-spacing: 4px; color: var(--neon-cyan); }
+
+  .play-arrow { font-size: 16px; transition: transform 0.2s; }
+  .game-card:hover .play-arrow { transform: translateX(4px); }
+
+  .game-card[data-accent="cyan"] .card-title { color: var(--neon-cyan); }
+  .game-card[data-accent="cyan"]:hover { border-color: rgba(0,240,255,0.3); box-shadow: 0 8px 32px rgba(0,240,255,0.08); }
+  .game-card[data-accent="green"] .card-title { color: var(--neon-green); }
+  .game-card[data-accent="green"]:hover { border-color: rgba(57,255,20,0.3); box-shadow: 0 8px 32px rgba(57,255,20,0.08); }
+  .game-card[data-accent="purple"] .card-title { color: var(--neon-purple); }
+  .game-card[data-accent="purple"]:hover { border-color: rgba(180,77,255,0.3); box-shadow: 0 8px 32px rgba(180,77,255,0.08); }
+  .game-card[data-accent="pink"] .card-title { color: var(--neon-pink); }
+  .game-card[data-accent="pink"]:hover { border-color: rgba(255,45,123,0.3); box-shadow: 0 8px 32px rgba(255,45,123,0.08); }
+  .game-card[data-accent="gold"] .card-title { color: var(--neon-gold); }
+  .game-card[data-accent="gold"]:hover { border-color: rgba(255,215,0,0.3); box-shadow: 0 8px 32px rgba(255,215,0,0.08); }
+  .game-card[data-accent="orange"] .card-title { color: var(--neon-orange); }
+  .game-card[data-accent="orange"]:hover { border-color: rgba(255,140,0,0.3); box-shadow: 0 8px 32px rgba(255,140,0,0.08); }
+
+  .coming-soon {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+
+  .coming-soon h3 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .upcoming-list {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .upcoming-item {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #3a3a5a;
+    padding: 6px 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a { color: #6a6a8a; text-decoration: none; transition: color 0.2s; }
+  .credit a:hover { color: var(--neon-green); }
+
+  @media (max-width: 700px) {
+    .games-grid { grid-template-columns: 1fr; padding: 12px 16px 60px; gap: 16px; }
+    header { padding: 40px 16px 16px; }
+    .stats-bar { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <a href="../index.html" class="back-link">&larr; NEON ARCADE</a>
+  <h1 class="logo">NEON<span>CHILL</span></h1>
+  <p class="tagline">No timer &mdash; No score &mdash; Just vibes</p>
+  <p class="header-desc">Beautiful, pressure-free experiences in the NEON ARCADE style. Draw with light, grow gardens, connect stars. Every session creates something unique and shareable.</p>
+  <div class="header-line"></div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-value">4</div>
+    <div class="stat-label">Experiences</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">0</div>
+    <div class="stat-label">Pressure</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">&infin;</div>
+    <div class="stat-label">Vibes</div>
+  </div>
+</div>
+
+<div class="games-grid">
+
+  <!-- 1. SANDFALL -->
+  <a href="sandfall.html" class="game-card" data-accent="orange">
+    <div class="card-screenshot">
+      <img fetchpriority="high" src="/screenshots/sandfall.png" alt="Sandfall" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#9676;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">EXPERIENCE 01</span>
+      <h2 class="card-title">SANDFALL</h2>
+      <p class="card-desc">A falling sand simulation with neon elements. Draw fire, water, sand, plant, lava, and ice &mdash; watch them interact in mesmerizing chain reactions. Every creation is unique.</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>6</strong> elements</span>
+        <span class="meta-item">Simulation</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Sandbox</span>
+        <span class="tag">Physics</span>
+        <span class="tag">Creative</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 2. SILK DRAW -->
+  <a href="silk-draw.html" class="game-card" data-accent="pink">
+    <div class="card-screenshot">
+      <img fetchpriority="high" src="/screenshots/silk-draw.png" alt="Silk Draw" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#10024;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">EXPERIENCE 02</span>
+      <h2 class="card-title">SILK DRAW</h2>
+      <p class="card-desc">Paint with light. Drag to create flowing neon patterns with mirrored symmetry. 2-fold, 4-fold, or 6-fold reflections turn every stroke into generative art.</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>4</strong> symmetry modes</span>
+        <span class="meta-item">Generative Art</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Drawing</span>
+        <span class="tag">Symmetry</span>
+        <span class="tag">Art</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 3. NEON GARDEN -->
+  <a href="neon-garden.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img fetchpriority="high" src="/screenshots/neon-garden.png" alt="Neon Garden" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#127800;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">EXPERIENCE 03</span>
+      <h2 class="card-title">NEON GARDEN</h2>
+      <p class="card-desc">Plant glowing seeds and watch procedural neon flowers bloom. Each flower is unique. Water them to grow larger. Share screenshots of your garden.</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>20</strong> seeds</span>
+        <span class="meta-item">Procedural Flora</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Garden</span>
+        <span class="tag">Procedural</span>
+        <span class="tag">Relaxing</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 4. CONSTELLATION -->
+  <a href="constellation.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img loading="lazy" src="/screenshots/constellation.png" alt="Constellation" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#9733;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">EXPERIENCE 04</span>
+      <h2 class="card-title">CONSTELLATION</h2>
+      <p class="card-desc">Connect twinkling stars to draw constellations on a procedural night sky. Daily sky seed so everyone sees the same stars. Name your creation and share it.</p>
+      <div class="card-meta">
+        <span class="meta-item"><strong>60+</strong> stars</span>
+        <span class="meta-item">Daily Sky</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Stars</span>
+        <span class="tag">Creative</span>
+        <span class="tag">Daily</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+</div>
+
+<div class="coming-soon">
+  <h3>COMING SOON</h3>
+  <div class="upcoming-list">
+    <span class="upcoming-item">WAVE MAKER</span>
+    <span class="upcoming-item">FLOW FIELD</span>
+    <span class="upcoming-item">BEAT GRID</span>
+    <span class="upcoming-item">BLOOMFIELD</span>
+    <span class="upcoming-item">RIFFLOOP</span>
+  </div>
+</div>
+
+<footer>
+  <p>NO TIMER &mdash; NO SCORE &mdash; JUST VIBES</p>
+  <p class="credit">Part of <a href="../index.html">NEON ARCADE</a> &mdash; Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+</body>
+</html>
