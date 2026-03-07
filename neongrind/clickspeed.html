@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Click Speed Test — Free Online CPS Test | NEON ARCADE</title>
+<meta name="description" content="Test your click speed free online. How many clicks per second can you do? Standard, precision, and burst modes.">
+<meta name="keywords" content="click speed test, CPS test, clicks per second, free online game, tapping speed">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neongrind/clickspeed.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neongrind/clickspeed.html">
+<meta property="og:title" content="Click Speed Test — Free Online CPS Test | NEON ARCADE">
+<meta property="og:description" content="Test your click speed. How many clicks per second can you do?">
+<meta property="og:image" content="https://neonarcade.net/screenshots/clickspeed.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Click Speed Test — Free Online CPS Test | NEON ARCADE">
+<meta name="twitter:description" content="Test your click speed. How many clicks per second can you do?">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/clickspeed.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Click Speed Test","url":"https://neonarcade.net/neongrind/clickspeed.html","description":"Test your click speed. Standard, precision, and burst CPS modes.","genre":"Skill","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/screenshots/clickspeed.png","inLanguage":"en","isFamilyFriendly":true}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON GRIND","item":"https://neonarcade.net/neongrind/"},{"@type":"ListItem","position":3,"name":"Click Speed Test","item":"https://neonarcade.net/neongrind/clickspeed.html"}]}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:10;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:10px}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,60px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:6px}
+
+.mode-selector{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap;justify-content:center}
+.mode-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;padding:10px 20px;border:1px solid #4a4a6a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.mode-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.mode-btn.selected{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.1);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+.mode-desc{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#7a7a9a;text-align:center;max-width:340px;min-height:36px}
+
+.start-stats{display:flex;gap:24px;justify-content:center;margin:6px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.3)}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:4px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.play-btn:active{transform:scale(0.97)}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#4a4a6a;text-transform:uppercase;margin-top:4px}
+
+#startLB{width:100%;max-width:400px;margin-top:8px}
+
+/* COUNTDOWN SCREEN */
+#countdownScreen{gap:10px}
+.countdown-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;letter-spacing:3px;color:#8888aa;text-transform:uppercase}
+.countdown-num{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(64px,18vw,120px);color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.6),0 0 60px rgba(255,215,0,0.2);transition:transform 0.15s}
+.countdown-num.pop{transform:scale(1.2)}
+.countdown-mode{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:4px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4);margin-bottom:10px}
+
+/* GAME SCREEN */
+#gameScreen{padding:12px;gap:8px;justify-content:flex-start}
+.game-hud{display:flex;width:100%;max-width:500px;justify-content:space-between;align-items:center;padding:8px 0}
+.hud-block{text-align:center}
+.hud-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#7a7a9a}
+.hud-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(18px,5vw,28px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-value.gold{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.hud-value.pink{color:#ff2d7b;text-shadow:0 0 8px rgba(255,45,123,0.4)}
+
+.progress-bar-wrap{width:100%;max-width:500px;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#00f0ff,#39ff14);border-radius:3px;transition:width 0.1s linear}
+.progress-bar-fill.warning{background:linear-gradient(90deg,#ff8c00,#ff2d7b)}
+
+.click-zone{position:relative;width:100%;max-width:500px;flex:1;min-height:200px;border:2px solid rgba(0,240,255,0.3);border-radius:8px;background:rgba(0,240,255,0.02);cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color 0.1s,box-shadow 0.1s;margin-bottom:40px}
+.click-zone:active{border-color:rgba(0,240,255,0.7);box-shadow:0 0 30px rgba(0,240,255,0.15)}
+.click-zone-label{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,3vw,16px);letter-spacing:4px;color:rgba(0,240,255,0.2);text-transform:uppercase;pointer-events:none;z-index:2}
+.click-zone.pulse{animation:zonePulse 1s ease-in-out infinite}
+@keyframes zonePulse{0%,100%{box-shadow:0 0 10px rgba(0,240,255,0.05)}50%{box-shadow:0 0 25px rgba(0,240,255,0.15)}}
+
+/* Precision target */
+.precision-target{position:absolute;border-radius:50%;border:2px solid #39ff14;background:rgba(57,255,20,0.1);cursor:pointer;pointer-events:all;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px rgba(57,255,20,0.3),inset 0 0 10px rgba(57,255,20,0.1)}
+.precision-target-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#39ff14;box-shadow:0 0 6px rgba(57,255,20,0.8)}
+
+/* Burst round indicator */
+.burst-info{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:3px;color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.4);text-transform:uppercase;margin-bottom:4px}
+.burst-dots{display:flex;gap:6px;margin-bottom:6px}
+.burst-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid #333;background:transparent;transition:all 0.2s}
+.burst-dot.active{border-color:#b44dff;background:#b44dff;box-shadow:0 0 6px rgba(180,77,255,0.5)}
+.burst-dot.done{border-color:#39ff14;background:#39ff14;box-shadow:0 0 6px rgba(57,255,20,0.4)}
+.burst-dot.best{border-color:#ffd700;background:#ffd700;box-shadow:0 0 8px rgba(255,215,0,0.6)}
+
+/* Ripple effects */
+.ripple{position:absolute;border-radius:50%;border:2px solid rgba(0,240,255,0.6);pointer-events:none;animation:rippleOut 0.5s ease-out forwards}
+@keyframes rippleOut{0%{transform:scale(0);opacity:1}100%{transform:scale(3);opacity:0}}
+
+/* Particle effects */
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:particleFly 0.6s ease-out forwards}
+@keyframes particleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}}
+
+/* RESULTS SCREEN */
+#resultsScreen{gap:8px}
+.result-cps{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(40px,12vw,80px);letter-spacing:4px;color:#00f0ff;text-shadow:0 0 15px rgba(0,240,255,0.6),0 0 50px rgba(0,240,255,0.2)}
+.result-unit{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(14px,3vw,20px);letter-spacing:4px;color:#8888aa;margin-top:-4px}
+.result-stats{display:flex;gap:24px;justify-content:center;margin:8px 0;flex-wrap:wrap}
+.result-stat{text-align:center}
+.result-stat .r-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,4vw,24px);color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.3)}
+.result-stat .r-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+.percentile-bar{width:100%;max-width:360px;margin:6px 0}
+.percentile-track{height:16px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;position:relative}
+.percentile-fill{height:100%;border-radius:8px;transition:width 1s ease-out}
+.percentile-label{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;text-align:center;margin-top:4px}
+
+.new-record{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(14px,3vw,18px);letter-spacing:4px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6);animation:recordPulse 0.8s ease-in-out infinite}
+@keyframes recordPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.8;transform:scale(1.05)}}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.play-btn.secondary{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.06);font-size:12px;padding:10px 24px}
+.play-btn.secondary:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.08)}
+.play-btn.share{border-color:#39ff14;color:#39ff14;background:rgba(57,255,20,0.06)}
+.play-btn.share:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 20px rgba(57,255,20,0.2)}
+
+.share-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;color:#39ff14;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);padding:8px 20px;border-radius:3px;opacity:0;transition:opacity 0.3s;z-index:100;pointer-events:none}
+.share-toast.show{opacity:1}
+
+#resultsLB{width:100%;max-width:400px;margin-top:4px}
+
+/* Screen shake */
+.screen-shake{animation:shake 0.25s}
+@keyframes shake{0%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,3px)}80%{transform:translate(2px,-3px)}100%{transform:translate(0)}}
+
+/* More Games nav */
+.na-more-games{position:fixed;bottom:0;left:0;width:100%;z-index:50;background:rgba(10,10,18,0.92);border-top:1px solid rgba(0,240,255,0.08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:700px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:16px;overflow-x:auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:2px;color:#4a4a6a;white-space:nowrap;flex-shrink:0}
+.na-more-links{display:flex;gap:8px;overflow-x:auto;flex:1}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:12px;letter-spacing:1px;color:#7a7a9a;text-decoration:none;padding:4px 12px;border:1px solid rgba(255,255,255,0.06);border-radius:3px;white-space:nowrap;transition:all 0.2s;background:rgba(255,255,255,0.02)}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.2);background:rgba(0,240,255,0.05)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.05)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="main-title">CLICKSPEED</div>
+  <div class="subtitle">HOW FAST CAN YOU CLICK?</div>
+
+  <div class="mode-selector">
+    <button class="mode-btn selected" data-mode="standard">STANDARD</button>
+    <button class="mode-btn" data-mode="precision">PRECISION</button>
+    <button class="mode-btn" data-mode="burst">BURST</button>
+  </div>
+  <div class="mode-desc" id="modeDesc">Raw clicking speed. 5 seconds. Go as fast as you can.</div>
+
+  <div class="start-stats">
+    <div class="start-stat">
+      <div class="stat-val" id="bestCPS">--</div>
+      <div class="stat-lbl">Best CPS</div>
+    </div>
+    <div class="start-stat">
+      <div class="stat-val" id="bestClicks">--</div>
+      <div class="stat-lbl">Best Clicks</div>
+    </div>
+  </div>
+
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">CLICK / TAP TO PLAY</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- COUNTDOWN SCREEN -->
+<div id="countdownScreen" class="screen">
+  <div class="countdown-mode" id="countdownMode">STANDARD</div>
+  <div class="countdown-label">GET READY</div>
+  <div class="countdown-num" id="countdownNum">3</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="burst-info" id="burstInfo" style="display:none">ROUND <span id="burstRound">1</span> / 10</div>
+  <div class="burst-dots" id="burstDots" style="display:none"></div>
+  <div class="game-hud">
+    <div class="hud-block">
+      <div class="hud-label">CPS</div>
+      <div class="hud-value" id="liveCPS">0.0</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">CLICKS</div>
+      <div class="hud-value gold" id="liveClicks">0</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">TIME</div>
+      <div class="hud-value pink" id="liveTime">5.0</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:100%"></div>
+  </div>
+  <div class="click-zone pulse" id="clickZone">
+    <span class="click-zone-label" id="clickZoneLabel">CLICK HERE</span>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="resultsScreen" class="screen">
+  <div class="result-cps" id="resultCPS">0.0</div>
+  <div class="result-unit">CLICKS PER SECOND</div>
+
+  <div class="result-stats">
+    <div class="result-stat">
+      <div class="r-val" id="resultClicks">0</div>
+      <div class="r-lbl">Total Clicks</div>
+    </div>
+    <div class="result-stat">
+      <div class="r-val" id="resultMode">STANDARD</div>
+      <div class="r-lbl">Mode</div>
+    </div>
+    <div class="result-stat">
+      <div class="r-val" id="resultBest">0.0</div>
+      <div class="r-lbl">All-Time Best</div>
+    </div>
+  </div>
+
+  <div class="percentile-bar">
+    <div class="percentile-track">
+      <div class="percentile-fill" id="percentileFill" style="width:0%"></div>
+    </div>
+    <div class="percentile-label" id="percentileLabel">--</div>
+  </div>
+
+  <div class="new-record" id="newRecord" style="display:none">NEW RECORD!</div>
+
+  <div class="btn-row">
+    <button class="play-btn share" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="retryBtn">TRY AGAIN</button>
+    <button class="play-btn secondary" id="switchBtn">SWITCH MODE</button>
+  </div>
+
+  <div id="resultsLB"></div>
+</div>
+
+<div class="share-toast" id="shareToast">COPIED TO CLIPBOARD</div>
+
+<!-- More Games Navigation -->
+<div class="na-more-games">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+      <a href="mathblitz.html" class="na-more-link">MathBlitz</a>
+      <a href="reflex-chain.html" class="na-more-link">Reflex Chain</a>
+      <a href="neurosort.html" class="na-more-link">NeuroSort</a>
+      <a href="/neongrind/" class="na-more-link na-more-hub">&larr; All NEON GRIND Games</a>
+    </div>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ====== CONFIG ======
+  var MODES = {
+    standard: { label: 'STANDARD', duration: 5, desc: 'Raw clicking speed. 5 seconds. Go as fast as you can.' },
+    precision: { label: 'PRECISION', duration: 10, desc: 'Hit shrinking targets. 10 seconds. Misses count against you.' },
+    burst: { label: 'BURST', duration: 1, desc: '10 rounds of 1-second bursts. Your best round counts.' }
+  };
+  var BURST_ROUNDS = 10;
+  var PRECISION_TARGET_MAX = 80;
+  var PRECISION_TARGET_MIN = 30;
+  var PRECISION_SHRINK_RATE = 0.92;
+
+  // ====== DOM REFS ======
+  var startScreen = document.getElementById('startScreen');
+  var countdownScreen = document.getElementById('countdownScreen');
+  var gameScreen = document.getElementById('gameScreen');
+  var resultsScreen = document.getElementById('resultsScreen');
+  var modeDescEl = document.getElementById('modeDesc');
+  var bestCPSEl = document.getElementById('bestCPS');
+  var bestClicksEl = document.getElementById('bestClicks');
+  var startBtn = document.getElementById('startBtn');
+  var countdownNumEl = document.getElementById('countdownNum');
+  var countdownModeEl = document.getElementById('countdownMode');
+  var burstInfoEl = document.getElementById('burstInfo');
+  var burstRoundEl = document.getElementById('burstRound');
+  var burstDotsEl = document.getElementById('burstDots');
+  var liveCPSEl = document.getElementById('liveCPS');
+  var liveClicksEl = document.getElementById('liveClicks');
+  var liveTimeEl = document.getElementById('liveTime');
+  var progressBarEl = document.getElementById('progressBar');
+  var clickZone = document.getElementById('clickZone');
+  var clickZoneLabel = document.getElementById('clickZoneLabel');
+  var resultCPSEl = document.getElementById('resultCPS');
+  var resultClicksEl = document.getElementById('resultClicks');
+  var resultModeEl = document.getElementById('resultMode');
+  var resultBestEl = document.getElementById('resultBest');
+  var percentileFillEl = document.getElementById('percentileFill');
+  var percentileLabelEl = document.getElementById('percentileLabel');
+  var newRecordEl = document.getElementById('newRecord');
+  var shareBtn = document.getElementById('shareBtn');
+  var retryBtn = document.getElementById('retryBtn');
+  var switchBtn = document.getElementById('switchBtn');
+  var shareToast = document.getElementById('shareToast');
+
+  // ====== STATE ======
+  var currentMode = 'standard';
+  var clicks = 0;
+  var startTime = 0;
+  var gameActive = false;
+  var animFrame = null;
+
+  // Precision state
+  var precisionTarget = null;
+  var precisionSize = PRECISION_TARGET_MAX;
+  var precisionHits = 0;
+  var precisionMisses = 0;
+  var precisionShrinkTimer = null;
+
+  // Burst state
+  var burstRound = 0;
+  var burstScores = [];
+  var burstClicks = 0;
+  var burstBestCPS = 0;
+  var burstTotalClicks = 0;
+  var burstPaused = false;
+
+  // Best scores per mode
+  var localBests = JSON.parse(localStorage.getItem('clickspeed_local_bests') || '{}');
+
+  // ====== SOUND ENGINE ======
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playClick() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.06);
+    } catch(e) {}
+  }
+
+  function playPrecisionHit() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
+
+  function playMiss() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.15);
+    } catch(e) {}
+  }
+
+  function playCountdownTick() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } catch(e) {}
+  }
+
+  function playTimerEnd() {
+    try {
+      var ctx = getAudio();
+      for (var i = 0; i < 2; i++) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(300, ctx.currentTime + i * 0.15);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.12);
+        osc.start(ctx.currentTime + i * 0.15);
+        osc.stop(ctx.currentTime + i * 0.15 + 0.12);
+      }
+    } catch(e) {}
+  }
+
+  function playCelebration() {
+    try {
+      var ctx = getAudio();
+      var notes = [523, 659, 784, 1047];
+      for (var i = 0; i < notes.length; i++) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(notes[i], ctx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.2);
+        osc.start(ctx.currentTime + i * 0.1);
+        osc.stop(ctx.currentTime + i * 0.1 + 0.2);
+      }
+    } catch(e) {}
+  }
+
+  function playBurstEnd() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(500, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
+
+  // ====== VISUAL EFFECTS ======
+  function spawnRipple(x, y, parent) {
+    var r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.left = (x - 15) + 'px';
+    r.style.top = (y - 15) + 'px';
+    r.style.width = '30px';
+    r.style.height = '30px';
+    parent.appendChild(r);
+    setTimeout(function() { if (r.parentNode) r.parentNode.removeChild(r); }, 500);
+  }
+
+  function spawnParticles(x, y, parent, count, color) {
+    count = count || 8;
+    color = color || '#00f0ff';
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
+      var dist = 30 + Math.random() * 50;
+      var dx = Math.cos(angle) * dist;
+      var dy = Math.sin(angle) * dist;
+      var size = 3 + Math.random() * 4;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.background = color;
+      p.style.setProperty('--dx', dx + 'px');
+      p.style.setProperty('--dy', dy + 'px');
+      parent.appendChild(p);
+      (function(el) {
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
+      })(p);
+    }
+  }
+
+  function screenShake() {
+    document.body.classList.add('screen-shake');
+    setTimeout(function() { document.body.classList.remove('screen-shake'); }, 250);
+  }
+
+  // ====== SCREEN MANAGEMENT ======
+  function showScreen(screen) {
+    var screens = [startScreen, countdownScreen, gameScreen, resultsScreen];
+    for (var i = 0; i < screens.length; i++) {
+      screens[i].classList.remove('active');
+    }
+    screen.classList.add('active');
+  }
+
+  // ====== NEON.JS INIT ======
+  function initNeon() {
+    if (typeof Neon !== 'undefined') {
+      Neon.init({
+        game: 'clickspeed',
+        mode: 'high',
+        key: 'neonarcade_neongrind_clickspeed_scores',
+        formatScore: function(s) { return (s / 10).toFixed(1) + ' CPS'; }
+      });
+      updateBestDisplay();
+      Neon.render(document.getElementById('startLB'));
+    }
+  }
+
+  function updateBestDisplay() {
+    if (typeof Neon !== 'undefined') {
+      var best = Neon.getHighScore();
+      if (best > 0) {
+        bestCPSEl.textContent = (best / 10).toFixed(1);
+      } else {
+        bestCPSEl.textContent = '--';
+      }
+    }
+    var bestC = localBests[currentMode + '_clicks'];
+    bestClicksEl.textContent = bestC ? bestC : '--';
+  }
+
+  // ====== MODE SELECTION ======
+  var modeBtns = document.querySelectorAll('.mode-btn');
+  for (var mi = 0; mi < modeBtns.length; mi++) {
+    (function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        for (var j = 0; j < modeBtns.length; j++) modeBtns[j].classList.remove('selected');
+        btn.classList.add('selected');
+        currentMode = btn.getAttribute('data-mode');
+        modeDescEl.textContent = MODES[currentMode].desc;
+        updateBestDisplay();
+      });
+    })(modeBtns[mi]);
+  }
+
+  // ====== PERCENTILE CALC ======
+  function getPercentile(cps) {
+    if (cps < 1) return { pct: 5, label: 'Bottom 5%', color: '#ff2d7b' };
+    if (cps < 4) return { pct: Math.round(5 + (cps - 1) / 3 * 15), label: 'Bottom 20%', color: '#ff2d7b' };
+    if (cps < 5) return { pct: Math.round(20 + (cps - 4) * 10), label: '20-30%', color: '#ff8c00' };
+    if (cps < 7) return { pct: Math.round(30 + (cps - 5) / 2 * 20), label: '30-50%', color: '#ff8c00' };
+    if (cps < 8) return { pct: Math.round(50 + (cps - 7) * 10), label: '50-60%', color: '#ffd700' };
+    if (cps < 10) return { pct: Math.round(60 + (cps - 8) / 2 * 20), label: '60-80%', color: '#ffd700' };
+    if (cps < 11) return { pct: Math.round(80 + (cps - 10) * 5), label: '80-85%', color: '#39ff14' };
+    if (cps < 13) return { pct: Math.round(85 + (cps - 11) / 2 * 10), label: '85-95%', color: '#39ff14' };
+    if (cps < 14) return { pct: Math.round(95 + (cps - 13) * 2), label: 'Top 5%', color: '#00f0ff' };
+    var finalPct = Math.min(99, Math.round(97 + (cps - 14) * 0.5));
+    return { pct: finalPct, label: 'Top ' + Math.max(1, 100 - finalPct) + '%', color: '#00f0ff' };
+  }
+
+  // ====== SHARE ======
+  function getShareText(cps) {
+    var pInfo = getPercentile(cps);
+    var pct = pInfo.pct;
+    var filled = Math.round(pct / 100 * 15);
+    var bar = '';
+    for (var i = 0; i < 15; i++) bar += i < filled ? '\u2588' : '\u2591';
+    var topPct = 100 - pct;
+    var topStr = topPct <= 0 ? 'Top 1%' : (topPct <= 5 ? 'Top ' + topPct + '%' : pct + '%');
+    return '\u26A1 CLICKSPEED\n' + cps.toFixed(1) + ' CPS | ' + MODES[currentMode].label + '\n' + bar + ' ' + topStr + '\nneonarcade.net';
+  }
+
+  shareBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var cps = parseFloat(resultCPSEl.textContent);
+    var text = getShareText(cps);
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  });
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('COPIED TO CLIPBOARD');
+      }).catch(function() {
+        showToast('COPY FAILED');
+      });
+    } else {
+      showToast('COPY FAILED');
+    }
+  }
+
+  function showToast(msg) {
+    shareToast.textContent = msg;
+    shareToast.classList.add('show');
+    setTimeout(function() { shareToast.classList.remove('show'); }, 2000);
+  }
+
+  // ====== START GAME ======
+  startBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    startCountdown();
+  });
+
+  retryBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    startCountdown();
+  });
+
+  switchBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    showScreen(startScreen);
+    updateBestDisplay();
+    if (typeof Neon !== 'undefined') Neon.render(document.getElementById('startLB'));
+  });
+
+  // ====== COUNTDOWN ======
+  function startCountdown() {
+    showScreen(countdownScreen);
+    countdownModeEl.textContent = MODES[currentMode].label;
+    var count = 3;
+    countdownNumEl.textContent = count;
+    countdownNumEl.classList.add('pop');
+    playCountdownTick();
+
+    var cdInterval = setInterval(function() {
+      count--;
+      if (count <= 0) {
+        clearInterval(cdInterval);
+        countdownNumEl.textContent = 'GO!';
+        countdownNumEl.style.color = '#39ff14';
+        countdownNumEl.style.textShadow = '0 0 20px rgba(57,255,20,0.6),0 0 60px rgba(57,255,20,0.2)';
+        countdownNumEl.classList.remove('pop');
+        void countdownNumEl.offsetWidth;
+        countdownNumEl.classList.add('pop');
+        playCountdownTick();
+        setTimeout(function() {
+          countdownNumEl.style.color = '#ffd700';
+          countdownNumEl.style.textShadow = '';
+          startGame();
+        }, 400);
+      } else {
+        countdownNumEl.textContent = count;
+        countdownNumEl.classList.remove('pop');
+        void countdownNumEl.offsetWidth;
+        countdownNumEl.classList.add('pop');
+        playCountdownTick();
+      }
+    }, 800);
+  }
+
+  // ====== START GAME ======
+  function startGame() {
+    showScreen(gameScreen);
+    clicks = 0;
+    gameActive = true;
+    startTime = performance.now();
+
+    // Clear old precision targets
+    var oldTargets = clickZone.querySelectorAll('.precision-target');
+    for (var ot = 0; ot < oldTargets.length; ot++) oldTargets[ot].parentNode.removeChild(oldTargets[ot]);
+
+    // Clear old particles/ripples
+    var oldFx = clickZone.querySelectorAll('.ripple,.particle');
+    for (var of2 = 0; of2 < oldFx.length; of2++) oldFx[of2].parentNode.removeChild(oldFx[of2]);
+
+    clickZone.classList.remove('pulse');
+    clickZoneLabel.textContent = 'CLICK HERE';
+    clickZoneLabel.style.display = '';
+    clickZone.style.borderColor = 'rgba(0,240,255,0.3)';
+    clickZone.style.boxShadow = '';
+
+    if (currentMode === 'standard') {
+      startStandard();
+    } else if (currentMode === 'precision') {
+      startPrecision();
+    } else if (currentMode === 'burst') {
+      startBurst();
+    }
+  }
+
+  // ====== STANDARD MODE ======
+  function startStandard() {
+    var duration = MODES.standard.duration;
+    burstInfoEl.style.display = 'none';
+    burstDotsEl.style.display = 'none';
+
+    updateHUD();
+    animFrame = requestAnimationFrame(standardLoop);
+  }
+
+  function standardLoop() {
+    if (!gameActive) return;
+    var now = performance.now();
+    var elapsed = (now - startTime) / 1000;
+    var remaining = Math.max(0, MODES.standard.duration - elapsed);
+    var fraction = remaining / MODES.standard.duration;
+
+    liveTimeEl.textContent = remaining.toFixed(1);
+    var cps = elapsed > 0 ? clicks / elapsed : 0;
+    liveCPSEl.textContent = cps.toFixed(1);
+    liveClicksEl.textContent = clicks;
+
+    progressBarEl.style.width = (fraction * 100) + '%';
+    if (fraction < 0.3) {
+      progressBarEl.classList.add('warning');
+    } else {
+      progressBarEl.classList.remove('warning');
+    }
+
+    if (remaining <= 0) {
+      var finalCPS = MODES.standard.duration > 0 ? clicks / MODES.standard.duration : 0;
+      endGame(finalCPS, clicks);
+      return;
+    }
+    animFrame = requestAnimationFrame(standardLoop);
+  }
+
+  // ====== PRECISION MODE ======
+  function startPrecision() {
+    burstInfoEl.style.display = 'none';
+    burstDotsEl.style.display = 'none';
+    precisionSize = PRECISION_TARGET_MAX;
+    precisionHits = 0;
+    precisionMisses = 0;
+    clickZoneLabel.style.display = 'none';
+
+    spawnPrecisionTarget();
+    animFrame = requestAnimationFrame(precisionLoop);
+  }
+
+  function spawnPrecisionTarget() {
+    var old = clickZone.querySelector('.precision-target');
+    if (old) old.parentNode.removeChild(old);
+
+    var zoneW = clickZone.clientWidth;
+    var zoneH = clickZone.clientHeight;
+    var pad = precisionSize / 2 + 10;
+    var maxX = zoneW - pad * 2;
+    var maxY = zoneH - pad * 2;
+    if (maxX < 0) maxX = 0;
+    if (maxY < 0) maxY = 0;
+    var tx = pad + Math.random() * maxX;
+    var ty = pad + Math.random() * maxY;
+
+    var target = document.createElement('div');
+    target.className = 'precision-target';
+    target.style.width = precisionSize + 'px';
+    target.style.height = precisionSize + 'px';
+    target.style.left = (tx - precisionSize / 2) + 'px';
+    target.style.top = (ty - precisionSize / 2) + 'px';
+
+    var dot = document.createElement('div');
+    dot.className = 'precision-target-dot';
+    target.appendChild(dot);
+
+    clickZone.appendChild(target);
+    precisionTarget = target;
+
+    clearInterval(precisionShrinkTimer);
+    precisionShrinkTimer = setInterval(function() {
+      if (!gameActive) { clearInterval(precisionShrinkTimer); return; }
+      precisionSize = Math.max(PRECISION_TARGET_MIN, precisionSize - 0.5);
+      if (precisionTarget && precisionTarget.parentNode) {
+        var currentLeft = parseFloat(precisionTarget.style.left);
+        var currentTop = parseFloat(precisionTarget.style.top);
+        var oldSize = parseFloat(precisionTarget.style.width);
+        var diff = (oldSize - precisionSize) / 2;
+        precisionTarget.style.width = precisionSize + 'px';
+        precisionTarget.style.height = precisionSize + 'px';
+        precisionTarget.style.left = (currentLeft + diff) + 'px';
+        precisionTarget.style.top = (currentTop + diff) + 'px';
+      }
+    }, 100);
+  }
+
+  function precisionLoop() {
+    if (!gameActive) return;
+    var now = performance.now();
+    var elapsed = (now - startTime) / 1000;
+    var remaining = Math.max(0, MODES.precision.duration - elapsed);
+    var fraction = remaining / MODES.precision.duration;
+
+    liveTimeEl.textContent = remaining.toFixed(1);
+    var effectiveClicks = Math.max(0, precisionHits - precisionMisses);
+    var cps = elapsed > 0 ? effectiveClicks / elapsed : 0;
+    liveCPSEl.textContent = cps.toFixed(1);
+    liveClicksEl.textContent = precisionHits + '/' + precisionMisses;
+
+    progressBarEl.style.width = (fraction * 100) + '%';
+    if (fraction < 0.3) progressBarEl.classList.add('warning');
+    else progressBarEl.classList.remove('warning');
+
+    if (remaining <= 0) {
+      clearInterval(precisionShrinkTimer);
+      var finalClicks = Math.max(0, precisionHits - precisionMisses);
+      var finalCPS = MODES.precision.duration > 0 ? finalClicks / MODES.precision.duration : 0;
+      endGame(finalCPS, precisionHits);
+      return;
+    }
+    animFrame = requestAnimationFrame(precisionLoop);
+  }
+
+  // ====== BURST MODE ======
+  function startBurst() {
+    burstRound = 0;
+    burstScores = [];
+    burstBestCPS = 0;
+    burstTotalClicks = 0;
+    burstPaused = false;
+
+    burstInfoEl.style.display = '';
+    burstDotsEl.style.display = 'flex';
+
+    // Build burst dots using DOM methods
+    while (burstDotsEl.firstChild) burstDotsEl.removeChild(burstDotsEl.firstChild);
+    for (var i = 0; i < BURST_ROUNDS; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'burst-dot';
+      burstDotsEl.appendChild(dot);
+    }
+
+    startBurstRound();
+  }
+
+  function startBurstRound() {
+    if (burstRound >= BURST_ROUNDS) {
+      endGame(burstBestCPS, burstTotalClicks);
+      return;
+    }
+
+    burstClicks = 0;
+    burstPaused = false;
+    burstRoundEl.textContent = (burstRound + 1);
+    var dots = burstDotsEl.querySelectorAll('.burst-dot');
+    if (dots[burstRound]) dots[burstRound].classList.add('active');
+
+    clickZoneLabel.textContent = 'GO!';
+    clickZoneLabel.style.display = '';
+    clickZone.style.borderColor = 'rgba(180,77,255,0.5)';
+
+    startTime = performance.now();
+    gameActive = true;
+    animFrame = requestAnimationFrame(burstLoop);
+  }
+
+  function burstLoop() {
+    if (!gameActive) return;
+    var now = performance.now();
+    var elapsed = (now - startTime) / 1000;
+    var remaining = Math.max(0, MODES.burst.duration - elapsed);
+    var fraction = remaining / MODES.burst.duration;
+
+    liveTimeEl.textContent = remaining.toFixed(1);
+    var cps = elapsed > 0 ? burstClicks / elapsed : 0;
+    liveCPSEl.textContent = cps.toFixed(1);
+    liveClicksEl.textContent = burstClicks;
+
+    progressBarEl.style.width = (fraction * 100) + '%';
+    if (fraction < 0.3) progressBarEl.classList.add('warning');
+    else progressBarEl.classList.remove('warning');
+
+    if (remaining <= 0) {
+      gameActive = false;
+      var roundCPS = burstClicks / MODES.burst.duration;
+      burstScores.push(roundCPS);
+      burstTotalClicks += burstClicks;
+
+      var dots = burstDotsEl.querySelectorAll('.burst-dot');
+      if (dots[burstRound]) {
+        dots[burstRound].classList.remove('active');
+        if (roundCPS > burstBestCPS) {
+          for (var d = 0; d < dots.length; d++) dots[d].classList.remove('best');
+          dots[burstRound].classList.add('best');
+          burstBestCPS = roundCPS;
+        } else {
+          dots[burstRound].classList.add('done');
+        }
+      }
+
+      playBurstEnd();
+      burstRound++;
+
+      if (burstRound >= BURST_ROUNDS) {
+        setTimeout(function() {
+          endGame(burstBestCPS, burstTotalClicks);
+        }, 400);
+      } else {
+        burstPaused = true;
+        clickZoneLabel.textContent = 'NEXT...';
+        clickZone.style.borderColor = 'rgba(0,240,255,0.3)';
+        setTimeout(function() {
+          startBurstRound();
+        }, 800);
+      }
+      return;
+    }
+    animFrame = requestAnimationFrame(burstLoop);
+  }
+
+  // ====== CLICK HANDLING ======
+  function handleZoneClick(e) {
+    if (!gameActive && currentMode !== 'burst') return;
+    if (currentMode === 'burst' && burstPaused) return;
+    if (!gameActive) return;
+
+    var rect = clickZone.getBoundingClientRect();
+    var clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    var x = clientX - rect.left;
+    var y = clientY - rect.top;
+
+    if (currentMode === 'precision') {
+      if (precisionTarget && precisionTarget.parentNode) {
+        var tRect = precisionTarget.getBoundingClientRect();
+        var tx = tRect.left + tRect.width / 2;
+        var ty = tRect.top + tRect.height / 2;
+        var dist = Math.sqrt((clientX - tx) * (clientX - tx) + (clientY - ty) * (clientY - ty));
+        if (dist <= tRect.width / 2) {
+          precisionHits++;
+          clicks++;
+          precisionSize = Math.max(PRECISION_TARGET_MIN, precisionSize * PRECISION_SHRINK_RATE);
+          playPrecisionHit();
+          spawnRipple(x, y, clickZone);
+          spawnParticles(x, y, clickZone, 10, '#39ff14');
+          spawnPrecisionTarget();
+        } else {
+          precisionMisses++;
+          playMiss();
+          spawnParticles(x, y, clickZone, 5, '#ff2d7b');
+          clickZone.style.borderColor = 'rgba(255,45,123,0.5)';
+          setTimeout(function() {
+            if (gameActive) clickZone.style.borderColor = 'rgba(0,240,255,0.3)';
+          }, 150);
+        }
+      }
+      return;
+    }
+
+    // Standard or Burst click
+    if (currentMode === 'standard') {
+      clicks++;
+    } else if (currentMode === 'burst') {
+      burstClicks++;
+    }
+
+    playClick();
+    spawnRipple(x, y, clickZone);
+    spawnParticles(x, y, clickZone, 8, '#00f0ff');
+
+    clickZone.style.borderColor = 'rgba(0,240,255,0.7)';
+    clickZone.style.boxShadow = '0 0 30px rgba(0,240,255,0.2)';
+    setTimeout(function() {
+      if (gameActive) {
+        clickZone.style.borderColor = currentMode === 'burst' ? 'rgba(180,77,255,0.5)' : 'rgba(0,240,255,0.3)';
+        clickZone.style.boxShadow = '';
+      }
+    }, 80);
+  }
+
+  clickZone.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    handleZoneClick(e);
+  });
+  clickZone.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    handleZoneClick(e);
+  }, { passive: false });
+
+  // Prevent context menu on long press
+  clickZone.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+  // ====== UPDATE HUD ======
+  function updateHUD() {
+    liveCPSEl.textContent = '0.0';
+    liveClicksEl.textContent = '0';
+    var dur = currentMode === 'burst' ? MODES.burst.duration : MODES[currentMode].duration;
+    liveTimeEl.textContent = dur.toFixed(1);
+    progressBarEl.style.width = '100%';
+    progressBarEl.classList.remove('warning');
+  }
+
+  // ====== END GAME ======
+  function endGame(cps, totalClicks) {
+    gameActive = false;
+    burstPaused = false;
+    if (animFrame) cancelAnimationFrame(animFrame);
+    clearInterval(precisionShrinkTimer);
+
+    playTimerEnd();
+    clickZone.classList.add('pulse');
+    clickZone.style.borderColor = 'rgba(0,240,255,0.3)';
+    clickZone.style.boxShadow = '';
+
+    var pt = clickZone.querySelector('.precision-target');
+    if (pt && pt.parentNode) pt.parentNode.removeChild(pt);
+
+    showScreen(resultsScreen);
+
+    resultCPSEl.textContent = cps.toFixed(1);
+    resultClicksEl.textContent = totalClicks;
+    resultModeEl.textContent = MODES[currentMode].label;
+
+    // Percentile
+    var pInfo = getPercentile(cps);
+    percentileFillEl.style.width = '0%';
+    percentileFillEl.style.background = 'linear-gradient(90deg, ' + pInfo.color + '88, ' + pInfo.color + ')';
+    var topPct = 100 - pInfo.pct;
+    if (topPct <= 0) topPct = 1;
+    percentileLabelEl.textContent = topPct <= 5 ? 'Top ' + topPct + '%' : pInfo.label;
+    percentileLabelEl.style.color = pInfo.color;
+
+    setTimeout(function() {
+      percentileFillEl.style.width = pInfo.pct + '%';
+    }, 100);
+
+    // Save local best clicks
+    var bestKey = currentMode + '_clicks';
+    var prevBestClicks = localBests[bestKey] || 0;
+    if (totalClicks > prevBestClicks) {
+      localBests[bestKey] = totalClicks;
+      localStorage.setItem('clickspeed_local_bests', JSON.stringify(localBests));
+    }
+
+    // Neon.js save
+    if (typeof Neon === 'undefined') return;
+    var cpsScore = Math.round(cps * 10);
+    var prevBest = Neon.getHighScore();
+    var isNewBest = cpsScore > prevBest;
+
+    if (isNewBest && prevBest > 0) {
+      newRecordEl.style.display = '';
+      playCelebration();
+      screenShake();
+    } else {
+      newRecordEl.style.display = 'none';
+    }
+
+    resultBestEl.textContent = isNewBest ? cps.toFixed(1) : (prevBest / 10).toFixed(1);
+
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(cpsScore);
+    }).then(function(result) {
+      Neon.render(document.getElementById('resultsLB'));
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+      resultBestEl.textContent = (Neon.getHighScore() / 10).toFixed(1);
+    });
+  }
+
+  // ====== INIT ======
+  initNeon();
+
+})();
+</script>
+</body>
+</html>
