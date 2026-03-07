@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/">
+<link rel="manifest" href="/manifest.json">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
@@ -46,6 +47,46 @@
     "url": "https://neonarcade.net",
     "logo": "https://neonarcade.net/og-image.png"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What games can I play for free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All 30+ games on NEON ARCADE are completely free to play — no download, no login, no ads. Just open your browser and start playing instantly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to download anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No downloads required! Every game runs directly in your browser on any device — desktop, tablet, or phone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are these games mobile-friendly?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! All NEON ARCADE games are optimized for both desktop and mobile. Use touch controls on your phone or keyboard/mouse on desktop."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I share my scores?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every game has a built-in share button that creates a visual emoji summary of your results. Share your scores on social media and challenge your friends!"
+      }
+    }
+  ]
 }
 </script>
 
@@ -499,7 +540,7 @@
     ],
   };
 
-  function makeCard(game, basePath) {
+  function makeCard(game, basePath, priority) {
     var path = game.path || basePath;
     var a = document.createElement('a');
     a.href = '/' + path + game.slug + '.html';
@@ -510,6 +551,7 @@
     var img = document.createElement('img');
     img.src = '/' + game.img;
     img.alt = game.name;
+    if (priority) img.fetchPriority = 'high';
     img.onerror = function() { this.style.display = 'none'; };
     ssDiv.appendChild(img);
     if (game.plays) {
@@ -549,17 +591,17 @@
     return String(n);
   }
 
-  function renderCategory(containerId, games, basePath, limit) {
+  function renderCategory(containerId, games, basePath, limit, priorityCount) {
     var container = document.getElementById(containerId);
     container.textContent = '';
     var shown = games.slice(0, limit || 3);
-    shown.forEach(function(g) {
-      container.appendChild(makeCard(g, basePath));
+    shown.forEach(function(g, i) {
+      container.appendChild(makeCard(g, basePath, i < (priorityCount || 0)));
     });
   }
 
   // Initially render with default order
-  renderCategory('arcade-games', CATALOG.arcade, 'neonarcade/', 3);
+  renderCategory('arcade-games', CATALOG.arcade, 'neonarcade/', 3, 3);
   renderCategory('grind-games', CATALOG.grind, 'neongrind/', 3);
   renderCategory('mind-games', CATALOG.mind, 'neonmind/', 3);
 

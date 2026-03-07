@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/neonarcade/">
+<link rel="manifest" href="/manifest.json">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
@@ -45,6 +46,38 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What types of arcade games are available?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We have 20+ free action games including Snake, Pong, Pac-Man, Tetris, Flappy Bird, Breakout, and many original neon-styled arcade games."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need a controller to play?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No controller needed. All games use keyboard (arrows or WASD) on desktop and touch controls on mobile."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are high scores saved?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Your personal best scores are saved locally, and you can compete on our global leaderboards."
+      }
+    }
+  ]
 }
 </script>
 
@@ -535,7 +568,7 @@
   <!-- 1. NEON SNAKE (existing) -->
   <a href="neon-snake.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/neon-snake.png" alt="Neon Snake" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img fetchpriority="high" src="/screenshots/neon-snake.png" alt="Neon Snake" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🐍</div>
       <span class="card-badge badge-classic">OG</span>
     </div>
@@ -555,7 +588,7 @@
   <!-- 2. IMPOSTOR PIXEL -->
   <a href="impostor-pixel.html" class="game-card" data-accent="purple">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/impostor-pixel.png" alt="Impostor Pixel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img fetchpriority="high" src="/screenshots/impostor-pixel.png" alt="Impostor Pixel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">👁️</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -575,7 +608,7 @@
   <!-- 3. CATALYST -->
   <a href="catalyst.html" class="game-card" data-accent="orange">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/catalyst.png" alt="Catalyst" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img fetchpriority="high" src="/screenshots/catalyst.png" alt="Catalyst" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">⚡</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -595,7 +628,7 @@
   <!-- 4. PONG: BOTH SIDES -->
   <a href="pong-both-sides.html" class="game-card" data-accent="green">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/pong-both-sides.png" alt="Pong Both Sides" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/pong-both-sides.png" alt="Pong Both Sides" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🏓</div>
       <span class="card-badge badge-hot">HOT</span>
     </div>
@@ -615,7 +648,7 @@
   <!-- 5. AFTERGLOW -->
   <a href="afterglow.html" class="game-card" data-accent="gold">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/afterglow.png" alt="Afterglow" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/afterglow.png" alt="Afterglow" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">✨</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -635,7 +668,7 @@
   <!-- 6. FLAPPY REWIND -->
   <a href="flappy-rewind.html" class="game-card" data-accent="pink">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/flappy-rewind.png" alt="Flappy Rewind" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/flappy-rewind.png" alt="Flappy Rewind" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🐤</div>
       <span class="card-badge badge-hot">HOT</span>
     </div>
@@ -655,7 +688,7 @@
   <!-- 7. PALETTE -->
   <a href="palette.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/palette.png" alt="Palette" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/palette.png" alt="Palette" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🎨</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -675,7 +708,7 @@
   <!-- 8. PAC-MAN AMNESIA -->
   <a href="pacman-amnesia.html" class="game-card" data-accent="white">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/pacman-amnesia.png" alt="Pac-Man Amnesia" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/pacman-amnesia.png" alt="Pac-Man Amnesia" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">👻</div>
       <span class="card-badge badge-hot">HOT</span>
     </div>
@@ -695,7 +728,7 @@
   <!-- 9. TERRITORY -->
   <a href="territory.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/territory.png" alt="Territory" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/territory.png" alt="Territory" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🗺️</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -715,7 +748,7 @@
   <!-- 10. TETRIS BETRAYAL -->
   <a href="tetris-betrayal.html" class="game-card" data-accent="pink">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/tetris-betrayal.png" alt="Tetris Betrayal" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/tetris-betrayal.png" alt="Tetris Betrayal" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🧱</div>
       <span class="card-badge badge-hot">HOT</span>
     </div>
@@ -735,7 +768,7 @@
   <!-- 11. SIGNAL -->
   <a href="signal.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/signal.png" alt="Signal" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/signal.png" alt="Signal" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">📡</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -755,7 +788,7 @@
   <!-- 12. FAULTLINE -->
   <a href="faultline.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/faultline.png" alt="Faultline" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/faultline.png" alt="Faultline" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🔍</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -775,7 +808,7 @@
   <!-- 13. DOODLE DROP -->
   <a href="doodle-drop.html" class="game-card" data-accent="purple">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/doodle-drop.png" alt="Doodle Drop" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/doodle-drop.png" alt="Doodle Drop" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">✏️</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -795,7 +828,7 @@
   <!-- 14. PRIORSELF -->
   <a href="priorself.html" class="game-card" data-accent="gold">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/priorself.png" alt="Priorself" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/priorself.png" alt="Priorself" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">👻</div>
       <span class="card-badge badge-hot">HOT</span>
     </div>
@@ -815,7 +848,7 @@
   <!-- 15. BURNDOWN -->
   <a href="burndown.html" class="game-card" data-accent="orange">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/burndown.png" alt="Burndown" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/burndown.png" alt="Burndown" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🔥</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -835,7 +868,7 @@
   <!-- 16. MINE FINDER -->
   <a href="mine-finder.html" class="game-card" data-accent="green">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/mine-finder.png" alt="Mine Finder" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/mine-finder.png" alt="Mine Finder" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">💣</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -855,7 +888,7 @@
   <!-- 17. WORDCHAIN DUEL -->
   <a href="wordchain-duel.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/wordchain-duel.png" alt="Wordchain Duel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/wordchain-duel.png" alt="Wordchain Duel" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🔗</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -875,7 +908,7 @@
   <!-- 19. GRIDLOCK -->
   <a href="gridlock.html" class="game-card" data-accent="green">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/gridlock.png" alt="Gridlock" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/gridlock.png" alt="Gridlock" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🔒</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -895,7 +928,7 @@
   <!-- 20. TRUECOLOR -->
   <a href="truecolor.html" class="game-card" data-accent="purple">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/truecolor.png" alt="TrueColor" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/truecolor.png" alt="TrueColor" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🎨</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -915,7 +948,7 @@
   <!-- 18. BREAKOUT ARCHITECT -->
   <a href="breakout-architect.html" class="game-card" data-accent="pink">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/breakout-architect.png" alt="Breakout Architect" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/breakout-architect.png" alt="Breakout Architect" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🏗️</div>
       <span class="card-badge badge-hot">HOT</span>
     </div>
@@ -934,7 +967,7 @@
 
   <a href="split-second.html" class="game-card" data-accent="pink">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/split-second.png" alt="Split Second" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/split-second.png" alt="Split Second" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">👁️</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -953,7 +986,7 @@
 
   <a href="wordchain.html" class="game-card" data-accent="gold">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/wordchain.png" alt="Wordchain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/wordchain.png" alt="Wordchain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🔗</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -972,7 +1005,7 @@
 
   <a href="curfew.html" class="game-card" data-accent="purple">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/curfew.png" alt="Curfew" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/curfew.png" alt="Curfew" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🌙</div>
       <span class="card-badge badge-new">NEW</span>
     </div>
@@ -991,7 +1024,7 @@
 
   <a href="chromaself.html" class="game-card" data-accent="purple">
     <div class="card-screenshot">
-      <img loading="lazy" src="screenshots/chromaself.png" alt="Chromaself" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="/screenshots/chromaself.png" alt="Chromaself" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">🎨</div>
       <span class="card-badge badge-new">NEW</span>
     </div>

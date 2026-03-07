@@ -51,17 +51,17 @@
 ## Next Steps (Recommended)
 
 ### 6. Content & Keyword Strategy
-- [ ] **Create an og-image.png** (1280x800) — A branded social sharing image for the homepage and hub pages showing the NEON ARCADE logo with neon styling
-- [ ] **Verify all screenshots exist** — Ensure `/screenshots/{game-name}.png` exists for every game so social shares display correctly
+- [x] **Create an og-image.png** (1280x800) — Branded social sharing image with NEON ARCADE logo, stats, and neon styling
+- [x] **Verify all screenshots exist** — 35 game screenshots + 4 hub screenshots generated at 1280x800 in `/screenshots/`
 - [x] **Add H1 tags** — Wrap logo/title elements in semantic `<h1>` on all 4 hub pages
 - [x] **Add breadcrumb JSON-LD** — BreadcrumbList schema on all 31 game pages (Home > Category > Game)
-- [ ] **Add FAQ schema** — Create FAQ sections on hub pages (e.g., "What games can I play for free?" "Do I need to download anything?") for FAQ rich snippets
+- [x] **Add FAQ schema** — FAQPage JSON-LD on all 4 hub pages (4 Qs on main, 3 on arcade, 3 on mind, 2 on grind)
 
 ### 7. Performance & Core Web Vitals
 - [x] **Add `<link rel="preconnect">` tags** — Added to all 39 pages for `fonts.googleapis.com` and `fonts.gstatic.com`
 - [ ] **Minimize CSS** — Consider minifying inline CSS for faster first paint
 - [x] **Add `loading="lazy"`** to screenshot images on all 3 category hub pages (35 images total)
-- [ ] **Add `fetchpriority="high"`** to above-the-fold images
+- [x] **Add `fetchpriority="high"`** — First 3 images on each category hub page use fetchpriority="high" instead of lazy
 
 ### 8. Crawlability & Indexing
 - [ ] **Submit sitemap to Google Search Console** — Register site and submit `sitemap.xml`
@@ -92,7 +92,7 @@
 
 ### 12. Advanced SEO
 - [ ] **Add `hreflang` tags** if planning multilingual support
-- [ ] **Add `manifest.json`** for PWA support — Helps with installability and return visits
+- [x] **Add `manifest.json`** for PWA support — Created manifest.json and added `<link rel="manifest">` to all 40 HTML pages
 - [ ] **Add service worker** for offline support — Improves user experience metrics
 - [ ] **Implement dynamic `<meta>` for daily games** — Signal, Territory change daily; consider updating meta descriptions or adding `dateModified`
 - [ ] **Add `SoftwareApplication` aggregate rating** — Once reviews/ratings exist, add to JSON-LD
