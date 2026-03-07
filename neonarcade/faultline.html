@@ -9,6 +9,9 @@
 <meta name="author" content="NEON ARCADE">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0a0a12">
+<!-- Preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/neonarcade/faultline.html">
 
 <!-- Open Graph / Facebook -->
@@ -57,7 +60,32 @@
   "isFamilyFriendly": true
 }
 </script>
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://neonarcade.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "NEON ARCADE",
+      "item": "https://neonarcade.net/neonarcade/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Faultline",
+      "item": "https://neonarcade.net/neonarcade/faultline.html"
+    }
+  ]
+}
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -119,6 +147,16 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 .daily-badge{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#ff8c00;border:1px solid rgba(255,140,0,0.3);background:rgba(255,140,0,0.06);padding:4px 12px;border-radius:2px;margin-bottom:20px}
 
 .score-table { margin: 16px auto; max-width: 320px; }
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#4a4a6a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
 </style>
 </head>
 <body>
@@ -912,6 +950,22 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 
   updateBestDisplay();
 })();
+
+// Show More Games bar after game starts or on game over
+setTimeout(function(){var mg=document.getElementById('neonMoreGames');if(mg)mg.style.display='block';},3000);
 </script>
+<!-- More Games Navigation -->
+<div id="neonMoreGames" class="na-more-games" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+            <a href="wordchain-duel.html" class="na-more-link">⚔️ WordChain Duel</a>
+      <a href="flappy-rewind.html" class="na-more-link">🐦 Flappy Rewind</a>
+      <a href="afterglow.html" class="na-more-link">✨ Afterglow</a>
+      <a href="mine-finder.html" class="na-more-link">💣 Mine Finder</a>
+      <a href="/neonarcade/" class="na-more-link na-more-hub">&larr; All NEON ARCADE Games</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>

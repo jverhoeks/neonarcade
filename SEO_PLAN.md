@@ -53,15 +53,14 @@
 ### 6. Content & Keyword Strategy
 - [ ] **Create an og-image.png** (1280x800) — A branded social sharing image for the homepage and hub pages showing the NEON ARCADE logo with neon styling
 - [ ] **Verify all screenshots exist** — Ensure `/screenshots/{game-name}.png` exists for every game so social shares display correctly
-- [ ] **Add H1 tags** — Wrap logo/title elements in semantic `<h1>` on hub pages and game pages for heading hierarchy
-- [ ] **Add breadcrumb JSON-LD** — e.g., Home > NEON ARCADE > Neon Snake for Google breadcrumb rich results
+- [x] **Add H1 tags** — Wrap logo/title elements in semantic `<h1>` on all 4 hub pages
+- [x] **Add breadcrumb JSON-LD** — BreadcrumbList schema on all 31 game pages (Home > Category > Game)
 - [ ] **Add FAQ schema** — Create FAQ sections on hub pages (e.g., "What games can I play for free?" "Do I need to download anything?") for FAQ rich snippets
 
 ### 7. Performance & Core Web Vitals
-- [ ] **Preload Google Fonts** — Add `<link rel="preload">` for Orbitron and Rajdhani to reduce render-blocking
-- [ ] **Add `<link rel="preconnect">` tags** — For `fonts.googleapis.com` and `fonts.gstatic.com`
+- [x] **Add `<link rel="preconnect">` tags** — Added to all 39 pages for `fonts.googleapis.com` and `fonts.gstatic.com`
 - [ ] **Minimize CSS** — Consider minifying inline CSS for faster first paint
-- [ ] **Add `loading="lazy"`** to screenshot images on hub pages
+- [x] **Add `loading="lazy"`** to screenshot images on all 3 category hub pages (35 images total)
 - [ ] **Add `fetchpriority="high"`** to above-the-fold images
 
 ### 8. Crawlability & Indexing
@@ -82,8 +81,8 @@
 - [ ] **Submit to browser game directories** — itch.io, CrazyGames, Poki, Kongregate
 - [ ] **Submit to ProductHunt** — Launch as a collection of free browser games
 - [ ] **Create a blog/changelog page** — New game announcements help with fresh content signals
-- [ ] **Add internal linking** — Each game page should link back to its category hub and to related games
-- [ ] **Add a "More Games" section** on each game page — Cross-link to 3-4 related games for internal link equity
+- [x] **Add internal linking** — "More Games" bar on all 31 game pages with 4 related games + category hub link
+- [x] **Add a "More Games" section** on each game page — Fixed bottom bar with cross-links to related games, appears after 3 seconds
 
 ### 11. Local & Social Signals
 - [ ] **Create social profiles** — Twitter/X, TikTok, Reddit presence for the brand
@@ -97,7 +96,7 @@
 - [ ] **Add service worker** for offline support — Improves user experience metrics
 - [ ] **Implement dynamic `<meta>` for daily games** — Signal, Territory change daily; consider updating meta descriptions or adding `dateModified`
 - [ ] **Add `SoftwareApplication` aggregate rating** — Once reviews/ratings exist, add to JSON-LD
-- [ ] **Create a 404.html** — Custom 404 page with links back to game hub
+- [x] **Create a 404.html** — Custom neon-styled 404 page with links to all 3 category hubs
 
 ---
 

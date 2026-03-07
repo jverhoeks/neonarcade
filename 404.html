@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Page Not Found | NEON ARCADE</title>
+<meta name="description" content="This page doesn't exist. Head back to NEON ARCADE and play 30+ free browser games instantly.">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;overflow:hidden}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.04) 0%,transparent 50%),#0a0a12}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:1000}
+.code{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(80px,20vw,160px);letter-spacing:8px;color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.6),0 0 40px rgba(255,45,123,0.2),0 0 80px rgba(255,45,123,0.1);line-height:1;margin-bottom:12px}
+.msg{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,20px);letter-spacing:4px;color:#4a4a6a;text-transform:uppercase;margin-bottom:30px}
+.sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(16px,3vw,20px);color:#8888aa;max-width:400px;margin-bottom:40px;line-height:1.5}
+.btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;text-decoration:none;display:inline-block;transition:all 0.2s}
+.btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.links{margin-top:24px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;color:#8888aa;text-decoration:none;padding:6px 12px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;transition:all 0.15s}
+.link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25)}
+</style>
+</head>
+<body>
+<div class="code">404</div>
+<div class="msg">Signal Lost</div>
+<p class="sub">This page has drifted into the void. But there are 30+ games waiting for you back at the arcade.</p>
+<a href="/" class="btn">Back to Arcade</a>
+<div class="links">
+  <a href="/neonarcade/" class="link">Action Games</a>
+  <a href="/neonmind/" class="link">Puzzle Games</a>
+  <a href="/neongrind/" class="link">Skill Games</a>
+</div>
+</body>
+</html>

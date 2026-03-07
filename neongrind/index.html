@@ -9,6 +9,9 @@
 <meta name="author" content="NEON ARCADE">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0a0a12">
+<!-- Preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://neonarcade.net/neongrind/">
 
 <!-- Open Graph / Facebook -->
@@ -521,7 +524,7 @@
 
 <header>
   <a href="../index.html" class="back-link">&larr; NEON ARCADE</a>
-  <div class="logo">NEON<span>GRIND</span></div>
+  <h1 class="logo">NEON<span>GRIND</span></h1>
   <p class="tagline">Level up your skills — push your ceiling</p>
   <p class="header-desc">Progressive skill games that get harder every level. Practice to improve, grind to master. How far can you get?</p>
   <div class="header-line"></div>
@@ -547,7 +550,7 @@
   <!-- 1. MATHBLITZ -->
   <a href="mathblitz.html" class="game-card" data-accent="cyan">
     <div class="card-screenshot">
-      <img src="screenshots/mathblitz.png" alt="MathBlitz" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="screenshots/mathblitz.png" alt="MathBlitz" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">+x</div>
       <span class="card-badge badge-brain">GRIND</span>
     </div>
@@ -572,7 +575,7 @@
   <!-- 2. REFLEX CHAIN -->
   <a href="reflex-chain.html" class="game-card" data-accent="green">
     <div class="card-screenshot">
-      <img src="screenshots/reflex-chain.png" alt="Reflex Chain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="screenshots/reflex-chain.png" alt="Reflex Chain" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">&oplus;</div>
       <span class="card-badge badge-brain">GRIND</span>
     </div>
@@ -597,7 +600,7 @@
   <!-- 3. NEUROSORT -->
   <a href="neurosort.html" class="game-card" data-accent="orange">
     <div class="card-screenshot">
-      <img src="screenshots/neurosort.png" alt="NeuroSort" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <img loading="lazy" src="screenshots/neurosort.png" alt="NeuroSort" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
       <div class="placeholder" style="display:none">&darr;</div>
       <span class="card-badge badge-brain">GRIND</span>
     </div>
