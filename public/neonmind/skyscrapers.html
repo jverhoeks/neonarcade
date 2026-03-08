@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Skyscrapers — Free Online Building Logic Puzzle | NEON ARCADE</title>
+<meta name="description" content="Play Skyscrapers free online — fill the grid so skyline clues match. 3D logic reasoning in a 2D puzzle. No download, no login.">
+<meta name="keywords" content="skyscrapers puzzle, building puzzle, latin square, logic puzzle, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonmind/skyscrapers.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/skyscrapers.html">
+<meta property="og:title" content="Skyscrapers — Free Online Building Logic Puzzle | NEON ARCADE">
+<meta property="og:description" content="Fill the grid so skyline clues match. 3D logic reasoning in 2D.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/skyscrapers.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/skyscrapers.html">
+<meta name="twitter:title" content="Skyscrapers — Free Online Building Logic Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Fill the grid so skyline clues match. 3D logic reasoning in 2D.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/skyscrapers.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Skyscrapers",
+  "url": "https://neonarcade.net/neonmind/skyscrapers.html",
+  "description": "Fill the grid so skyline clues match. 3D logic reasoning in a 2D puzzle.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/skyscrapers.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON MIND", "item": "https://neonarcade.net/neonmind/" },
+    { "@type": "ListItem", "position": 3, "name": "Skyscrapers", "item": "https://neonarcade.net/neonmind/skyscrapers.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  z-index: 9999;
+}
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 60%);
+  z-index: 0;
+}
+
+.screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { display: flex; }
+
+#startScreen { padding: 20px; gap: 10px; }
+
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(36px, 8vw, 72px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  letter-spacing: 6px;
+  animation: titleGlow 3s ease-in-out infinite;
+  text-align: center;
+}
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.8), 0 0 60px rgba(0,240,255,0.3); }
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(13px, 2.5vw, 18px);
+  font-weight: 300;
+  color: #00f0ff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  opacity: 0.8;
+  text-align: center;
+}
+
+.diff-list {
+  display: flex; flex-direction: column; gap: 10px;
+  width: 100%; max-width: 340px;
+  margin-bottom: 12px;
+}
+.diff-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px;
+  border: 1px solid rgba(0,240,255,0.15);
+  background: rgba(0,240,255,0.03);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Rajdhani', sans-serif;
+}
+.diff-btn:hover, .diff-btn:active {
+  background: rgba(0,240,255,0.08);
+  border-color: rgba(0,240,255,0.3);
+  box-shadow: 0 0 15px rgba(0,240,255,0.1);
+}
+.diff-btn .diff-name {
+  font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 2px; text-transform: uppercase;
+}
+.diff-btn .diff-info {
+  font-size: 14px; color: #7a7a9a; letter-spacing: 1px;
+}
+.diff-btn.selected {
+  border-color: #00f0ff;
+  background: rgba(0,240,255,0.1);
+  box-shadow: 0 0 20px rgba(0,240,255,0.15);
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid #00f0ff; background: rgba(0,240,255,0.06);
+  color: #00f0ff; cursor: pointer; border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.controls-hint {
+  font-size: 13px; color: #7a7a9a; letter-spacing: 2px; text-transform: uppercase;
+  margin-top: 12px;
+}
+
+#startLB { width: 100%; max-width: 380px; margin-top: 10px; }
+
+/* GAME SCREEN */
+#gameScreen {
+  padding: 10px;
+  gap: 0;
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+.game-header {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; max-width: 500px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+}
+.timer {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 700;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+  letter-spacing: 2px;
+}
+.header-btns {
+  display: flex; gap: 8px;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,240,255,0.2);
+  background: rgba(0,240,255,0.04);
+  color: #00f0ff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  font-family: 'Rajdhani', sans-serif;
+}
+.icon-btn:hover {
+  background: rgba(0,240,255,0.1);
+  box-shadow: 0 0 10px rgba(0,240,255,0.15);
+}
+
+.size-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 300;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* GRID AREA */
+.grid-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+}
+
+.grid-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #12121f;
+  border: 1px solid rgba(0,240,255,0.12);
+  cursor: pointer;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: #fff;
+  transition: all 0.15s;
+  position: relative;
+}
+.grid-cell:hover {
+  background: rgba(0,240,255,0.06);
+}
+.grid-cell.selected {
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0,240,255,0.3), inset 0 0 8px rgba(0,240,255,0.1);
+  background: rgba(0,240,255,0.08);
+  z-index: 2;
+}
+.grid-cell.conflict {
+  color: #ff2d7b;
+  text-shadow: 0 0 8px rgba(255,45,123,0.5);
+}
+.grid-cell.filled {
+  animation: placeNum 0.2s ease-out;
+}
+@keyframes placeNum {
+  0% { transform: scale(0.7); opacity: 0.5; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.grid-cell.height-1 { background: rgba(18,18,31,1); }
+.grid-cell.height-2 { background: rgba(20,22,38,1); }
+.grid-cell.height-3 { background: rgba(22,26,44,1); }
+.grid-cell.height-4 { background: rgba(24,30,50,1); }
+.grid-cell.height-5 { background: rgba(26,34,56,1); }
+.grid-cell.height-6 { background: rgba(28,38,62,1); }
+
+/* EDGE CLUES */
+.clue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: #00f0ff;
+  text-shadow: 0 0 6px rgba(0,240,255,0.3);
+  opacity: 0.9;
+}
+.clue.satisfied {
+  color: #39ff14;
+  text-shadow: 0 0 8px rgba(57,255,20,0.4);
+}
+.clue.empty {
+  opacity: 0;
+}
+
+/* NUMBER PAD */
+.numpad {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.num-btn {
+  width: clamp(40px, 10vw, 52px);
+  height: clamp(40px, 10vw, 52px);
+  border: 1px solid rgba(0,240,255,0.2);
+  background: rgba(0,240,255,0.04);
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 4vw, 22px);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.num-btn:hover {
+  background: rgba(0,240,255,0.1);
+  border-color: rgba(0,240,255,0.4);
+  box-shadow: 0 0 10px rgba(0,240,255,0.15);
+}
+.num-btn:active {
+  transform: scale(0.95);
+}
+.num-btn.clear-btn {
+  border-color: rgba(255,45,123,0.3);
+  color: #ff2d7b;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+.num-btn.clear-btn:hover {
+  background: rgba(255,45,123,0.1);
+}
+
+/* COMPLETE SCREEN */
+#completeScreen { padding: 20px; gap: 14px; }
+.complete-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(28px, 7vw, 52px);
+  font-weight: 900;
+  color: #39ff14;
+  text-shadow: 0 0 20px rgba(57,255,20,0.6), 0 0 40px rgba(57,255,20,0.2);
+  letter-spacing: 4px;
+}
+.complete-stats {
+  display: flex; flex-direction: column; gap: 6px;
+  align-items: center;
+}
+.stat-row {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  color: #9999bb;
+  letter-spacing: 2px;
+}
+.stat-row strong {
+  color: #fff;
+  font-weight: 700;
+}
+.complete-btns {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+}
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; padding: 12px 30px;
+  border: 1px solid #39ff14; background: rgba(57,255,20,0.06);
+  color: #39ff14; cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+.share-copied {
+  font-size: 12px; color: #39ff14; letter-spacing: 2px;
+  min-height: 18px; text-align: center;
+}
+#endLB { width: 100%; max-width: 380px; }
+
+/* SCREEN SHAKE */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+.shake { animation: shake 0.25s ease-in-out; }
+
+/* PARTICLES */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 9998;
+}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="game-title">SKYSCRAPERS</div>
+  <div class="game-subtitle">See the skyline. Deduce the heights.</div>
+
+  <div class="diff-list">
+    <div class="diff-btn selected" data-size="4" onclick="selectDiff(this)">
+      <span class="diff-name">4 x 4</span>
+      <span class="diff-info">Easy</span>
+    </div>
+    <div class="diff-btn" data-size="5" onclick="selectDiff(this)">
+      <span class="diff-name">5 x 5</span>
+      <span class="diff-info">Medium</span>
+    </div>
+    <div class="diff-btn" data-size="6" onclick="selectDiff(this)">
+      <span class="diff-name">6 x 6</span>
+      <span class="diff-info">Hard</span>
+    </div>
+  </div>
+
+  <button class="play-btn" onclick="startGame()">START</button>
+  <div class="controls-hint">Click cell + number &bull; Arrows to move &bull; 1-6 to fill</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="game-header">
+    <div class="size-label" id="sizeLabel">4x4 EASY</div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="header-btns">
+      <button class="icon-btn" id="undoBtn" onclick="doUndo()" title="Undo">&#8630;</button>
+      <button class="icon-btn" onclick="resetPuzzle()" title="Reset">&#8635;</button>
+    </div>
+  </div>
+  <div class="grid-wrapper" id="gridWrapper"></div>
+  <div class="numpad" id="numpad"></div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+  <div class="complete-title">COMPLETE</div>
+  <div class="complete-stats">
+    <div class="stat-row">SIZE: <strong id="endSize">4x4</strong></div>
+    <div class="stat-row">TIME: <strong id="endTime">00:00</strong></div>
+  </div>
+  <div class="complete-btns">
+    <button class="share-btn" onclick="shareResult()">SHARE</button>
+    <button class="play-btn" onclick="newPuzzle()">NEW PUZZLE</button>
+    <button class="play-btn" onclick="showStart()">MENU</button>
+  </div>
+  <div class="share-copied" id="shareCopied"></div>
+  <div id="endLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // CONFIG
+  var SIZES = { 4: 'EASY', 5: 'MEDIUM', 6: 'HARD' };
+  var CLUE_KEEP = { 4: 0.6, 5: 0.5, 6: 0.4 };
+
+  // STATE
+  var N = 4;
+  var grid = [];
+  var solution = [];
+  var clues = { top: [], bottom: [], left: [], right: [] };
+  var selectedRow = -1, selectedCol = -1;
+  var timerStart = 0, timerInterval = null, elapsed = 0;
+  var moveHistory = [];
+  var gameActive = false;
+
+  // AUDIO
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playTone(freq, dur, type, vol) {
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol || 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  }
+  function sndPlace() { playTone(520, 0.12, 'sine', 0.07); }
+  function sndError() { playTone(180, 0.25, 'sawtooth', 0.06); playTone(140, 0.3, 'sawtooth', 0.04); }
+  function sndClear() { playTone(300, 0.08, 'sine', 0.05); }
+  function sndWin() {
+    [523, 659, 784, 1047].forEach(function(f, i) {
+      setTimeout(function() { playTone(f, 0.3, 'sine', 0.07); }, i * 120);
+    });
+  }
+
+  // PUZZLE GENERATION
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function generateLatinSquare(n) {
+    var g = [];
+    for (var i = 0; i < n; i++) g[i] = new Array(n).fill(0);
+
+    function canPlace(r, c, v) {
+      for (var i = 0; i < n; i++) {
+        if (g[r][i] === v) return false;
+        if (g[i][c] === v) return false;
+      }
+      return true;
+    }
+
+    function solve(pos) {
+      if (pos === n * n) return true;
+      var r = Math.floor(pos / n), c = pos % n;
+      var vals = [];
+      for (var i = 1; i <= n; i++) vals.push(i);
+      shuffle(vals);
+      for (var vi = 0; vi < vals.length; vi++) {
+        if (canPlace(r, c, vals[vi])) {
+          g[r][c] = vals[vi];
+          if (solve(pos + 1)) return true;
+          g[r][c] = 0;
+        }
+      }
+      return false;
+    }
+
+    solve(0);
+    return g;
+  }
+
+  function countVisible(arr) {
+    var max = 0, count = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] > max) { count++; max = arr[i]; }
+    }
+    return count;
+  }
+
+  function getColumnFromGrid(g, c) {
+    var col = [];
+    for (var r = 0; r < g.length; r++) col.push(g[r][c]);
+    return col;
+  }
+
+  function computeAllClues(sol, n) {
+    var top = [], bottom = [], left = [], right = [];
+    for (var c = 0; c < n; c++) {
+      var col = getColumnFromGrid(sol, c);
+      top.push(countVisible(col));
+      bottom.push(countVisible(col.slice().reverse()));
+    }
+    for (var r = 0; r < n; r++) {
+      left.push(countVisible(sol[r]));
+      right.push(countVisible(sol[r].slice().reverse()));
+    }
+    return { top: top, bottom: bottom, left: left, right: right };
+  }
+
+  function hasUniqueSolution(cluesObj, n) {
+    var solCount = 0;
+    var tg = [];
+    for (var i = 0; i < n; i++) tg[i] = new Array(n).fill(0);
+
+    function canPlace(r, c, v) {
+      for (var i = 0; i < n; i++) {
+        if (tg[r][i] === v) return false;
+        if (tg[i][c] === v) return false;
+      }
+      return true;
+    }
+
+    function checkCluesPartial(r, c) {
+      var rowComplete = true;
+      for (var i = 0; i < n; i++) { if (tg[r][i] === 0) { rowComplete = false; break; } }
+      if (rowComplete) {
+        if (cluesObj.left[r] > 0 && countVisible(tg[r]) !== cluesObj.left[r]) return false;
+        if (cluesObj.right[r] > 0 && countVisible(tg[r].slice().reverse()) !== cluesObj.right[r]) return false;
+      }
+      var colComplete = true;
+      for (var i = 0; i < n; i++) { if (tg[i][c] === 0) { colComplete = false; break; } }
+      if (colComplete) {
+        var col = getColumnFromGrid(tg, c);
+        if (cluesObj.top[c] > 0 && countVisible(col) !== cluesObj.top[c]) return false;
+        if (cluesObj.bottom[c] > 0 && countVisible(col.slice().reverse()) !== cluesObj.bottom[c]) return false;
+      }
+      return true;
+    }
+
+    function solve(pos) {
+      if (solCount > 1) return;
+      if (pos === n * n) { solCount++; return; }
+      var r = Math.floor(pos / n), c = pos % n;
+      for (var v = 1; v <= n; v++) {
+        if (canPlace(r, c, v)) {
+          tg[r][c] = v;
+          if (checkCluesPartial(r, c)) solve(pos + 1);
+          tg[r][c] = 0;
+        }
+      }
+    }
+
+    solve(0);
+    return solCount === 1;
+  }
+
+  function generatePuzzle(n) {
+    var sol = generateLatinSquare(n);
+    var allClues = computeAllClues(sol, n);
+    var keepRatio = CLUE_KEEP[n] || 0.5;
+
+    var indices = [];
+    for (var i = 0; i < n; i++) {
+      indices.push({ side: 'top', idx: i });
+      indices.push({ side: 'bottom', idx: i });
+      indices.push({ side: 'left', idx: i });
+      indices.push({ side: 'right', idx: i });
+    }
+    shuffle(indices);
+
+    var puzzleClues = {
+      top: allClues.top.slice(),
+      bottom: allClues.bottom.slice(),
+      left: allClues.left.slice(),
+      right: allClues.right.slice()
+    };
+
+    var totalClues = n * 4;
+    var targetKeep = Math.ceil(totalClues * keepRatio);
+    var removed = 0;
+    var maxRemove = totalClues - targetKeep;
+
+    for (var i = 0; i < indices.length && removed < maxRemove; i++) {
+      var ci = indices[i];
+      var oldVal = puzzleClues[ci.side][ci.idx];
+      puzzleClues[ci.side][ci.idx] = 0;
+      if (hasUniqueSolution(puzzleClues, n)) {
+        removed++;
+      } else {
+        puzzleClues[ci.side][ci.idx] = oldVal;
+      }
+    }
+
+    return { solution: sol, clues: puzzleClues };
+  }
+
+  // NEON.JS
+  function initNeon() {
+    if (typeof Neon !== 'undefined') {
+      Neon.init({
+        game: 'skyscrapers',
+        mode: 'low',
+        key: 'neonarcade_neonmind_skyscrapers_scores_' + N,
+        formatScore: function(s) {
+          var m = Math.floor(s / 60);
+          var sec = Math.floor(s % 60);
+          return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+      });
+      Neon.render(document.getElementById('startLB'));
+    }
+  }
+
+  // DIFFICULTY SELECT
+  window.selectDiff = function(el) {
+    document.querySelectorAll('.diff-btn').forEach(function(b) { b.classList.remove('selected'); });
+    el.classList.add('selected');
+    N = parseInt(el.dataset.size);
+    initNeon();
+  };
+
+  // SHOW SCREENS
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+  }
+
+  window.showStart = function() {
+    stopTimer();
+    gameActive = false;
+    showScreen('startScreen');
+    initNeon();
+  };
+
+  // TIMER
+  function startTimer() {
+    timerStart = Date.now();
+    elapsed = 0;
+    updateTimerDisplay();
+    timerInterval = setInterval(function() {
+      elapsed = (Date.now() - timerStart) / 1000;
+      updateTimerDisplay();
+    }, 200);
+  }
+  function stopTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  }
+  function updateTimerDisplay() {
+    var m = Math.floor(elapsed / 60);
+    var s = Math.floor(elapsed % 60);
+    document.getElementById('timer').textContent =
+      (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+  function formatTime(sec) {
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  // BUILD GRID UI
+  function buildGrid() {
+    var wrapper = document.getElementById('gridWrapper');
+    // Clear children safely
+    while (wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
+
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var maxGridWidth = Math.min(vw - 40, 500);
+    var maxGridHeight = vh - 200;
+    var totalSlots = N + 2;
+    var cellSize = Math.floor(Math.min(maxGridWidth / totalSlots, maxGridHeight / totalSlots));
+    cellSize = Math.max(cellSize, 32);
+    cellSize = Math.min(cellSize, 64);
+    var clueSize = cellSize;
+    var fontSize = Math.max(14, Math.floor(cellSize * 0.45));
+    var clueFontSize = Math.max(12, Math.floor(clueSize * 0.4));
+
+    var container = document.createElement('div');
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = clueSize + 'px repeat(' + N + ', ' + cellSize + 'px) ' + clueSize + 'px';
+    container.style.gridTemplateRows = clueSize + 'px repeat(' + N + ', ' + cellSize + 'px) ' + clueSize + 'px';
+    container.style.gap = '0px';
+
+    // Top-left corner
+    container.appendChild(document.createElement('div'));
+
+    // Top clues
+    for (var c = 0; c < N; c++) {
+      container.appendChild(createClue(clues.top[c], clueFontSize, 'top', c));
+    }
+
+    // Top-right corner
+    container.appendChild(document.createElement('div'));
+
+    // Grid rows
+    for (var r = 0; r < N; r++) {
+      container.appendChild(createClue(clues.left[r], clueFontSize, 'left', r));
+
+      for (var c = 0; c < N; c++) {
+        var cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.style.width = cellSize + 'px';
+        cell.style.height = cellSize + 'px';
+        cell.style.fontSize = fontSize + 'px';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.id = 'cell-' + r + '-' + c;
+        if (grid[r][c] > 0) {
+          cell.textContent = grid[r][c];
+          cell.classList.add('height-' + grid[r][c]);
+        }
+        (function(rr, cc) {
+          cell.addEventListener('click', function() { selectCell(rr, cc); });
+        })(r, c);
+        container.appendChild(cell);
+      }
+
+      container.appendChild(createClue(clues.right[r], clueFontSize, 'right', r));
+    }
+
+    // Bottom-left corner
+    container.appendChild(document.createElement('div'));
+
+    // Bottom clues
+    for (var c = 0; c < N; c++) {
+      container.appendChild(createClue(clues.bottom[c], clueFontSize, 'bottom', c));
+    }
+
+    // Bottom-right corner
+    container.appendChild(document.createElement('div'));
+
+    wrapper.appendChild(container);
+
+    buildNumpad();
+    updateClueColors();
+  }
+
+  function createClue(val, fontSize, side, idx) {
+    var el = document.createElement('div');
+    el.className = 'clue';
+    el.id = 'clue-' + side + '-' + idx;
+    el.style.fontSize = fontSize + 'px';
+    if (val > 0) {
+      el.textContent = val;
+    } else {
+      el.classList.add('empty');
+    }
+    return el;
+  }
+
+  function buildNumpad() {
+    var pad = document.getElementById('numpad');
+    while (pad.firstChild) pad.removeChild(pad.firstChild);
+    for (var i = 1; i <= N; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'num-btn';
+      btn.textContent = i;
+      (function(v) {
+        btn.addEventListener('click', function() { placeNumber(v); });
+      })(i);
+      pad.appendChild(btn);
+    }
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'num-btn clear-btn';
+    clearBtn.textContent = 'CLR';
+    clearBtn.addEventListener('click', function() { clearSelectedCell(); });
+    pad.appendChild(clearBtn);
+  }
+
+  // CELL SELECTION
+  function selectCell(r, c) {
+    selectedRow = r;
+    selectedCol = c;
+    document.querySelectorAll('.grid-cell').forEach(function(el) { el.classList.remove('selected'); });
+    var cell = document.getElementById('cell-' + r + '-' + c);
+    if (cell) cell.classList.add('selected');
+  }
+
+  // PLACE NUMBER
+  function placeNumber(val) {
+    if (!gameActive || selectedRow < 0 || selectedCol < 0) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    var r = selectedRow, c = selectedCol;
+    var old = grid[r][c];
+
+    if (old === val) {
+      clearSelectedCell();
+      return;
+    }
+
+    moveHistory.push({ r: r, c: c, old: old });
+    grid[r][c] = val;
+
+    var cell = document.getElementById('cell-' + r + '-' + c);
+    cell.textContent = val;
+    cell.className = 'grid-cell selected filled height-' + val;
+
+    var hasConflict = checkConflicts();
+    if (hasConflict) {
+      sndError();
+      document.getElementById('gameScreen').classList.add('shake');
+      setTimeout(function() { document.getElementById('gameScreen').classList.remove('shake'); }, 250);
+    } else {
+      sndPlace();
+    }
+
+    updateClueColors();
+
+    if (isGridFull() && !hasConflict && allCluesSatisfied()) {
+      gameWin();
+    }
+  }
+
+  function clearSelectedCell() {
+    if (!gameActive || selectedRow < 0 || selectedCol < 0) return;
+    var r = selectedRow, c = selectedCol;
+    if (grid[r][c] === 0) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    moveHistory.push({ r: r, c: c, old: grid[r][c] });
+    grid[r][c] = 0;
+    var cell = document.getElementById('cell-' + r + '-' + c);
+    cell.textContent = '';
+    cell.className = 'grid-cell selected';
+    sndClear();
+    checkConflicts();
+    updateClueColors();
+  }
+
+  // UNDO
+  window.doUndo = function() {
+    if (!gameActive || moveHistory.length === 0) return;
+    var entry = moveHistory.pop();
+    grid[entry.r][entry.c] = entry.old;
+    var cell = document.getElementById('cell-' + entry.r + '-' + entry.c);
+    cell.textContent = entry.old > 0 ? entry.old : '';
+    cell.className = 'grid-cell' + (entry.old > 0 ? ' height-' + entry.old : '');
+    selectedRow = entry.r;
+    selectedCol = entry.c;
+    cell.classList.add('selected');
+    document.querySelectorAll('.grid-cell').forEach(function(el) {
+      if (el !== cell) el.classList.remove('selected');
+    });
+    sndClear();
+    checkConflicts();
+    updateClueColors();
+  };
+
+  // RESET
+  window.resetPuzzle = function() {
+    if (!gameActive) return;
+    for (var r = 0; r < N; r++)
+      for (var c = 0; c < N; c++)
+        grid[r][c] = 0;
+    moveHistory = [];
+    selectedRow = -1;
+    selectedCol = -1;
+    buildGrid();
+  };
+
+  // CONFLICT CHECK
+  function checkConflicts() {
+    var conflictCells = {};
+
+    for (var r = 0; r < N; r++) {
+      var seen = {};
+      for (var c = 0; c < N; c++) {
+        var v = grid[r][c];
+        if (v === 0) continue;
+        if (seen[v] !== undefined) {
+          conflictCells[r + ',' + c] = true;
+          conflictCells[r + ',' + seen[v]] = true;
+        } else {
+          seen[v] = c;
+        }
+      }
+    }
+
+    for (var c = 0; c < N; c++) {
+      var seen = {};
+      for (var r = 0; r < N; r++) {
+        var v = grid[r][c];
+        if (v === 0) continue;
+        if (seen[v] !== undefined) {
+          conflictCells[r + ',' + c] = true;
+          conflictCells[seen[v] + ',' + c] = true;
+        } else {
+          seen[v] = r;
+        }
+      }
+    }
+
+    var hasAny = false;
+    for (var r = 0; r < N; r++) {
+      for (var c = 0; c < N; c++) {
+        var cell = document.getElementById('cell-' + r + '-' + c);
+        if (conflictCells[r + ',' + c]) {
+          cell.classList.add('conflict');
+          hasAny = true;
+        } else {
+          cell.classList.remove('conflict');
+        }
+      }
+    }
+
+    return hasAny;
+  }
+
+  // CLUE SATISFACTION
+  function updateClueColors() {
+    var sides = ['top', 'bottom', 'left', 'right'];
+    for (var si = 0; si < sides.length; si++) {
+      var side = sides[si];
+      for (var i = 0; i < N; i++) {
+        var clueVal = clues[side][i];
+        if (clueVal === 0) continue;
+        var el = document.getElementById('clue-' + side + '-' + i);
+        if (!el) continue;
+
+        var line = getLine(side, i);
+        var complete = true;
+        for (var k = 0; k < line.length; k++) { if (line[k] === 0) { complete = false; break; } }
+
+        if (complete) {
+          var vis;
+          if (side === 'bottom' || side === 'right') {
+            vis = countVisible(line.slice().reverse());
+          } else {
+            vis = countVisible(line);
+          }
+          if (vis === clueVal) {
+            el.classList.add('satisfied');
+          } else {
+            el.classList.remove('satisfied');
+          }
+        } else {
+          el.classList.remove('satisfied');
+        }
+      }
+    }
+  }
+
+  function getLine(side, idx) {
+    if (side === 'top' || side === 'bottom') return getColumnFromGrid(grid, idx);
+    return grid[idx].slice();
+  }
+
+  function isGridFull() {
+    for (var r = 0; r < N; r++)
+      for (var c = 0; c < N; c++)
+        if (grid[r][c] === 0) return false;
+    return true;
+  }
+
+  function allCluesSatisfied() {
+    var sides = ['top', 'bottom', 'left', 'right'];
+    for (var si = 0; si < sides.length; si++) {
+      var side = sides[si];
+      for (var i = 0; i < N; i++) {
+        var clueVal = clues[side][i];
+        if (clueVal === 0) continue;
+        var line = getLine(side, i);
+        var vis;
+        if (side === 'bottom' || side === 'right') {
+          vis = countVisible(line.slice().reverse());
+        } else {
+          vis = countVisible(line);
+        }
+        if (vis !== clueVal) return false;
+      }
+    }
+    return true;
+  }
+
+  // WIN
+  function gameWin() {
+    gameActive = false;
+    stopTimer();
+    sndWin();
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#39ff14', 20);
+
+    var solveTime = Math.floor(elapsed);
+    var diffName = SIZES[N] || '';
+    document.getElementById('endSize').textContent = N + 'x' + N + ' ' + diffName;
+    document.getElementById('endTime').textContent = formatTime(solveTime);
+
+    setTimeout(function() {
+      showScreen('completeScreen');
+
+      if (typeof Neon !== 'undefined') {
+        var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+        nameReady.then(function() {
+          return Neon.save(solveTime);
+        }).then(function(result) {
+          Neon.render(document.getElementById('endLB'));
+          if (result.globalRank >= 1 && result.globalRank <= 5) {
+            Neon.showGlobalSplash(result.globalRank);
+          }
+        });
+      }
+    }, 600);
+  }
+
+  // PARTICLES
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var size = 3 + Math.random() * 5;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.background = color;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 80 + Math.random() * 200;
+      var dx = Math.cos(angle) * speed;
+      var dy = Math.sin(angle) * speed;
+
+      (function(el, pdx, pdy) {
+        var startX = x, startY = y, t = 0;
+        var dur = 600 + Math.random() * 600;
+        function animate() {
+          t += 16;
+          var progress = t / dur;
+          if (progress >= 1) { el.remove(); return; }
+          el.style.left = (startX + pdx * progress) + 'px';
+          el.style.top = (startY + pdy * progress - 50 * progress) + 'px';
+          el.style.opacity = String(1 - progress);
+          requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+      })(p, dx, dy);
+    }
+  }
+
+  // SHARE
+  window.shareResult = function() {
+    var diffName = SIZES[N] || '';
+    var timeStr = formatTime(Math.floor(elapsed));
+    var text = '\u{1f3d9}\ufe0f SKYSCRAPERS\n' +
+      N + 'x' + N + ' ' + diffName + ' | ' + timeStr + '\n' +
+      'All clues satisfied! \u{1f3d7}\ufe0f\n' +
+      'neonarcade.net/neonmind/skyscrapers.html';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  };
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      document.getElementById('shareCopied').textContent = 'COPIED TO CLIPBOARD';
+      setTimeout(function() { document.getElementById('shareCopied').textContent = ''; }, 2000);
+    }).catch(function() {
+      document.getElementById('shareCopied').textContent = 'COPY FAILED';
+    });
+  }
+
+  // KEYBOARD
+  document.addEventListener('keydown', function(e) {
+    if (!gameActive) return;
+
+    if (e.key >= '1' && e.key <= '9' && parseInt(e.key) <= N) {
+      e.preventDefault();
+      placeNumber(parseInt(e.key));
+      return;
+    }
+
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      e.preventDefault();
+      clearSelectedCell();
+      return;
+    }
+
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      doUndo();
+      return;
+    }
+
+    var dr = 0, dc = 0;
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dr = -1;
+    else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dr = 1;
+    else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dc = -1;
+    else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dc = 1;
+
+    if (dr !== 0 || dc !== 0) {
+      e.preventDefault();
+      var nr = selectedRow + dr;
+      var nc = selectedCol + dc;
+      if (selectedRow < 0) { nr = 0; nc = 0; }
+      if (nr >= 0 && nr < N && nc >= 0 && nc < N) {
+        selectCell(nr, nc);
+      }
+    }
+  });
+
+  // START GAME
+  window.startGame = function() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    document.getElementById('sizeLabel').textContent = N + 'x' + N + ' ' + SIZES[N];
+
+    var puzzle = generatePuzzle(N);
+    solution = puzzle.solution;
+    clues = puzzle.clues;
+
+    grid = [];
+    for (var r = 0; r < N; r++) grid[r] = new Array(N).fill(0);
+    moveHistory = [];
+    selectedRow = -1;
+    selectedCol = -1;
+    gameActive = true;
+
+    showScreen('gameScreen');
+    buildGrid();
+    startTimer();
+  };
+
+  window.newPuzzle = function() {
+    startGame();
+  };
+
+  // INIT
+  initNeon();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TypeBlitz — Free Online Typing Speed Test | NEON ARCADE</title>
+<meta name="description" content="Play TypeBlitz free online — test your typing speed with a neon-styled WPM challenge. 15s, 30s, or 60s modes. No download, no login.">
+<meta name="keywords" content="typing test, wpm test, typing speed, typeblitz, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/typeblitz.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/typeblitz.html">
+<meta property="og:title" content="TypeBlitz — Free Online Typing Speed Test | NEON ARCADE">
+<meta property="og:description" content="Test your typing speed with a neon-styled WPM challenge.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/typeblitz.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/typeblitz.html">
+<meta name="twitter:title" content="TypeBlitz — Free Online Typing Speed Test | NEON ARCADE">
+<meta name="twitter:description" content="Test your typing speed with a neon-styled WPM challenge.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/typeblitz.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "TypeBlitz",
+  "url": "https://neonarcade.net/neonarcade/typeblitz.html",
+  "description": "Test your typing speed with a neon-styled WPM challenge.",
+  "genre": "Skill",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/typeblitz.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON ARCADE", "item": "https://neonarcade.net/neonarcade/" },
+    { "@type": "ListItem", "position": 3, "name": "TypeBlitz", "item": "https://neonarcade.net/neonarcade/typeblitz.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+  z-index: 999;
+}
+
+.bg-glow {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(0,240,255,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255,45,123,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.03) 0%, transparent 60%);
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 10;
+  transition: opacity 0.3s;
+}
+.screen.hidden { display: none; }
+
+/* ===== START SCREEN ===== */
+.title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900; font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: 6px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: clamp(16px, 3vw, 22px);
+  letter-spacing: 3px; text-transform: uppercase;
+  color: #9999bb;
+  margin-bottom: 28px;
+}
+
+/* Mode selector */
+.mode-selector {
+  display: flex; gap: 12px;
+  margin-bottom: 28px;
+}
+.mode-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border: 1px solid #7a7a9a;
+  background: transparent;
+  color: #7a7a9a;
+  cursor: pointer; border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.mode-btn:hover {
+  border-color: #00f0ff;
+  color: #00f0ff;
+  background: rgba(0,240,255,0.06);
+}
+.mode-btn.active {
+  border-color: #00f0ff;
+  color: #00f0ff;
+  background: rgba(0,240,255,0.1);
+  box-shadow: 0 0 15px rgba(0,240,255,0.15);
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff; cursor: pointer;
+  border-radius: 3px; text-transform: uppercase;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+
+.hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 14px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: #7a7a9a;
+  margin-bottom: 24px;
+}
+
+#startLB {
+  width: min(90vw, 420px);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+/* ===== GAME SCREEN ===== */
+#game-screen {
+  justify-content: flex-start;
+  padding: 0;
+}
+
+/* Timer bar */
+.timer-bar-wrap {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  position: relative;
+  flex-shrink: 0;
+}
+.timer-bar {
+  height: 100%;
+  background: #00f0ff;
+  box-shadow: 0 0 12px rgba(0,240,255,0.5);
+  transition: width 0.1s linear;
+  width: 100%;
+}
+.timer-bar.warning {
+  background: #ff8c00;
+  box-shadow: 0 0 12px rgba(255,140,0,0.5);
+}
+.timer-bar.danger {
+  background: #ff2d7b;
+  box-shadow: 0 0 12px rgba(255,45,123,0.5);
+}
+
+/* HUD */
+.hud {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  flex-shrink: 0;
+}
+.hud-stat {
+  text-align: center;
+}
+.hud-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: #7a7a9a;
+}
+.hud-val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700; font-size: clamp(18px, 4vw, 28px);
+  color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+.hud-val.wpm-main {
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 900;
+}
+
+/* Word display area */
+.words-area {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 5%;
+  overflow: hidden;
+  position: relative;
+}
+.words-inner {
+  max-width: 700px;
+  width: 100%;
+  line-height: 2.4;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: clamp(20px, 4vw, 28px);
+  text-align: left;
+  position: relative;
+}
+
+/* Individual word spans */
+.word {
+  display: inline-block;
+  margin-right: 0.4em;
+  position: relative;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color 0.15s;
+}
+.word.current {
+  border-bottom-color: #00f0ff;
+  filter: drop-shadow(0 2px 6px rgba(0,240,255,0.3));
+}
+.word .ch {
+  display: inline-block;
+  transition: color 0.08s;
+  color: #7a7a9a;
+}
+.word .ch.correct { color: #39ff14; }
+.word .ch.wrong {
+  color: #ff2d7b;
+  text-decoration: underline;
+  text-decoration-color: rgba(255,45,123,0.4);
+}
+.word .ch.current-char {
+  color: #fff;
+}
+/* Extra typed chars shown as pink */
+.word .ch.extra {
+  color: #ff2d7b;
+  opacity: 0.7;
+}
+
+/* Caret */
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: #00f0ff;
+  box-shadow: 0 0 8px rgba(0,240,255,0.6);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: caretBlink 1s steps(2) infinite;
+  transition: left 0.06s, top 0.06s;
+  z-index: 5;
+  pointer-events: none;
+}
+@keyframes caretBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Hidden input for mobile */
+#type-input {
+  position: absolute;
+  left: -9999px; top: -9999px;
+  opacity: 0;
+  width: 1px; height: 1px;
+}
+
+/* ===== RESULT SCREEN ===== */
+.result-wpm {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900; font-size: clamp(48px, 12vw, 80px);
+  color: #00f0ff;
+  text-shadow: 0 0 15px rgba(0,240,255,0.6), 0 0 50px rgba(0,240,255,0.2);
+  line-height: 1;
+}
+.result-wpm-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 16px;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: #7a7a9a;
+  margin-bottom: 20px;
+}
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  width: min(90vw, 400px);
+}
+.stat-box {
+  text-align: center;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 4px;
+  background: rgba(18,18,31,0.6);
+}
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700; font-size: 20px;
+  color: #fff;
+}
+.stat-val.green { color: #39ff14; }
+.stat-val.pink { color: #ff2d7b; }
+.stat-val.gold { color: #ffd700; }
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: #7a7a9a;
+  margin-top: 4px;
+}
+
+.result-btns {
+  display: flex; gap: 12px;
+  margin-bottom: 20px;
+}
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid #39ff14;
+  background: rgba(57,255,20,0.06);
+  color: #39ff14; cursor: pointer;
+  border-radius: 3px; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+}
+
+#endLB {
+  width: min(90vw, 420px);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Particles */
+.particle {
+  position: fixed;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Screen shake */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+}
+.shake {
+  animation: shake 0.2s ease-out;
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- ===== START SCREEN ===== -->
+<div id="start-screen" class="screen">
+  <div class="title">TYPEBLITZ</div>
+  <div class="subtitle">How fast can you type?</div>
+  <div class="mode-selector">
+    <button class="mode-btn" data-time="15">15s</button>
+    <button class="mode-btn active" data-time="30">30s</button>
+    <button class="mode-btn" data-time="60">60s</button>
+  </div>
+  <button class="play-btn" id="start-btn">START</button>
+  <div class="hint">Start typing to begin</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen" class="screen hidden">
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+  <div class="hud">
+    <div class="hud-stat"><div class="hud-label">TIME</div><div class="hud-val" id="hud-time">30</div></div>
+    <div class="hud-stat"><div class="hud-label">WPM</div><div class="hud-val wpm-main" id="hud-wpm">0</div></div>
+    <div class="hud-stat"><div class="hud-label">ACC</div><div class="hud-val" id="hud-acc">100%</div></div>
+  </div>
+  <div class="words-area" id="words-area">
+    <div class="words-inner" id="words-inner"></div>
+    <div class="caret" id="caret"></div>
+  </div>
+  <input type="text" id="type-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+</div>
+
+<!-- ===== RESULT SCREEN ===== -->
+<div id="result-screen" class="screen hidden">
+  <div class="result-wpm" id="res-wpm">0</div>
+  <div class="result-wpm-label">Words per minute</div>
+  <div class="result-stats">
+    <div class="stat-box"><div class="stat-val green" id="res-acc">100%</div><div class="stat-label">Accuracy</div></div>
+    <div class="stat-box"><div class="stat-val" id="res-chars">0/0</div><div class="stat-label">Chars</div></div>
+    <div class="stat-box"><div class="stat-val gold" id="res-words">0</div><div class="stat-label">Words</div></div>
+  </div>
+  <div class="result-btns">
+    <button class="share-btn" id="share-btn">SHARE</button>
+    <button class="play-btn" id="retry-btn">PLAY AGAIN</button>
+  </div>
+  <div id="endLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== WORD LIST =====
+  const WORDS = [
+    "the","be","to","of","and","in","that","have","it","for","not","on","with","he","as",
+    "you","do","at","this","but","his","by","from","they","we","say","her","she","or","an",
+    "will","my","one","all","would","there","their","what","so","up","out","if","about","who",
+    "get","which","go","me","when","make","can","like","time","no","just","him","know","take",
+    "people","into","year","your","good","some","could","them","see","other","than","then","now",
+    "look","only","come","its","over","think","also","back","after","use","two","how","our",
+    "work","first","well","way","even","new","want","give","most","find","here","thing","many",
+    "still","long","great","small","hand","high","keep","place","hold","turn","move","live",
+    "real","left","part","read","last","open","same","tell","need","home","run","night","each",
+    "play","point","start","city","help","four","set","name","under","close","door","never",
+    "old","hard","might","change","own","world","line","end","must","study","word","head",
+    "form","group","side","show","plan","learn","such","kind","next","both","face","ask",
+    "water","state","room","land","call","write","try","stop","grow","area","walk","food",
+    "stand","seem","girl","build","below","power","mark","begin","able","idea","class","young",
+    "body","carry","leave","watch","clear"
+  ];
+
+  // ===== CONFIG =====
+  let currentMode = 30;
+  let totalTime = 30;
+  let timeLeft = 30;
+  let timerInterval = null;
+  let gameStarted = false;
+  let gameEnded = false;
+  let startTime = 0;
+
+  // Word tracking
+  let wordList = [];
+  let wordIndex = 0;
+  let wordInputs = [];
+
+  // Stats
+  let correctChars = 0;
+  let wrongChars = 0;
+  let correctWords = 0;
+  let totalKeystrokes = 0;
+
+  // ===== DOM REFS =====
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  const wordsInner = document.getElementById('words-inner');
+  const wordsArea = document.getElementById('words-area');
+  const caret = document.getElementById('caret');
+  const typeInput = document.getElementById('type-input');
+  const timerBar = document.getElementById('timer-bar');
+  const hudTime = document.getElementById('hud-time');
+  const hudWpm = document.getElementById('hud-wpm');
+  const hudAcc = document.getElementById('hud-acc');
+  const startBtn = document.getElementById('start-btn');
+  const retryBtn = document.getElementById('retry-btn');
+  const shareBtn = document.getElementById('share-btn');
+  const modeBtns = document.querySelectorAll('.mode-btn');
+
+  // ===== AUDIO =====
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+  function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+
+  function playTick() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine'; o.frequency.value = 600 + Math.random() * 200;
+    g.gain.value = 0.04;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    o.start(); o.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playWordComplete() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine'; o.frequency.value = 880;
+    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
+    g.gain.value = 0.06;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+    o.start(); o.stop(audioCtx.currentTime + 0.12);
+  }
+
+  function playError() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sawtooth'; o.frequency.value = 200;
+    g.gain.value = 0.06;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    o.start(); o.stop(audioCtx.currentTime + 0.1);
+  }
+
+  function playTimerWarn() {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'square'; o.frequency.value = 440;
+    g.gain.value = 0.04;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    o.start(); o.stop(audioCtx.currentTime + 0.15);
+  }
+
+  function playResult() {
+    ensureAudio();
+    const notes = [523, 659, 784, 1047];
+    notes.forEach((f, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.value = 0.05;
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.12 + 0.2);
+      o.start(audioCtx.currentTime + i * 0.12);
+      o.stop(audioCtx.currentTime + i * 0.12 + 0.2);
+    });
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 40 + Math.random() * 80;
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed;
+      const dur = 400 + Math.random() * 300;
+      p.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0)', opacity: 0 }
+      ], { duration: dur, easing: 'ease-out' });
+      setTimeout(function() { p.remove(); }, dur);
+    }
+  }
+
+  // ===== NEON.JS INIT =====
+  function initNeon() {
+    Neon.init({
+      game: 'typeblitz',
+      mode: 'high',
+      key: 'neonarcade_neonarcade_typeblitz_scores_' + currentMode,
+      formatScore: function(s) { return (s / 10).toFixed(1) + ' WPM'; }
+    });
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  // ===== GENERATE WORDS =====
+  function generateWords(count) {
+    var result = [];
+    for (var i = 0; i < count; i++) {
+      result.push(WORDS[Math.floor(Math.random() * WORDS.length)]);
+    }
+    return result;
+  }
+
+  // ===== RENDER WORDS =====
+  let currentTypedBuffer = '';
+
+  function renderWords() {
+    // Clear all children safely
+    while (wordsInner.firstChild) {
+      wordsInner.removeChild(wordsInner.firstChild);
+    }
+
+    wordList.forEach(function(word, wi) {
+      var span = document.createElement('span');
+      span.className = 'word';
+      if (wi === wordIndex) span.classList.add('current');
+
+      var typed = '';
+      if (wi < wordIndex && wordInputs[wi]) {
+        typed = wordInputs[wi].typed;
+      } else if (wi === wordIndex) {
+        typed = currentTypedBuffer;
+      }
+
+      // Render each character of the word
+      for (var ci = 0; ci < word.length; ci++) {
+        var ch = document.createElement('span');
+        ch.className = 'ch';
+        ch.textContent = word[ci];
+
+        if (ci < typed.length) {
+          ch.classList.add(typed[ci] === word[ci] ? 'correct' : 'wrong');
+        } else if (wi === wordIndex && ci === typed.length) {
+          ch.classList.add('current-char');
+        }
+        span.appendChild(ch);
+      }
+
+      // Extra chars typed beyond word length
+      if (typed.length > word.length) {
+        for (var ei = word.length; ei < typed.length; ei++) {
+          var ech = document.createElement('span');
+          ech.className = 'ch extra';
+          ech.textContent = typed[ei];
+          span.appendChild(ech);
+        }
+      }
+
+      wordsInner.appendChild(span);
+    });
+
+    updateCaret();
+    scrollToCurrentWord();
+  }
+
+  // ===== CARET POSITION =====
+  function updateCaret() {
+    var wordEls = wordsInner.querySelectorAll('.word');
+    if (!wordEls[wordIndex]) return;
+    var currentWordEl = wordEls[wordIndex];
+    var chars = currentWordEl.querySelectorAll('.ch');
+    var typed = currentTypedBuffer;
+    var targetChar;
+
+    if (typed.length < chars.length) {
+      targetChar = chars[typed.length];
+    } else if (chars.length > 0) {
+      targetChar = chars[chars.length - 1];
+    }
+
+    if (targetChar) {
+      var rect = targetChar.getBoundingClientRect();
+      var areaRect = wordsArea.getBoundingClientRect();
+      if (typed.length >= chars.length && typed.length > 0) {
+        caret.style.left = (rect.right - areaRect.left) + 'px';
+      } else {
+        caret.style.left = (rect.left - areaRect.left) + 'px';
+      }
+      caret.style.top = (rect.top - areaRect.top + rect.height / 2) + 'px';
+      caret.style.height = rect.height * 0.8 + 'px';
+    }
+  }
+
+  // ===== SCROLL TO CURRENT WORD =====
+  function scrollToCurrentWord() {
+    var wordEls = wordsInner.querySelectorAll('.word');
+    if (!wordEls[wordIndex]) return;
+    var el = wordEls[wordIndex];
+    var areaRect = wordsArea.getBoundingClientRect();
+    var elRect = el.getBoundingClientRect();
+    var areaCenter = areaRect.top + areaRect.height * 0.45;
+    if (elRect.top > areaCenter) {
+      var offset = elRect.top - areaCenter;
+      var currentScroll = parseFloat(wordsInner.dataset.scrollY || '0');
+      wordsInner.style.transform = 'translateY(-' + (currentScroll + offset) + 'px)';
+      wordsInner.dataset.scrollY = String(currentScroll + offset);
+    }
+  }
+
+  // ===== TIMER =====
+  function startTimer() {
+    timerInterval = setInterval(function() {
+      timeLeft -= 0.1;
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        endGame();
+        return;
+      }
+      var pct = (timeLeft / totalTime) * 100;
+      timerBar.style.width = pct + '%';
+      if (pct <= 20) {
+        timerBar.className = 'timer-bar danger';
+      } else if (pct <= 40) {
+        timerBar.className = 'timer-bar warning';
+      } else {
+        timerBar.className = 'timer-bar';
+      }
+      hudTime.textContent = String(Math.ceil(timeLeft));
+
+      // Warning beep at 5, 4, 3, 2, 1
+      if (timeLeft <= 5 && Math.abs(timeLeft - Math.round(timeLeft)) < 0.05) {
+        playTimerWarn();
+      }
+
+      updateLiveStats();
+    }, 100);
+  }
+
+  function updateLiveStats() {
+    var elapsed = (Date.now() - startTime) / 1000;
+    if (elapsed < 0.5) return;
+    var wpm = (correctChars / 5) / (elapsed / 60);
+    hudWpm.textContent = String(Math.round(wpm));
+    var total = correctChars + wrongChars;
+    var acc = total > 0 ? Math.round((correctChars / total) * 100) : 100;
+    hudAcc.textContent = acc + '%';
+  }
+
+  // ===== HANDLE INPUT =====
+  function handleInput() {
+    if (gameEnded) return;
+    if (!gameStarted) return;
+
+    var val = typeInput.value;
+
+    // Check if space was typed (word separator)
+    if (val.endsWith(' ')) {
+      var typed = val.slice(0, -1);
+      submitWord(typed);
+      typeInput.value = '';
+      currentTypedBuffer = '';
+      renderWords();
+      return;
+    }
+
+    // Track previous length for sound
+    var prevLen = currentTypedBuffer.length;
+    currentTypedBuffer = val;
+
+    // Sound feedback on new char typed (not backspace)
+    if (val.length > prevLen) {
+      var word = wordList[wordIndex];
+      var pos = val.length - 1;
+      if (pos >= 0 && pos < word.length) {
+        if (val[pos] === word[pos]) {
+          playTick();
+        } else {
+          playError();
+        }
+      } else if (pos >= word.length) {
+        playError();
+      }
+    }
+
+    renderWords();
+  }
+
+  function submitWord(typed) {
+    var word = wordList[wordIndex];
+    var wordCorrectChars = 0;
+    var wordWrongChars = 0;
+    var maxLen = Math.max(typed.length, word.length);
+
+    for (var i = 0; i < maxLen; i++) {
+      if (i < typed.length && i < word.length) {
+        if (typed[i] === word[i]) {
+          wordCorrectChars++;
+        } else {
+          wordWrongChars++;
+        }
+      } else if (i < typed.length) {
+        wordWrongChars++;
+      } else {
+        wordWrongChars++;
+      }
+    }
+
+    correctChars += wordCorrectChars;
+    wrongChars += wordWrongChars;
+
+    var isCorrect = typed === word;
+    if (isCorrect) correctWords++;
+
+    wordInputs[wordIndex] = { typed: typed, correct: isCorrect };
+    totalKeystrokes += typed.length;
+
+    // Particles on word completion
+    var wordEls = wordsInner.querySelectorAll('.word');
+    if (wordEls[wordIndex]) {
+      var rect = wordEls[wordIndex].getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      if (isCorrect) {
+        spawnParticles(cx, cy, '#39ff14', 8);
+        playWordComplete();
+      } else {
+        spawnParticles(cx, cy, '#ff2d7b', 5);
+      }
+    }
+
+    wordIndex++;
+
+    // Generate more words if running low
+    if (wordIndex >= wordList.length - 10) {
+      wordList = wordList.concat(generateWords(30));
+    }
+  }
+
+  // ===== START GAME =====
+  function startGame() {
+    if (gameStarted) return;
+    gameStarted = true;
+    startTime = Date.now();
+    startTimer();
+    typeInput.focus();
+    caret.style.animationPlayState = 'running';
+  }
+
+  function showScreen(screen) {
+    startScreen.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    screen.classList.remove('hidden');
+  }
+
+  function initGame() {
+    gameStarted = false;
+    gameEnded = false;
+    wordIndex = 0;
+    currentTypedBuffer = '';
+    wordInputs = [];
+    correctChars = 0;
+    wrongChars = 0;
+    correctWords = 0;
+    totalKeystrokes = 0;
+    timeLeft = totalTime;
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+
+    timerBar.style.width = '100%';
+    timerBar.className = 'timer-bar';
+    hudTime.textContent = String(totalTime);
+    hudWpm.textContent = '0';
+    hudAcc.textContent = '100%';
+
+    wordsInner.style.transform = 'translateY(0)';
+    wordsInner.dataset.scrollY = '0';
+
+    wordList = generateWords(80);
+    typeInput.value = '';
+    renderWords();
+    showScreen(gameScreen);
+
+    setTimeout(function() { typeInput.focus(); }, 50);
+  }
+
+  // ===== END GAME =====
+  function endGame() {
+    if (gameEnded) return;
+    gameEnded = true;
+    if (timerInterval) clearInterval(timerInterval);
+
+    // Count the final partial word if any
+    var partialTyped = currentTypedBuffer;
+    if (partialTyped.length > 0) {
+      var word = wordList[wordIndex];
+      for (var i = 0; i < partialTyped.length; i++) {
+        if (i < word.length && partialTyped[i] === word[i]) {
+          correctChars++;
+        } else {
+          wrongChars++;
+        }
+      }
+      totalKeystrokes += partialTyped.length;
+    }
+
+    var elapsed = totalTime;
+    var wpm = (correctChars / 5) / (elapsed / 60);
+    var totalCharsTyped = correctChars + wrongChars;
+    var accuracy = totalCharsTyped > 0 ? (correctChars / totalCharsTyped) * 100 : 100;
+
+    playResult();
+
+    document.getElementById('res-wpm').textContent = String(Math.round(wpm));
+    document.getElementById('res-acc').textContent = accuracy.toFixed(1) + '%';
+    document.getElementById('res-chars').textContent = correctChars + '/' + totalCharsTyped;
+    document.getElementById('res-words').textContent = String(correctWords);
+
+    showScreen(resultScreen);
+
+    // Save score via Neon.js
+    var wpmScore = Math.round(wpm * 10);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(wpmScore);
+    }).then(function(result) {
+      Neon.render(document.getElementById('endLB'));
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+
+    // Store for share
+    window._lastResult = {
+      wpm: Math.round(wpm),
+      accuracy: accuracy.toFixed(1),
+      mode: currentMode,
+      words: correctWords
+    };
+  }
+
+  // ===== SHARE =====
+  function shareResult() {
+    var r = window._lastResult;
+    if (!r) return;
+    var text = '\u2328\uFE0F TYPEBLITZ\n' + r.wpm + ' WPM | ' + r.accuracy + '% accuracy\n' + r.mode + 's mode | ' + r.words + ' words\nneonarcade.net/neonarcade/typeblitz.html';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      shareBtn.textContent = 'COPIED!';
+      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+    }).catch(function() {
+      shareBtn.textContent = 'FAILED';
+      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+    });
+  }
+
+  // ===== MODE SELECTION =====
+  modeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      modeBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentMode = parseInt(btn.dataset.time, 10);
+      totalTime = currentMode;
+      timeLeft = currentMode;
+      initNeon();
+    });
+  });
+
+  // ===== EVENT LISTENERS =====
+  startBtn.addEventListener('click', function() {
+    initGame();
+  });
+
+  retryBtn.addEventListener('click', function() {
+    initNeon();
+    initGame();
+  });
+
+  shareBtn.addEventListener('click', shareResult);
+
+  // Keyboard: any key on start screen starts game
+  document.addEventListener('keydown', function(e) {
+    if (!startScreen.classList.contains('hidden')) {
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        initGame();
+        setTimeout(function() {
+          typeInput.value = e.key;
+          currentTypedBuffer = e.key;
+          if (!gameStarted) startGame();
+          handleInput();
+        }, 10);
+        return;
+      }
+    }
+
+    if (!gameScreen.classList.contains('hidden')) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        return;
+      }
+      typeInput.focus();
+    }
+  });
+
+  typeInput.addEventListener('input', function() {
+    if (!gameStarted && !gameEnded) {
+      startGame();
+    }
+    handleInput();
+  });
+
+  // Handle backspace re-render
+  typeInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace') {
+      setTimeout(function() {
+        currentTypedBuffer = typeInput.value;
+        renderWords();
+      }, 0);
+    }
+  });
+
+  // Mobile: tap words area to focus input
+  wordsArea.addEventListener('click', function() {
+    typeInput.focus();
+  });
+  wordsArea.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    typeInput.focus();
+  });
+
+  // ===== INIT =====
+  initNeon();
+})();
+</script>
+</body>
+</html>

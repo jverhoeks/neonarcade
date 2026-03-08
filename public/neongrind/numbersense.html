@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NumberSense — Free Online Dot Estimation Game | NEON ARCADE</title>
+<meta name="description" content="Play NumberSense free online — dots flash on screen, estimate how many. Test your subitizing and number sense. 20 rounds of visual estimation. No download, no login.">
+<meta name="keywords" content="number sense, dot estimation, subitizing, counting game, brain game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neongrind/numbersense.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neongrind/numbersense.html">
+<meta property="og:title" content="NumberSense — Free Online Dot Estimation Game | NEON ARCADE">
+<meta property="og:description" content="Dots flash on screen — estimate how many. Test your number sense.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/numbersense.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neongrind/numbersense.html">
+<meta name="twitter:title" content="NumberSense — Free Online Dot Estimation Game | NEON ARCADE">
+<meta name="twitter:description" content="Dots flash on screen — estimate how many. Test your number sense.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/numbersense.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "NumberSense",
+  "url": "https://neonarcade.net/neongrind/numbersense.html",
+  "description": "Dots flash on screen — estimate how many. Test your number sense.",
+  "genre": "Brain Training",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/numbersense.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON GRIND", "item": "https://neonarcade.net/neongrind/" },
+    { "@type": "ListItem", "position": 3, "name": "NumberSense", "item": "https://neonarcade.net/neongrind/numbersense.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:10}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{text-align:center;gap:12px}
+.game-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,7vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-transform:uppercase;margin-bottom:4px}
+.game-subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;color:#9999bb;text-transform:uppercase;margin-bottom:16px;max-width:500px}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:8px}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+#startLB{margin-top:16px;width:100%;max-width:400px}
+
+/* GAME SCREEN */
+#gameScreen{padding:0}
+#gameCanvas{position:absolute;top:0;left:0;width:100%;height:100%}
+
+.hud{position:absolute;top:12px;left:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:0 16px;z-index:20;pointer-events:none}
+.hud-item{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,2.5vw,16px);letter-spacing:2px;color:#9999bb}
+.hud-score{color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-round{color:#9999bb}
+
+/* COUNTDOWN OVERLAY */
+#countdownOverlay{position:absolute;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:30;background:rgba(10,10,18,0.85)}
+#countdownOverlay.active{display:flex}
+#countdownText{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(60px,15vw,120px);color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.6),0 0 60px rgba(0,240,255,0.3);transition:transform 0.15s,opacity 0.15s}
+
+/* INPUT OVERLAY */
+#inputOverlay{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:30;background:rgba(10,10,18,0.7);gap:16px}
+#inputOverlay.active{display:flex}
+.input-prompt{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,4vw,24px);letter-spacing:3px;color:#9999bb;text-transform:uppercase}
+.input-row{display:flex;align-items:center;gap:12px}
+.adj-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:28px;width:56px;height:56px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.adj-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 15px rgba(0,240,255,0.2)}
+.adj-btn:active{transform:scale(0.95)}
+#guessInput{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,56px);width:140px;text-align:center;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.3);color:#00f0ff;border-radius:3px;padding:8px;outline:none;-moz-appearance:textfield}
+#guessInput::-webkit-outer-spin-button,#guessInput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+#guessInput:focus{border-color:#00f0ff;box-shadow:0 0 15px rgba(0,240,255,0.2)}
+.submit-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:12px 32px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:4px}
+.submit-btn:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 20px rgba(57,255,20,0.2);transform:scale(1.04)}
+.input-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+/* RESULT OVERLAY */
+#resultOverlay{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:30;background:rgba(10,10,18,0.85);gap:12px}
+#resultOverlay.active{display:flex}
+.result-actual{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(20px,5vw,32px);letter-spacing:2px;color:#fff}
+.result-guess{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(14px,3vw,18px);letter-spacing:2px;color:#9999bb}
+.result-points{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(24px,6vw,40px);letter-spacing:3px;margin-top:4px}
+.accuracy-bar-wrap{width:clamp(200px,60vw,360px);height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;margin-top:4px}
+.accuracy-bar{height:100%;border-radius:4px;transition:width 0.6s ease-out}
+.result-pct{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+/* END SCREEN */
+#endScreen{text-align:center;gap:10px;overflow-y:auto}
+.end-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,6vw,40px);letter-spacing:4px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2)}
+.end-score{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,9vw,64px);letter-spacing:4px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.5),0 0 40px rgba(255,215,0,0.2)}
+.end-max{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;letter-spacing:2px;color:#7a7a9a}
+.end-stats{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin:4px 0}
+.end-stat{text-align:center}
+.end-stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,4vw,24px);color:#00f0ff}
+.end-stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.brain-type{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,20px);letter-spacing:3px;padding:8px 20px;border:1px solid;border-radius:3px;text-transform:uppercase}
+.end-bar-wrap{width:clamp(200px,70vw,400px);height:10px;background:rgba(255,255,255,0.08);border-radius:5px;overflow:hidden}
+.end-bar{height:100%;border-radius:5px;background:linear-gradient(90deg,#00f0ff,#39ff14)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:3px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.06);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(180,77,255,0.15);box-shadow:0 0 20px rgba(180,77,255,0.2);transform:scale(1.04)}
+#endLB{width:100%;max-width:400px;margin-top:8px}
+
+/* PARTICLES */
+.particle{position:absolute;pointer-events:none;border-radius:50%;z-index:50}
+
+/* SCREEN SHAKE */
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,3px)}80%{transform:translate(2px,-3px)}}
+.shake{animation:shake 0.25s ease-in-out}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="game-title">NUMBERSENSE</div>
+  <div class="game-subtitle">Dots flash on screen. How many did you see? Test your estimation instincts across 20 rounds of increasing chaos.</div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">Type your guess or use +/- buttons</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <canvas id="gameCanvas"></canvas>
+  <div class="hud">
+    <span class="hud-item hud-round" id="hudRound">ROUND 1/20</span>
+    <span class="hud-item hud-score" id="hudScore">0</span>
+  </div>
+  <div id="countdownOverlay"><span id="countdownText">3</span></div>
+  <div id="inputOverlay">
+    <div class="input-prompt">How many dots?</div>
+    <div class="input-row">
+      <button class="adj-btn" id="btnMinus">−</button>
+      <input type="number" id="guessInput" min="1" max="999" value="10">
+      <button class="adj-btn" id="btnPlus">+</button>
+    </div>
+    <button class="submit-btn" id="submitBtn">SUBMIT</button>
+    <div class="input-hint">Enter to submit</div>
+  </div>
+  <div id="resultOverlay">
+    <div class="result-actual" id="resultActual">ACTUAL: 42</div>
+    <div class="result-guess" id="resultGuess">YOUR GUESS: 38</div>
+    <div class="result-points" id="resultPoints">+80</div>
+    <div class="accuracy-bar-wrap"><div class="accuracy-bar" id="accuracyBar"></div></div>
+    <div class="result-pct" id="resultPct">90% ACCURACY</div>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="endScreen" class="screen">
+  <div class="end-title">RESULTS</div>
+  <div class="end-score" id="endScore">0</div>
+  <div class="end-max">/ 2,000</div>
+  <div class="end-bar-wrap"><div class="end-bar" id="endBar"></div></div>
+  <div class="end-stats">
+    <div class="end-stat"><div class="end-stat-val" id="endAvgErr">0%</div><div class="end-stat-label">Avg Error</div></div>
+    <div class="end-stat"><div class="end-stat-val" id="endBestRound">-</div><div class="end-stat-label">Best Round</div></div>
+    <div class="end-stat"><div class="end-stat-val" id="endWorstRound">-</div><div class="end-stat-label">Worst Round</div></div>
+    <div class="end-stat"><div class="end-stat-val" id="endPerfect">0</div><div class="end-stat-label">Perfect</div></div>
+  </div>
+  <div class="brain-type" id="brainType">QUICK GUESSER</div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+  </div>
+  <div id="endLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // === CONFIG ===
+  const TOTAL_ROUNDS = 20;
+  const ROUND_CONFIG = [
+    { minDots: 3,  maxDots: 9,   flashTime: 1000 },  // rounds 1-5
+    { minDots: 8,  maxDots: 20,  flashTime: 750 },   // rounds 6-10
+    { minDots: 15, maxDots: 50,  flashTime: 600 },   // rounds 11-15
+    { minDots: 30, maxDots: 100, flashTime: 500 }    // rounds 16-20
+  ];
+  const DOT_MIN_R = 4;
+  const DOT_MAX_R = 10;
+  const DOT_PADDING = 50;
+
+  // === DOM ===
+  const startScreen = document.getElementById('startScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const endScreen = document.getElementById('endScreen');
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const hudRound = document.getElementById('hudRound');
+  const hudScore = document.getElementById('hudScore');
+  const countdownOverlay = document.getElementById('countdownOverlay');
+  const countdownText = document.getElementById('countdownText');
+  const inputOverlay = document.getElementById('inputOverlay');
+  const guessInput = document.getElementById('guessInput');
+  const resultOverlay = document.getElementById('resultOverlay');
+  const resultActual = document.getElementById('resultActual');
+  const resultGuess = document.getElementById('resultGuess');
+  const resultPoints = document.getElementById('resultPoints');
+  const accuracyBar = document.getElementById('accuracyBar');
+  const resultPct = document.getElementById('resultPct');
+
+  // === AUDIO ===
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playTone(freq, dur, type, vol) {
+    var g = audioCtx.createGain();
+    var o = audioCtx.createOscillator();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  }
+  function sndCountdown() { playTone(440, 0.12, 'square', 0.08); }
+  function sndGo() { playTone(880, 0.2, 'square', 0.1); }
+  function sndFlash() { playTone(600, 0.15, 'sine', 0.06); }
+  function sndSubmit() { playTone(520, 0.1, 'triangle', 0.08); }
+  function sndPerfect() { playTone(660, 0.1, 'sine', 0.1); setTimeout(function(){ playTone(880, 0.1, 'sine', 0.1); }, 100); setTimeout(function(){ playTone(1100, 0.15, 'sine', 0.1); }, 200); }
+  function sndGood() { playTone(660, 0.12, 'sine', 0.08); setTimeout(function(){ playTone(790, 0.15, 'sine', 0.08); }, 100); }
+  function sndBad() { playTone(200, 0.25, 'sawtooth', 0.06); }
+  function sndReveal() { playTone(400, 0.08, 'triangle', 0.06); setTimeout(function(){ playTone(500, 0.08, 'triangle', 0.06); }, 60); setTimeout(function(){ playTone(650, 0.12, 'triangle', 0.06); }, 120); }
+
+  // === STATE ===
+  var round = 0;
+  var score = 0;
+  var dots = [];
+  var actualCount = 0;
+  var roundResults = []; // { actual, guess, points, error }
+  var dpr = 1;
+  var cw = 0, ch = 0;
+  var showingDots = false;
+  var idleAnim = null;
+  var idleDots = [];
+
+  // === SIZING ===
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    cw = window.innerWidth;
+    ch = window.innerHeight;
+    canvas.width = cw * dpr;
+    canvas.height = ch * dpr;
+    canvas.style.width = cw + 'px';
+    canvas.style.height = ch + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // === DOT GENERATION ===
+  function generateDots(count) {
+    var result = [];
+    var minSpacing = DOT_MAX_R * 2.5;
+    var padX = DOT_PADDING;
+    var padY = DOT_PADDING + 40; // extra top for HUD
+    var attempts = 0;
+    var maxAttempts = count * 150;
+    while (result.length < count && attempts < maxAttempts) {
+      attempts++;
+      var r = DOT_MIN_R + Math.random() * (DOT_MAX_R - DOT_MIN_R);
+      var x = padX + r + Math.random() * (cw - 2 * padX - 2 * r);
+      var y = padY + r + Math.random() * (ch - padY - DOT_PADDING - 2 * r);
+      var overlap = false;
+      for (var i = 0; i < result.length; i++) {
+        var d = result[i];
+        var dx = x - d.x, dy = y - d.y;
+        if (Math.sqrt(dx * dx + dy * dy) < r + d.r + minSpacing) {
+          overlap = true;
+          break;
+        }
+      }
+      if (!overlap) {
+        result.push({ x: x, y: y, r: r });
+      }
+    }
+    // If we couldn't place all dots with strict spacing, relax and fill remaining
+    if (result.length < count) {
+      var relaxSpacing = DOT_MAX_R * 1.5;
+      attempts = 0;
+      while (result.length < count && attempts < count * 200) {
+        attempts++;
+        var r2 = DOT_MIN_R + Math.random() * (DOT_MAX_R - DOT_MIN_R);
+        var x2 = padX + r2 + Math.random() * (cw - 2 * padX - 2 * r2);
+        var y2 = padY + r2 + Math.random() * (ch - padY - DOT_PADDING - 2 * r2);
+        var ov = false;
+        for (var j = 0; j < result.length; j++) {
+          var d2 = result[j];
+          var dx2 = x2 - d2.x, dy2 = y2 - d2.y;
+          if (Math.sqrt(dx2 * dx2 + dy2 * dy2) < r2 + d2.r + relaxSpacing) {
+            ov = true;
+            break;
+          }
+        }
+        if (!ov) {
+          result.push({ x: x2, y: y2, r: r2 });
+        }
+      }
+    }
+    return result;
+  }
+
+  // === DRAWING ===
+  function clearCanvas() {
+    ctx.clearRect(0, 0, cw, ch);
+  }
+
+  function drawDots(dotArray, alpha) {
+    var a = alpha !== undefined ? alpha : 1;
+    for (var i = 0; i < dotArray.length; i++) {
+      var d = dotArray[i];
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,240,255,' + a + ')';
+      ctx.shadowColor = 'rgba(0,240,255,' + (a * 0.6) + ')';
+      ctx.shadowBlur = 15;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  // === PARTICLES ===
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < (count || 12); i++) {
+      var el = document.createElement('div');
+      el.className = 'particle';
+      var size = 3 + Math.random() * 5;
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.background = color || '#00f0ff';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.boxShadow = '0 0 6px ' + (color || '#00f0ff');
+      document.body.appendChild(el);
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 40 + Math.random() * 80;
+      var dx = Math.cos(angle) * speed;
+      var dy = Math.sin(angle) * speed;
+      (function(el, dx, dy) {
+        var px = parseFloat(el.style.left);
+        var py = parseFloat(el.style.top);
+        var opacity = 1;
+        var step = function() {
+          px += dx * 0.016;
+          py += dy * 0.016;
+          dy += 60 * 0.016; // gravity
+          opacity -= 0.016 * 1.8;
+          if (opacity <= 0) { el.remove(); return; }
+          el.style.left = px + 'px';
+          el.style.top = py + 'px';
+          el.style.opacity = opacity;
+          requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      })(el, dx, dy);
+    }
+  }
+
+  // === IDLE ANIMATION ===
+  function startIdleAnim() {
+    idleDots = [];
+    for (var i = 0; i < 15; i++) {
+      idleDots.push({
+        x: Math.random() * cw,
+        y: Math.random() * ch,
+        r: 2 + Math.random() * 4,
+        vx: (Math.random() - 0.5) * 30,
+        vy: (Math.random() - 0.5) * 30,
+        a: 0.15 + Math.random() * 0.2
+      });
+    }
+    function tick() {
+      idleAnim = requestAnimationFrame(tick);
+      clearCanvas();
+      for (var i = 0; i < idleDots.length; i++) {
+        var d = idleDots[i];
+        d.x += d.vx * 0.016;
+        d.y += d.vy * 0.016;
+        if (d.x < 0 || d.x > cw) d.vx *= -1;
+        if (d.y < 0 || d.y > ch) d.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,240,255,' + d.a + ')';
+        ctx.shadowColor = 'rgba(0,240,255,' + (d.a * 0.4) + ')';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+    tick();
+  }
+
+  function stopIdleAnim() {
+    if (idleAnim) { cancelAnimationFrame(idleAnim); idleAnim = null; }
+    clearCanvas();
+  }
+
+  // === SCREENS ===
+  function showScreen(id) {
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  // === ROUND CONFIG ===
+  function getRoundConfig(r) {
+    var tier = Math.min(Math.floor(r / 5), 3);
+    return ROUND_CONFIG[tier];
+  }
+
+  // === SCORING ===
+  function calcPoints(actual, guess) {
+    if (actual === 0) return 0;
+    var err = Math.abs(guess - actual) / actual;
+    if (err === 0) return 100;
+    if (err <= 0.10) return 80;
+    if (err <= 0.20) return 60;
+    if (err <= 0.30) return 40;
+    if (err <= 0.50) return 20;
+    return 0;
+  }
+
+  // === COUNTDOWN ===
+  function doCountdown(cb) {
+    countdownOverlay.classList.add('active');
+    var nums = ['3', '2', '1', 'GO'];
+    var i = 0;
+    function tick() {
+      countdownText.textContent = nums[i];
+      countdownText.style.transform = 'scale(1.3)';
+      countdownText.style.opacity = '1';
+      if (nums[i] === 'GO') {
+        sndGo();
+        countdownText.style.color = '#39ff14';
+      } else {
+        sndCountdown();
+        countdownText.style.color = '#00f0ff';
+      }
+      setTimeout(function() {
+        countdownText.style.transform = 'scale(1)';
+        countdownText.style.opacity = '0.5';
+      }, 200);
+      i++;
+      if (i < nums.length) {
+        setTimeout(tick, 500);
+      } else {
+        setTimeout(function() {
+          countdownOverlay.classList.remove('active');
+          cb();
+        }, 350);
+      }
+    }
+    tick();
+  }
+
+  // === ROUND FLOW ===
+  function startRound() {
+    var cfg = getRoundConfig(round);
+    actualCount = cfg.minDots + Math.floor(Math.random() * (cfg.maxDots - cfg.minDots + 1));
+    dots = generateDots(actualCount);
+
+    hudRound.textContent = 'ROUND ' + (round + 1) + '/' + TOTAL_ROUNDS;
+    hudScore.textContent = score;
+
+    inputOverlay.classList.remove('active');
+    resultOverlay.classList.remove('active');
+
+    // Brief pause then countdown
+    if (round === 0) {
+      doCountdown(flashDots);
+    } else {
+      // Mini countdown for subsequent rounds - just flash round number
+      countdownOverlay.classList.add('active');
+      countdownText.textContent = 'R' + (round + 1);
+      countdownText.style.color = '#9999bb';
+      countdownText.style.transform = 'scale(1)';
+      countdownText.style.opacity = '1';
+      sndCountdown();
+      setTimeout(function() {
+        countdownOverlay.classList.remove('active');
+        flashDots();
+      }, 600);
+    }
+  }
+
+  function flashDots() {
+    var cfg = getRoundConfig(round);
+    showingDots = true;
+    clearCanvas();
+    drawDots(dots);
+    sndFlash();
+
+    setTimeout(function() {
+      showingDots = false;
+      clearCanvas();
+      showInput();
+    }, cfg.flashTime);
+  }
+
+  function showInput() {
+    // Set default guess to middle of current range
+    var cfg = getRoundConfig(round);
+    var mid = Math.round((cfg.minDots + cfg.maxDots) / 2);
+    guessInput.value = mid;
+    inputOverlay.classList.add('active');
+    guessInput.focus();
+    guessInput.select();
+  }
+
+  function submitGuess() {
+    var guess = parseInt(guessInput.value) || 0;
+    if (guess < 1) guess = 1;
+    if (guess > 999) guess = 999;
+    sndSubmit();
+    inputOverlay.classList.remove('active');
+
+    var pts = calcPoints(actualCount, guess);
+    var error = actualCount > 0 ? Math.abs(guess - actualCount) / actualCount : 1;
+    var accuracy = Math.max(0, 1 - error);
+
+    score += pts;
+    roundResults.push({ actual: actualCount, guess: guess, points: pts, error: error });
+
+    hudScore.textContent = score;
+    showResult(guess, pts, accuracy);
+  }
+
+  function showResult(guess, pts, accuracy) {
+    resultActual.textContent = 'ACTUAL: ' + actualCount;
+    resultGuess.textContent = 'YOUR GUESS: ' + guess;
+
+    // Color the points
+    var ptColor = '#ff2d7b';
+    if (pts === 100) ptColor = '#ffd700';
+    else if (pts >= 60) ptColor = '#39ff14';
+    else if (pts >= 20) ptColor = '#ff8c00';
+    resultPoints.textContent = '+' + pts;
+    resultPoints.style.color = ptColor;
+    resultPoints.style.textShadow = '0 0 10px ' + ptColor + '80, 0 0 30px ' + ptColor + '30';
+
+    // Accuracy bar
+    var pctVal = Math.round(accuracy * 100);
+    accuracyBar.style.width = '0%';
+    if (pctVal >= 80) accuracyBar.style.background = 'linear-gradient(90deg, #00f0ff, #39ff14)';
+    else if (pctVal >= 50) accuracyBar.style.background = 'linear-gradient(90deg, #ff8c00, #ffd700)';
+    else accuracyBar.style.background = 'linear-gradient(90deg, #ff2d7b, #ff8c00)';
+    resultPct.textContent = pctVal + '% ACCURACY';
+
+    // Show dots briefly for reveal
+    clearCanvas();
+    drawDots(dots, 0.4);
+
+    resultOverlay.classList.add('active');
+    sndReveal();
+
+    // Animate bar
+    setTimeout(function() {
+      accuracyBar.style.width = pctVal + '%';
+    }, 50);
+
+    // Sound + effects
+    if (pts === 100) {
+      sndPerfect();
+      spawnParticles(cw / 2, ch / 2, '#ffd700', 20);
+    } else if (pts >= 60) {
+      sndGood();
+    } else if (pts === 0) {
+      sndBad();
+      document.body.classList.add('shake');
+      setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+    }
+
+    // Move to next round or end
+    var delay = pts === 100 ? 1800 : 1400;
+    setTimeout(function() {
+      resultOverlay.classList.remove('active');
+      clearCanvas();
+      round++;
+      if (round < TOTAL_ROUNDS) {
+        startRound();
+      } else {
+        endGame();
+      }
+    }, delay);
+  }
+
+  // === END GAME ===
+  function endGame() {
+    showScreen('endScreen');
+
+    document.getElementById('endScore').textContent = score.toLocaleString();
+    document.getElementById('endBar').style.width = Math.round(score / 2000 * 100) + '%';
+
+    // Avg error
+    var totalErr = 0;
+    var bestPts = -1, bestR = 0;
+    var worstPts = 101, worstR = 0;
+    var perfectCount = 0;
+    for (var i = 0; i < roundResults.length; i++) {
+      var r = roundResults[i];
+      totalErr += r.error;
+      if (r.points > bestPts) { bestPts = r.points; bestR = i + 1; }
+      if (r.points < worstPts) { worstPts = r.points; worstR = i + 1; }
+      if (r.points === 100) perfectCount++;
+    }
+    var avgErr = totalErr / roundResults.length;
+    document.getElementById('endAvgErr').textContent = (avgErr * 100).toFixed(1) + '%';
+    document.getElementById('endBestRound').textContent = 'R' + bestR;
+    document.getElementById('endWorstRound').textContent = 'R' + worstR;
+    document.getElementById('endPerfect').textContent = perfectCount;
+
+    // Brain type
+    var bt = document.getElementById('brainType');
+    if (score >= 1800) {
+      bt.textContent = 'PERFECT ESTIMATOR';
+      bt.style.color = '#ffd700';
+      bt.style.borderColor = '#ffd700';
+    } else if (score >= 1400) {
+      bt.textContent = 'SHARP COUNTER';
+      bt.style.color = '#39ff14';
+      bt.style.borderColor = '#39ff14';
+    } else if (score >= 1000) {
+      bt.textContent = 'QUICK GUESSER';
+      bt.style.color = '#00f0ff';
+      bt.style.borderColor = '#00f0ff';
+    } else {
+      bt.textContent = 'GUT FEELER';
+      bt.style.color = '#b44dff';
+      bt.style.borderColor = '#b44dff';
+    }
+
+    // Neon.js save
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      Neon.render(document.getElementById('endLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+  }
+
+  // === SHARE ===
+  function getShareText() {
+    var pct = Math.round(score / 2000 * 100);
+    var filledBlocks = Math.round(pct / 10);
+    var bar = '';
+    for (var i = 0; i < 10; i++) bar += i < filledBlocks ? '\u2588' : '\u2591';
+    var avgErr = 0;
+    for (var i = 0; i < roundResults.length; i++) avgErr += roundResults[i].error;
+    avgErr = ((avgErr / roundResults.length) * 100).toFixed(1);
+    var bt = document.getElementById('brainType').textContent;
+    return '\uD83D\uDD22 NUMBERSENSE\nScore: ' + score.toLocaleString() + ' / 2,000\nAvg Error: ' + avgErr + '% | Type: ' + bt + '\n' + bar + ' ' + pct + '%\nneonarcade.net/neongrind/numbersense.html';
+  }
+
+  document.getElementById('shareBtn').addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('shareBtn');
+        btn.textContent = 'COPIED!';
+        setTimeout(function() { btn.textContent = 'SHARE'; }, 1500);
+      });
+    }
+  });
+
+  // === INPUT HANDLERS ===
+  document.getElementById('btnMinus').addEventListener('click', function() {
+    var v = parseInt(guessInput.value) || 1;
+    guessInput.value = Math.max(1, v - 1);
+  });
+  document.getElementById('btnPlus').addEventListener('click', function() {
+    var v = parseInt(guessInput.value) || 0;
+    guessInput.value = Math.min(999, v + 1);
+  });
+  document.getElementById('submitBtn').addEventListener('click', function() {
+    submitGuess();
+  });
+  guessInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitGuess();
+    }
+  });
+
+  // Long press for +/-
+  var holdTimer = null;
+  var holdInterval = null;
+  function startHold(dir) {
+    holdTimer = setTimeout(function() {
+      holdInterval = setInterval(function() {
+        var v = parseInt(guessInput.value) || 1;
+        guessInput.value = Math.max(1, Math.min(999, v + dir));
+      }, 60);
+    }, 300);
+  }
+  function stopHold() {
+    clearTimeout(holdTimer);
+    clearInterval(holdInterval);
+  }
+  var minus = document.getElementById('btnMinus');
+  var plus = document.getElementById('btnPlus');
+  minus.addEventListener('mousedown', function() { startHold(-1); });
+  minus.addEventListener('mouseup', stopHold);
+  minus.addEventListener('mouseleave', stopHold);
+  minus.addEventListener('touchstart', function(e) { e.preventDefault(); startHold(-1); var v = parseInt(guessInput.value) || 1; guessInput.value = Math.max(1, v - 1); });
+  minus.addEventListener('touchend', function(e) { e.preventDefault(); stopHold(); });
+  plus.addEventListener('mousedown', function() { startHold(1); });
+  plus.addEventListener('mouseup', stopHold);
+  plus.addEventListener('mouseleave', stopHold);
+  plus.addEventListener('touchstart', function(e) { e.preventDefault(); startHold(1); var v = parseInt(guessInput.value) || 0; guessInput.value = Math.min(999, v + 1); });
+  plus.addEventListener('touchend', function(e) { e.preventDefault(); stopHold(); });
+
+  // === START / REPLAY ===
+  function startGame() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    stopIdleAnim();
+    round = 0;
+    score = 0;
+    roundResults = [];
+    showScreen('gameScreen');
+    resize();
+    clearCanvas();
+    startRound();
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('replayBtn').addEventListener('click', function() {
+    startGame();
+  });
+
+  // === INIT ===
+  Neon.init({
+    game: 'numbersense',
+    mode: 'high',
+    key: 'neonarcade_neongrind_numbersense_scores'
+  });
+  Neon.render(document.getElementById('startLB'));
+  startIdleAnim();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bloomfield — Free Online Generative Art Game | NEON ARCADE</title>
+<meta name="description" content="Play Bloomfield free online — plant neon seeds and grow a procedural glowing garden. Every garden is unique art. No download, no login.">
+<meta name="keywords" content="bloomfield, generative art game, flower game, creative game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/bloomfield.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/bloomfield.html">
+<meta property="og:title" content="Bloomfield — Free Online Generative Art Game | NEON ARCADE">
+<meta property="og:description" content="Play Bloomfield free online — plant neon seeds and grow a procedural glowing garden.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/bloomfield.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/bloomfield.html">
+<meta name="twitter:title" content="Bloomfield — Free Online Generative Art Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Bloomfield free online — plant neon seeds and grow a procedural glowing garden.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/bloomfield.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Bloomfield",
+  "url": "https://neonarcade.net/neonarcade/bloomfield.html",
+  "description": "Play Bloomfield free online — plant neon seeds and grow a procedural glowing garden.",
+  "genre": "Creative",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/bloomfield.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON ARCADE", "item": "https://neonarcade.net/neonarcade/" },
+    { "@type": "ListItem", "position": 3, "name": "Bloomfield", "item": "https://neonarcade.net/neonarcade/bloomfield.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+canvas {
+  position: fixed; top: 0; left: 0;
+  display: block;
+  width: 100%; height: 100%;
+}
+#scanlines {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+  z-index: 10;
+}
+#ui {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.screen {
+  pointer-events: auto;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  max-width: 480px;
+  width: 90%;
+}
+.screen.active { display: flex; }
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(32px, 8vw, 56px);
+  letter-spacing: 6px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(16px, 4vw, 22px);
+  letter-spacing: 3px;
+  color: #9999bb;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  margin-top: 16px;
+  text-transform: uppercase;
+}
+#startLB, #endLB {
+  width: 100%;
+  margin-top: 20px;
+}
+/* HUD */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 15;
+  pointer-events: none;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+#hud.active { display: flex; }
+.hud-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+}
+.hud-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 20px;
+  color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+/* Color picker strip */
+#colorPicker {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+  padding: 8px 16px;
+  background: rgba(10,10,18,0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 30px;
+  backdrop-filter: blur(8px);
+}
+#colorPicker.active { display: flex; }
+.color-swatch {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.color-swatch:hover { transform: scale(1.2); }
+.color-swatch.selected {
+  border-color: #fff;
+  box-shadow: 0 0 12px rgba(255,255,255,0.3);
+  transform: scale(1.15);
+}
+.color-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+/* End screen */
+.score-big {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(40px, 10vw, 64px);
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
+  margin-bottom: 4px;
+}
+.score-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #9999bb;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.breakdown {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 24px;
+}
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.breakdown-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #9999bb;
+  letter-spacing: 1px;
+}
+.breakdown-val {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  color: #00f0ff;
+  text-shadow: 0 0 6px rgba(0,240,255,0.3);
+}
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  border: 1px solid #39ff14;
+  background: rgba(57,255,20,0.06);
+  color: #39ff14;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+}
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(2px, -3px); }
+  75% { transform: translate(-2px, 1px); }
+}
+.shake { animation: shake 0.25s; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="scanlines"></div>
+
+<div id="hud">
+  <div>
+    <div class="hud-label">Seeds</div>
+    <div class="hud-value" id="hudSeeds">15</div>
+  </div>
+  <div style="text-align:right">
+    <div class="hud-label">Planted</div>
+    <div class="hud-value" id="hudPlanted">0</div>
+  </div>
+</div>
+
+<div id="colorPicker">
+  <span class="color-label">Color</span>
+</div>
+
+<div id="ui">
+  <div id="startScreen" class="screen active">
+    <div class="game-title">BLOOMFIELD</div>
+    <div class="game-subtitle">Plant. Grow. Glow.</div>
+    <button class="play-btn" id="startBtn">START</button>
+    <div class="controls-hint">Click / Tap to plant seeds</div>
+    <div class="controls-hint" style="margin-top:4px">Scroll / Swipe strip to pick color</div>
+    <div id="startLB"></div>
+  </div>
+
+  <div id="endScreen" class="screen">
+    <div class="game-title" style="font-size:clamp(24px,6vw,36px);margin-bottom:4px">GARDEN COMPLETE</div>
+    <div class="score-big" id="finalScore">0</div>
+    <div class="score-label">Beauty Score</div>
+    <div class="breakdown" id="breakdown"></div>
+    <div class="btn-row">
+      <button class="share-btn" id="shareBtn">SHARE</button>
+      <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+    </div>
+    <div id="endLB"></div>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ============ CONFIG ============
+  const MAX_SEEDS = 15;
+  const GROW_DURATION = 2000;
+  const COLORS = [
+    { name: 'Cyan',   h: 185, s: 100, l: 50, hex: '#00f0ff' },
+    { name: 'Pink',   h: 340, s: 100, l: 58, hex: '#ff2d7b' },
+    { name: 'Green',  h: 105, s: 100, l: 54, hex: '#39ff14' },
+    { name: 'Gold',   h: 51,  s: 100, l: 50, hex: '#ffd700' },
+    { name: 'Purple', h: 271, s: 100, l: 65, hex: '#b44dff' },
+    { name: 'Orange', h: 33,  s: 100, l: 50, hex: '#ff8c00' },
+    { name: 'White',  h: 200, s: 10,  l: 90, hex: '#e0e4f0' },
+    { name: 'Rose',   h: 0,   s: 100, l: 65, hex: '#ff4d4d' },
+  ];
+
+  // ============ DOM ============
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const hud = document.getElementById('hud');
+  const hudSeeds = document.getElementById('hudSeeds');
+  const hudPlanted = document.getElementById('hudPlanted');
+  const colorPicker = document.getElementById('colorPicker');
+  const startScreen = document.getElementById('startScreen');
+  const endScreen = document.getElementById('endScreen');
+  const startBtn = document.getElementById('startBtn');
+  const replayBtn = document.getElementById('replayBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const finalScoreEl = document.getElementById('finalScore');
+  const breakdownEl = document.getElementById('breakdown');
+
+  // ============ SIZING ============
+  let W, H, dpr;
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ============ AUDIO ============
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  function playPlant() {
+    ensureAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(600, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.3);
+  }
+  function playBloom() {
+    ensureAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(400, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.4);
+    g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.5);
+  }
+  function playComplete() {
+    ensureAudio();
+    var notes = [523, 659, 784, 1047];
+    notes.forEach(function(freq, i) {
+      var o = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.12);
+      g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.12 + 0.5);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + i * 0.12);
+      o.stop(audioCtx.currentTime + i * 0.12 + 0.5);
+    });
+  }
+
+  // ============ COLOR PICKER ============
+  let selectedColorIdx = 0;
+  function buildColorPicker() {
+    var old = colorPicker.querySelectorAll('.color-swatch');
+    old.forEach(function(el) { el.remove(); });
+    COLORS.forEach(function(c, i) {
+      var sw = document.createElement('div');
+      sw.className = 'color-swatch' + (i === selectedColorIdx ? ' selected' : '');
+      sw.style.background = c.hex;
+      sw.style.boxShadow = '0 0 8px ' + c.hex + '60';
+      sw.addEventListener('click', function(e) {
+        e.stopPropagation();
+        selectColor(i);
+      });
+      sw.addEventListener('touchstart', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        selectColor(i);
+      }, { passive: false });
+      colorPicker.appendChild(sw);
+    });
+  }
+  function selectColor(i) {
+    selectedColorIdx = i;
+    var swatches = colorPicker.querySelectorAll('.color-swatch');
+    swatches.forEach(function(sw, idx) {
+      sw.classList.toggle('selected', idx === i);
+    });
+  }
+  buildColorPicker();
+
+  window.addEventListener('wheel', function(e) {
+    if (state !== 'playing') return;
+    if (e.deltaY > 0) {
+      selectColor((selectedColorIdx + 1) % COLORS.length);
+    } else if (e.deltaY < 0) {
+      selectColor((selectedColorIdx - 1 + COLORS.length) % COLORS.length);
+    }
+  });
+
+  // ============ GAME STATE ============
+  let state = 'start';
+  let flowers = [];
+  let particles = [];
+  let seedsLeft = MAX_SEEDS;
+  let planted = 0;
+  let endingTimer = 0;
+
+  // ============ FLOWER ============
+  function createFlower(x, y, colorIdx) {
+    var c = COLORS[colorIdx];
+    var petalCount = 4 + Math.floor(Math.random() * 9);
+    var baseRadius = 25 + Math.random() * 30;
+    var petals = [];
+    for (var i = 0; i < petalCount; i++) {
+      var angle = (Math.PI * 2 / petalCount) * i;
+      var hueShift = (Math.random() - 0.5) * 20;
+      var lenVar = 0.8 + Math.random() * 0.4;
+      var widVar = 0.6 + Math.random() * 0.5;
+      petals.push({
+        angle: angle,
+        hueShift: hueShift,
+        lengthMul: lenVar,
+        widthMul: widVar
+      });
+    }
+    return {
+      x: x, y: y,
+      colorIdx: colorIdx,
+      h: c.h, s: c.s, l: c.l,
+      petalCount: petalCount,
+      petals: petals,
+      baseRadius: baseRadius,
+      birthTime: performance.now(),
+      growProgress: 0,
+      swayPhase: Math.random() * Math.PI * 2,
+      swaySpeed: 0.5 + Math.random() * 0.5,
+      attraction: 0,
+      bloomed: false
+    };
+  }
+
+  // ============ PARTICLES ============
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 1 + Math.random() * 3;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.02,
+        radius: 1.5 + Math.random() * 2.5,
+        color: color
+      });
+    }
+  }
+
+  // ============ SCORING ============
+  function calculateScore() {
+    if (flowers.length === 0) return { coverage: 0, coveragePct: 0, spacing: 0, variety: 0, uniqueColors: 0, symmetry: 0, total: 0 };
+
+    var gridRes = 40;
+    var cellW = W / gridRes;
+    var cellH = H / gridRes;
+    var covered = 0;
+    var total = gridRes * gridRes;
+    for (var gx = 0; gx < gridRes; gx++) {
+      for (var gy = 0; gy < gridRes; gy++) {
+        var px = (gx + 0.5) * cellW;
+        var py = (gy + 0.5) * cellH;
+        for (var fi = 0; fi < flowers.length; fi++) {
+          var f = flowers[fi];
+          var dx = px - f.x;
+          var dy = py - f.y;
+          if (dx * dx + dy * dy < f.baseRadius * f.baseRadius * 1.5) {
+            covered++;
+            break;
+          }
+        }
+      }
+    }
+    var coveragePct = covered / total;
+    var coverageScore = Math.min(40, Math.round(coveragePct * 50));
+
+    var spacingScore = 30;
+    var avgDist = 0;
+    var distCount = 0;
+    for (var i = 0; i < flowers.length; i++) {
+      for (var j = i + 1; j < flowers.length; j++) {
+        var dx2 = flowers[i].x - flowers[j].x;
+        var dy2 = flowers[i].y - flowers[j].y;
+        var dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+        avgDist += dist;
+        distCount++;
+        var overlapThresh = (flowers[i].baseRadius + flowers[j].baseRadius) * 0.6;
+        if (dist < overlapThresh) {
+          spacingScore -= 3;
+        }
+      }
+    }
+    if (distCount > 0) avgDist /= distCount;
+    var idealDist = Math.sqrt(W * H / flowers.length) * 0.6;
+    var distRatio = avgDist / idealDist;
+    if (distRatio > 0.5 && distRatio < 1.5) spacingScore += 5;
+    spacingScore = Math.max(0, Math.min(30, spacingScore));
+
+    var colorSet = {};
+    flowers.forEach(function(f) { colorSet[f.colorIdx] = true; });
+    var uniqueColors = Object.keys(colorSet).length;
+    var varietyScore = Math.min(15, Math.round((uniqueColors / Math.min(COLORS.length, flowers.length)) * 15));
+
+    var cx = 0, cy = 0;
+    flowers.forEach(function(f) { cx += f.x; cy += f.y; });
+    cx /= flowers.length;
+    cy /= flowers.length;
+    var offX = Math.abs(cx - W / 2) / (W / 2);
+    var offY = Math.abs(cy - H / 2) / (H / 2);
+    var offCenter = Math.sqrt(offX * offX + offY * offY);
+    var symmetryScore = Math.max(0, Math.round((1 - offCenter) * 15));
+
+    var totalScore = coverageScore + spacingScore + varietyScore + symmetryScore;
+    return {
+      coverage: coverageScore,
+      coveragePct: Math.round(coveragePct * 100),
+      spacing: spacingScore,
+      variety: varietyScore,
+      uniqueColors: uniqueColors,
+      symmetry: symmetryScore,
+      total: Math.min(100, totalScore)
+    };
+  }
+
+  // ============ ATTRACTION ============
+  function updateAttraction() {
+    for (var i = 0; i < flowers.length; i++) {
+      var f = flowers[i];
+      var nearestDist = Infinity;
+      var nearestAngle = 0;
+      for (var j = 0; j < flowers.length; j++) {
+        if (i === j) continue;
+        var dx = flowers[j].x - f.x;
+        var dy = flowers[j].y - f.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < nearestDist && dist < 250) {
+          nearestDist = dist;
+          nearestAngle = Math.atan2(dy, dx);
+        }
+      }
+      if (nearestDist < 250) {
+        var strength = (1 - nearestDist / 250) * 0.15;
+        f.attraction = nearestAngle * strength;
+      } else {
+        f.attraction = 0;
+      }
+    }
+  }
+
+  // ============ DRAW ============
+  function drawBackground() {
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+    var g1 = ctx.createRadialGradient(W * 0.3, H * 0.2, 0, W * 0.3, H * 0.2, W * 0.6);
+    g1.addColorStop(0, 'rgba(0,240,255,0.03)');
+    g1.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = g1;
+    ctx.fillRect(0, 0, W, H);
+
+    var g2 = ctx.createRadialGradient(W * 0.8, H * 0.8, 0, W * 0.8, H * 0.8, W * 0.5);
+    g2.addColorStop(0, 'rgba(255,45,123,0.025)');
+    g2.addColorStop(1, 'rgba(255,45,123,0)');
+    ctx.fillStyle = g2;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawFlower(f, now) {
+    var age = now - f.birthTime;
+    f.growProgress = Math.min(1, age / GROW_DURATION);
+    var gp = f.growProgress;
+    var ease = 1 - Math.pow(1 - gp, 3);
+    var scale = ease;
+
+    if (!f.bloomed && gp >= 1) {
+      f.bloomed = true;
+      playBloom();
+    }
+
+    var sway = Math.sin(now * 0.001 * f.swaySpeed + f.swayPhase) * 0.05;
+    var rot = sway + f.attraction;
+
+    ctx.save();
+    ctx.translate(f.x, f.y);
+    ctx.rotate(rot);
+    ctx.globalAlpha = Math.min(1, gp * 2);
+
+    var r = f.baseRadius * scale;
+
+    // Stem
+    var stemLen = r * 1.2;
+    ctx.strokeStyle = 'hsl(' + ((f.h + 120) % 360) + ',60%,30%)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, stemLen);
+    ctx.stroke();
+
+    // Petals
+    for (var i = 0; i < f.petals.length; i++) {
+      var p = f.petals[i];
+      var petalH = (f.h + p.hueShift + 360) % 360;
+      var petalLen = r * p.lengthMul;
+      var petalW = r * 0.32 * p.widthMul;
+
+      ctx.save();
+      ctx.rotate(p.angle);
+
+      var grad = ctx.createRadialGradient(petalLen * 0.5, 0, 0, petalLen * 0.5, 0, petalLen * 0.7);
+      grad.addColorStop(0, 'hsla(' + petalH + ',' + f.s + '%,' + (f.l + 15) + '%,0.7)');
+      grad.addColorStop(0.6, 'hsla(' + petalH + ',' + f.s + '%,' + f.l + '%,0.5)');
+      grad.addColorStop(1, 'hsla(' + petalH + ',' + f.s + '%,' + (f.l - 10) + '%,0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(petalLen * 0.45, 0, petalLen * 0.55, petalW, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'hsla(' + petalH + ',' + f.s + '%,' + (f.l + 20) + '%,0.3)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.ellipse(petalLen * 0.45, 0, petalLen * 0.55, petalW, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Center orb
+    var cGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 0.2);
+    cGrad.addColorStop(0, 'hsla(' + f.h + ',100%,90%,0.9)');
+    cGrad.addColorStop(0.5, 'hsla(' + f.h + ',' + f.s + '%,' + f.l + '%,0.6)');
+    cGrad.addColorStop(1, 'hsla(' + f.h + ',' + f.s + '%,' + f.l + '%,0)');
+    ctx.fillStyle = cGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Outer glow
+    ctx.shadowColor = 'hsla(' + f.h + ',' + f.s + '%,' + f.l + '%,0.4)';
+    ctx.shadowBlur = r * 0.6;
+    ctx.fillStyle = 'hsla(' + f.h + ',' + f.s + '%,' + f.l + '%,0.05)';
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.02;
+      p.life -= p.decay;
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  // Idle floating particles
+  let idleParticles = [];
+  function initIdleParticles() {
+    idleParticles = [];
+    for (var i = 0; i < 30; i++) {
+      idleParticles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -0.2 - Math.random() * 0.4,
+        radius: 1 + Math.random() * 2,
+        alpha: 0.2 + Math.random() * 0.3,
+        hue: COLORS[Math.floor(Math.random() * COLORS.length)].h
+      });
+    }
+  }
+  initIdleParticles();
+
+  function drawIdleParticles(now) {
+    for (var i = 0; i < idleParticles.length; i++) {
+      var p = idleParticles[i];
+      p.x += p.vx + Math.sin(now * 0.001 + i) * 0.1;
+      p.y += p.vy;
+      if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+      ctx.globalAlpha = p.alpha * (0.7 + Math.sin(now * 0.002 + i * 2) * 0.3);
+      ctx.fillStyle = 'hsl(' + p.hue + ',100%,70%)';
+      ctx.shadowColor = 'hsl(' + p.hue + ',100%,70%)';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  // ============ PLANT SEED ============
+  function plantSeed(x, y) {
+    if (state !== 'playing' || seedsLeft <= 0) return;
+    if (y < 50) return;
+    if (y > H - 70) return;
+
+    seedsLeft--;
+    planted++;
+    hudSeeds.textContent = seedsLeft;
+    hudPlanted.textContent = planted;
+
+    var f = createFlower(x, y, selectedColorIdx);
+    flowers.push(f);
+    updateAttraction();
+
+    playPlant();
+    spawnParticles(x, y, COLORS[selectedColorIdx].hex, 12);
+
+    if (seedsLeft === 0) {
+      state = 'ending';
+      endingTimer = performance.now();
+    }
+  }
+
+  // ============ INPUT ============
+  canvas.addEventListener('click', function(e) {
+    if (state === 'playing') {
+      plantSeed(e.clientX, e.clientY);
+    }
+  });
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (state === 'playing' && e.touches.length === 1) {
+      var t = e.touches[0];
+      plantSeed(t.clientX, t.clientY);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+  }, { passive: false });
+
+  // ============ SHOW END ============
+  function showEnd() {
+    state = 'done';
+    playComplete();
+
+    var score = calculateScore();
+    finalScoreEl.textContent = score.total;
+
+    // Build breakdown using DOM methods (safe, no innerHTML)
+    while (breakdownEl.firstChild) breakdownEl.removeChild(breakdownEl.firstChild);
+    var rows = [
+      { name: 'Coverage (' + score.coveragePct + '%)', val: score.coverage + '/40' },
+      { name: 'Spacing', val: score.spacing + '/30' },
+      { name: 'Variety (' + score.uniqueColors + ' colors)', val: score.variety + '/15' },
+      { name: 'Symmetry', val: score.symmetry + '/15' }
+    ];
+    rows.forEach(function(r) {
+      var row = document.createElement('div');
+      row.className = 'breakdown-row';
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'breakdown-name';
+      nameSpan.textContent = r.name;
+      var valSpan = document.createElement('span');
+      valSpan.className = 'breakdown-val';
+      valSpan.textContent = r.val;
+      row.appendChild(nameSpan);
+      row.appendChild(valSpan);
+      breakdownEl.appendChild(row);
+    });
+
+    hud.classList.remove('active');
+    colorPicker.classList.remove('active');
+    endScreen.classList.add('active');
+
+    // Neon.js save
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score.total);
+    }).then(function(result) {
+      Neon.render(document.getElementById('endLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+
+    // Share
+    shareBtn.onclick = function() {
+      var emojis = ['🌸', '🌺', '🌼', '🌻', '🌷', '🌹', '💐'];
+      var emojiRow = '';
+      for (var i = 0; i < Math.min(flowers.length, 7); i++) {
+        emojiRow += emojis[i % emojis.length];
+      }
+      var text = '🌸 BLOOMFIELD\nBeauty Score: ' + score.total + '/100\nCoverage: ' + score.coveragePct + '% | Variety: ' + score.variety + '/15\n' + emojiRow + '\nneonarcade.net/neonarcade/bloomfield.html';
+
+      if (navigator.share) {
+        navigator.share({ title: 'BLOOMFIELD', text: text }).catch(function() {
+          navigator.clipboard.writeText(text).then(function() {
+            shareBtn.textContent = 'COPIED!';
+            setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+          });
+        });
+      } else {
+        navigator.clipboard.writeText(text).then(function() {
+          shareBtn.textContent = 'COPIED!';
+          setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+        });
+      }
+    };
+  }
+
+  // ============ GAME FLOW ============
+  function startGame() {
+    flowers = [];
+    particles = [];
+    seedsLeft = MAX_SEEDS;
+    planted = 0;
+    state = 'playing';
+    selectedColorIdx = 0;
+    selectColor(0);
+
+    hudSeeds.textContent = seedsLeft;
+    hudPlanted.textContent = planted;
+
+    startScreen.classList.remove('active');
+    endScreen.classList.remove('active');
+    hud.classList.add('active');
+    colorPicker.classList.add('active');
+  }
+
+  startBtn.addEventListener('click', function() {
+    ensureAudio();
+    startGame();
+  });
+  replayBtn.addEventListener('click', function() {
+    startGame();
+  });
+
+  // ============ NEON.JS ============
+  Neon.init({
+    game: 'bloomfield',
+    mode: 'high',
+    key: 'neonarcade_neonarcade_bloomfield_scores'
+  });
+  Neon.render(document.getElementById('startLB'));
+
+  // ============ MAIN LOOP ============
+  function frame(now) {
+    requestAnimationFrame(frame);
+    drawBackground();
+
+    if (state === 'start' || state === 'done') {
+      drawIdleParticles(now);
+      if (state === 'done') {
+        for (var i = 0; i < flowers.length; i++) {
+          drawFlower(flowers[i], now);
+        }
+      }
+      drawParticles();
+      return;
+    }
+
+    for (var i = 0; i < flowers.length; i++) {
+      drawFlower(flowers[i], now);
+    }
+    drawParticles();
+
+    if (state === 'ending') {
+      var allGrown = true;
+      for (var j = 0; j < flowers.length; j++) {
+        if (flowers[j].growProgress < 1) { allGrown = false; break; }
+      }
+      if (allGrown && now - endingTimer > 500) {
+        showEnd();
+      }
+    }
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

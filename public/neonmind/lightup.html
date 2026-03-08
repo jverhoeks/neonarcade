@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>LightUp (Akari) — Free Online Light Puzzle Game | NEON ARCADE</title>
+<meta name="description" content="Play LightUp free online — place bulbs to illuminate every cell. Classic Akari logic puzzle with neon aesthetics. No download, no login.">
+<meta name="keywords" content="lightup, akari, light puzzle, logic puzzle, nikoli, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonmind/lightup.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/lightup.html">
+<meta property="og:title" content="LightUp (Akari) — Free Online Light Puzzle Game | NEON ARCADE">
+<meta property="og:description" content="Place bulbs to illuminate every cell. Classic Akari logic puzzle.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/lightup.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/lightup.html">
+<meta name="twitter:title" content="LightUp (Akari) — Free Online Light Puzzle Game | NEON ARCADE">
+<meta name="twitter:description" content="Place bulbs to illuminate every cell. Classic Akari logic puzzle.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/lightup.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "LightUp",
+  "url": "https://neonarcade.net/neonmind/lightup.html",
+  "description": "Place bulbs to illuminate every cell. Classic Akari logic puzzle with neon aesthetics.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/lightup.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON MIND", "item": "https://neonarcade.net/neonmind/" },
+    { "@type": "ListItem", "position": 3, "name": "LightUp", "item": "https://neonarcade.net/neonmind/lightup.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+  --wall-color: #1a1a2e;
+  --cell-empty: #12121f;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(0,240,255,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255,45,123,0.04) 0%, transparent 50%),
+    var(--bg-deep);
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+
+body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+@keyframes shake {
+  10%,90% { transform: translate3d(-2px,0,0); }
+  20%,80% { transform: translate3d(3px,0,0); }
+  30%,50%,70% { transform: translate3d(-4px,0,0); }
+  40%,60% { transform: translate3d(4px,0,0); }
+}
+
+#particles {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 100;
+}
+
+.screen {
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; width: 100%;
+  padding: 16px; position: absolute; inset: 0;
+}
+.screen.active { display: flex; }
+
+/* ---- START SCREEN ---- */
+#start-screen {
+  gap: 8px; overflow-y: auto;
+  justify-content: flex-start; padding-top: 40px;
+}
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.8rem, 7vw, 3rem);
+  font-weight: 900; color: var(--neon-cyan);
+  text-shadow: 0 0 20px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.15);
+  letter-spacing: 6px; margin-bottom: 4px;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 0 0 20px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.15); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.8), 0 0 80px rgba(0,240,255,0.3); }
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+  font-weight: 300; color: var(--text-mid);
+  letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 20px; max-width: 500px;
+}
+
+.diff-list {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%; max-width: 420px; margin-bottom: 16px;
+}
+
+.diff-btn {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: 15px; letter-spacing: 2px;
+  padding: 12px 16px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03); color: #fff;
+  cursor: pointer; border-radius: 4px;
+  display: flex; align-items: center; gap: 10px;
+  transition: all 0.2s; text-transform: uppercase;
+}
+.diff-btn:hover { background: rgba(0,240,255,0.08); border-color: var(--neon-cyan); transform: scale(1.02); }
+.diff-btn:active { transform: scale(0.98); }
+
+.diff-name { width: 80px; text-align: left; font-family: 'Orbitron', monospace; font-size: 12px; }
+.diff-info { flex: 1; text-align: left; color: var(--text-mid); font-size: 13px; }
+.diff-stars { color: var(--neon-gold); font-size: 14px; min-width: 50px; text-align: right; }
+.diff-time { color: var(--text-dim); font-size: 12px; min-width: 50px; text-align: right; font-family: 'Orbitron', monospace; }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 12px;
+  letter-spacing: 2px; color: var(--text-dim);
+  text-transform: uppercase; margin-top: 4px;
+}
+
+#startLB { width: 100%; max-width: 420px; margin-top: 8px; }
+
+/* ---- GAME SCREEN ---- */
+#game-screen {
+  flex-direction: column; padding: 0;
+  justify-content: space-between;
+}
+
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; width: 100%;
+  font-family: 'Orbitron', monospace; font-size: 14px;
+  background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05);
+  min-height: 44px; z-index: 10;
+}
+.bar-left { display: flex; align-items: center; gap: 12px; }
+.bar-right { display: flex; align-items: center; gap: 12px; }
+.diff-label { color: var(--text-mid); font-size: 11px; letter-spacing: 3px; }
+.timer { color: var(--neon-cyan); min-width: 60px; text-align: right; }
+.bulb-count { color: var(--neon-gold); min-width: 50px; text-align: left; }
+
+.bar-btn {
+  font-family: 'Orbitron', monospace; font-size: 10px;
+  letter-spacing: 2px; padding: 6px 12px;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04);
+  color: var(--text-mid); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.bar-btn:hover { background: rgba(0,240,255,0.1); color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+.grid-wrapper {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative; width: 100%;
+}
+
+#grid-canvas {
+  cursor: pointer;
+}
+
+.bottom-bar {
+  display: flex; align-items: center; justify-content: center;
+  padding: 8px 16px; width: 100%; gap: 10px;
+  background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05);
+  min-height: 44px; z-index: 10;
+}
+
+/* ---- END SCREEN ---- */
+#end-screen {
+  gap: 12px; overflow-y: auto;
+  justify-content: flex-start; padding-top: 40px;
+}
+
+.end-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 900; color: var(--neon-green);
+  text-shadow: 0 0 20px rgba(57,255,20,0.5);
+  letter-spacing: 6px;
+}
+
+.end-stats {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px 24px; border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02); border-radius: 6px;
+  max-width: 340px; width: 100%;
+}
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 14px; letter-spacing: 1px;
+}
+.stat-label { color: var(--text-dim); text-transform: uppercase; font-weight: 300; }
+.stat-value { font-family: 'Orbitron', monospace; font-size: 16px; color: var(--neon-cyan); }
+.stat-value.best { color: var(--neon-green); }
+
+.end-buttons {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin-top: 8px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+
+#endLB { width: 100%; max-width: 420px; margin-top: 8px; }
+
+.toast {
+  position: fixed; bottom: 60px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  font-family: 'Rajdhani', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: 2px;
+  padding: 10px 24px; border-radius: 4px;
+  background: rgba(57,255,20,0.15); border: 1px solid rgba(57,255,20,0.3);
+  color: var(--neon-green); opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 200; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- ===== START SCREEN ===== -->
+<div id="start-screen" class="screen active">
+  <div class="title">LIGHTUP</div>
+  <div class="subtitle">Illuminate every cell. No bulb sees another.</div>
+
+  <div class="diff-list">
+    <button class="diff-btn" onclick="startGame(7)">
+      <span class="diff-name">EASY</span>
+      <span class="diff-info">7 x 7 grid</span>
+      <span class="diff-stars">&#9733;</span>
+      <span class="diff-time" id="best7">--:--</span>
+    </button>
+    <button class="diff-btn" onclick="startGame(10)">
+      <span class="diff-name">MEDIUM</span>
+      <span class="diff-info">10 x 10 grid</span>
+      <span class="diff-stars">&#9733;&#9733;</span>
+      <span class="diff-time" id="best10">--:--</span>
+    </button>
+    <button class="diff-btn" onclick="startGame(14)">
+      <span class="diff-name">HARD</span>
+      <span class="diff-info">14 x 14 grid</span>
+      <span class="diff-stars">&#9733;&#9733;&#9733;</span>
+      <span class="diff-time" id="best14">--:--</span>
+    </button>
+  </div>
+
+  <div class="controls-hint">Click / Tap to place or remove bulbs</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen" class="screen">
+  <div class="top-bar">
+    <div class="bar-left">
+      <span class="bulb-count" id="bulbCount">0</span>
+      <span class="diff-label" id="diffLabel">7x7 EASY</span>
+    </div>
+    <div class="bar-right">
+      <span class="timer" id="timer">00:00</span>
+    </div>
+  </div>
+  <div class="grid-wrapper" id="gridWrapper">
+    <canvas id="grid-canvas"></canvas>
+  </div>
+  <div class="bottom-bar">
+    <button class="bar-btn" id="undoBtn" onclick="undoMove()">UNDO</button>
+    <button class="bar-btn" onclick="resetPuzzle()">RESET</button>
+    <button class="bar-btn" onclick="backToMenu()">MENU</button>
+  </div>
+</div>
+
+<!-- ===== END SCREEN ===== -->
+<div id="end-screen" class="screen">
+  <div class="end-title">ILLUMINATED</div>
+  <div class="end-stats">
+    <div class="stat-row">
+      <span class="stat-label">Time</span>
+      <span class="stat-value" id="endTime">00:00</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Difficulty</span>
+      <span class="stat-value" id="endDiff">Easy</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Bulbs Placed</span>
+      <span class="stat-value" id="endBulbs">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Best</span>
+      <span class="stat-value best" id="endBest">--:--</span>
+    </div>
+  </div>
+  <div class="end-buttons">
+    <button class="share-btn" onclick="shareResult()">SHARE</button>
+    <button class="play-btn" onclick="startGame(currentSize)">PLAY AGAIN</button>
+    <button class="play-btn" onclick="backToMenu()">MENU</button>
+  </div>
+  <div id="endLB"></div>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ========== CONSTANTS ==========
+  const WALL = -1;
+  const EMPTY = 0;
+  const WALL0 = -2; // wall with 0 constraint
+  const BULB = 5;
+
+  const SIZES = { 7: 'Easy', 10: 'Medium', 14: 'Hard' };
+  const WALL_DENSITY = { 7: 0.26, 10: 0.27, 14: 0.28 };
+
+  // ========== STATE ==========
+  var currentSize = 7;
+  var grid = [];
+  var playerGrid = [];
+  var litGrid = [];
+  var solution = [];
+  var moveHistory = [];
+  var timerInterval = null;
+  var startTime = 0;
+  var elapsed = 0;
+  var gameActive = false;
+  var totalBulbs = 0;
+
+  // Canvas state
+  var canvas, ctx;
+  var cellSize = 40;
+  var gridPixelSize = 0;
+  var dpr = window.devicePixelRatio || 1;
+
+  // Light ray animation
+  var lightAnimations = [];
+  var animFrame = null;
+
+  // ========== AUDIO ==========
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+  }
+
+  function playTone(freq, dur, type, vol) {
+    ensureAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol || 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  }
+
+  function sfxPlace() { playTone(880, 0.15, 'sine', 0.07); setTimeout(function(){ playTone(1320, 0.1, 'sine', 0.04); }, 50); }
+  function sfxRemove() { playTone(440, 0.12, 'triangle', 0.06); }
+  function sfxError() { playTone(200, 0.3, 'sawtooth', 0.06); setTimeout(function(){ playTone(150, 0.25, 'sawtooth', 0.04); }, 50); }
+  function sfxComplete() {
+    [660,880,1100,1320,1760].forEach(function(f, i) {
+      setTimeout(function() { playTone(f, 0.3, 'sine', 0.06); }, i * 80);
+    });
+  }
+
+  // ========== DOM ==========
+  var startScreen = document.getElementById('start-screen');
+  var gameScreen = document.getElementById('game-screen');
+  var endScreen = document.getElementById('end-screen');
+  var gridWrapper = document.getElementById('gridWrapper');
+  var timerEl = document.getElementById('timer');
+  var bulbCountEl = document.getElementById('bulbCount');
+  var diffLabelEl = document.getElementById('diffLabel');
+  var particlesCanvas = document.getElementById('particles');
+  var pCtx = particlesCanvas.getContext('2d');
+  var particles = [];
+
+  function showScreen(screen) {
+    [startScreen, gameScreen, endScreen].forEach(function(s) { s.classList.remove('active'); });
+    screen.classList.add('active');
+  }
+
+  // ========== NEON.JS INTEGRATION ==========
+  function initNeon(size) {
+    Neon.init({
+      game: 'lightup',
+      mode: 'low',
+      key: 'neonarcade_neonmind_lightup_scores_' + size,
+      formatScore: function(s) {
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+      }
+    });
+  }
+
+  function updateBestTimes() {
+    [7, 10, 14].forEach(function(sz) {
+      initNeon(sz);
+      var best = Neon.getHighScore();
+      var el = document.getElementById('best' + sz);
+      if (best && best < 999999) {
+        var m = Math.floor(best / 60);
+        var s = Math.floor(best % 60);
+        el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      } else {
+        el.textContent = '--:--';
+      }
+    });
+  }
+
+  // ========== PUZZLE GENERATOR ==========
+  function isWallOrNum(val) {
+    return val === WALL || val === WALL0 || (val >= 1 && val <= 4);
+  }
+
+  function neighbors(r, c, size) {
+    var n = [];
+    if (r > 0) n.push([r-1, c]);
+    if (r < size-1) n.push([r+1, c]);
+    if (c > 0) n.push([r, c-1]);
+    if (c < size-1) n.push([r, c+1]);
+    return n;
+  }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+
+  function generatePuzzle(size) {
+    for (var attempt = 0; attempt < 80; attempt++) {
+      var result = tryGenerate(size);
+      if (result) return result;
+    }
+    return generateFallback(size);
+  }
+
+  function tryGenerate(size) {
+    var g = [];
+    for (var r = 0; r < size; r++) {
+      g[r] = [];
+      for (var c = 0; c < size; c++) g[r][c] = EMPTY;
+    }
+
+    var density = WALL_DENSITY[size] || 0.27;
+    var wallCount = Math.floor(size * size * density);
+    var placed = 0;
+    var maxTries = wallCount * 10;
+    for (var t = 0; t < maxTries && placed < wallCount; t++) {
+      var wr = Math.floor(Math.random() * size);
+      var wc = Math.floor(Math.random() * size);
+      if (g[wr][wc] === EMPTY) {
+        g[wr][wc] = WALL;
+        placed++;
+        if (placed < wallCount && Math.random() < 0.5) {
+          var mr = size - 1 - wr;
+          var mc = size - 1 - wc;
+          if (g[mr][mc] === EMPTY) { g[mr][mc] = WALL; placed++; }
+        }
+      }
+    }
+
+    // Place bulbs
+    var sol = [];
+    var lit = [];
+    for (var r2 = 0; r2 < size; r2++) {
+      sol[r2] = []; lit[r2] = [];
+      for (var c2 = 0; c2 < size; c2++) { sol[r2][c2] = 0; lit[r2][c2] = false; }
+    }
+
+    var emptyCells = [];
+    for (var r3 = 0; r3 < size; r3++) {
+      for (var c3 = 0; c3 < size; c3++) {
+        if (g[r3][c3] === EMPTY) emptyCells.push([r3, c3]);
+      }
+    }
+    shuffle(emptyCells);
+
+    for (var i = 0; i < emptyCells.length; i++) {
+      var br = emptyCells[i][0], bc = emptyCells[i][1];
+      if (!lit[br][bc] && sol[br][bc] === 0) {
+        if (canPlaceBulbSol(g, sol, br, bc, size)) {
+          sol[br][bc] = 1;
+          markLitSol(g, lit, br, bc, size);
+        }
+      }
+    }
+
+    // Fill remaining unlit cells
+    for (var r4 = 0; r4 < size; r4++) {
+      for (var c4 = 0; c4 < size; c4++) {
+        if (g[r4][c4] === EMPTY && !lit[r4][c4] && sol[r4][c4] === 0) {
+          if (canPlaceBulbSol(g, sol, r4, c4, size)) {
+            sol[r4][c4] = 1;
+            markLitSol(g, lit, r4, c4, size);
+          } else {
+            return null;
+          }
+        }
+      }
+    }
+
+    // Verify all empty cells lit
+    for (var r5 = 0; r5 < size; r5++) {
+      for (var c5 = 0; c5 < size; c5++) {
+        if (g[r5][c5] === EMPTY && !lit[r5][c5] && sol[r5][c5] === 0) return null;
+      }
+    }
+
+    // Add number constraints to some walls
+    for (var r6 = 0; r6 < size; r6++) {
+      for (var c6 = 0; c6 < size; c6++) {
+        if (g[r6][c6] === WALL) {
+          var adjBulbs = 0;
+          var ns = neighbors(r6, c6, size);
+          for (var n = 0; n < ns.length; n++) {
+            if (sol[ns[n][0]][ns[n][1]] === 1) adjBulbs++;
+          }
+          if (Math.random() < 0.40) {
+            g[r6][c6] = adjBulbs === 0 ? WALL0 : adjBulbs;
+          }
+        }
+      }
+    }
+
+    return { grid: g, solution: sol };
+  }
+
+  function canPlaceBulbSol(g, sol, r, c, size) {
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var d = 0; d < dirs.length; d++) {
+      var dr = dirs[d][0], dc = dirs[d][1];
+      var nr = r + dr, nc = c + dc;
+      while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+        if (isWallOrNum(g[nr][nc])) break;
+        if (sol[nr][nc] === 1) return false;
+        nr += dr; nc += dc;
+      }
+    }
+    return true;
+  }
+
+  function markLitSol(g, lit, r, c, size) {
+    lit[r][c] = true;
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var d = 0; d < dirs.length; d++) {
+      var dr = dirs[d][0], dc = dirs[d][1];
+      var nr = r + dr, nc = c + dc;
+      while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+        if (isWallOrNum(g[nr][nc])) break;
+        lit[nr][nc] = true;
+        nr += dr; nc += dc;
+      }
+    }
+  }
+
+  function generateFallback(size) {
+    var g = [], sol = [];
+    for (var r = 0; r < size; r++) {
+      g[r] = []; sol[r] = [];
+      for (var c = 0; c < size; c++) { g[r][c] = EMPTY; sol[r][c] = 0; }
+    }
+    for (var r2 = 0; r2 < size; r2++) {
+      for (var c2 = 0; c2 < size; c2++) {
+        if (r2 % 3 === 1 && c2 % 3 === 1) g[r2][c2] = WALL;
+      }
+    }
+    var lit = [];
+    for (var r3 = 0; r3 < size; r3++) { lit[r3] = []; for (var c3 = 0; c3 < size; c3++) lit[r3][c3] = false; }
+    for (var r4 = 0; r4 < size; r4++) {
+      for (var c4 = 0; c4 < size; c4++) {
+        if (g[r4][c4] === EMPTY && !lit[r4][c4] && sol[r4][c4] === 0) {
+          if (canPlaceBulbSol(g, sol, r4, c4, size)) {
+            sol[r4][c4] = 1;
+            markLitSol(g, lit, r4, c4, size);
+          }
+        }
+      }
+    }
+    return { grid: g, solution: sol };
+  }
+
+  // ========== GAME LOGIC ==========
+  function getWallNumber(val) {
+    if (val === WALL0) return 0;
+    if (val >= 1 && val <= 4) return val;
+    return -1;
+  }
+
+  function isWallCell(val) {
+    return val === WALL || val === WALL0 || (val >= 1 && val <= 4);
+  }
+
+  function computeLit() {
+    var size = currentSize;
+    var newLit = [];
+    for (var r = 0; r < size; r++) {
+      newLit[r] = [];
+      for (var c = 0; c < size; c++) newLit[r][c] = false;
+    }
+    for (var r2 = 0; r2 < size; r2++) {
+      for (var c2 = 0; c2 < size; c2++) {
+        if (playerGrid[r2][c2] === BULB) {
+          newLit[r2][c2] = true;
+          var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+          for (var d = 0; d < dirs.length; d++) {
+            var dr = dirs[d][0], dc = dirs[d][1];
+            var nr = r2 + dr, nc = c2 + dc;
+            while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+              if (isWallCell(grid[nr][nc])) break;
+              newLit[nr][nc] = true;
+              nr += dr; nc += dc;
+            }
+          }
+        }
+      }
+    }
+    litGrid = newLit;
+  }
+
+  function findErrors() {
+    var size = currentSize;
+    var errors = {};
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
+        if (playerGrid[r][c] === BULB) {
+          var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+          for (var d = 0; d < dirs.length; d++) {
+            var dr = dirs[d][0], dc = dirs[d][1];
+            var nr = r + dr, nc = c + dc;
+            while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+              if (isWallCell(grid[nr][nc])) break;
+              if (playerGrid[nr][nc] === BULB) {
+                errors[r + ',' + c] = true;
+                errors[nr + ',' + nc] = true;
+              }
+              nr += dr; nc += dc;
+            }
+          }
+        }
+      }
+    }
+    return errors;
+  }
+
+  function checkWallStatus(r, c) {
+    var num = getWallNumber(grid[r][c]);
+    if (num < 0) return 'none';
+    var size = currentSize;
+    var ns = neighbors(r, c, size);
+    var adjBulbs = 0, adjEmpty = 0;
+    for (var i = 0; i < ns.length; i++) {
+      var nr = ns[i][0], nc = ns[i][1];
+      if (!isWallCell(grid[nr][nc])) {
+        if (playerGrid[nr][nc] === BULB) adjBulbs++;
+        else adjEmpty++;
+      }
+    }
+    if (adjBulbs === num) return 'satisfied';
+    if (adjBulbs > num) return 'violated';
+    if (adjBulbs + adjEmpty < num) return 'violated';
+    return 'partial';
+  }
+
+  function checkComplete() {
+    var size = currentSize;
+    var errors = findErrors();
+    for (var k in errors) { if (errors.hasOwnProperty(k)) return false; }
+
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
+        if (!isWallCell(grid[r][c]) && !litGrid[r][c]) return false;
+      }
+    }
+
+    for (var r2 = 0; r2 < size; r2++) {
+      for (var c2 = 0; c2 < size; c2++) {
+        var num = getWallNumber(grid[r2][c2]);
+        if (num >= 0) {
+          var ns = neighbors(r2, c2, size);
+          var adjBulbs = 0;
+          for (var i = 0; i < ns.length; i++) {
+            if (playerGrid[ns[i][0]][ns[i][1]] === BULB) adjBulbs++;
+          }
+          if (adjBulbs !== num) return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // ========== CANVAS RENDERING ==========
+  function initCanvas() {
+    canvas = document.getElementById('grid-canvas');
+    ctx = canvas.getContext('2d');
+  }
+
+  function sizeCanvas() {
+    var wrapRect = gridWrapper.getBoundingClientRect();
+    var maxW = wrapRect.width - 20;
+    var maxH = wrapRect.height - 20;
+    var size = currentSize;
+
+    cellSize = Math.floor(Math.min(maxW, maxH) / size);
+    cellSize = Math.max(cellSize, 22);
+    cellSize = Math.min(cellSize, 56);
+
+    gridPixelSize = cellSize * size;
+    canvas.style.width = gridPixelSize + 'px';
+    canvas.style.height = gridPixelSize + 'px';
+    canvas.width = gridPixelSize * dpr;
+    canvas.height = gridPixelSize * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function drawGrid() {
+    var size = currentSize;
+    computeLit();
+    var errors = findErrors();
+
+    ctx.clearRect(0, 0, gridPixelSize, gridPixelSize);
+
+    var bulbCount = 0;
+
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
+        var x = c * cellSize;
+        var y = r * cellSize;
+        var val = grid[r][c];
+        var wallNum = getWallNumber(val);
+
+        if (isWallCell(val)) {
+          // Draw wall
+          ctx.fillStyle = '#1a1a2e';
+          ctx.fillRect(x, y, cellSize, cellSize);
+          // Subtle border
+          ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x + 0.5, y + 0.5, cellSize - 1, cellSize - 1);
+
+          // Draw number if numbered wall
+          if (wallNum >= 0) {
+            var status = checkWallStatus(r, c);
+            if (status === 'satisfied') {
+              ctx.fillStyle = '#39ff14';
+              ctx.shadowColor = 'rgba(57,255,20,0.5)';
+            } else if (status === 'violated') {
+              ctx.fillStyle = '#ff2d7b';
+              ctx.shadowColor = 'rgba(255,45,123,0.5)';
+            } else {
+              ctx.fillStyle = '#00f0ff';
+              ctx.shadowColor = 'rgba(0,240,255,0.5)';
+            }
+            ctx.shadowBlur = 8;
+            ctx.font = '700 ' + Math.max(12, Math.floor(cellSize * 0.5)) + 'px Orbitron, monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(wallNum.toString(), x + cellSize / 2, y + cellSize / 2);
+            ctx.shadowBlur = 0;
+          }
+        } else if (playerGrid[r][c] === BULB) {
+          bulbCount++;
+          var isError = errors[r + ',' + c];
+
+          // Lit background
+          ctx.fillStyle = isError ? 'rgba(255,45,123,0.1)' : 'rgba(0,240,255,0.1)';
+          ctx.fillRect(x, y, cellSize, cellSize);
+
+          // Draw light rays from this bulb
+          drawLightRays(r, c, isError);
+
+          // Draw bulb circle
+          var cx = x + cellSize / 2;
+          var cy = y + cellSize / 2;
+          var bulbR = cellSize * 0.28;
+
+          // Outer glow
+          var glowColor = isError ? 'rgba(255,45,123,' : 'rgba(0,240,255,';
+          var grad = ctx.createRadialGradient(cx, cy, bulbR * 0.3, cx, cy, bulbR * 2.5);
+          grad.addColorStop(0, glowColor + '0.4)');
+          grad.addColorStop(1, glowColor + '0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(x, y, cellSize, cellSize);
+
+          // Bulb body
+          var bulbGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, bulbR);
+          if (isError) {
+            bulbGrad.addColorStop(0, '#ffffff');
+            bulbGrad.addColorStop(0.4, '#ff2d7b');
+            bulbGrad.addColorStop(1, 'rgba(255,45,123,0.6)');
+          } else {
+            bulbGrad.addColorStop(0, '#ffffff');
+            bulbGrad.addColorStop(0.4, '#00f0ff');
+            bulbGrad.addColorStop(1, 'rgba(0,240,255,0.6)');
+          }
+          ctx.beginPath();
+          ctx.arc(cx, cy, bulbR, 0, Math.PI * 2);
+          ctx.fillStyle = bulbGrad;
+          ctx.fill();
+
+          // Outer ring glow
+          ctx.beginPath();
+          ctx.arc(cx, cy, bulbR + 2, 0, Math.PI * 2);
+          ctx.strokeStyle = isError ? 'rgba(255,45,123,0.6)' : 'rgba(0,240,255,0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Cell border
+          ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+          ctx.lineWidth = 0.5;
+          ctx.strokeRect(x + 0.5, y + 0.5, cellSize - 1, cellSize - 1);
+
+        } else if (litGrid[r][c]) {
+          // Illuminated cell
+          ctx.fillStyle = 'rgba(0,240,255,0.05)';
+          ctx.fillRect(x, y, cellSize, cellSize);
+          ctx.strokeStyle = 'rgba(0,240,255,0.06)';
+          ctx.lineWidth = 0.5;
+          ctx.strokeRect(x + 0.5, y + 0.5, cellSize - 1, cellSize - 1);
+        } else {
+          // Empty dark cell
+          ctx.fillStyle = '#12121f';
+          ctx.fillRect(x, y, cellSize, cellSize);
+          ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+          ctx.lineWidth = 0.5;
+          ctx.strokeRect(x + 0.5, y + 0.5, cellSize - 1, cellSize - 1);
+        }
+      }
+    }
+
+    // Draw grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 0.5;
+    for (var i = 0; i <= size; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * cellSize, 0);
+      ctx.lineTo(i * cellSize, gridPixelSize);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i * cellSize);
+      ctx.lineTo(gridPixelSize, i * cellSize);
+      ctx.stroke();
+    }
+
+    totalBulbs = bulbCount;
+    bulbCountEl.textContent = bulbCount;
+  }
+
+  function drawLightRays(br, bc, isError) {
+    var size = currentSize;
+    var bx = bc * cellSize + cellSize / 2;
+    var by = br * cellSize + cellSize / 2;
+    var color = isError ? 'rgba(255,45,123,' : 'rgba(0,240,255,';
+
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var d = 0; d < dirs.length; d++) {
+      var dr = dirs[d][0], dc = dirs[d][1];
+      var nr = br + dr, nc = bc + dc;
+      var dist = 0;
+      while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+        if (isWallCell(grid[nr][nc])) break;
+        dist++;
+        nr += dr; nc += dc;
+      }
+      if (dist === 0) continue;
+
+      // Draw the ray line
+      var endX, endY;
+      if (dc !== 0) {
+        // Horizontal ray
+        endX = (bc + dc * dist) * cellSize + cellSize / 2;
+        endY = by;
+        var rayGrad = ctx.createLinearGradient(bx, by, endX, endY);
+        rayGrad.addColorStop(0, color + '0.25)');
+        rayGrad.addColorStop(1, color + '0.03)');
+        ctx.strokeStyle = rayGrad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      } else {
+        // Vertical ray
+        endX = bx;
+        endY = (br + dr * dist) * cellSize + cellSize / 2;
+        var rayGradV = ctx.createLinearGradient(bx, by, endX, endY);
+        rayGradV.addColorStop(0, color + '0.25)');
+        rayGradV.addColorStop(1, color + '0.03)');
+        ctx.strokeStyle = rayGradV;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // ========== INPUT ==========
+  function getCellFromEvent(e) {
+    var rect = canvas.getBoundingClientRect();
+    var mx, my;
+    if (e.changedTouches) {
+      mx = e.changedTouches[0].clientX - rect.left;
+      my = e.changedTouches[0].clientY - rect.top;
+    } else {
+      mx = e.clientX - rect.left;
+      my = e.clientY - rect.top;
+    }
+    var scale = rect.width / gridPixelSize;
+    var c = Math.floor(mx / scale / cellSize);
+    var r = Math.floor(my / scale / cellSize);
+    if (r < 0 || r >= currentSize || c < 0 || c >= currentSize) return null;
+    return { r: r, c: c };
+  }
+
+  function handleCanvasClick(e) {
+    if (!gameActive) return;
+    var cell = getCellFromEvent(e);
+    if (!cell) return;
+    toggleBulb(cell.r, cell.c);
+  }
+
+  function handleCanvasTouch(e) {
+    if (!gameActive) return;
+    e.preventDefault();
+    var cell = getCellFromEvent(e);
+    if (!cell) return;
+    toggleBulb(cell.r, cell.c);
+  }
+
+  function toggleBulb(r, c) {
+    if (isWallCell(grid[r][c])) return;
+
+    if (playerGrid[r][c] === BULB) {
+      playerGrid[r][c] = 0;
+      moveHistory.push({ r: r, c: c, action: 'remove' });
+      sfxRemove();
+    } else {
+      playerGrid[r][c] = BULB;
+      moveHistory.push({ r: r, c: c, action: 'place' });
+      sfxPlace();
+    }
+
+    drawGrid();
+
+    // Check for errors on place
+    if (moveHistory[moveHistory.length - 1].action === 'place') {
+      var errors = findErrors();
+      if (errors[r + ',' + c]) {
+        document.body.classList.add('shake');
+        sfxError();
+        setTimeout(function() { document.body.classList.remove('shake'); }, 300);
+      }
+    }
+
+    // Check completion
+    if (checkComplete()) {
+      gameActive = false;
+      clearInterval(timerInterval);
+      sfxComplete();
+      spawnCelebration();
+      setTimeout(showEndScreen, 800);
+    }
+  }
+
+  function undoMove() {
+    if (moveHistory.length === 0) return;
+    var last = moveHistory.pop();
+    if (last.action === 'place') {
+      playerGrid[last.r][last.c] = 0;
+    } else {
+      playerGrid[last.r][last.c] = BULB;
+    }
+    drawGrid();
+  }
+  window.undoMove = undoMove;
+
+  function resetPuzzle() {
+    for (var r = 0; r < currentSize; r++) {
+      for (var c = 0; c < currentSize; c++) playerGrid[r][c] = 0;
+    }
+    moveHistory = [];
+    drawGrid();
+  }
+  window.resetPuzzle = resetPuzzle;
+
+  // ========== TIMER ==========
+  function formatTime(secs) {
+    var m = Math.floor(secs / 60);
+    var s = Math.floor(secs % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function updateTimer() {
+    elapsed = Math.floor((Date.now() - startTime) / 1000);
+    timerEl.textContent = formatTime(elapsed);
+  }
+
+  // ========== SCREENS ==========
+  function startGame(size) {
+    currentSize = size;
+    window.currentSize = size;
+
+    var puzzle = generatePuzzle(size);
+    grid = puzzle.grid;
+    solution = puzzle.solution;
+
+    playerGrid = [];
+    for (var r = 0; r < size; r++) {
+      playerGrid[r] = [];
+      for (var c = 0; c < size; c++) playerGrid[r][c] = 0;
+    }
+    moveHistory = [];
+
+    initNeon(size);
+
+    var diffNames = { 7: '7x7 EASY', 10: '10x10 MEDIUM', 14: '14x14 HARD' };
+    diffLabelEl.textContent = diffNames[size] || size + 'x' + size;
+
+    showScreen(gameScreen);
+
+    requestAnimationFrame(function() {
+      sizeCanvas();
+      drawGrid();
+
+      // Set up input
+      canvas.removeEventListener('click', handleCanvasClick);
+      canvas.removeEventListener('touchend', handleCanvasTouch);
+      canvas.addEventListener('click', handleCanvasClick);
+      canvas.addEventListener('touchend', handleCanvasTouch);
+    });
+
+    startTime = Date.now();
+    elapsed = 0;
+    timerEl.textContent = '00:00';
+    clearInterval(timerInterval);
+    timerInterval = setInterval(updateTimer, 500);
+    gameActive = true;
+  }
+  window.startGame = startGame;
+
+  function showEndScreen() {
+    var solveTime = elapsed;
+    var diffNames = { 7: 'Easy (7x7)', 10: 'Medium (10x10)', 14: 'Hard (14x14)' };
+
+    document.getElementById('endTime').textContent = formatTime(solveTime);
+    document.getElementById('endDiff').textContent = diffNames[currentSize] || currentSize + 'x' + currentSize;
+    document.getElementById('endBulbs').textContent = totalBulbs;
+
+    initNeon(currentSize);
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(solveTime);
+    }).then(function(result) {
+      Neon.render(document.getElementById('endLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+      var best = Neon.getHighScore();
+      if (best && best < 999999) {
+        document.getElementById('endBest').textContent = formatTime(best);
+      }
+    });
+
+    showScreen(endScreen);
+  }
+
+  function backToMenu() {
+    clearInterval(timerInterval);
+    gameActive = false;
+    updateBestTimes();
+    initNeon(currentSize);
+    Neon.render(document.getElementById('startLB'));
+    showScreen(startScreen);
+  }
+  window.backToMenu = backToMenu;
+
+  // ========== SHARE ==========
+  function shareResult() {
+    var diffNames = { 7: 'Easy', 10: 'Medium', 14: 'Hard' };
+    var sizeStr = currentSize + 'x' + currentSize + ' ' + (diffNames[currentSize] || '');
+    var timeStr = formatTime(elapsed);
+
+    var text = '\uD83D\uDCA1 LIGHTUP\n' +
+      sizeStr + ' | ' + timeStr + '\n' +
+      totalBulbs + ' bulbs placed\n' +
+      'neonarcade.net/neonmind/lightup.html';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() { copyToClipboard(text); });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+  window.shareResult = shareResult;
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('Copied to clipboard!');
+    }).catch(function() { showToast('Could not copy'); });
+  }
+
+  function showToast(msg) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2000);
+  }
+
+  // ========== PARTICLES ==========
+  function resizeParticles() {
+    particlesCanvas.width = window.innerWidth;
+    particlesCanvas.height = window.innerHeight;
+  }
+
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 1 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.02,
+        size: 2 + Math.random() * 3,
+        color: color
+      });
+    }
+  }
+
+  function spawnCelebration() {
+    var cx = window.innerWidth / 2;
+    var cy = window.innerHeight / 2;
+    for (var i = 0; i < 5; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          spawnParticles(cx + (Math.random() - 0.5) * 200, cy + (Math.random() - 0.5) * 200, '#00f0ff', 15);
+          spawnParticles(cx + (Math.random() - 0.5) * 200, cy + (Math.random() - 0.5) * 200, '#39ff14', 10);
+          spawnParticles(cx + (Math.random() - 0.5) * 200, cy + (Math.random() - 0.5) * 200, '#ffd700', 8);
+        }, idx * 100);
+      })(i);
+    }
+  }
+
+  function tickParticles() {
+    pCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      pCtx.globalAlpha = p.life;
+      pCtx.fillStyle = p.color;
+      pCtx.beginPath();
+      pCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      pCtx.fill();
+    }
+    pCtx.globalAlpha = 1;
+    requestAnimationFrame(tickParticles);
+  }
+
+  // ========== INIT ==========
+  function init() {
+    initCanvas();
+    resizeParticles();
+    window.addEventListener('resize', function() {
+      resizeParticles();
+      if (gameActive) { sizeCanvas(); drawGrid(); }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        undoMove();
+      }
+    });
+
+    updateBestTimes();
+    initNeon(7);
+    Neon.render(document.getElementById('startLB'));
+    tickParticles();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
