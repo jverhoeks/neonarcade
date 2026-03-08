@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pour — Free Online Fluid Physics Game | NEON ARCADE</title>
+<meta name="description" content="Play Pour free online — tilt and guide neon particle-fluid into target containers. Satisfying physics, beautiful splatter art from failures. No download, no login.">
+<meta name="keywords" content="pour game, fluid physics game, particle game, tilt game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/pour.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/pour.html">
+<meta property="og:title" content="Pour — Free Online Fluid Physics Game | NEON ARCADE">
+<meta property="og:description" content="Play Pour free online — tilt and guide neon particle-fluid into target containers.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/pour.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/pour.html">
+<meta name="twitter:title" content="Pour — Free Online Fluid Physics Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Pour free online — tilt and guide neon particle-fluid into target containers.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/pour.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Pour",
+  "url": "https://neonarcade.net/neonarcade/pour.html",
+  "description": "Play Pour free online — tilt and guide neon particle-fluid into target containers.",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/pour.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON ARCADE", "item": "https://neonarcade.net/neonarcade/" },
+    { "@type": "ListItem", "position": 3, "name": "Pour", "item": "https://neonarcade.net/neonarcade/pour.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 10%,rgba(0,240,255,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(255,45,123,0.05) 0%,transparent 50%)}
+canvas{display:block;position:absolute;top:0;left:0;z-index:1}
+#ui{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:auto;padding:20px;max-width:480px;width:90%}
+.screen.active{display:flex}
+.title{font-family:'Orbitron',monospace;font-weight:900;font-size:64px;letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:8px}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:22px;letter-spacing:3px;color:#9999bb;text-transform:uppercase;margin-bottom:30px}
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:16px}
+.hud{position:absolute;top:0;left:0;width:100%;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:10}
+.hud-item{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:2px;color:#9999bb}
+.hud-item span{color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-level{font-size:16px}
+.hud-score span{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.hud-fill{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.fill-bar-bg{width:120px;height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;margin-top:4px}
+.fill-bar{height:100%;background:#39ff14;border-radius:4px;transition:width 0.15s;box-shadow:0 0 8px rgba(57,255,20,0.4)}
+.fill-label{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.stat-row{display:flex;justify-content:space-between;width:100%;max-width:300px;margin:6px 0;font-family:'Rajdhani',sans-serif;font-weight:500;font-size:18px}
+.stat-label{color:#7a7a9a}
+.stat-value{color:#00f0ff;font-family:'Orbitron',monospace;font-weight:700;font-size:16px}
+.stat-value.gold{color:#ffd700}
+.stat-value.green{color:#39ff14}
+.stat-value.pink{color:#ff2d7b}
+.level-title{font-family:'Orbitron',monospace;font-weight:700;font-size:28px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.5);margin-bottom:12px}
+.level-sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;color:#9999bb;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.score-big{font-family:'Orbitron',monospace;font-weight:900;font-size:48px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.5),0 0 40px rgba(255,215,0,0.2);margin:10px 0}
+.accuracy-bar{width:100%;max-width:300px;display:flex;align-items:center;gap:10px;margin:10px 0}
+.accuracy-bar-bg{flex:1;height:12px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden}
+.accuracy-bar-fill{height:100%;border-radius:6px;transition:width 0.8s ease}
+.accuracy-pct{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;color:#39ff14;min-width:50px;text-align:right}
+.btn-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.06);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(180,77,255,0.15);box-shadow:0 0 20px rgba(180,77,255,0.2)}
+#startLB,#endLB{width:100%;margin-top:16px}
+.pour-indicator{position:absolute;top:50px;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;display:none}
+.pour-indicator.active{display:block}
+.pour-text{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.5);text-transform:uppercase;opacity:0.7}
+@keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-3px)}}
+.shake{animation:shake 0.25s ease}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.screen.active{animation:fadeSlideUp 0.3s ease}
+.perfect-text{font-family:'Orbitron',monospace;font-weight:900;font-size:20px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6);letter-spacing:4px;margin:6px 0}
+</style>
+</head>
+<body>
+<canvas id="gc"></canvas>
+<div id="ui">
+  <div id="startScreen" class="screen active">
+    <div class="title">POUR</div>
+    <div class="subtitle">Tilt. Flow. Fill.</div>
+    <button class="play-btn" id="startBtn">START</button>
+    <div class="controls-hint">ARROW KEYS / A-D TO TILT &mdash; SPACE TO POUR</div>
+    <div class="controls-hint" style="margin-top:4px">MOBILE: TOUCH-DRAG TO TILT &mdash; TAP TO POUR</div>
+    <div id="startLB"></div>
+  </div>
+  <div id="levelIntro" class="screen">
+    <div class="level-title" id="levelIntroTitle">LEVEL 1</div>
+    <div class="level-sub" id="levelIntroSub">Fill the container</div>
+  </div>
+  <div id="levelComplete" class="screen">
+    <div class="level-title">LEVEL COMPLETE</div>
+    <div class="stat-row"><span class="stat-label">Accuracy</span><span class="stat-value green" id="lcAccuracy">0%</span></div>
+    <div class="accuracy-bar"><div class="accuracy-bar-bg"><div class="accuracy-bar-fill" id="lcAccBar" style="width:0%;background:#39ff14"></div></div><span class="accuracy-pct" id="lcAccPct">0%</span></div>
+    <div class="stat-row"><span class="stat-label">Particles Landed</span><span class="stat-value" id="lcLanded">0</span></div>
+    <div class="stat-row"><span class="stat-label">Particles Wasted</span><span class="stat-value pink" id="lcWasted">0</span></div>
+    <div class="stat-row"><span class="stat-label">Level Score</span><span class="stat-value gold" id="lcScore">0</span></div>
+    <div id="lcPerfect" class="perfect-text" style="display:none">PERFECT FILL!</div>
+    <button class="play-btn" id="nextLevelBtn" style="margin-top:16px">NEXT LEVEL</button>
+  </div>
+  <div id="gameOver" class="screen">
+    <div class="level-title">GAME OVER</div>
+    <div class="score-big" id="goScore">0</div>
+    <div class="stat-row"><span class="stat-label">Levels Cleared</span><span class="stat-value" id="goLevels">0</span></div>
+    <div class="stat-row"><span class="stat-label">Overall Accuracy</span><span class="stat-value green" id="goAccuracy">0%</span></div>
+    <div class="accuracy-bar"><div class="accuracy-bar-bg"><div class="accuracy-bar-fill" id="goAccBar" style="width:0%;background:#39ff14"></div></div><span class="accuracy-pct" id="goAccPct">0%</span></div>
+    <div class="stat-row"><span class="stat-label">Total Landed</span><span class="stat-value" id="goLanded">0</span></div>
+    <div class="stat-row"><span class="stat-label">Total Wasted</span><span class="stat-value pink" id="goWasted">0</span></div>
+    <div class="btn-row">
+      <button class="share-btn" id="shareBtn">SHARE</button>
+      <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+    </div>
+    <div id="endLB"></div>
+  </div>
+</div>
+<div class="hud" id="hud" style="display:none">
+  <div class="hud-item hud-level">LVL <span id="hudLevel">1</span></div>
+  <div class="hud-fill">
+    <div class="fill-label">FILL</div>
+    <div class="fill-bar-bg"><div class="fill-bar" id="hudFill" style="width:0%"></div></div>
+  </div>
+  <div class="hud-item hud-score">SCORE <span id="hudScore">0</span></div>
+</div>
+<div class="pour-indicator" id="pourIndicator"><span class="pour-text">POURING</span></div>
+
+<script src="/neon.js"></script>
+<script>
+(()=>{
+'use strict';
+
+// ===== CONFIG =====
+const GRAVITY = 0.06;
+const PARTICLE_R = 3;
+const MAX_PARTICLES = 800;
+const POUR_RATE = 2;
+const FRICTION = 0.985;
+const BOUNCE = 0.3;
+const SUBSTEPS = 3;
+const PARTICLE_COLORS = ['#00f0ff','#39ff14','#ffd700','#b44dff','#ff8c00'];
+const LEVEL_COLORS = [
+  '#00f0ff','#39ff14','#ffd700','#b44dff','#ff8c00',
+  '#00f0ff','#39ff14','#ffd700','#ff2d7b','#b44dff'
+];
+
+// ===== AUDIO =====
+let audioCtx = null;
+function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)()}
+function playTone(freq,dur,type,vol){
+  ensureAudio();
+  try{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(vol||0.08,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start();o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+function sndPour(){playTone(180+Math.random()*40,0.06,'sine',0.04)}
+function sndSplash(){playTone(400+Math.random()*200,0.15,'sine',0.06);setTimeout(()=>playTone(600+Math.random()*200,0.1,'triangle',0.04),30)}
+function sndLevelComplete(){playTone(523,0.15,'square',0.06);setTimeout(()=>playTone(659,0.15,'square',0.06),120);setTimeout(()=>playTone(784,0.2,'square',0.07),240)}
+function sndFail(){playTone(200,0.3,'sawtooth',0.06);setTimeout(()=>playTone(150,0.4,'sawtooth',0.05),100)}
+function sndPerfect(){playTone(784,0.12,'square',0.06);setTimeout(()=>playTone(988,0.12,'square',0.06),100);setTimeout(()=>playTone(1175,0.12,'square',0.06),200);setTimeout(()=>playTone(1568,0.25,'square',0.08),300)}
+
+// ===== DOM =====
+const canvas = document.getElementById('gc');
+const ctx = canvas.getContext('2d');
+const startScreen = document.getElementById('startScreen');
+const levelIntro = document.getElementById('levelIntro');
+const levelComplete = document.getElementById('levelComplete');
+const gameOver = document.getElementById('gameOver');
+const hud = document.getElementById('hud');
+const pourIndicator = document.getElementById('pourIndicator');
+
+// ===== SIZING =====
+let W, H, dpr;
+function resize(){
+  dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ===== GAME STATE =====
+let state = 'start';
+let tilt = 0;
+let pouring = false;
+let particles = [];
+let settled = [];
+let currentLevel = 0;
+let totalScore = 0;
+let totalLanded = 0;
+let totalWasted = 0;
+let levelLanded = 0;
+let levelWasted = 0;
+let levelParticlesNeeded = 0;
+let pourBudget = 0;
+let pourSpawnCount = 0;
+let containers = [];
+let obstacles = [];
+let splitters = [];
+let movingPlatforms = [];
+let levelColor = '#00f0ff';
+let celebrationParticles = [];
+let shakeTimer = 0;
+let introTimer = 0;
+let fillRatio = 0;
+let pourX = 0;
+let endWaitTimer = 0;
+
+// ===== LEVEL DEFINITIONS =====
+function buildLevels(){
+  const L = [];
+
+  // Level 1: Single wide container, no obstacles
+  L.push({
+    desc: 'Fill the container',
+    budget: 80,
+    targetFill: 50,
+    containers: [{x:0.30,y:0.72,w:0.40,h:0.18}],
+    obstacles: [],
+    splitters: [],
+    moving: []
+  });
+
+  // Level 2: Two containers side by side
+  L.push({
+    desc: 'Fill both containers',
+    budget: 120,
+    targetFill: 70,
+    containers: [{x:0.10,y:0.72,w:0.30,h:0.18},{x:0.60,y:0.72,w:0.30,h:0.18}],
+    obstacles: [],
+    splitters: [],
+    moving: []
+  });
+
+  // Level 3: One container with a wall obstacle
+  L.push({
+    desc: 'Navigate the wall',
+    budget: 100,
+    targetFill: 55,
+    containers: [{x:0.52,y:0.72,w:0.35,h:0.18}],
+    obstacles: [{x:0.46,y:0.28,w:0.04,h:0.35}],
+    splitters: [],
+    moving: []
+  });
+
+  // Level 4: Three stacked containers at different heights
+  L.push({
+    desc: 'Three-tier pour',
+    budget: 150,
+    targetFill: 80,
+    containers: [
+      {x:0.05,y:0.48,w:0.25,h:0.14},
+      {x:0.38,y:0.64,w:0.25,h:0.14},
+      {x:0.70,y:0.78,w:0.25,h:0.14}
+    ],
+    obstacles: [],
+    splitters: [],
+    moving: []
+  });
+
+  // Level 5: Container behind a maze of walls
+  L.push({
+    desc: 'Thread the gap',
+    budget: 120,
+    targetFill: 60,
+    containers: [{x:0.30,y:0.76,w:0.40,h:0.16}],
+    obstacles: [
+      {x:0.15,y:0.28,w:0.28,h:0.03},
+      {x:0.57,y:0.28,w:0.28,h:0.03},
+      {x:0.30,y:0.50,w:0.40,h:0.03}
+    ],
+    splitters: [],
+    moving: []
+  });
+
+  // Level 6: Moving platform
+  L.push({
+    desc: 'Watch the platform',
+    budget: 130,
+    targetFill: 70,
+    containers: [{x:0.55,y:0.76,w:0.35,h:0.16}],
+    obstacles: [],
+    splitters: [],
+    moving: [{x:0.20,y:0.42,w:0.24,h:0.03,dx:0.003,minX:0.05,maxX:0.71}]
+  });
+
+  // Level 7: Splitter
+  L.push({
+    desc: 'Use the splitter',
+    budget: 140,
+    targetFill: 70,
+    containers: [
+      {x:0.05,y:0.74,w:0.28,h:0.16},
+      {x:0.67,y:0.74,w:0.28,h:0.16}
+    ],
+    obstacles: [],
+    splitters: [{x:0.38,y:0.38,w:0.24,h:0.04,angle:0}],
+    moving: []
+  });
+
+  // Level 8: Complex
+  L.push({
+    desc: 'Precision pouring',
+    budget: 160,
+    targetFill: 80,
+    containers: [
+      {x:0.05,y:0.76,w:0.25,h:0.16},
+      {x:0.70,y:0.76,w:0.25,h:0.16}
+    ],
+    obstacles: [
+      {x:0.28,y:0.22,w:0.04,h:0.28},
+      {x:0.68,y:0.22,w:0.04,h:0.28}
+    ],
+    splitters: [],
+    moving: [{x:0.28,y:0.54,w:0.22,h:0.03,dx:0.002,minX:0.12,maxX:0.66}]
+  });
+
+  // Level 9: Funnel setup
+  L.push({
+    desc: 'Through the funnel',
+    budget: 150,
+    targetFill: 75,
+    containers: [{x:0.25,y:0.78,w:0.50,h:0.14}],
+    obstacles: [
+      {x:0.02,y:0.28,w:0.40,h:0.03},
+      {x:0.58,y:0.28,w:0.40,h:0.03},
+      {x:0.12,y:0.52,w:0.30,h:0.03},
+      {x:0.58,y:0.52,w:0.30,h:0.03}
+    ],
+    splitters: [],
+    moving: []
+  });
+
+  // Level 10: The gauntlet
+  L.push({
+    desc: 'The gauntlet',
+    budget: 200,
+    targetFill: 90,
+    containers: [
+      {x:0.02,y:0.78,w:0.22,h:0.14},
+      {x:0.39,y:0.78,w:0.22,h:0.14},
+      {x:0.76,y:0.78,w:0.22,h:0.14}
+    ],
+    obstacles: [
+      {x:0.24,y:0.22,w:0.04,h:0.22},
+      {x:0.72,y:0.22,w:0.04,h:0.22},
+      {x:0.32,y:0.52,w:0.36,h:0.03}
+    ],
+    splitters: [{x:0.32,y:0.32,w:0.16,h:0.04,angle:0}],
+    moving: [{x:0.12,y:0.64,w:0.18,h:0.03,dx:0.004,minX:0.02,maxX:0.80}]
+  });
+
+  return L;
+}
+
+const LEVELS = buildLevels();
+
+// ===== CONVERT LEVEL COORDS TO PIXELS =====
+function toPixel(lvl){
+  const cArr = lvl.containers.map(c=>({
+    x: c.x*W, y: c.y*H, w: c.w*W, h: c.h*H, fill:0
+  }));
+  const oArr = lvl.obstacles.map(o=>({
+    x: o.x*W, y: o.y*H, w: o.w*W, h: o.h*H
+  }));
+  const sArr = lvl.splitters.map(s=>({
+    x: s.x*W, y: s.y*H, w: s.w*W, h: s.h*H, angle: s.angle||0
+  }));
+  const mArr = lvl.moving.map(m=>({
+    x: m.x*W, y: m.y*H, w: m.w*W, h: m.h*H,
+    dx: m.dx*W, minX: m.minX*W, maxX: m.maxX*W, dir:1
+  }));
+  return {cArr, oArr, sArr, mArr, budget: lvl.budget, targetFill: lvl.targetFill, desc: lvl.desc};
+}
+
+// ===== PARTICLE =====
+function spawnParticle(x, y, vx, vy){
+  if(particles.length + settled.length >= MAX_PARTICLES) return;
+  particles.push({
+    x, y, vx: vx||0, vy: vy||0,
+    r: PARTICLE_R * (0.8 + Math.random()*0.4),
+    color: levelColor,
+    alpha: 0.85 + Math.random()*0.15,
+    settled: false,
+    settleTimer: 0,
+    containerIdx: -1
+  });
+}
+
+// ===== COLLISION WITH SOLID RECT (obstacles, walls) =====
+function collideRect(p, rx, ry, rw, rh){
+  // Expanded rect by particle radius
+  const ex = rx - p.r, ey = ry - p.r, ew = rw + p.r*2, eh = rh + p.r*2;
+  if(p.x < ex || p.x > ex+ew || p.y < ey || p.y > ey+eh) return false;
+
+  const left = p.x - rx;
+  const right = (rx+rw) - p.x;
+  const top = p.y - ry;
+  const bottom = (ry+rh) - p.y;
+  const minD = Math.min(left, right, top, bottom);
+
+  if(minD === top){
+    p.y = ry - p.r;
+    p.vy = -Math.abs(p.vy) * BOUNCE;
+    p.vx *= 0.92;
+  } else if(minD === bottom){
+    p.y = ry + rh + p.r;
+    p.vy = Math.abs(p.vy) * BOUNCE;
+  } else if(minD === left){
+    p.x = rx - p.r;
+    p.vx = -Math.abs(p.vx) * BOUNCE;
+  } else {
+    p.x = rx + rw + p.r;
+    p.vx = Math.abs(p.vx) * BOUNCE;
+  }
+  return true;
+}
+
+// ===== CONTAINER COLLISION (U-shape: left wall, right wall, floor) =====
+function collideContainer(p, c, ci){
+  const WALL_T = 4; // wall thickness
+  // Check if particle is in the horizontal span of the container (with some margin)
+  const inXSpan = p.x >= c.x - p.r - WALL_T && p.x <= c.x + c.w + p.r + WALL_T;
+  const inYSpan = p.y >= c.y - p.r && p.y <= c.y + c.h + p.r + WALL_T;
+  if(!inXSpan || !inYSpan) return false;
+
+  let hit = false;
+
+  // Floor collision (bottom of container)
+  if(p.x >= c.x && p.x <= c.x + c.w){
+    if(p.y > c.y + c.h - p.r){
+      p.y = c.y + c.h - p.r;
+      p.vy = -Math.abs(p.vy) * BOUNCE * 0.4;
+      p.vx *= 0.9;
+      hit = true;
+    }
+  }
+
+  // Left wall (only if particle approaching from right side or inside)
+  if(p.x < c.x + p.r && p.x > c.x - WALL_T - p.r && p.y >= c.y && p.y <= c.y + c.h){
+    p.x = c.x + p.r;
+    p.vx = Math.abs(p.vx) * BOUNCE;
+    hit = true;
+  }
+
+  // Right wall
+  if(p.x > c.x + c.w - p.r && p.x < c.x + c.w + WALL_T + p.r && p.y >= c.y && p.y <= c.y + c.h){
+    p.x = c.x + c.w - p.r;
+    p.vx = -Math.abs(p.vx) * BOUNCE;
+    hit = true;
+  }
+
+  // Track if inside container
+  if(p.x >= c.x && p.x <= c.x + c.w && p.y >= c.y && p.y <= c.y + c.h){
+    p.containerIdx = ci;
+  }
+
+  return hit;
+}
+
+// ===== SCREENS =====
+function showScreen(id){
+  [startScreen, levelIntro, levelComplete, gameOver].forEach(s=>s.classList.remove('active'));
+  if(id)document.getElementById(id).classList.add('active');
+}
+
+// ===== INIT LEVEL =====
+function initLevel(idx){
+  const lvl = LEVELS[idx];
+  const px = toPixel(lvl);
+  containers = px.cArr;
+  obstacles = px.oArr;
+  splitters = px.sArr;
+  movingPlatforms = px.mArr;
+  pourBudget = px.budget;
+  levelParticlesNeeded = px.targetFill;
+  levelLanded = 0;
+  levelWasted = 0;
+  pourSpawnCount = 0;
+  particles = [];
+  settled = [];
+  fillRatio = 0;
+  endWaitTimer = 0;
+  levelColor = LEVEL_COLORS[idx % LEVEL_COLORS.length];
+  pourX = W / 2;
+  tilt = 0;
+  pouring = false;
+
+  document.getElementById('hudLevel').textContent = idx + 1;
+  document.getElementById('hudFill').style.width = '0%';
+}
+
+// ===== START GAME =====
+function startGame(){
+  ensureAudio();
+  currentLevel = 0;
+  totalScore = 0;
+  totalLanded = 0;
+  totalWasted = 0;
+  showLevelIntro();
+}
+
+function showLevelIntro(){
+  state = 'levelIntroState';
+  initLevel(currentLevel);
+  document.getElementById('levelIntroTitle').textContent = 'LEVEL ' + (currentLevel+1);
+  document.getElementById('levelIntroSub').textContent = LEVELS[currentLevel].desc.toUpperCase();
+  showScreen('levelIntro');
+  hud.style.display = 'none';
+  introTimer = 80;
+}
+
+function startPlaying(){
+  state = 'playing';
+  showScreen(null);
+  hud.style.display = 'flex';
+}
+
+function showLevelComplete(){
+  state = 'levelCompleteState';
+  const total = levelLanded + levelWasted;
+  const acc = total > 0 ? Math.round(levelLanded / total * 100) : 0;
+  const score = levelLanded * 10 + (acc >= 95 ? 500 : acc >= 80 ? 200 : 0);
+  totalScore += score;
+  totalLanded += levelLanded;
+  totalWasted += levelWasted;
+
+  document.getElementById('lcAccuracy').textContent = acc + '%';
+  document.getElementById('lcAccPct').textContent = acc + '%';
+  document.getElementById('lcLanded').textContent = levelLanded;
+  document.getElementById('lcWasted').textContent = levelWasted;
+  document.getElementById('lcScore').textContent = score.toLocaleString();
+
+  const isPerfect = acc >= 95;
+  document.getElementById('lcPerfect').style.display = isPerfect ? 'block' : 'none';
+
+  const barColor = acc >= 80 ? '#39ff14' : acc >= 50 ? '#ffd700' : '#ff2d7b';
+  const bar = document.getElementById('lcAccBar');
+  bar.style.background = barColor;
+  bar.style.boxShadow = '0 0 8px ' + barColor;
+  setTimeout(()=>{ bar.style.width = acc + '%'; }, 50);
+
+  if(currentLevel >= LEVELS.length - 1){
+    document.getElementById('nextLevelBtn').textContent = 'FINISH';
+  } else {
+    document.getElementById('nextLevelBtn').textContent = 'NEXT LEVEL';
+  }
+
+  showScreen('levelComplete');
+  hud.style.display = 'none';
+
+  if(isPerfect) sndPerfect(); else sndLevelComplete();
+}
+
+function showGameOver(){
+  state = 'gameOverState';
+  const total = totalLanded + totalWasted;
+  const acc = total > 0 ? Math.round(totalLanded / total * 100) : 0;
+
+  document.getElementById('goScore').textContent = totalScore.toLocaleString();
+  document.getElementById('goLevels').textContent = Math.min(currentLevel + 1, LEVELS.length);
+  document.getElementById('goAccuracy').textContent = acc + '%';
+  document.getElementById('goAccPct').textContent = acc + '%';
+  document.getElementById('goLanded').textContent = totalLanded;
+  document.getElementById('goWasted').textContent = totalWasted;
+
+  const barColor = acc >= 80 ? '#39ff14' : acc >= 50 ? '#ffd700' : '#ff2d7b';
+  const bar = document.getElementById('goAccBar');
+  bar.style.background = barColor;
+  bar.style.boxShadow = '0 0 8px ' + barColor;
+  setTimeout(()=>{ bar.style.width = acc + '%'; }, 50);
+
+  showScreen('gameOver');
+  hud.style.display = 'none';
+
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function(){
+    return Neon.save(totalScore);
+  }).then(function(result){
+    Neon.render(document.getElementById('endLB'));
+    if(result.globalRank >= 1 && result.globalRank <= 5){
+      Neon.showGlobalSplash(result.globalRank);
+    }
+  });
+}
+
+// ===== SHARE =====
+function share(){
+  const total = totalLanded + totalWasted;
+  const acc = total > 0 ? Math.round(totalLanded / total * 100) : 0;
+  const filled = Math.round(acc / 10);
+  const barFull = '\u2588'.repeat(filled);
+  const barEmpty = '\u2591'.repeat(10 - filled);
+  const lvlCleared = Math.min(currentLevel + 1, LEVELS.length);
+
+  const text = '\uD83E\uDED7 POUR\n' +
+    'Level ' + lvlCleared + ' | Score: ' + totalScore.toLocaleString() + ' | ' + acc + '% accuracy\n' +
+    barFull + barEmpty + ' ' + acc + '%\n' +
+    'neonarcade.net/neonarcade/pour.html';
+
+  if(navigator.share){
+    navigator.share({title:'POUR',text:text}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(()=>{
+      const btn = document.getElementById('shareBtn');
+      btn.textContent = 'COPIED!';
+      setTimeout(()=>{btn.textContent = 'SHARE';}, 1500);
+    });
+  }
+}
+
+// ===== CELEBRATION PARTICLES =====
+function spawnCelebration(x, y, count, color){
+  for(let i = 0; i < count; i++){
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 4;
+    celebrationParticles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      r: 2 + Math.random() * 3,
+      color: color || PARTICLE_COLORS[Math.floor(Math.random()*PARTICLE_COLORS.length)],
+      life: 1,
+      decay: 0.015 + Math.random() * 0.015
+    });
+  }
+}
+
+// ===== PHYSICS UPDATE =====
+function updatePhysics(){
+  // Pour particles
+  if(pouring && pourBudget > 0){
+    for(let i = 0; i < POUR_RATE; i++){
+      if(pourBudget <= 0) break;
+      const px = pourX + (Math.random() - 0.5) * 8;
+      spawnParticle(px, 35, tilt * 0.8 + (Math.random()-0.5)*0.3, 0.3 + Math.random()*0.3);
+      pourBudget--;
+      pourSpawnCount++;
+      if(pourSpawnCount % 4 === 0) sndPour();
+    }
+  }
+
+  // Update moving platforms
+  for(const mp of movingPlatforms){
+    mp.x += mp.dx * mp.dir;
+    if(mp.x <= mp.minX || mp.x + mp.w >= mp.maxX + mp.w) mp.dir *= -1;
+  }
+
+  // Substep physics for each particle
+  const subDt = 1 / SUBSTEPS;
+  for(let i = particles.length - 1; i >= 0; i--){
+    const p = particles[i];
+    if(p.settled) continue;
+
+    p.containerIdx = -1;
+    for(let s = 0; s < SUBSTEPS; s++){
+      // Apply forces
+      p.vy += GRAVITY * subDt;
+      p.vx += tilt * 0.04 * subDt;
+
+      // Integrate
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Friction
+      p.vx *= FRICTION;
+      p.vy *= FRICTION;
+
+      // Wall boundaries
+      if(p.x < p.r){ p.x = p.r; p.vx = Math.abs(p.vx) * BOUNCE; }
+      if(p.x > W - p.r){ p.x = W - p.r; p.vx = -Math.abs(p.vx) * BOUNCE; }
+
+      // Collide with obstacles
+      for(const o of obstacles) collideRect(p, o.x, o.y, o.w, o.h);
+
+      // Collide with splitters (flat platforms that redirect)
+      for(const sp of splitters) collideRect(p, sp.x, sp.y, sp.w, sp.h);
+
+      // Collide with moving platforms
+      for(const mp of movingPlatforms){
+        if(collideRect(p, mp.x, mp.y, mp.w, mp.h)){
+          p.vx += mp.dx * mp.dir * 0.3;
+        }
+      }
+
+      // Container collision (U-shape) - keep containerIdx if set in any substep
+      for(let ci = 0; ci < containers.length; ci++){
+        collideContainer(p, containers[ci], ci);
+      }
+    }
+
+    // Settle check - if inside a container and moving slowly
+    // Also check if touching the container floor
+    if(p.containerIdx >= 0){
+      const c = containers[p.containerIdx];
+      const onFloor = p.y >= c.y + c.h - p.r - 2;
+      const speed = Math.abs(p.vx) + Math.abs(p.vy);
+      if(speed < 0.8 || (onFloor && speed < 1.5)){
+        p.settleTimer++;
+        if(p.settleTimer > 5){
+          p.settled = true;
+          c.fill++;
+          levelLanded++;
+          // Clamp to floor
+          p.y = Math.min(p.y, c.y + c.h - p.r);
+          p.vx = 0; p.vy = 0;
+          if(levelLanded % 5 === 0) sndSplash();
+          settled.push(p);
+        }
+      } else {
+        p.settleTimer = Math.max(0, p.settleTimer - 1);
+      }
+
+      // Particle-particle collision inside container (limit for perf)
+      let checks = 0;
+      for(let j = settled.length - 1; j >= 0 && checks < 20; j--){
+        const sp = settled[j];
+        const dx = p.x - sp.x;
+        const dy = p.y - sp.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const minD = p.r + sp.r;
+        if(dist < minD && dist > 0.01){
+          const nx = dx / dist, ny = dy / dist;
+          const overlap = minD - dist;
+          p.x += nx * overlap;
+          p.y += ny * overlap;
+          p.vx += nx * 0.15;
+          p.vy += ny * 0.15;
+          checks++;
+        }
+      }
+    } else {
+      p.settleTimer = 0;
+    }
+
+    // Off screen = wasted
+    if(p.y > H + 30){
+      particles.splice(i, 1);
+      levelWasted++;
+      continue;
+    }
+
+    // Remove if settled
+    if(p.settled){
+      particles.splice(i, 1);
+    }
+  }
+}
+
+// ===== UPDATE =====
+function update(){
+  if(state === 'levelIntroState'){
+    introTimer--;
+    if(introTimer <= 0) startPlaying();
+    return;
+  }
+
+  if(state !== 'playing') return;
+
+  updatePhysics();
+
+  // Update fill ratio
+  const totalFill = containers.reduce((sum, c) => sum + c.fill, 0);
+  fillRatio = Math.min(totalFill / levelParticlesNeeded, 1);
+  document.getElementById('hudFill').style.width = Math.round(fillRatio * 100) + '%';
+  document.getElementById('hudScore').textContent = (totalScore + totalFill * 10).toLocaleString();
+
+  // Check level end: must have spawned particles, budget empty, all particles gone
+  if(pourBudget <= 0 && pourSpawnCount > 0 && particles.length === 0){
+    endWaitTimer++;
+    // Small delay so player sees final state
+    if(endWaitTimer > 30){
+      if(fillRatio >= 0.4){
+        spawnCelebration(W/2, H/2, 30, levelColor);
+        showLevelComplete();
+      } else {
+        sndFail();
+        document.body.classList.add('shake');
+        setTimeout(()=>document.body.classList.remove('shake'), 250);
+        showGameOver();
+      }
+    }
+  }
+
+  // Update celebrations
+  for(let i = celebrationParticles.length - 1; i >= 0; i--){
+    const cp = celebrationParticles[i];
+    cp.x += cp.vx; cp.y += cp.vy;
+    cp.vy += 0.08;
+    cp.life -= cp.decay;
+    if(cp.life <= 0) celebrationParticles.splice(i, 1);
+  }
+
+  if(shakeTimer > 0) shakeTimer--;
+}
+
+// ===== DRAW =====
+function draw(){
+  ctx.clearRect(0, 0, W, H);
+
+  // Background glows
+  const bg = ctx.createRadialGradient(W*0.3, H*0.1, 0, W*0.3, H*0.1, W*0.6);
+  bg.addColorStop(0, 'rgba(0,240,255,0.03)');
+  bg.addColorStop(1, 'transparent');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const bg2 = ctx.createRadialGradient(W*0.8, H*0.9, 0, W*0.8, H*0.9, W*0.5);
+  bg2.addColorStop(0, 'rgba(255,45,123,0.02)');
+  bg2.addColorStop(1, 'transparent');
+  ctx.fillStyle = bg2;
+  ctx.fillRect(0, 0, W, H);
+
+  if(state !== 'playing' && state !== 'levelIntroState') {
+    drawCelebrations();
+    return;
+  }
+
+  // Pour spout
+  if(state === 'playing'){
+    ctx.save();
+    ctx.strokeStyle = levelColor;
+    ctx.globalAlpha = pouring ? 0.5 : 0.2;
+    ctx.lineWidth = pouring ? 3 : 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pourX, 0);
+    ctx.lineTo(pourX, 42);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Nozzle
+    ctx.save();
+    ctx.fillStyle = levelColor;
+    ctx.globalAlpha = pouring ? 0.7 : 0.4;
+    ctx.beginPath();
+    ctx.arc(pourX, 30, pouring ? 8 : 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 0.15;
+    ctx.beginPath();
+    ctx.arc(pourX, 30, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw containers
+  for(const c of containers){
+    ctx.fillStyle = 'rgba(18,18,31,0.8)';
+    ctx.fillRect(c.x, c.y, c.w, c.h);
+
+    // Glow U-shape walls
+    ctx.strokeStyle = levelColor;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = levelColor;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y);
+    ctx.lineTo(c.x, c.y + c.h);
+    ctx.lineTo(c.x + c.w, c.y + c.h);
+    ctx.lineTo(c.x + c.w, c.y);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Fill level glow
+    const fillH = (c.fill / Math.max(1, levelParticlesNeeded / containers.length)) * c.h;
+    const clampH = Math.min(fillH, c.h);
+    if(clampH > 0){
+      const grad = ctx.createLinearGradient(c.x, c.y + c.h - clampH, c.x, c.y + c.h);
+      grad.addColorStop(0, levelColor + '08');
+      grad.addColorStop(1, levelColor + '25');
+      ctx.fillStyle = grad;
+      ctx.fillRect(c.x + 1, c.y + c.h - clampH, c.w - 2, clampH);
+    }
+  }
+
+  // Draw obstacles
+  for(const o of obstacles){
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+    ctx.strokeStyle = '#7a7a9a';
+    ctx.lineWidth = 1;
+    ctx.shadowColor = '#7a7a9a';
+    ctx.shadowBlur = 4;
+    ctx.strokeRect(o.x, o.y, o.w, o.h);
+    ctx.shadowBlur = 0;
+  }
+
+  // Draw splitters
+  for(const s of splitters){
+    ctx.fillStyle = '#2a1a3e';
+    ctx.fillRect(s.x, s.y, s.w, s.h);
+    ctx.strokeStyle = '#b44dff';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#b44dff';
+    ctx.shadowBlur = 6;
+    ctx.strokeRect(s.x, s.y, s.w, s.h);
+    ctx.shadowBlur = 0;
+  }
+
+  // Draw moving platforms
+  for(const mp of movingPlatforms){
+    ctx.fillStyle = '#1a2a1e';
+    ctx.fillRect(mp.x, mp.y, mp.w, mp.h);
+    ctx.strokeStyle = '#ff8c00';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#ff8c00';
+    ctx.shadowBlur = 6;
+    ctx.strokeRect(mp.x, mp.y, mp.w, mp.h);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ff8c00';
+    ctx.globalAlpha = 0.4;
+    ctx.font = '10px Rajdhani';
+    ctx.fillText(mp.dir > 0 ? '\u25B6' : '\u25C0', mp.dir > 0 ? mp.x + mp.w - 12 : mp.x + 4, mp.y + mp.h/2 + 3);
+    ctx.globalAlpha = 1;
+  }
+
+  // Draw settled particles
+  for(const p of settled){
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha * 0.85;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // Draw active particles with glow
+  for(const p of particles){
+    ctx.globalAlpha = p.alpha;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+  ctx.globalAlpha = 1;
+
+  // Budget indicator
+  if(state === 'playing'){
+    const budgetPct = pourBudget / LEVELS[currentLevel].budget;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(W - 30, 50, 12, H - 100);
+    const bh = (H - 100) * budgetPct;
+    ctx.fillStyle = levelColor + '40';
+    ctx.fillRect(W - 30, 50 + (H - 100 - bh), 12, bh);
+    ctx.strokeStyle = levelColor + '30';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(W - 30, 50, 12, H - 100);
+
+    ctx.save();
+    ctx.translate(W - 24, H/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.font = '700 9px Orbitron';
+    ctx.fillStyle = '#7a7a9a';
+    ctx.textAlign = 'center';
+    ctx.fillText('FLUID', 0, 0);
+    ctx.restore();
+  }
+
+  drawCelebrations();
+}
+
+function drawCelebrations(){
+  for(const cp of celebrationParticles){
+    ctx.globalAlpha = cp.life;
+    ctx.fillStyle = cp.color;
+    ctx.beginPath();
+    ctx.arc(cp.x, cp.y, cp.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ===== INPUT =====
+let keys = {};
+let touchId = null;
+let touchStartX = 0;
+let touchActive = false;
+
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if(e.code === 'Space'){
+    e.preventDefault();
+    if(state === 'playing') pouring = true;
+    pourIndicator.classList.add('active');
+  }
+  if(e.code === 'ArrowLeft' || e.code === 'KeyA') e.preventDefault();
+  if(e.code === 'ArrowRight' || e.code === 'KeyD') e.preventDefault();
+});
+
+document.addEventListener('keyup', e => {
+  keys[e.code] = false;
+  if(e.code === 'Space'){
+    pouring = false;
+    pourIndicator.classList.remove('active');
+  }
+});
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  ensureAudio();
+  const t = e.touches[0];
+  touchId = t.identifier;
+  touchStartX = t.clientX;
+  touchActive = true;
+  if(state === 'playing') pouring = true;
+  pourIndicator.classList.add('active');
+}, {passive: false});
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier === touchId){
+      const dx = t.clientX - touchStartX;
+      tilt = Math.max(-1, Math.min(1, dx / (W * 0.25)));
+    }
+  }
+}, {passive: false});
+
+canvas.addEventListener('touchend', e => {
+  for(const t of e.changedTouches){
+    if(t.identifier === touchId){
+      touchActive = false;
+      pouring = false;
+      pourIndicator.classList.remove('active');
+    }
+  }
+});
+
+// ===== TILT UPDATE =====
+function updateTilt(){
+  if(touchActive) return;
+  if(keys['ArrowLeft'] || keys['KeyA']){
+    tilt = Math.max(-1, tilt - 0.05);
+  } else if(keys['ArrowRight'] || keys['KeyD']){
+    tilt = Math.min(1, tilt + 0.05);
+  } else {
+    tilt *= 0.92;
+  }
+  pourX = W / 2 + tilt * W * 0.35;
+  pourX = Math.max(20, Math.min(W - 40, pourX));
+}
+
+// ===== GAME LOOP =====
+let lastTime = 0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  const dt = ts - lastTime;
+  lastTime = ts;
+  if(dt > 60) return;
+
+  updateTilt();
+  update();
+  draw();
+}
+
+// ===== BUTTON HANDLERS =====
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  ensureAudio();
+  startGame();
+});
+
+document.getElementById('nextLevelBtn').addEventListener('click', ()=>{
+  if(currentLevel >= LEVELS.length - 1){
+    showGameOver();
+  } else {
+    currentLevel++;
+    showLevelIntro();
+  }
+});
+
+document.getElementById('shareBtn').addEventListener('click', share);
+document.getElementById('replayBtn').addEventListener('click', ()=> startGame());
+
+// ===== INIT =====
+Neon.init({
+  game: 'pour',
+  mode: 'high',
+  key: 'neonarcade_neonarcade_pour_scores'
+});
+Neon.render(document.getElementById('startLB'));
+showScreen('startScreen');
+
+// Idle background animation
+function idleParticles(){
+  if(state === 'start' || state === 'gameOverState'){
+    if(Math.random() < 0.15){
+      celebrationParticles.push({
+        x: Math.random() * W, y: -10,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: 0.5 + Math.random() * 1,
+        r: 1.5 + Math.random() * 2,
+        color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+        life: 1, decay: 0.005
+      });
+    }
+  }
+}
+setInterval(idleParticles, 50);
+
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

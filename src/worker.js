@@ -36,11 +36,17 @@ const KNOWN_GAMES = {
   'clickspeed-standard': { mode: 'high', maxScore: 500 },
   'clickspeed-precision':{ mode: 'high', maxScore: 500 },
   'clickspeed-burst':    { mode: 'high', maxScore: 500 },
+  'pour':                { mode: 'high', maxScore: 100000 },
+  'bloomfield':          { mode: 'high', maxScore: 100 },
+  'typeblitz':           { mode: 'high', maxScore: 5000 },
 
   // NEON GRIND (mode: high)
   'mathblitz':           { mode: 'high', maxScore: 100000 },
   'reflex-chain':        { mode: 'high', maxScore: 100000 },
   'neurosort':           { mode: 'high', maxScore: 100000 },
+  'colorname':           { mode: 'high', maxScore: 1000 },
+  'numbersense':         { mode: 'high', maxScore: 2000 },
+  'gridmatch':           { mode: 'high', maxScore: 1000 },
 
   // NEON MIND (mode: low — time-based puzzles)
   'sudoku':              { mode: 'low', maxScore: 86400 },
@@ -52,6 +58,9 @@ const KNOWN_GAMES = {
   'nurikabe':            { mode: 'low', maxScore: 86400 },
   'bridges':             { mode: 'low', maxScore: 86400 },
   'tango':               { mode: 'low', maxScore: 86400 },
+  'lightup':             { mode: 'low', maxScore: 86400 },
+  'tents':               { mode: 'low', maxScore: 86400 },
+  'skyscrapers':         { mode: 'low', maxScore: 86400 },
   'priorself':           { mode: 'low', maxScore: 86400 },
 };
 

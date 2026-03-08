@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ColorName — Free Online Stroop Test Game | NEON ARCADE</title>
+<meta name="description" content="Play ColorName free online — name the color, not the word. Classic Stroop effect as a competitive speed game. How fast is your brain? No download, no login.">
+<meta name="keywords" content="stroop test, color name game, brain game, reaction game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neongrind/colorname.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neongrind/colorname.html">
+<meta property="og:title" content="ColorName — Free Online Stroop Test Game | NEON ARCADE">
+<meta property="og:description" content="Name the color, not the word. Classic Stroop effect speed game.">
+<meta property="og:image" content="https://neonarcade.net/screenshots/colorname.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neongrind/colorname.html">
+<meta name="twitter:title" content="ColorName — Free Online Stroop Test Game | NEON ARCADE">
+<meta name="twitter:description" content="Name the color, not the word. Classic Stroop effect speed game.">
+<meta name="twitter:image" content="https://neonarcade.net/screenshots/colorname.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "ColorName",
+  "url": "https://neonarcade.net/neongrind/colorname.html",
+  "description": "Name the color, not the word. Classic Stroop effect as a competitive speed game.",
+  "genre": "Brain Training",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/screenshots/colorname.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON GRIND", "item": "https://neonarcade.net/neongrind/" },
+    { "@type": "ListItem", "position": 3, "name": "ColorName", "item": "https://neonarcade.net/neongrind/colorname.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:12px}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,7vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;color:#9999bb;text-transform:uppercase;text-align:center;max-width:400px}
+
+.mode-selector{display:flex;gap:8px;margin:8px 0}
+.mode-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;padding:10px 18px;border:1px solid #333;background:rgba(255,255,255,0.02);color:#7a7a9a;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.mode-btn:hover{border-color:#7a7a9a;color:#9999bb}
+.mode-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.08);box-shadow:0 0 12px rgba(0,240,255,0.15)}
+.mode-desc{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-align:center;height:18px}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:4px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:4px}
+#startLB{width:100%;max-width:400px;margin-top:8px}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:12px;gap:0}
+.game-hud{display:flex;width:100%;max-width:560px;justify-content:space-between;align-items:center;padding:8px 4px}
+.hud-item{text-align:center}
+.hud-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.hud-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-value.timer{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.hud-value.timer.warning{color:#ff2d7b;text-shadow:0 0 8px rgba(255,45,123,0.5);animation:timerPulse 0.5s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.hud-value.streak{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
+
+.timer-bar-wrap{width:100%;max-width:560px;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;margin:4px 0 8px 0;overflow:hidden}
+.timer-bar{height:100%;background:#ffd700;border-radius:2px;transition:width 0.1s linear;box-shadow:0 0 8px rgba(255,215,0,0.4)}
+.timer-bar.warning{background:#ff2d7b;box-shadow:0 0 8px rgba(255,45,123,0.5)}
+
+.word-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0}
+.stroop-word{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(48px,12vw,100px);letter-spacing:6px;text-transform:uppercase;transition:opacity 0.08s;line-height:1.2}
+.stroop-instruction{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-top:8px}
+
+.feedback-flash{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;opacity:0;transition:opacity 0.15s}
+.feedback-flash.correct{background:rgba(57,255,20,0.08);opacity:1}
+.feedback-flash.wrong{background:rgba(255,45,123,0.12);opacity:1}
+
+.color-buttons{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:560px;padding:8px 0 12px 0}
+.color-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;padding:clamp(10px,2.5vw,16px) clamp(12px,3vw,22px);border:2px solid;background:rgba(255,255,255,0.02);cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.12s;min-width:clamp(65px,15vw,85px);text-align:center}
+.color-btn:hover{transform:scale(1.06)}
+.color-btn:active{transform:scale(0.96)}
+.color-btn.flash-correct{background:rgba(57,255,20,0.2) !important;border-color:#39ff14 !important;color:#39ff14 !important}
+.color-btn.flash-wrong{background:rgba(255,45,123,0.2) !important;border-color:#ff2d7b !important;color:#ff2d7b !important}
+
+/* RESULT SCREEN */
+#resultScreen{gap:14px}
+.result-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,6vw,44px);letter-spacing:4px;text-align:center}
+.result-score{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(40px,10vw,72px);color:#00f0ff;text-shadow:0 0 15px rgba(0,240,255,0.5),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.result-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase}
+.result-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.result-stat{text-align:center}
+.result-stat .val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.3)}
+.result-stat .lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.new-best{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5);animation:bestPulse 1s ease-in-out infinite}
+@keyframes bestPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.8;transform:scale(1.05)}}
+.result-buttons{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.08);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(180,77,255,0.18);box-shadow:0 0 16px rgba(180,77,255,0.2);transform:scale(1.04)}
+#endLB{width:100%;max-width:400px;margin-top:4px}
+
+/* SCREEN SHAKE */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-3px,1px)}20%{transform:translate(3px,-2px)}30%{transform:translate(-2px,3px)}40%{transform:translate(2px,-1px)}50%{transform:translate(-3px,2px)}60%{transform:translate(3px,-3px)}70%{transform:translate(-1px,2px)}80%{transform:translate(2px,-2px)}90%{transform:translate(-2px,1px)}}
+.shaking{animation:shake 0.3s ease-in-out}
+
+/* PARTICLES */
+.particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:200}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="main-title">COLORNAME</div>
+  <div class="subtitle">Name the color of the text, not the word itself. How fast is your brain?</div>
+  <div class="mode-selector">
+    <button class="mode-btn active" data-mode="speed">SPEED</button>
+    <button class="mode-btn" data-mode="survival">SURVIVAL</button>
+    <button class="mode-btn" data-mode="zen">ZEN</button>
+  </div>
+  <div class="mode-desc" id="modeDesc">30 SECONDS — WRONG ANSWERS ADD 2S PENALTY</div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">KEYS: R B G Y P O | TAP COLOR BUTTONS</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="game-hud">
+    <div class="hud-item"><div class="hud-label">SCORE</div><div class="hud-value" id="hudScore">0</div></div>
+    <div class="hud-item"><div class="hud-label" id="hudTimerLabel">TIME</div><div class="hud-value timer" id="hudTimer">30.0</div></div>
+    <div class="hud-item"><div class="hud-label">STREAK</div><div class="hud-value streak" id="hudStreak">0</div></div>
+  </div>
+  <div class="timer-bar-wrap" id="timerBarWrap"><div class="timer-bar" id="timerBar"></div></div>
+  <div class="word-area">
+    <div class="stroop-word" id="stroopWord">RED</div>
+    <div class="stroop-instruction">WHAT COLOR IS THE TEXT?</div>
+  </div>
+  <div class="color-buttons" id="colorButtons"></div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="screen">
+  <div class="result-title" id="resultTitle">GAME OVER</div>
+  <div class="result-label">SCORE</div>
+  <div class="result-score" id="resultScore">0</div>
+  <div class="new-best" id="newBest" style="display:none">NEW BEST!</div>
+  <div class="result-stats">
+    <div class="result-stat"><div class="val" id="statAccuracy">100%</div><div class="lbl">ACCURACY</div></div>
+    <div class="result-stat"><div class="val" id="statAvgTime">0.0s</div><div class="lbl">AVG TIME</div></div>
+    <div class="result-stat"><div class="val" id="statBestStreak">0</div><div class="lbl">BEST STREAK</div></div>
+    <div class="result-stat"><div class="val" id="statTotal">0</div><div class="lbl">ANSWERED</div></div>
+  </div>
+  <div class="result-buttons">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+  </div>
+  <div id="endLB"></div>
+</div>
+
+<div class="feedback-flash" id="feedbackFlash"></div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  const COLORS = [
+    { name: 'RED',    hex: '#ff2d7b', key: 'r' },
+    { name: 'BLUE',   hex: '#00f0ff', key: 'b' },
+    { name: 'GREEN',  hex: '#39ff14', key: 'g' },
+    { name: 'YELLOW', hex: '#ffd700', key: 'y' },
+    { name: 'PURPLE', hex: '#b44dff', key: 'p' },
+    { name: 'ORANGE', hex: '#ff8c00', key: 'o' }
+  ];
+
+  const MODE_DESC = {
+    speed: '30 SECONDS \u2014 WRONG ANSWERS ADD 2S PENALTY',
+    survival: 'ONE MISTAKE AND YOU\'RE OUT',
+    zen: '60 SECONDS \u2014 NO PENALTY, TRACK ACCURACY'
+  };
+
+  const MODE_TIME = { speed: 30, survival: Infinity, zen: 60 };
+
+  const screens = {
+    start: document.getElementById('startScreen'),
+    game: document.getElementById('gameScreen'),
+    result: document.getElementById('resultScreen')
+  };
+  const $ = id => document.getElementById(id);
+  const $stroopWord = $('stroopWord');
+  const $colorButtons = $('colorButtons');
+  const $hudScore = $('hudScore');
+  const $hudTimer = $('hudTimer');
+  const $hudTimerLabel = $('hudTimerLabel');
+  const $hudStreak = $('hudStreak');
+  const $timerBar = $('timerBar');
+  const $timerBarWrap = $('timerBarWrap');
+  const $feedbackFlash = $('feedbackFlash');
+  const $modeDesc = $('modeDesc');
+  const $resultTitle = $('resultTitle');
+  const $resultScore = $('resultScore');
+  const $newBest = $('newBest');
+  const $statAccuracy = $('statAccuracy');
+  const $statAvgTime = $('statAvgTime');
+  const $statBestStreak = $('statBestStreak');
+  const $statTotal = $('statTotal');
+
+  let currentMode = 'speed';
+  let score = 0;
+  let streak = 0;
+  let bestStreak = 0;
+  let correct = 0;
+  let wrong = 0;
+  let reactionTimes = [];
+  let timeLeft = 30;
+  let maxTime = 30;
+  let timerStartTime = 0;
+  let timerInitial = 0;
+  let timerRAF = null;
+  let gameActive = false;
+  let currentWordIdx = -1;
+  let currentColorIdx = -1;
+  let lastAnswerTime = 0;
+  let inputLocked = false;
+  let penaltyAccum = 0;
+
+  // AUDIO
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playSound(type) {
+    try {
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.linearRampToValueAtTime(1320, now + 0.08);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.12);
+        osc.start(now); osc.stop(now + 0.12);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+        osc.start(now); osc.stop(now + 0.25);
+      } else if (type === 'tick') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.05);
+        osc.start(now); osc.stop(now + 0.05);
+      } else if (type === 'result') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523, now);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.15);
+        osc.start(now); osc.stop(now + 0.15);
+        var o2 = audioCtx.createOscillator(), g2 = audioCtx.createGain();
+        o2.connect(g2); g2.connect(audioCtx.destination);
+        o2.type = 'sine'; o2.frequency.setValueAtTime(659, now + 0.15);
+        g2.gain.setValueAtTime(0.1, now + 0.15); g2.gain.linearRampToValueAtTime(0, now + 0.3);
+        o2.start(now + 0.15); o2.stop(now + 0.3);
+        var o3 = audioCtx.createOscillator(), g3 = audioCtx.createGain();
+        o3.connect(g3); g3.connect(audioCtx.destination);
+        o3.type = 'sine'; o3.frequency.setValueAtTime(784, now + 0.3);
+        g3.gain.setValueAtTime(0.1, now + 0.3); g3.gain.linearRampToValueAtTime(0, now + 0.6);
+        o3.start(now + 0.3); o3.stop(now + 0.6);
+      } else if (type === 'countdown') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(660, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.15);
+        osc.start(now); osc.stop(now + 0.15);
+      }
+    } catch (e) {}
+  }
+
+  // PARTICLES
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      var angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      var speed = 80 + Math.random() * 120;
+      var dx = Math.cos(angle) * speed;
+      var dy = Math.sin(angle) * speed;
+      var size = 3 + Math.random() * 4;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.animate([
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px)', opacity: 0 }
+      ], { duration: 400 + Math.random() * 200, easing: 'cubic-bezier(0,.8,.5,1)' })
+      .onfinish = function() { p.remove(); };
+    }
+  }
+
+  function showScreen(name) {
+    Object.values(screens).forEach(function(s) { s.classList.remove('active'); });
+    screens[name].classList.add('active');
+  }
+
+  // BUILD COLOR BUTTONS
+  function buildButtons() {
+    while ($colorButtons.firstChild) $colorButtons.removeChild($colorButtons.firstChild);
+    COLORS.forEach(function(c, i) {
+      var btn = document.createElement('button');
+      btn.className = 'color-btn';
+      btn.textContent = c.name;
+      btn.style.borderColor = c.hex;
+      btn.style.color = c.hex;
+      btn.dataset.idx = i;
+      btn.addEventListener('click', function(e) { e.preventDefault(); handleAnswer(i); });
+      $colorButtons.appendChild(btn);
+    });
+  }
+
+  // MODE SELECTOR
+  document.querySelectorAll('.mode-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+      $modeDesc.textContent = MODE_DESC[currentMode];
+      initNeon();
+    });
+  });
+
+  // NEON.JS
+  function initNeon() {
+    if (typeof Neon !== 'undefined') {
+      Neon.init({
+        game: 'colorname',
+        mode: 'high',
+        key: 'neonarcade_neongrind_colorname_scores_' + currentMode
+      });
+      Neon.render($('startLB'));
+    }
+  }
+
+  // GENERATE NEXT WORD
+  function nextWord() {
+    var wordIdx, colorIdx;
+    do {
+      wordIdx = Math.floor(Math.random() * COLORS.length);
+      colorIdx = Math.floor(Math.random() * COLORS.length);
+    } while (wordIdx === colorIdx || (wordIdx === currentWordIdx && colorIdx === currentColorIdx));
+
+    currentWordIdx = wordIdx;
+    currentColorIdx = colorIdx;
+    $stroopWord.textContent = COLORS[wordIdx].name;
+    $stroopWord.style.color = COLORS[colorIdx].hex;
+    $stroopWord.style.textShadow = '0 0 15px ' + COLORS[colorIdx].hex + '99, 0 0 40px ' + COLORS[colorIdx].hex + '33';
+    $stroopWord.style.opacity = '1';
+    lastAnswerTime = performance.now();
+    inputLocked = false;
+  }
+
+  // HANDLE ANSWER
+  function handleAnswer(idx) {
+    if (!gameActive || inputLocked) return;
+    inputLocked = true;
+
+    var rt = (performance.now() - lastAnswerTime) / 1000;
+    var isCorrect = idx === currentColorIdx;
+    var btn = $colorButtons.children[idx];
+
+    if (isCorrect) {
+      correct++;
+      score++;
+      streak++;
+      if (streak > bestStreak) bestStreak = streak;
+      reactionTimes.push(rt);
+
+      playSound('correct');
+      btn.classList.add('flash-correct');
+      setTimeout(function() { btn.classList.remove('flash-correct'); }, 200);
+
+      $feedbackFlash.className = 'feedback-flash correct';
+      setTimeout(function() { $feedbackFlash.className = 'feedback-flash'; }, 150);
+
+      var wr = $stroopWord.getBoundingClientRect();
+      spawnParticles(wr.left + wr.width / 2, wr.top + wr.height / 2, COLORS[currentColorIdx].hex, 12);
+
+      $hudScore.textContent = score;
+      $hudStreak.textContent = streak;
+
+      $stroopWord.style.opacity = '0';
+      setTimeout(function() { nextWord(); }, 80);
+    } else {
+      wrong++;
+      streak = 0;
+      $hudStreak.textContent = streak;
+
+      playSound('wrong');
+      btn.classList.add('flash-wrong');
+      setTimeout(function() { btn.classList.remove('flash-wrong'); }, 300);
+
+      $feedbackFlash.className = 'feedback-flash wrong';
+      setTimeout(function() { $feedbackFlash.className = 'feedback-flash'; }, 200);
+
+      document.body.classList.add('shaking');
+      setTimeout(function() { document.body.classList.remove('shaking'); }, 300);
+
+      if (currentMode === 'speed') {
+        penaltyAccum += 2;
+        updateTimerDisplay();
+      } else if (currentMode === 'survival') {
+        gameActive = false;
+        setTimeout(function() { endGame(); }, 400);
+        return;
+      }
+      inputLocked = false;
+    }
+  }
+
+  // TIMER
+  var lastTickSecond = -1;
+  function updateTimerDisplay() {
+    if (currentMode === 'survival') {
+      $hudTimer.textContent = score;
+      return;
+    }
+    var elapsed = (performance.now() - timerStartTime) / 1000;
+    timeLeft = Math.max(0, timerInitial - elapsed - penaltyAccum);
+
+    var t = timeLeft;
+    $hudTimer.textContent = t.toFixed(1);
+
+    var pct = (t / maxTime) * 100;
+    $timerBar.style.width = pct + '%';
+
+    if (t <= 5) {
+      $hudTimer.classList.add('warning');
+      $timerBar.classList.add('warning');
+      var sec = Math.ceil(t);
+      if (sec !== lastTickSecond && sec > 0) {
+        lastTickSecond = sec;
+        playSound('tick');
+      }
+    } else {
+      $hudTimer.classList.remove('warning');
+      $timerBar.classList.remove('warning');
+      lastTickSecond = -1;
+    }
+  }
+
+  function timerLoop() {
+    if (!gameActive) return;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      gameActive = false;
+      setTimeout(function() { endGame(); }, 300);
+      return;
+    }
+    timerRAF = requestAnimationFrame(timerLoop);
+  }
+
+  // START GAME
+  function startGame() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    score = 0;
+    streak = 0;
+    bestStreak = 0;
+    correct = 0;
+    wrong = 0;
+    reactionTimes = [];
+    gameActive = false;
+    currentWordIdx = -1;
+    currentColorIdx = -1;
+    penaltyAccum = 0;
+    lastTickSecond = -1;
+
+    maxTime = MODE_TIME[currentMode];
+    timeLeft = maxTime;
+
+    showScreen('game');
+
+    $hudScore.textContent = '0';
+    $hudStreak.textContent = '0';
+
+    if (currentMode === 'survival') {
+      $hudTimerLabel.textContent = 'SCORE';
+      $hudTimer.textContent = '0';
+      $timerBarWrap.style.display = 'none';
+      $hudTimer.classList.remove('warning');
+    } else {
+      $hudTimerLabel.textContent = 'TIME';
+      $timerBarWrap.style.display = '';
+      $hudTimer.classList.remove('warning');
+      $timerBar.classList.remove('warning');
+      $timerBar.style.width = '100%';
+      $hudTimer.textContent = maxTime.toFixed(1);
+    }
+
+    buildButtons();
+
+    // Countdown
+    $stroopWord.style.opacity = '1';
+    $stroopWord.style.color = '#ffd700';
+    $stroopWord.style.textShadow = '0 0 20px rgba(255,215,0,0.5)';
+    $stroopWord.textContent = '3';
+    playSound('countdown');
+
+    setTimeout(function() {
+      $stroopWord.textContent = '2';
+      playSound('countdown');
+    }, 700);
+    setTimeout(function() {
+      $stroopWord.textContent = '1';
+      playSound('countdown');
+    }, 1400);
+    setTimeout(function() {
+      $stroopWord.textContent = 'GO!';
+      $stroopWord.style.color = '#39ff14';
+      $stroopWord.style.textShadow = '0 0 20px rgba(57,255,20,0.5)';
+    }, 2100);
+    setTimeout(function() {
+      gameActive = true;
+      nextWord();
+      if (currentMode !== 'survival') {
+        timerStartTime = performance.now();
+        timerInitial = maxTime;
+        timerRAF = requestAnimationFrame(timerLoop);
+      }
+    }, 2500);
+  }
+
+  // END GAME
+  function endGame() {
+    if (timerRAF) cancelAnimationFrame(timerRAF);
+    playSound('result');
+
+    var totalAnswered = correct + wrong;
+    var accuracy = totalAnswered > 0 ? Math.round((correct / totalAnswered) * 100) : 0;
+    var avgTime = reactionTimes.length > 0
+      ? (reactionTimes.reduce(function(a, b) { return a + b; }, 0) / reactionTimes.length).toFixed(2)
+      : '0.00';
+
+    showScreen('result');
+
+    if (currentMode === 'survival') {
+      $resultTitle.textContent = 'GAME OVER';
+      $resultTitle.style.color = '#ff2d7b';
+      $resultTitle.style.textShadow = '0 0 10px rgba(255,45,123,0.5)';
+    } else {
+      $resultTitle.textContent = 'TIME\'S UP';
+      $resultTitle.style.color = '#ffd700';
+      $resultTitle.style.textShadow = '0 0 10px rgba(255,215,0,0.5)';
+    }
+
+    $resultScore.textContent = score;
+    $statAccuracy.textContent = accuracy + '%';
+    $statAvgTime.textContent = avgTime + 's';
+    $statBestStreak.textContent = bestStreak;
+    $statTotal.textContent = totalAnswered;
+    $newBest.style.display = 'none';
+
+    if (typeof Neon !== 'undefined') {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(score);
+      }).then(function(result) {
+        if (result && result.isNewBest) {
+          $newBest.style.display = '';
+        }
+        Neon.render($('endLB'));
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      });
+    }
+
+    var sr = $resultScore.getBoundingClientRect();
+    spawnParticles(sr.left + sr.width / 2, sr.top + sr.height / 2, '#00f0ff', 20);
+  }
+
+  // SHARE
+  function getShareText() {
+    var totalAnswered = correct + wrong;
+    var accuracy = totalAnswered > 0 ? Math.round((correct / totalAnswered) * 100) : 0;
+    var avgTime = reactionTimes.length > 0
+      ? (reactionTimes.reduce(function(a, b) { return a + b; }, 0) / reactionTimes.length).toFixed(1)
+      : '0.0';
+    var modeLabel = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+    return '\uD83E\uDDE0 COLORNAME\n' +
+      modeLabel + ' Mode | ' + score + ' correct | ' + accuracy + '% accuracy\n' +
+      avgTime + 's avg reaction | Streak: ' + bestStreak + '\n' +
+      'neonarcade.net/neongrind/colorname.html';
+  }
+
+  $('shareBtn').addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() {
+          $('shareBtn').textContent = 'COPIED!';
+          setTimeout(function() { $('shareBtn').textContent = 'SHARE'; }, 2000);
+        });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() {
+        $('shareBtn').textContent = 'COPIED!';
+        setTimeout(function() { $('shareBtn').textContent = 'SHARE'; }, 2000);
+      });
+    }
+  });
+
+  // KEYBOARD
+  document.addEventListener('keydown', function(e) {
+    if (!gameActive) {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        if (screens.start.classList.contains('active')) startGame();
+        else if (screens.result.classList.contains('active')) restartGame();
+      }
+      return;
+    }
+    var key = e.key.toLowerCase();
+    var idx = -1;
+    for (var i = 0; i < COLORS.length; i++) {
+      if (COLORS[i].key === key) { idx = i; break; }
+    }
+    if (idx !== -1) {
+      e.preventDefault();
+      handleAnswer(idx);
+    }
+  });
+
+  $('startBtn').addEventListener('click', startGame);
+  $('replayBtn').addEventListener('click', restartGame);
+
+  function restartGame() {
+    if (timerRAF) cancelAnimationFrame(timerRAF);
+    gameActive = false;
+    showScreen('start');
+    initNeon();
+  }
+
+  buildButtons();
+  initNeon();
+})();
+</script>
+</body>
+</html>
