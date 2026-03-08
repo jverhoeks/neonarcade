@@ -1603,6 +1603,8 @@ body::before {
         return Neon.save(capturedTimer);
       }).then(function(result) {
         showCompleteScreen(capturedStars, capturedIsNewBest, result);
+      }).catch(function() {
+        showCompleteScreen(capturedStars, capturedIsNewBest, null);
       });
     }, 800);
   }
@@ -1696,7 +1698,7 @@ body::before {
 
     // Render leaderboard via neon.js
     var lbContainer = document.getElementById('completeLB');
-    Neon.render(lbContainer);
+    try { Neon.render(lbContainer); } catch(e) {}
 
     if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
       Neon.showGlobalSplash(neonResult.globalRank);
