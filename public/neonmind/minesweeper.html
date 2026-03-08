@@ -1389,10 +1389,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     var capturedStats = { streak: stats.streak, bestStreak: stats.bestStreak };
 
     setTimeout(function() {
-      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
-      nameReady.then(function() {
-        return Neon.save(capturedElapsed);
-      }).then(function(neonResult) {
+      function showWinUI(neonResult) {
         winStarsEl.textContent = '';
         for (var i = 0; i < 3; i++) winStarsEl.textContent += (i < capturedStarCount ? '\u2605' : '\u2606');
 
@@ -1423,7 +1420,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
         // build leaderboard via neon.js
         winLbEl.textContent = '';
-        Neon.render(winLbEl);
+        try { Neon.render(winLbEl); } catch(e) {}
 
         if (neonResult && neonResult.globalRank >= 1 && neonResult.globalRank <= 5) {
           Neon.showGlobalSplash(neonResult.globalRank);
@@ -1439,6 +1436,15 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
         }
 
         winOverlay.classList.add('active');
+      }
+
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(capturedElapsed);
+      }).then(function(neonResult) {
+        showWinUI(neonResult);
+      }).catch(function() {
+        showWinUI(null);
       });
     }, 800);
   }

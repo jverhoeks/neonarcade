@@ -102,21 +102,25 @@ window.Neon = (function() {
   // Save locally (top 10) + submit to global if qualifying
   // Returns promise: { scores, isNewBest, globalRank }
   function save(score) {
-    // Reject zero/null/undefined/NaN scores — no achievement to record
-    if (!score) {
+    // Reject null/undefined/NaN scores — but allow 0 (valid for time-based puzzles)
+    if (score === null || score === undefined || score !== score) {
       return Promise.resolve({ scores: localScores, isNewBest: false, globalRank: -1 });
     }
 
     // Local
-    localScores.push({ score: score, ts: Date.now(), name: playerName || '???' });
-    if (cfg.mode === 'low') {
-      localScores.sort(function(a, b) { return a.score - b.score; });
-    } else {
-      localScores.sort(function(a, b) { return b.score - a.score; });
+    try {
+      localScores.push({ score: score, ts: Date.now(), name: playerName || '???' });
+      if (cfg.mode === 'low') {
+        localScores.sort(function(a, b) { return a.score - b.score; });
+      } else {
+        localScores.sort(function(a, b) { return b.score - a.score; });
+      }
+      localScores = localScores.slice(0, 10);
+      localStorage.setItem(cfg.key, JSON.stringify(localScores));
+    } catch(e) {
+      // localStorage may throw QuotaExceededError — continue so completion still works
     }
-    localScores = localScores.slice(0, 10);
-    localStorage.setItem(cfg.key, JSON.stringify(localScores));
-    var isNewBest = localScores[0].score === score;
+    var isNewBest = localScores.length > 0 && localScores[0].score === score;
 
     // Global
     lastGlobalRank = -1;

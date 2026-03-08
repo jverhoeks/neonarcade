@@ -823,11 +823,23 @@ function getPartialDone(clueArr, line){
 
 function checkWin(){
   var n = selectedSize;
+  // Check against clues (not stored solution) to handle puzzles with multiple valid solutions
   for(var r = 0; r < n; r++){
-    for(var c = 0; c < n; c++){
-      var expected = solution[r][c];
-      var actual = playerGrid[r][c] === 1 ? 1 : 0;
-      if(expected !== actual) return false;
+    var line = [];
+    for(var c = 0; c < n; c++) line.push(playerGrid[r][c] === 1 ? 1 : 0);
+    var pc = calcClues(line);
+    if(pc.length !== rowClues[r].length) return false;
+    for(var i = 0; i < pc.length; i++){
+      if(pc[i] !== rowClues[r][i]) return false;
+    }
+  }
+  for(var c = 0; c < n; c++){
+    var line = [];
+    for(var r = 0; r < n; r++) line.push(playerGrid[r][c] === 1 ? 1 : 0);
+    var pc = calcClues(line);
+    if(pc.length !== colClues[c].length) return false;
+    for(var i = 0; i < pc.length; i++){
+      if(pc[i] !== colClues[c][i]) return false;
     }
   }
   return true;
