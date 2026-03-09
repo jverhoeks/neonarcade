@@ -902,7 +902,7 @@ function updateStartScreen() {
   for (var i = 0; i < sizes.length; i++) {
     var btn = document.createElement('div');
     btn.className = 'diff-btn' + (i === sizes.length - 1 ? ' span2' : '');
-    var lScores = JSON.parse(localStorage.getItem(scoreKey(sizes[i])) || '[]');
+    var lScores;try{lScores=JSON.parse(localStorage.getItem(scoreKey(sizes[i]))||'[]');}catch(e){lScores=[];}
     var bestStr = lScores.length > 0 ? 'Best: ' + formatTime(lScores[0].score) : 'No record';
     btn.appendChild(document.createTextNode(labels[i]));
     var bestSpan = document.createElement('span');

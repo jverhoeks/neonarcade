@@ -1190,7 +1190,7 @@
       e.preventDefault();
       e.stopPropagation();
       var game = btn.dataset.game;
-      var liked = JSON.parse(localStorage.getItem('neonarcade_liked') || '{}');
+      var liked = (function(){try{return JSON.parse(localStorage.getItem('neonarcade_liked'))||{};}catch(e){return {};}})();
       if (liked[game]) return;
       liked[game] = true;
       localStorage.setItem('neonarcade_liked', JSON.stringify(liked));
@@ -1207,7 +1207,7 @@
       e.preventDefault();
       e.stopPropagation();
       var game = btn.dataset.game;
-      var rep = JSON.parse(localStorage.getItem('neonarcade_reported') || '{}');
+      var rep = (function(){try{return JSON.parse(localStorage.getItem('neonarcade_reported'))||{};}catch(e){return {};}})();
       if (rep[game]) return;
       rep[game] = true;
       localStorage.setItem('neonarcade_reported', JSON.stringify(rep));
@@ -1217,8 +1217,8 @@
     });
   });
 
-  var liked = JSON.parse(localStorage.getItem('neonarcade_liked') || '{}');
-  var reported = JSON.parse(localStorage.getItem('neonarcade_reported') || '{}');
+  var liked = (function(){try{return JSON.parse(localStorage.getItem('neonarcade_liked'))||{};}catch(e){return {};}})();
+  var reported = (function(){try{return JSON.parse(localStorage.getItem('neonarcade_reported'))||{};}catch(e){return {};}})();
   Object.keys(liked).forEach(function(g) {
     var btn = document.querySelector('.like-btn[data-game="' + g + '"]');
     if (btn) { btn.classList.add('liked'); btn.textContent = '\u2665 LIKED'; }

@@ -84,13 +84,6 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;background:rep
     return 'just now';
   }
 
-  // Escape text for safe DOM insertion
-  function esc(str) {
-    var d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
   function fetchAll() {
     GAMES.forEach(function(game) {
       fetch('/api/leaderboard/' + game)
@@ -112,7 +105,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;background:rep
     document.getElementById('loading').style.display = 'none';
     var grid = document.getElementById('grid');
     grid.style.display = '';
-    grid.innerHTML = '';
+    grid.textContent = '';
 
     var search = document.getElementById('search').value.toLowerCase();
     var sort = document.getElementById('sort').value;

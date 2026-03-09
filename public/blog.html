@@ -127,6 +127,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 7 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Quality Gates — Pre-Commit Testing and the Second Security Audit",
+  "description": "Adding automated HTML/JS validation, fixing JS syntax bugs, and closing every critical security finding from the first audit.",
+  "url": "https://neonarcade.net/blog.html#quality-gates",
+  "datePublished": "2026-03-09",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#quality-gates"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -706,6 +722,10 @@
       <span class="toc-num">06</span>
       <span class="toc-text">Bringing Back the Classics &mdash; Why Retro Games Deserve Neon</span>
     </a></li>
+    <li><a href="#quality-gates">
+      <span class="toc-num">07</span>
+      <span class="toc-text">Quality Gates &mdash; Pre-Commit Testing and the Second Security Audit</span>
+    </a></li>
   </ol>
 </nav>
 
@@ -1218,6 +1238,80 @@ Neon.getName() ? Promise.resolve() : Neon.promptName();
   </div>
 
   <p>Seven games launched today. Seven games that have collectively been played by billions of people over nearly five decades. The difference now: you can play them in a browser tab, compete globally, and share your scores with a single tap. The classics are back. They just glow a little brighter.</p>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 7 -->
+<!-- ================================================================ -->
+<article class="article" id="quality-gates">
+  <p class="article-num">Article 07 &mdash; March 9, 2026</p>
+  <h2 class="article-title">Quality Gates</h2>
+
+  <p>At 64 HTML files and counting, NEON ARCADE passed a threshold where "just open it in a browser and click around" stopped being a testing strategy. A single stray curly brace in a thousand-line game file can silently break everything &mdash; and you will not notice until a player reports it. So this week we built the thing every growing project eventually needs: <strong>automated quality gates.</strong></p>
+
+  <h3>What Broke (and How We Found It)</h3>
+
+  <p>The trigger was simple. We wrote a Node.js validator that extracts every inline <code>&lt;script&gt;</code> block from every HTML file and runs it through V8's syntax checker. On the first run, it found a real bug: <strong>Pac-Man Amnesia</strong> had a stray <code>}</code> on line 176 that prematurely closed its IIFE wrapper. The game still "worked" in browsers because the variables fell to global scope, but the code was technically broken and would fail under strict mode or any future refactoring.</p>
+
+  <p>One bug in 64 files sounds good. But it was a bug that had shipped to production, was invisible to manual testing, and would have been caught instantly by a syntax checker. That is the argument for automation in one sentence.</p>
+
+  <h3>The Pre-Commit Pipeline</h3>
+
+  <p>We use the <code>pre-commit</code> framework (the Python one, not husky). Three hooks run on every commit:</p>
+
+  <ul>
+    <li><strong>HTML/JS validator</strong> &mdash; For every staged <code>.html</code> file: checks HTML structure (matching tags, DOCTYPE), extracts inline scripts and validates JS syntax via <code>vm.Script</code>, checks required patterns (neon.js inclusion, Neon.init call, viewport meta, SEO tags), and flags dangerous patterns (innerHTML, eval, @import). Errors block the commit; warnings pass through.</li>
+    <li><strong>Worker syntax check</strong> &mdash; <code>node --check</code> on <code>src/worker.js</code> if it changed.</li>
+    <li><strong>neon.js syntax check</strong> &mdash; <code>node --check</code> on <code>public/neon.js</code> if it changed.</li>
+  </ul>
+
+  <p>The validator runs in under 2 seconds across all 64 files. Fast enough that you forget it is there &mdash; which is exactly how pre-commit hooks should feel.</p>
+
+  <h3>The Second Security Audit</h3>
+
+  <p>We also ran a fresh security audit, comparing against the 15-issue report from March 7. The results were satisfying:</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val green">0</div>
+      <div class="stat-label">Critical Issues</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">15</div>
+      <div class="stat-label">Issues Fixed</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">64</div>
+      <div class="stat-label">Files Scanned</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">3</div>
+      <div class="stat-label">Auditors (AI)</div>
+    </div>
+  </div>
+
+  <p>All four critical issues from the original audit are resolved: score caps enforce per-game maximums, rate limiting blocks abuse at 30 POST requests per minute per IP, leaderboard sort mode is server-enforced (client cannot inject), and the game slug allowlist prevents KV namespace pollution.</p>
+
+  <p>New hardening this round:</p>
+
+  <ul>
+    <li><strong>Origin validation on POST</strong> &mdash; The worker now rejects POST requests from unknown origins, preventing cross-site counter manipulation. Previously, any website could trigger play/like increments by sending a fetch request.</li>
+    <li><strong>CORS tightened</strong> &mdash; Non-matching origins no longer receive <code>Access-Control-Allow-Origin</code> in the response. Clean behavior instead of a misleading fallback.</li>
+    <li><strong>localStorage guards</strong> &mdash; Every <code>JSON.parse(localStorage.getItem(...))</code> across the codebase is now wrapped in try/catch. If a player's browser storage gets corrupted, the game gracefully resets instead of crashing.</li>
+    <li><strong>Dead code removal</strong> &mdash; Removed an unused <code>esc()</code> function from the admin dashboard and a dead <code>mode</code> parameter that the client was still sending to the API (the server already ignored it, but dead params confuse future developers).</li>
+    <li><strong>Zero innerHTML</strong> &mdash; The last three <code>innerHTML = ''</code> usages (safe but inconsistent) were replaced with <code>textContent = ''</code>. The codebase now has zero innerHTML assignments anywhere.</li>
+  </ul>
+
+  <h3>What Remains</h3>
+
+  <p>One issue that three independent AI auditors all flagged: <strong>admin pages have no authentication.</strong> Anyone who knows <code>/admin/stats.html</code> can view all game analytics and leaderboard data. The fix is straightforward &mdash; Cloudflare Access or a bearer token check in the worker &mdash; but it is the last meaningful security gap.</p>
+
+  <p>Everything else is architectural: CSP needs <code>'unsafe-inline'</code> because the games use inline scripts (single-file architecture), and KV's read-modify-write pattern has inherent race conditions that only matter at much higher traffic than we see today.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Lesson</span>
+    <p>Testing infrastructure pays for itself the first time it catches something. Our validator found a production bug on its first run. The security audit closed 15 issues. The total time to set up both: less than an hour. The math is obvious &mdash; yet most side projects skip it because "we will add tests later." Later never comes. Add the hooks on day one.</p>
+  </div>
 </article>
 
 </div><!-- .articles -->

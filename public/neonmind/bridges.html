@@ -266,7 +266,7 @@ neonInitForSize(7);
 
 // ====== SCORES ======
 function saveScore(key,score){
-  var scores=JSON.parse(localStorage.getItem(key)||'[]');
+  var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
   scores.push({score:score,ts:Date.now()});
   scores.sort(function(a,b){return a.score-b.score;});
   scores=scores.slice(0,5);
@@ -332,7 +332,7 @@ for(var di=0;di<diffBtns.length;di++){
 
 function renderBestTimes(){
   var key='neonarcade_neonmind_bridges_scores_'+gridSize;
-  var scores=JSON.parse(localStorage.getItem(key)||'[]');
+  var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
   var el=$('bestTimes');
   if(!scores.length){el.textContent='';return;}
   // Build using DOM methods

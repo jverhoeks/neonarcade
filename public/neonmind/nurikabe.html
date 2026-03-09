@@ -360,7 +360,7 @@ window.selectSize = function(s){
 
 function renderBestTimes(){
   var key = 'neonarcade_neonmind_nurikabe_scores_' + currentSize;
-  var scores = JSON.parse(localStorage.getItem(key)||'[]');
+  var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
   var el = document.getElementById('bestTimes');
   if(!scores.length){ el.textContent=''; return; }
   // Build with DOM methods
@@ -403,7 +403,7 @@ function timeAgo(ts){
 }
 
 function saveScore(key, score){
-  var scores = JSON.parse(localStorage.getItem(key)||'[]');
+  var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
   scores.push({score:score, ts:Date.now()});
   scores.sort(function(a,b){ return a.score-b.score; }); // lower is better for time
   scores = scores.slice(0,5);

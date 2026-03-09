@@ -693,7 +693,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   function updateBestTimes() {
     DIFFICULTIES.forEach(function(diff, i) {
       var key = 'neonarcade_neonclassic_pairs_scores_' + diff.label;
-      var scores = JSON.parse(localStorage.getItem(key) || '[]');
+      var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
       var el = document.getElementById('best-' + i);
       if (scores.length > 0) {
         el.textContent = formatTime(scores[0].score);

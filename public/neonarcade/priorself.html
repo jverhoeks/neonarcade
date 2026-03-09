@@ -362,7 +362,7 @@ function drawP(){particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.co
 let currentLevel=null,attempt=0,ghostRecordings=[],currentRecording=[],levelElements=[],activeButtons=new Set(),player=null,ghosts=[],gameState='menu',frameCount=0,deadTimer=0,shaking=false;
 resize();
 
-let progress=JSON.parse(localStorage.getItem('priorself_progress')||'{}');
+let progress;try{progress=JSON.parse(localStorage.getItem('priorself_progress')||'{}');}catch(e){progress={};}
 if(progress.maxUnlocked===undefined)progress.maxUnlocked=0;
 function saveProgress(){localStorage.setItem('priorself_progress',JSON.stringify(progress))}
 
