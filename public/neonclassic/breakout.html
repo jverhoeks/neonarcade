@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Neon Breakout — Free Online Brick Breaker Game | NEON ARCADE</title>
+<meta name="description" content="Play Neon Breakout free online — smash glowing neon bricks with combos and power-ups. Classic Arkanoid reimagined. No download, no login.">
+<meta name="keywords" content="neon breakout, free brick breaker game online, browser game, neon arcade, arkanoid">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonclassic/breakout.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonclassic/breakout.html">
+<meta property="og:title" content="Neon Breakout — Free Online Brick Breaker Game | NEON ARCADE">
+<meta property="og:description" content="Play Neon Breakout free online — smash glowing neon bricks with combos and power-ups. Classic Arkanoid reimagined.">
+<meta property="og:image" content="https://neonarcade.net/neonclassic/screenshots/breakout.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonclassic/breakout.html">
+<meta name="twitter:title" content="Neon Breakout — Free Online Brick Breaker Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Neon Breakout free online — smash glowing neon bricks with combos and power-ups. Classic Arkanoid reimagined.">
+<meta name="twitter:image" content="https://neonarcade.net/neonclassic/screenshots/breakout.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Neon Breakout",
+  "url": "https://neonarcade.net/neonclassic/breakout.html",
+  "description": "Play Neon Breakout free online — smash glowing neon bricks with combos and power-ups. Classic Arkanoid reimagined. No download, no login.",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonclassic/screenshots/breakout.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CLASSIC", "item": "https://neonarcade.net/neonclassic/" },
+    { "@type": "ListItem", "position": 3, "name": "Neon Breakout", "item": "https://neonarcade.net/neonclassic/breakout.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+canvas {
+  position: fixed; top: 0; left: 0;
+  display: block;
+  width: 100%; height: 100%;
+}
+#scanlines {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+  z-index: 10;
+}
+#ui {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 20; pointer-events: none;
+}
+.panel {
+  pointer-events: auto;
+  text-align: center;
+  padding: 40px 50px;
+  background: rgba(10,10,18,0.92);
+  border: 1px solid rgba(0,240,255,0.2);
+  border-radius: 6px;
+  box-shadow: 0 0 60px rgba(0,240,255,0.08), inset 0 0 60px rgba(0,240,255,0.03);
+  max-width: 440px;
+  width: 90%;
+}
+.panel.hidden { display: none; }
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 36px;
+  letter-spacing: 6px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #9999bb;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin: 8px;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.play-btn.pink {
+  border-color: #ff2d7b;
+  color: #ff2d7b;
+  background: rgba(255,45,123,0.06);
+}
+.play-btn.pink:hover {
+  background: rgba(255,45,123,0.15);
+  box-shadow: 0 0 20px rgba(255,45,123,0.2);
+}
+.play-btn.green {
+  border-color: #39ff14;
+  color: #39ff14;
+  background: rgba(57,255,20,0.06);
+}
+.play-btn.green:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+}
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-top: 18px;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  margin: 20px 0;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 22px;
+  color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+.stat-value.gold { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.stat-value.pink { color: #ff2d7b; text-shadow: 0 0 8px rgba(255,45,123,0.4); }
+.stat-value.green { color: #39ff14; text-shadow: 0 0 8px rgba(57,255,20,0.4); }
+.btn-row { margin-top: 16px; }
+#startLB, #gameoverLB {
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.share-toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px;
+  letter-spacing: 2px; color: #39ff14; background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.3); padding: 10px 24px;
+  border-radius: 3px; z-index: 100; pointer-events: none;
+  opacity: 0; transition: opacity 0.3s;
+}
+.share-toast.show { opacity: 1; }
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  10% { transform: translate(-3px, 2px); }
+  20% { transform: translate(3px, -2px); }
+  30% { transform: translate(-2px, -3px); }
+  40% { transform: translate(2px, 3px); }
+  50% { transform: translate(-3px, -1px); }
+  60% { transform: translate(3px, 1px); }
+  70% { transform: translate(-1px, 3px); }
+  80% { transform: translate(1px, -3px); }
+  90% { transform: translate(-2px, 2px); }
+}
+.shaking canvas { animation: shake 0.25s ease; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="scanlines"></div>
+<div id="ui">
+  <div id="startPanel" class="panel">
+    <div class="game-title">NEON BREAKOUT</div>
+    <div class="game-subtitle">Smash neon bricks. Chase the combo.</div>
+    <button class="play-btn" id="startBtn">START</button>
+    <div class="controls-hint">Mouse / Touch to move paddle &middot; Click to launch</div>
+    <div id="startLB"></div>
+  </div>
+  <div id="gameoverPanel" class="panel hidden">
+    <div class="game-title" style="font-size:28px">GAME OVER</div>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-label">SCORE</div><div class="stat-value gold" id="finalScore">0</div></div>
+      <div class="stat-item"><div class="stat-label">LEVEL</div><div class="stat-value" id="finalLevel">1</div></div>
+      <div class="stat-item"><div class="stat-label">BRICKS</div><div class="stat-value pink" id="finalBricks">0</div></div>
+      <div class="stat-item"><div class="stat-label">MAX COMBO</div><div class="stat-value green" id="finalCombo">0</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="play-btn green" id="shareBtn">SHARE</button>
+      <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+    </div>
+    <div id="gameoverLB"></div>
+  </div>
+</div>
+<div class="share-toast" id="shareToast">COPIED TO CLIPBOARD</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ========== CONFIG ==========
+  const COLORS = {
+    cyan: '#00f0ff',
+    green: '#39ff14',
+    gold: '#ffd700',
+    pink: '#ff2d7b',
+    purple: '#b44dff',
+    orange: '#ff8c00',
+    bg: '#0a0a12',
+    surface: '#12121f',
+    textDim: '#7a7a9a',
+    textMid: '#9999bb',
+  };
+
+  const ROW_COLORS = [COLORS.orange, COLORS.purple, COLORS.pink, COLORS.gold, COLORS.green, COLORS.cyan];
+  const ROW_POINTS = [60, 50, 40, 30, 20, 10];
+
+  const BRICK_COLS = 12;
+  const BRICK_ROWS = 6;
+  const BRICK_PAD = 4;
+  const BALL_RADIUS = 6;
+  const INITIAL_BALL_SPEED = 380;
+  const SPEED_INCREMENT = 15;
+  const TOP_ROW_SPEED_BONUS = 40;
+  const PADDLE_SHRINK = 0.75;
+
+  const POWERUP_CHANCE = 0.12;
+  const POWERUP_SPEED = 120;
+  const POWERUP_TYPES = ['multiball', 'wide', 'laser', 'life'];
+  const POWERUP_COLORS = { multiball: COLORS.cyan, wide: COLORS.green, laser: COLORS.pink, life: COLORS.gold };
+  const POWERUP_SYMBOLS = { multiball: 'M', wide: 'W', laser: 'L', life: '+' };
+  const POWERUP_DURATION = 12000;
+
+  // ========== CANVAS ==========
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr;
+  let GAME_W, GAME_H;
+  let offsetX = 0, offsetY = 0;
+  let scale = 1;
+
+  // Game area dimensions (logical)
+  const LOGIC_W = 600;
+  const LOGIC_H = 800;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+
+    // Fit LOGIC_W x LOGIC_H into the window
+    const scaleX = W / LOGIC_W;
+    const scaleY = H / LOGIC_H;
+    scale = Math.min(scaleX, scaleY);
+    GAME_W = LOGIC_W * scale;
+    GAME_H = LOGIC_H * scale;
+    offsetX = (W - GAME_W) / 2;
+    offsetY = (H - GAME_H) / 2;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function toLogic(screenX, screenY) {
+    return {
+      x: (screenX - offsetX) / scale,
+      y: (screenY - offsetY) / scale
+    };
+  }
+
+  // ========== AUDIO ==========
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function playSound(freq, duration, type, vol) {
+    ensureAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type || 'square';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol || 0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration || 0.1));
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + (duration || 0.1));
+  }
+
+  function sndPaddle() { playSound(440, 0.06, 'triangle', 0.07); }
+  function sndBrick(row) {
+    const freqs = [880, 784, 698, 587, 523, 440];
+    playSound(freqs[row] || 660, 0.08, 'square', 0.06);
+  }
+  function sndWall() { playSound(330, 0.04, 'sine', 0.04); }
+  function sndDeath() {
+    playSound(200, 0.3, 'sawtooth', 0.1);
+    setTimeout(() => playSound(140, 0.4, 'sawtooth', 0.08), 100);
+  }
+  function sndPowerup() {
+    playSound(660, 0.08, 'sine', 0.06);
+    setTimeout(() => playSound(880, 0.08, 'sine', 0.06), 60);
+    setTimeout(() => playSound(1100, 0.12, 'sine', 0.06), 120);
+  }
+  function sndLevelComplete() {
+    [523, 659, 784, 1047].forEach((f, i) => {
+      setTimeout(() => playSound(f, 0.15, 'sine', 0.07), i * 100);
+    });
+  }
+  function sndLaser() { playSound(1200, 0.06, 'sawtooth', 0.04); }
+
+  // ========== GAME STATE ==========
+  let state = 'start'; // start, playing, paused, gameover, levelcomplete
+  let score = 0;
+  let lives = 3;
+  let level = 1;
+  let bricksDestroyed = 0;
+  let combo = 0;
+  let maxCombo = 0;
+  let shakeTimer = 0;
+
+  // Paddle
+  let paddle = { x: 0, y: 0, w: 100, h: 14, baseW: 100, shrunk: false };
+  // Balls
+  let balls = [];
+  // Bricks
+  let bricks = [];
+  // Power-ups
+  let powerups = [];
+  let activePowers = {}; // { type: endTime }
+  // Lasers
+  let lasers = [];
+  // Particles
+  let particles = [];
+  // Ball trail
+  const TRAIL_LENGTH = 8;
+
+  // Paddle target (for mouse/touch)
+  let paddleTarget = LOGIC_W / 2;
+  let ballAttached = true;
+
+  // ========== LEVEL PATTERNS ==========
+  function generateBricks(lvl) {
+    const b = [];
+    const brickW = (LOGIC_W - BRICK_PAD * (BRICK_COLS + 1)) / BRICK_COLS;
+    const brickH = 20;
+    const topOffset = 60;
+
+    if (lvl <= 1) {
+      // Standard full grid
+      for (let r = 0; r < BRICK_ROWS; r++) {
+        for (let c = 0; c < BRICK_COLS; c++) {
+          b.push({
+            x: BRICK_PAD + c * (brickW + BRICK_PAD),
+            y: topOffset + r * (brickH + BRICK_PAD),
+            w: brickW, h: brickH,
+            row: r, color: ROW_COLORS[r],
+            points: ROW_POINTS[r],
+            alive: true,
+            hasPowerup: Math.random() < POWERUP_CHANCE
+          });
+        }
+      }
+    } else if (lvl === 2) {
+      // Checkerboard
+      for (let r = 0; r < BRICK_ROWS; r++) {
+        for (let c = 0; c < BRICK_COLS; c++) {
+          if ((r + c) % 2 === 0) {
+            b.push({
+              x: BRICK_PAD + c * (brickW + BRICK_PAD),
+              y: topOffset + r * (brickH + BRICK_PAD),
+              w: brickW, h: brickH,
+              row: r, color: ROW_COLORS[r],
+              points: ROW_POINTS[r] * 2,
+              alive: true,
+              hasPowerup: Math.random() < POWERUP_CHANCE * 1.5
+            });
+          }
+        }
+      }
+    } else if (lvl === 3) {
+      // Diamond pattern
+      const mid = Math.floor(BRICK_COLS / 2);
+      for (let r = 0; r < BRICK_ROWS; r++) {
+        const half = r < BRICK_ROWS / 2 ? r + 1 : BRICK_ROWS - r;
+        for (let c = mid - half; c < mid + half; c++) {
+          if (c >= 0 && c < BRICK_COLS) {
+            b.push({
+              x: BRICK_PAD + c * (brickW + BRICK_PAD),
+              y: topOffset + r * (brickH + BRICK_PAD),
+              w: brickW, h: brickH,
+              row: r, color: ROW_COLORS[r],
+              points: ROW_POINTS[r] * 2,
+              alive: true,
+              hasPowerup: Math.random() < POWERUP_CHANCE * 1.5
+            });
+          }
+        }
+      }
+    } else if (lvl === 4) {
+      // Double rows
+      for (let r = 0; r < BRICK_ROWS * 2; r++) {
+        for (let c = 0; c < BRICK_COLS; c++) {
+          if (r % 3 !== 2) {
+            const rowIdx = Math.min(Math.floor(r / 2), BRICK_ROWS - 1);
+            b.push({
+              x: BRICK_PAD + c * (brickW + BRICK_PAD),
+              y: topOffset + r * (brickH * 0.6 + BRICK_PAD),
+              w: brickW, h: brickH * 0.6,
+              row: rowIdx, color: ROW_COLORS[rowIdx],
+              points: ROW_POINTS[rowIdx],
+              alive: true,
+              hasPowerup: Math.random() < POWERUP_CHANCE
+            });
+          }
+        }
+      }
+    } else {
+      // Levels 5+: random holes, increasing density
+      for (let r = 0; r < BRICK_ROWS; r++) {
+        for (let c = 0; c < BRICK_COLS; c++) {
+          if (Math.random() < 0.7 + lvl * 0.03) {
+            b.push({
+              x: BRICK_PAD + c * (brickW + BRICK_PAD),
+              y: topOffset + r * (brickH + BRICK_PAD),
+              w: brickW, h: brickH,
+              row: r, color: ROW_COLORS[r],
+              points: ROW_POINTS[r] * Math.min(lvl, 5),
+              alive: true,
+              hasPowerup: Math.random() < POWERUP_CHANCE * 1.5
+            });
+          }
+        }
+      }
+    }
+    return b;
+  }
+
+  // ========== INIT ==========
+  function resetBall() {
+    ballAttached = true;
+    balls = [{
+      x: paddle.x + paddle.w / 2,
+      y: paddle.y - BALL_RADIUS - 1,
+      vx: 0,
+      vy: 0,
+      speed: INITIAL_BALL_SPEED + (level - 1) * SPEED_INCREMENT,
+      trail: []
+    }];
+  }
+
+  function initGame() {
+    score = 0;
+    lives = 3;
+    level = 1;
+    bricksDestroyed = 0;
+    combo = 0;
+    maxCombo = 0;
+    shakeTimer = 0;
+    powerups = [];
+    activePowers = {};
+    lasers = [];
+    particles = [];
+    paddle.w = paddle.baseW;
+    paddle.shrunk = false;
+    paddle.x = (LOGIC_W - paddle.w) / 2;
+    paddle.y = LOGIC_H - 50;
+    paddleTarget = LOGIC_W / 2;
+    bricks = generateBricks(level);
+    resetBall();
+    state = 'playing';
+  }
+
+  function nextLevel() {
+    level++;
+    powerups = [];
+    activePowers = {};
+    lasers = [];
+    paddle.w = paddle.baseW;
+    paddle.shrunk = false;
+    bricks = generateBricks(level);
+    resetBall();
+    state = 'playing';
+    sndLevelComplete();
+  }
+
+  // ========== PARTICLES ==========
+  function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < (count || 12); i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 80 + Math.random() * 200;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 0.4 + Math.random() * 0.5,
+        maxLife: 0.4 + Math.random() * 0.5,
+        color: color,
+        size: 2 + Math.random() * 3
+      });
+    }
+  }
+
+  // ========== POWERUP LOGIC ==========
+  function spawnPowerup(x, y) {
+    const type = POWERUP_TYPES[Math.floor(Math.random() * POWERUP_TYPES.length)];
+    powerups.push({
+      x: x, y: y, w: 24, h: 14,
+      type: type,
+      color: POWERUP_COLORS[type],
+      vy: POWERUP_SPEED
+    });
+  }
+
+  function activatePower(type) {
+    sndPowerup();
+    const now = performance.now();
+
+    if (type === 'multiball') {
+      // Add 2 extra balls
+      const src = balls[0] || { x: paddle.x + paddle.w / 2, y: paddle.y - 20, speed: INITIAL_BALL_SPEED };
+      for (let i = 0; i < 2; i++) {
+        const angle = -Math.PI / 4 + Math.random() * Math.PI / 2 - Math.PI / 2;
+        balls.push({
+          x: src.x, y: src.y,
+          vx: Math.cos(angle) * src.speed,
+          vy: Math.sin(angle) * src.speed,
+          speed: src.speed,
+          trail: []
+        });
+      }
+      if (ballAttached) launchBall();
+    } else if (type === 'wide') {
+      paddle.w = Math.min(paddle.baseW * 1.5, LOGIC_W * 0.4);
+      activePowers.wide = now + POWERUP_DURATION;
+    } else if (type === 'laser') {
+      activePowers.laser = now + POWERUP_DURATION;
+    } else if (type === 'life') {
+      lives = Math.min(lives + 1, 5);
+    }
+  }
+
+  let laserTimer = 0;
+
+  // ========== UPDATE ==========
+  function launchBall() {
+    if (!ballAttached || balls.length === 0) return;
+    ballAttached = false;
+    const b = balls[0];
+    const angle = -Math.PI / 4 - Math.random() * Math.PI / 2;
+    b.vx = Math.cos(angle) * b.speed;
+    b.vy = Math.sin(angle) * b.speed;
+  }
+
+  let topRowBroken = false;
+  let topTwoRowsBroken = false;
+
+  function checkTopRows() {
+    const newTopRow = !bricks.some(b => b.alive && b.row === 0);
+    const newTopTwo = !bricks.some(b => b.alive && (b.row === 0 || b.row === 1));
+
+    if (newTopTwo && !topTwoRowsBroken) {
+      topTwoRowsBroken = true;
+      balls.forEach(b => {
+        b.speed += TOP_ROW_SPEED_BONUS;
+        const mag = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+        if (mag > 0) {
+          b.vx = (b.vx / mag) * b.speed;
+          b.vy = (b.vy / mag) * b.speed;
+        }
+      });
+    }
+    if (newTopRow && !topRowBroken) {
+      topRowBroken = true;
+      if (!paddle.shrunk) {
+        paddle.w *= PADDLE_SHRINK;
+        paddle.shrunk = true;
+      }
+      balls.forEach(b => {
+        b.speed += TOP_ROW_SPEED_BONUS;
+        const mag = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+        if (mag > 0) {
+          b.vx = (b.vx / mag) * b.speed;
+          b.vy = (b.vy / mag) * b.speed;
+        }
+      });
+    }
+  }
+
+  function update(dt) {
+    if (state !== 'playing') return;
+
+    const now = performance.now();
+
+    // Expire powers
+    if (activePowers.wide && now > activePowers.wide) {
+      paddle.w = paddle.shrunk ? paddle.baseW * PADDLE_SHRINK : paddle.baseW;
+      delete activePowers.wide;
+    }
+    if (activePowers.laser && now > activePowers.laser) {
+      delete activePowers.laser;
+    }
+
+    // Shake timer
+    if (shakeTimer > 0) shakeTimer -= dt;
+
+    // Move paddle smoothly toward target
+    const targetX = paddleTarget - paddle.w / 2;
+    paddle.x += (targetX - paddle.x) * Math.min(1, dt * 15);
+    paddle.x = Math.max(0, Math.min(LOGIC_W - paddle.w, paddle.x));
+    paddle.y = LOGIC_H - 50;
+
+    // Laser firing
+    if (activePowers.laser && !ballAttached) {
+      laserTimer += dt;
+      if (laserTimer > 0.15) {
+        laserTimer = 0;
+        lasers.push(
+          { x: paddle.x + 4, y: paddle.y, vy: -600 },
+          { x: paddle.x + paddle.w - 4, y: paddle.y, vy: -600 }
+        );
+        sndLaser();
+      }
+    }
+
+    // Update lasers
+    for (let i = lasers.length - 1; i >= 0; i--) {
+      lasers[i].y += lasers[i].vy * dt;
+      if (lasers[i].y < 0) { lasers.splice(i, 1); continue; }
+
+      // Check laser-brick collision
+      for (const brick of bricks) {
+        if (!brick.alive) continue;
+        if (lasers[i].x >= brick.x && lasers[i].x <= brick.x + brick.w &&
+            lasers[i].y >= brick.y && lasers[i].y <= brick.y + brick.h) {
+          brick.alive = false;
+          bricksDestroyed++;
+          combo++;
+          maxCombo = Math.max(maxCombo, combo);
+          const multiplier = Math.min(1 + Math.floor(combo / 5) * 0.5, 5);
+          score += Math.floor(brick.points * multiplier);
+          spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, brick.color, 8);
+          sndBrick(brick.row);
+          if (brick.hasPowerup) spawnPowerup(brick.x + brick.w / 2, brick.y + brick.h / 2);
+          lasers.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    // Update balls
+    if (ballAttached && balls.length > 0) {
+      balls[0].x = paddle.x + paddle.w / 2;
+      balls[0].y = paddle.y - BALL_RADIUS - 1;
+    }
+
+    for (let bi = balls.length - 1; bi >= 0; bi--) {
+      const b = balls[bi];
+      if (ballAttached && bi === 0) continue;
+
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+
+      // Trail
+      b.trail.push({ x: b.x, y: b.y });
+      if (b.trail.length > TRAIL_LENGTH) b.trail.shift();
+
+      // Wall collisions
+      if (b.x - BALL_RADIUS < 0) {
+        b.x = BALL_RADIUS;
+        b.vx = Math.abs(b.vx);
+        sndWall();
+      }
+      if (b.x + BALL_RADIUS > LOGIC_W) {
+        b.x = LOGIC_W - BALL_RADIUS;
+        b.vx = -Math.abs(b.vx);
+        sndWall();
+      }
+      if (b.y - BALL_RADIUS < 0) {
+        b.y = BALL_RADIUS;
+        b.vy = Math.abs(b.vy);
+        sndWall();
+      }
+
+      // Bottom - ball lost
+      if (b.y + BALL_RADIUS > LOGIC_H) {
+        balls.splice(bi, 1);
+        continue;
+      }
+
+      // Paddle collision
+      if (b.vy > 0 &&
+          b.y + BALL_RADIUS >= paddle.y &&
+          b.y + BALL_RADIUS <= paddle.y + paddle.h + 4 &&
+          b.x >= paddle.x - BALL_RADIUS &&
+          b.x <= paddle.x + paddle.w + BALL_RADIUS) {
+
+        // Reset combo on paddle touch
+        combo = 0;
+
+        // Reflect angle based on where ball hit paddle
+        const hitPos = (b.x - paddle.x) / paddle.w; // 0 to 1
+        const angle = -Math.PI * 0.15 - hitPos * Math.PI * 0.7; // -15 deg to -165 deg (upward spread)
+        b.speed += SPEED_INCREMENT * 0.3;
+        b.vx = Math.cos(angle) * b.speed;
+        b.vy = Math.sin(angle) * b.speed;
+        // Ensure vy is always upward
+        if (b.vy > 0) b.vy = -b.vy;
+        b.y = paddle.y - BALL_RADIUS - 1;
+        sndPaddle();
+        spawnParticles(b.x, paddle.y, COLORS.cyan, 4);
+      }
+
+      // Brick collisions
+      for (const brick of bricks) {
+        if (!brick.alive) continue;
+
+        // AABB vs circle
+        const closestX = Math.max(brick.x, Math.min(b.x, brick.x + brick.w));
+        const closestY = Math.max(brick.y, Math.min(b.y, brick.y + brick.h));
+        const dx = b.x - closestX;
+        const dy = b.y - closestY;
+        if (dx * dx + dy * dy < BALL_RADIUS * BALL_RADIUS) {
+          brick.alive = false;
+          bricksDestroyed++;
+          combo++;
+          maxCombo = Math.max(maxCombo, combo);
+
+          const multiplier = Math.min(1 + Math.floor(combo / 5) * 0.5, 5);
+          score += Math.floor(brick.points * multiplier);
+
+          // Reflect
+          const overlapX = Math.abs(b.x - (brick.x + brick.w / 2)) - brick.w / 2;
+          const overlapY = Math.abs(b.y - (brick.y + brick.h / 2)) - brick.h / 2;
+          if (overlapX > overlapY) {
+            b.vx = -b.vx;
+          } else {
+            b.vy = -b.vy;
+          }
+
+          spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, brick.color, 12);
+          sndBrick(brick.row);
+
+          if (brick.hasPowerup) spawnPowerup(brick.x + brick.w / 2, brick.y + brick.h / 2);
+
+          checkTopRows();
+          break; // Only one brick per frame per ball
+        }
+      }
+    }
+
+    // All balls lost
+    if (balls.length === 0) {
+      lives--;
+      shakeTimer = 0.25;
+      sndDeath();
+      if (lives <= 0) {
+        gameOver();
+        return;
+      }
+      // Reset powers on death
+      activePowers = {};
+      paddle.w = paddle.shrunk ? paddle.baseW * PADDLE_SHRINK : paddle.baseW;
+      resetBall();
+    }
+
+    // Update powerups
+    for (let i = powerups.length - 1; i >= 0; i--) {
+      const p = powerups[i];
+      p.y += p.vy * dt;
+
+      // Catch with paddle
+      if (p.y + p.h >= paddle.y && p.y <= paddle.y + paddle.h &&
+          p.x + p.w / 2 >= paddle.x && p.x - p.w / 2 <= paddle.x + paddle.w) {
+        activatePower(p.type);
+        spawnParticles(p.x, p.y, p.color, 8);
+        powerups.splice(i, 1);
+        continue;
+      }
+
+      if (p.y > LOGIC_H) {
+        powerups.splice(i, 1);
+      }
+    }
+
+    // Update particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 200 * dt; // gravity
+      p.life -= dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    // Check level complete
+    if (!bricks.some(b => b.alive)) {
+      state = 'levelcomplete';
+      setTimeout(() => {
+        topRowBroken = false;
+        topTwoRowsBroken = false;
+        nextLevel();
+      }, 1200);
+    }
+  }
+
+  // ========== DRAW ==========
+  function draw() {
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    // Background
+    ctx.fillStyle = COLORS.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Background gradient glows
+    const grd1 = ctx.createRadialGradient(W / 2, H * 0.2, 0, W / 2, H * 0.2, W * 0.6);
+    grd1.addColorStop(0, 'rgba(0,240,255,0.04)');
+    grd1.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd1;
+    ctx.fillRect(0, 0, W, H);
+
+    const grd2 = ctx.createRadialGradient(W * 0.8, H * 0.8, 0, W * 0.8, H * 0.8, W * 0.5);
+    grd2.addColorStop(0, 'rgba(255,45,123,0.03)');
+    grd2.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+
+    // Apply screen shake
+    let sx = 0, sy = 0;
+    if (shakeTimer > 0) {
+      sx = (Math.random() - 0.5) * 6;
+      sy = (Math.random() - 0.5) * 6;
+    }
+
+    ctx.save();
+    ctx.translate(offsetX + sx, offsetY + sy);
+    ctx.scale(scale, scale);
+
+    // Grid lines for depth
+    ctx.strokeStyle = 'rgba(0,240,255,0.03)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x < LOGIC_W; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, LOGIC_H); ctx.stroke();
+    }
+    for (let y = 0; y < LOGIC_H; y += 40) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(LOGIC_W, y); ctx.stroke();
+    }
+
+    // Game border
+    ctx.strokeStyle = 'rgba(0,240,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, LOGIC_W, LOGIC_H);
+
+    if (state === 'playing' || state === 'levelcomplete' || state === 'gameover') {
+      // Draw bricks
+      for (const brick of bricks) {
+        if (!brick.alive) continue;
+        const r = 3;
+        ctx.fillStyle = brick.color;
+        ctx.shadowColor = brick.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.roundRect(brick.x, brick.y, brick.w, brick.h, r);
+        ctx.fill();
+
+        // Inner glow
+        ctx.shadowBlur = 0;
+        const igrd = ctx.createLinearGradient(brick.x, brick.y, brick.x, brick.y + brick.h);
+        igrd.addColorStop(0, 'rgba(255,255,255,0.25)');
+        igrd.addColorStop(0.5, 'rgba(255,255,255,0.05)');
+        igrd.addColorStop(1, 'rgba(0,0,0,0.2)');
+        ctx.fillStyle = igrd;
+        ctx.beginPath();
+        ctx.roundRect(brick.x, brick.y, brick.w, brick.h, r);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+
+      // Draw paddle
+      const pw = paddle.w;
+      ctx.fillStyle = COLORS.cyan;
+      ctx.shadowColor = COLORS.cyan;
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.roundRect(paddle.x, paddle.y, pw, paddle.h, 4);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Paddle inner sheen
+      const pGrd = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.h);
+      pGrd.addColorStop(0, 'rgba(255,255,255,0.3)');
+      pGrd.addColorStop(1, 'rgba(0,0,0,0.2)');
+      ctx.fillStyle = pGrd;
+      ctx.beginPath();
+      ctx.roundRect(paddle.x, paddle.y, pw, paddle.h, 4);
+      ctx.fill();
+
+      // Laser indicators
+      if (activePowers.laser) {
+        ctx.fillStyle = COLORS.pink;
+        ctx.shadowColor = COLORS.pink;
+        ctx.shadowBlur = 6;
+        ctx.fillRect(paddle.x + 2, paddle.y - 3, 4, 3);
+        ctx.fillRect(paddle.x + pw - 6, paddle.y - 3, 4, 3);
+        ctx.shadowBlur = 0;
+      }
+
+      // Draw lasers
+      for (const l of lasers) {
+        ctx.fillStyle = COLORS.pink;
+        ctx.shadowColor = COLORS.pink;
+        ctx.shadowBlur = 6;
+        ctx.fillRect(l.x - 1, l.y, 2, 10);
+        ctx.shadowBlur = 0;
+      }
+
+      // Draw balls
+      for (const b of balls) {
+        // Trail
+        for (let i = 0; i < b.trail.length; i++) {
+          const t = b.trail[i];
+          const alpha = (i / b.trail.length) * 0.3;
+          const size = BALL_RADIUS * (i / b.trail.length) * 0.8;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, size, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,240,255,' + alpha + ')';
+          ctx.fill();
+        }
+
+        // Ball
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = COLORS.cyan;
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // Draw powerups
+      for (const p of powerups) {
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.roundRect(p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, 3);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px Orbitron, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(POWERUP_SYMBOLS[p.type], p.x, p.y);
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        const alpha = p.life / p.maxLife;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      }
+      ctx.globalAlpha = 1;
+
+      // HUD
+      drawHUD();
+    }
+
+    if (state === 'levelcomplete') {
+      ctx.fillStyle = 'rgba(10,10,18,0.5)';
+      ctx.fillRect(0, 0, LOGIC_W, LOGIC_H);
+      ctx.font = '900 36px Orbitron, monospace';
+      ctx.fillStyle = COLORS.green;
+      ctx.textAlign = 'center';
+      ctx.shadowColor = COLORS.green;
+      ctx.shadowBlur = 20;
+      ctx.fillText('LEVEL ' + level + ' CLEAR!', LOGIC_W / 2, LOGIC_H / 2);
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.restore(); // game transform
+    ctx.restore(); // dpr
+  }
+
+  function drawHUD() {
+    // Score
+    ctx.font = '700 20px Orbitron, monospace';
+    ctx.fillStyle = COLORS.gold;
+    ctx.textAlign = 'left';
+    ctx.shadowColor = COLORS.gold;
+    ctx.shadowBlur = 6;
+    ctx.fillText(score.toLocaleString(), 12, 30);
+    ctx.shadowBlur = 0;
+
+    // Level
+    ctx.font = '300 12px Rajdhani, sans-serif';
+    ctx.fillStyle = COLORS.textMid;
+    ctx.textAlign = 'center';
+    ctx.fillText('LEVEL ' + level, LOGIC_W / 2, 24);
+
+    // Lives
+    ctx.textAlign = 'right';
+    for (let i = 0; i < lives; i++) {
+      ctx.beginPath();
+      ctx.arc(LOGIC_W - 16 - i * 20, 22, 6, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS.pink;
+      ctx.shadowColor = COLORS.pink;
+      ctx.shadowBlur = 6;
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    // Combo
+    if (combo > 1) {
+      ctx.font = '700 16px Orbitron, monospace';
+      ctx.textAlign = 'center';
+      const comboAlpha = Math.min(1, 0.5 + combo * 0.05);
+      ctx.fillStyle = 'rgba(57,255,20,' + comboAlpha + ')';
+      ctx.shadowColor = COLORS.green;
+      ctx.shadowBlur = 8;
+      ctx.fillText(combo + 'x COMBO', LOGIC_W / 2, LOGIC_H - 80);
+      ctx.shadowBlur = 0;
+    }
+
+    // Power-up timers
+    let timerY = 45;
+    const now = performance.now();
+    for (const type of ['wide', 'laser']) {
+      if (activePowers[type]) {
+        const remaining = Math.max(0, (activePowers[type] - now) / 1000);
+        ctx.font = '500 11px Rajdhani, sans-serif';
+        ctx.fillStyle = POWERUP_COLORS[type];
+        ctx.textAlign = 'left';
+        ctx.fillText(type.toUpperCase() + ' ' + remaining.toFixed(1) + 's', 12, timerY);
+        timerY += 16;
+      }
+    }
+  }
+
+  // ========== GAME OVER ==========
+  function gameOver() {
+    state = 'gameover';
+    document.getElementById('finalScore').textContent = score.toLocaleString();
+    document.getElementById('finalLevel').textContent = level;
+    document.getElementById('finalBricks').textContent = bricksDestroyed;
+    document.getElementById('finalCombo').textContent = maxCombo + 'x';
+
+    document.getElementById('startPanel').classList.add('hidden');
+    document.getElementById('gameoverPanel').classList.remove('hidden');
+
+    // Neon.js save
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      Neon.render(document.getElementById('gameoverLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    }).catch(function() {
+      Neon.render(document.getElementById('gameoverLB'));
+    });
+  }
+
+  // ========== SHARE ==========
+  function shareResult() {
+    const text = '\u{1f9f1} NEON BREAKOUT\n' +
+      'Score: ' + score.toLocaleString() + ' | Level: ' + level + '\n' +
+      'Bricks: ' + bricksDestroyed + ' | Max Combo: ' + maxCombo + 'x\n' +
+      '\u{1f7e6}\u{1f7e9}\u{1f7e8}\u{1f7e5}\u{1f7ea}\u{1f7e7}\n' +
+      'neonarcade.net/neonclassic/breakout.html';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast();
+    }).catch(function() {
+      showToast();
+    });
+  }
+
+  function showToast() {
+    const toast = document.getElementById('shareToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // ========== INPUT ==========
+  function handlePointerMove(clientX) {
+    const lp = toLogic(clientX, 0);
+    paddleTarget = lp.x;
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    handlePointerMove(e.clientX);
+  });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX);
+  }, { passive: false });
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    ensureAudio();
+    if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX);
+    if (state === 'playing' && ballAttached) launchBall();
+  }, { passive: false });
+
+  canvas.addEventListener('mousedown', (e) => {
+    ensureAudio();
+    if (state === 'playing' && ballAttached) launchBall();
+  });
+
+  // Keyboard (just for launch)
+  document.addEventListener('keydown', (e) => {
+    ensureAudio();
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+      if (state === 'playing' && ballAttached) launchBall();
+    }
+    if (e.code === 'ArrowLeft') paddleTarget -= 40;
+    if (e.code === 'ArrowRight') paddleTarget += 40;
+  });
+
+  // ========== UI BUTTONS ==========
+  document.getElementById('startBtn').addEventListener('click', () => {
+    ensureAudio();
+    initGame();
+    document.getElementById('startPanel').classList.add('hidden');
+  });
+
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    initGame();
+    document.getElementById('gameoverPanel').classList.add('hidden');
+  });
+
+  document.getElementById('shareBtn').addEventListener('click', shareResult);
+
+  // ========== MAIN LOOP ==========
+  let lastTime = 0;
+
+  function drawIdleBackground(ts) {
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    ctx.fillStyle = COLORS.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const grd1 = ctx.createRadialGradient(W / 2, H * 0.3, 0, W / 2, H * 0.3, W * 0.5);
+    grd1.addColorStop(0, 'rgba(0,240,255,0.05)');
+    grd1.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd1;
+    ctx.fillRect(0, 0, W, H);
+
+    const grd2 = ctx.createRadialGradient(W * 0.7, H * 0.7, 0, W * 0.7, H * 0.7, W * 0.4);
+    grd2.addColorStop(0, 'rgba(255,45,123,0.03)');
+    grd2.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+
+    // Floating bricks animation
+    const time = ts / 1000;
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    ctx.scale(scale, scale);
+    for (let i = 0; i < 18; i++) {
+      const bx = (i * 73 + time * (20 + i * 5)) % (LOGIC_W + 60) - 30;
+      const by = LOGIC_H * 0.2 + Math.sin(time * 0.8 + i * 1.3) * 60 + (i % 6) * 30;
+      const color = ROW_COLORS[i % 6];
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.15 + Math.sin(time + i) * 0.05;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, 40, 16, 3);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function mainLoop(ts) {
+    const dt = Math.min((ts - lastTime) / 1000, 0.05);
+    lastTime = ts;
+    resize();
+
+    if (state === 'start') {
+      drawIdleBackground(ts);
+    } else {
+      update(dt);
+      draw();
+    }
+
+    requestAnimationFrame(mainLoop);
+  }
+
+  // ========== INIT ==========
+  // Override initGame to also reset top-row flags
+  const _origInit = initGame;
+  initGame = function() {
+    _origInit();
+    topRowBroken = false;
+    topTwoRowsBroken = false;
+  };
+
+  Neon.init({
+    game: 'breakout',
+    mode: 'high',
+    key: 'neonarcade_neonclassic_breakout_scores'
+  });
+  Neon.render(document.getElementById('startLB'));
+
+  lastTime = performance.now();
+  requestAnimationFrame(mainLoop);
+})();
+</script>
+</body>
+</html>
