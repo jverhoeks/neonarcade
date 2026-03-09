@@ -20,18 +20,20 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/chimp.html">
 <meta property="og:title" content="Chimp Test — Free Online Memory Game | NEON ARCADE">
 <meta property="og:description" content="Play the Chimp Memory Test free online. Can you beat a chimpanzee?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/chimp.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/chimp.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/chimp.html">
 <meta name="twitter:title" content="Chimp Test — Free Online Memory Game | NEON ARCADE">
 <meta name="twitter:description" content="Play the Chimp Memory Test free online. Can you beat a chimpanzee?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/chimp.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/chimp.png">
 
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Chimp Test","url":"https://neonarcade.net/neonarcade/chimp.html","description":"Play the Chimp Memory Test free online. Numbers flash, then hide. Tap in order.","genre":"Memory","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/screenshots/chimp.png","inLanguage":"en","isFamilyFriendly":true}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Chimp Test","url":"https://neonarcade.net/neonarcade/chimp.html","description":"Play the Chimp Memory Test free online. Numbers flash, then hide. Tap in order.","genre":"Memory","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/neonarcade/screenshots/chimp.png","inLanguage":"en","isFamilyFriendly":true}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON ARCADE","item":"https://neonarcade.net/neonarcade/"},{"@type":"ListItem","position":3,"name":"Chimp Test","item":"https://neonarcade.net/neonarcade/chimp.html"}]}
@@ -1049,6 +1051,17 @@ body::after {
   });
 
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (phase === 'showing' || phase === 'playing') {
+        if (displayTimeout) { clearTimeout(displayTimeout); displayTimeout = null; }
+        phase = 'idle';
+        gridContainer.style.display = 'none';
+        hud.style.display = 'none';
+        gameoverScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
+        return;
+      }
+    }
     if (e.code === 'Space' || e.code === 'Enter') {
       if (phase === 'idle' && !startScreen.classList.contains('hidden')) {
         e.preventDefault();

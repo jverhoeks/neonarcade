@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/catalyst.html">
 <meta property="og:title" content="Catalyst — Free Chain Reaction Game | NEON ARCADE">
 <meta property="og:description" content="Play Catalyst free online — trigger chain reactions to clear the board. One click sets off a cascade of neon explosions. Satisfying physics-based puzzle action.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/catalyst.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/catalyst.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/catalyst.html">
 <meta name="twitter:title" content="Catalyst — Free Chain Reaction Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Catalyst free online — trigger chain reactions to clear the board. One click sets off a cascade of neon explosions. Satisfying physics-based puzzle action.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/catalyst.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/catalyst.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/catalyst.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/catalyst.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -282,6 +282,9 @@ h1 {
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
 .na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
 .na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);z-index:9999}
+@keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-3px,1px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-1px,3px)}}
+.shake{animation:shake 0.25s ease-in-out}
 </style>
 </head>
 <body>
@@ -595,6 +598,18 @@ document.addEventListener('mouseup', onUp);
 document.addEventListener('touchstart', onDown, { passive: false });
 document.addEventListener('touchmove', onMove, { passive: false });
 document.addEventListener('touchend', onUp, { passive: false });
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && (state === 'idle' || state === 'aiming' || state === 'launched' || state === 'reacting')) {
+    state = 'start';
+    spark = null;
+    projectiles = [];
+    effects = [];
+    floatingTexts = [];
+    document.getElementById('gameOverScreen').classList.remove('active');
+    document.getElementById('startScreen').classList.add('active');
+  }
+});
 
 function onDown(e) {
   e.preventDefault();
@@ -1103,6 +1118,8 @@ function update(dt, time) {
 function endGame() {
   state = 'gameover';
   playEnd();
+  document.body.classList.add('shake');
+  setTimeout(function(){document.body.classList.remove('shake');},250);
   document.getElementById('hud').style.display = 'none';
   document.getElementById('scoreDisplay').style.display = 'none';
 

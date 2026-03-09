@@ -1038,6 +1038,14 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     Neon.render(document.getElementById('start-lb'));
   };
 
+  // ========== ESC TO QUIT ==========
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active')) {
+      e.preventDefault();
+      goToMenu();
+    }
+  });
+
   // ========== INIT ==========
   initNeon();
   updateBestTimes();

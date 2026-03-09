@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/impostor-pixel.html">
 <meta property="og:title" content="Impostor Pixel — Spot the Odd Pixel Out | NEON ARCADE">
 <meta property="og:description" content="Play Impostor Pixel free online — find the one pixel that's slightly different. Sounds easy? The colors get closer and closer. A viral eye test challenge.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/impostor-pixel.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/impostor-pixel.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/impostor-pixel.html">
 <meta name="twitter:title" content="Impostor Pixel — Spot the Odd Pixel Out | NEON ARCADE">
 <meta name="twitter:description" content="Play Impostor Pixel free online — find the one pixel that's slightly different. Sounds easy? The colors get closer and closer. A viral eye test challenge.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/impostor-pixel.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/impostor-pixel.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/impostor-pixel.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/impostor-pixel.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -115,6 +115,7 @@
     position: relative;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    touch-action: none;
   }
 
   /* Scanline overlay */
@@ -520,9 +521,16 @@ const pCanvas = document.getElementById('particles');
 const pCtx = pCanvas.getContext('2d');
 let particles = [];
 
+var pLogicalW, pLogicalH;
 function resizeParticleCanvas() {
-  pCanvas.width = window.innerWidth;
-  pCanvas.height = window.innerHeight;
+  var dpr = window.devicePixelRatio || 1;
+  pLogicalW = window.innerWidth;
+  pLogicalH = window.innerHeight;
+  pCanvas.width = pLogicalW * dpr;
+  pCanvas.height = pLogicalH * dpr;
+  pCanvas.style.width = pLogicalW + 'px';
+  pCanvas.style.height = pLogicalH + 'px';
+  pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 window.addEventListener('resize', resizeParticleCanvas);
 resizeParticleCanvas();
@@ -545,7 +553,7 @@ function spawnParticles(x, y, color, count) {
 }
 
 function updateParticles() {
-  pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+  pCtx.clearRect(0, 0, pLogicalW, pLogicalH);
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.x += p.vx;
@@ -904,6 +912,14 @@ function startGame() {
 document.getElementById('hs-val').textContent = getHighScore();
 document.getElementById('btn-start').addEventListener('click', startGame);
 document.getElementById('btn-retry').addEventListener('click', startGame);
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && gameActive) {
+    gameActive = false;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    showScreen('start');
+  }
+});
 
 // Handle resize for grid
 window.addEventListener('resize', function() {

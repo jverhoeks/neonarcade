@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonmind/skyscrapers.html">
 <meta property="og:title" content="Skyscrapers — Free Online Building Logic Puzzle | NEON ARCADE">
 <meta property="og:description" content="Fill the grid so skyline clues match. 3D logic reasoning in 2D.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/skyscrapers.png">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/skyscrapers.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonmind/skyscrapers.html">
 <meta name="twitter:title" content="Skyscrapers — Free Online Building Logic Puzzle | NEON ARCADE">
 <meta name="twitter:description" content="Fill the grid so skyline clues match. 3D logic reasoning in 2D.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/skyscrapers.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/skyscrapers.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/skyscrapers.png",
+  "image": "https://neonarcade.net/neonmind/screenshots/skyscrapers.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1129,6 +1129,12 @@ body::before {
 
   // KEYBOARD
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (gameActive) {
+        showStart();
+      }
+      return;
+    }
     if (!gameActive) return;
 
     if (e.key >= '1' && e.key <= '9' && parseInt(e.key) <= N) {

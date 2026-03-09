@@ -1575,6 +1575,20 @@ h1 {
 
   // Start on any key (when on start screen)
   document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && (state === 'playing' || state === 'respawning')) {
+      e.preventDefault();
+      state = 'start';
+      stopThrust();
+      stopUfoSound();
+      bullets = []; asteroids = []; ufos = []; ufoBullets = []; particles = []; debris = [];
+      document.getElementById('hud').classList.remove('active');
+      document.getElementById('gameOverScreen').classList.remove('active');
+      document.getElementById('startScreen').classList.add('active');
+      if (isMobile && window._showMobileControls) window._showMobileControls(false);
+      initIdleAsteroids();
+      if (typeof Neon !== 'undefined') Neon.render(document.getElementById('startLB'));
+      return;
+    }
     if (state === 'start' && (e.code === 'Space' || e.code === 'Enter')) {
       e.preventDefault();
       startGame();

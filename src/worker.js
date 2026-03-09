@@ -67,7 +67,6 @@ const KNOWN_GAMES = {
   'invaders':            { mode: 'high', maxScore: 1000000 },
   'breakout':            { mode: 'high', maxScore: 1000000 },
   'tetris':              { mode: 'high', maxScore: 1000000 },
-  'tetris-sprint':       { mode: 'low', maxScore: 86400 },
   '2048':                { mode: 'high', maxScore: 10000000 },
   'pairs':               { mode: 'low', maxScore: 86400 },
   'asteroids':           { mode: 'high', maxScore: 1000000 },

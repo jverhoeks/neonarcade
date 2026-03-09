@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/typeblitz.html">
 <meta property="og:title" content="TypeBlitz — Free Online Typing Speed Test | NEON ARCADE">
 <meta property="og:description" content="Test your typing speed with a neon-styled WPM challenge.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/typeblitz.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/typeblitz.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/typeblitz.html">
 <meta name="twitter:title" content="TypeBlitz — Free Online Typing Speed Test | NEON ARCADE">
 <meta name="twitter:description" content="Test your typing speed with a neon-styled WPM challenge.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/typeblitz.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/typeblitz.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/typeblitz.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/typeblitz.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -494,7 +494,6 @@ body::after {
   let currentMode = 30;
   let totalTime = 30;
   let timeLeft = 30;
-  let timerInterval = null;
   let gameStarted = false;
   let gameEnded = false;
   let startTime = 0;
@@ -732,32 +731,46 @@ body::after {
   }
 
   // ===== TIMER =====
+  var timerRunning = false;
+  var timerLastTimestamp = 0;
+  var lastWarnSecond = -1;
+  function updateTimerRAF(timestamp) {
+    if (!timerRunning) return;
+    if (timerLastTimestamp === 0) timerLastTimestamp = timestamp;
+    var delta = (timestamp - timerLastTimestamp) / 1000;
+    timerLastTimestamp = timestamp;
+    timeLeft -= delta;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      endGame();
+      return;
+    }
+    var pct = (timeLeft / totalTime) * 100;
+    timerBar.style.width = pct + '%';
+    if (pct <= 20) {
+      timerBar.className = 'timer-bar danger';
+    } else if (pct <= 40) {
+      timerBar.className = 'timer-bar warning';
+    } else {
+      timerBar.className = 'timer-bar';
+    }
+    hudTime.textContent = String(Math.ceil(timeLeft));
+
+    // Warning beep at 5, 4, 3, 2, 1
+    var currentSecond = Math.ceil(timeLeft);
+    if (timeLeft <= 5 && currentSecond !== lastWarnSecond && currentSecond >= 1) {
+      lastWarnSecond = currentSecond;
+      playTimerWarn();
+    }
+
+    updateLiveStats();
+    requestAnimationFrame(updateTimerRAF);
+  }
   function startTimer() {
-    timerInterval = setInterval(function() {
-      timeLeft -= 0.1;
-      if (timeLeft <= 0) {
-        timeLeft = 0;
-        endGame();
-        return;
-      }
-      var pct = (timeLeft / totalTime) * 100;
-      timerBar.style.width = pct + '%';
-      if (pct <= 20) {
-        timerBar.className = 'timer-bar danger';
-      } else if (pct <= 40) {
-        timerBar.className = 'timer-bar warning';
-      } else {
-        timerBar.className = 'timer-bar';
-      }
-      hudTime.textContent = String(Math.ceil(timeLeft));
-
-      // Warning beep at 5, 4, 3, 2, 1
-      if (timeLeft <= 5 && Math.abs(timeLeft - Math.round(timeLeft)) < 0.05) {
-        playTimerWarn();
-      }
-
-      updateLiveStats();
-    }, 100);
+    timerRunning = true;
+    timerLastTimestamp = 0;
+    lastWarnSecond = -1;
+    requestAnimationFrame(updateTimerRAF);
   }
 
   function updateLiveStats() {
@@ -889,8 +902,7 @@ body::after {
     totalKeystrokes = 0;
     timeLeft = totalTime;
 
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
+    timerRunning = false;
 
     timerBar.style.width = '100%';
     timerBar.className = 'timer-bar';
@@ -913,7 +925,7 @@ body::after {
   function endGame() {
     if (gameEnded) return;
     gameEnded = true;
-    if (timerInterval) clearInterval(timerInterval);
+    timerRunning = false;
 
     // Count the final partial word if any
     var partialTyped = currentTypedBuffer;
@@ -1015,6 +1027,15 @@ body::after {
 
   // Keyboard: any key on start screen starts game
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (!gameScreen.classList.contains('hidden') && (gameStarted || !gameEnded)) {
+        gameEnded = true;
+        timerRunning = false;
+        gameStarted = false;
+        showScreen(startScreen);
+        return;
+      }
+    }
     if (!startScreen.classList.contains('hidden')) {
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();

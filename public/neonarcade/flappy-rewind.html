@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/flappy-rewind.html">
 <meta property="og:title" content="Flappy Rewind — Flappy Bird with Time Rewind | NEON ARCADE">
 <meta property="og:description" content="Play Flappy Rewind free — Flappy Bird meets time travel. Rewind your mistakes and try again. One life, infinite rewinds. How far can you fly?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/flappy-rewind.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/flappy-rewind.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/flappy-rewind.html">
 <meta name="twitter:title" content="Flappy Rewind — Flappy Bird with Time Rewind | NEON ARCADE">
 <meta name="twitter:description" content="Play Flappy Rewind free — Flappy Bird meets time travel. Rewind your mistakes and try again. One life, infinite rewinds. How far can you fly?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/flappy-rewind.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/flappy-rewind.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/flappy-rewind.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/flappy-rewind.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -93,7 +93,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
 canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 #ui-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:flex;flex-direction:column;align-items:center;z-index:5}
 #score-display{font-family:'Orbitron',monospace;font-size:clamp(36px,8vw,72px);font-weight:900;color:#fff;text-shadow:0 0 20px rgba(0,255,255,.8),0 0 40px rgba(0,255,255,.4);margin-top:40px;opacity:0;transition:opacity .3s}
@@ -101,12 +101,12 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 #phase-indicator{font-family:'Orbitron',monospace;font-size:clamp(14px,3vw,24px);font-weight:700;margin-top:8px;opacity:0;transition:opacity .3s,color .3s;letter-spacing:3px}
 #phase-indicator.visible{opacity:1}
 #phase-indicator.forward{color:#00ffcc;text-shadow:0 0 10px rgba(0,255,204,.6)}
-#phase-indicator.rewind{color:#ff6622;text-shadow:0 0 10px rgba(255,102,34,.6)}
-#rewind-btn{position:absolute;bottom:80px;right:20px;pointer-events:auto;font-family:'Orbitron',monospace;font-size:clamp(12px,2.5vw,18px);font-weight:700;color:#ff6622;background:rgba(255,102,34,.12);border:2px solid #ff6622;border-radius:12px;padding:10px 18px;cursor:pointer;opacity:0;transition:opacity .3s;animation:pulse-btn 1.5s ease-in-out infinite;text-transform:uppercase;letter-spacing:2px;z-index:6}
+#phase-indicator.rewind{color:#ff8c00;text-shadow:0 0 10px rgba(255,140,0,.6)}
+#rewind-btn{position:absolute;bottom:80px;right:20px;pointer-events:auto;font-family:'Orbitron',monospace;font-size:clamp(12px,2.5vw,18px);font-weight:700;color:#ff8c00;background:rgba(255,140,0,.12);border:2px solid #ff8c00;border-radius:12px;padding:10px 18px;cursor:pointer;opacity:0;transition:opacity .3s;animation:pulse-btn 1.5s ease-in-out infinite;text-transform:uppercase;letter-spacing:2px;z-index:6}
 #rewind-btn.visible{opacity:1;pointer-events:auto}
 #rewind-btn.hidden{opacity:0;pointer-events:none}
-#rewind-btn:active{background:rgba(255,102,34,.3)}
-@keyframes pulse-btn{0%,100%{box-shadow:0 0 8px rgba(255,102,34,.3);transform:scale(1)}50%{box-shadow:0 0 20px rgba(255,102,34,.6);transform:scale(1.05)}}
+#rewind-btn:active{background:rgba(255,140,0,.3)}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 8px rgba(255,140,0,.3);transform:scale(1)}50%{box-shadow:0 0 20px rgba(255,140,0,.6);transform:scale(1.05)}}
 .overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;opacity:0;transition:opacity .4s;z-index:10}
 .overlay.visible{opacity:1}
 .overlay.hidden{opacity:0;pointer-events:none}
@@ -117,13 +117,13 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 .btn-main{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,24px);font-weight:700;color:#0a0a12;background:#00ffdd;border:none;border-radius:50px;padding:14px 48px;cursor:pointer;text-transform:uppercase;letter-spacing:3px;box-shadow:0 0 30px rgba(0,255,221,.4);transition:transform .15s,box-shadow .15s}
 .btn-main:active{transform:scale(.95);box-shadow:0 0 15px rgba(0,255,221,.3)}
 #rewind-transition{background:rgba(10,10,18,.85);z-index:20}
-#rewind-transition h2{font-family:'Orbitron',monospace;font-size:clamp(40px,10vw,90px);font-weight:900;color:#ff6622;text-shadow:0 0 40px rgba(255,102,34,.8),0 0 80px rgba(255,102,34,.4);animation:rewind-text .8s ease-out}
+#rewind-transition h2{font-family:'Orbitron',monospace;font-size:clamp(40px,10vw,90px);font-weight:900;color:#ff8c00;text-shadow:0 0 40px rgba(255,140,0,.8),0 0 80px rgba(255,140,0,.4);animation:rewind-text .8s ease-out}
 @keyframes rewind-text{0%{transform:scaleX(3) scaleY(.3);opacity:0}50%{transform:scaleX(1.2) scaleY(1.1);opacity:1}100%{transform:scaleX(1) scaleY(1);opacity:1}}
 #gameover-screen{background:radial-gradient(ellipse at center,rgba(255,50,50,.06) 0%,rgba(10,10,18,.97) 70%)}
 #gameover-screen h2{font-family:'Orbitron',monospace;font-size:clamp(24px,6vw,48px);font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.3);margin-bottom:24px}
 .result-line{font-family:'Rajdhani',sans-serif;font-size:clamp(16px,3.5vw,26px);color:rgba(255,255,255,.7);margin:4px 0;font-weight:600}
 .result-line.forward-result{color:#00ffcc}
-.result-line.rewind-result{color:#ff6622}
+.result-line.rewind-result{color:#ff8c00}
 .result-line.final-score{font-family:'Orbitron',monospace;font-size:clamp(30px,7vw,56px);font-weight:900;color:#fff;margin:16px 0 8px;text-shadow:0 0 20px rgba(255,255,255,.4)}
 .result-line.new-best{font-size:clamp(14px,2.5vw,20px);color:rgba(255,200,50,.9)}
 .go-buttons{display:flex;gap:16px;margin-top:28px;flex-wrap:wrap;justify-content:center}
@@ -143,6 +143,25 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
 .na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
 .na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+
+/* Scanline overlay */
+body::after{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
+  z-index:999;
+}
+/* Screen shake */
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-3px)}
+  30%{transform:translateX(3px)}
+  45%{transform:translateX(-2px)}
+  60%{transform:translateX(2px)}
+  75%{transform:translateX(-1px)}
+  90%{transform:translateX(1px)}
+}
+.shake{animation:shake 0.25s ease}
 </style>
 </head>
 <body>
@@ -376,7 +395,7 @@ function startGame() {
 
 function triggerRewind(fromCrash) {
   if (state !== 'forward') return;
-  if (fromCrash) SFX.crash();
+  if (fromCrash) { SFX.crash(); spawnParticles(bird.x, bird.y, '#ff4444', 15); }
   state = 'transition';
   transTimer = 0;
   $('rewind-btn').className = 'hidden';
@@ -475,6 +494,19 @@ function handleInput(e) {
 }
 
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (state === 'forward' || state === 'transition' || state === 'rewind') {
+      state = 'start';
+      $('score-display').classList.remove('visible');
+      $('phase-indicator').classList.remove('visible');
+      $('rewind-btn').className = 'hidden';
+      $('rewind-transition').className = 'overlay hidden';
+      $('vhs-overlay').classList.remove('active');
+      $('gameover-screen').className = 'overlay hidden';
+      $('start-screen').className = 'overlay visible';
+      return;
+    }
+  }
   if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); handleInput(); }
 });
 
@@ -537,6 +569,7 @@ function updateForward() {
     scoredIdx++;
     $('score-display').textContent = fwdScore;
     SFX.score();
+    spawnParticles(bird.x, bird.y, '#00ffee', 8);
   }
 
   // Generate new pipes as needed
@@ -603,6 +636,7 @@ function updateRewind() {
       p.scored = true;
       rwDone++;
       SFX.score();
+      spawnParticles(bird.x, bird.y, '#ff8c00', 8);
     }
   }
 
@@ -656,6 +690,7 @@ function render() {
   } else {
     drawIdleBird();
   }
+  updateAndDrawParticles();
 }
 
 function drawBg() {
@@ -664,7 +699,7 @@ function drawBg() {
 
   // Grid
   const isRw = state === 'rewind';
-  C.strokeStyle = isRw ? 'rgba(255,102,34,.025)' : 'rgba(0,255,255,.025)';
+  C.strokeStyle = isRw ? 'rgba(255,140,0,.025)' : 'rgba(0,255,255,.025)';
   C.lineWidth = 1;
   const gs = 50;
   const offset = isRw ? (frame * 0.5) % gs : (-frame * 0.5) % gs;
@@ -674,7 +709,7 @@ function drawBg() {
   C.stroke();
 
   // Horizon lines
-  const lineColor = isRw ? 'rgba(255,102,34,.25)' : 'rgba(0,255,204,.25)';
+  const lineColor = isRw ? 'rgba(255,140,0,.25)' : 'rgba(0,255,204,.25)';
   C.strokeStyle = lineColor;
   C.lineWidth = 2;
   C.beginPath();
@@ -694,7 +729,7 @@ function drawRwPipes() {
   for (const p of rwPipes) {
     if (p.x + pipeW < -20 || p.x > W + 20) continue;
     const wave = Math.sin(rwWave + p.x * 0.008) * 4;
-    drawPipe(p.x, p.gapY + wave, '#ff6622', 'rgba(255,102,34,.1)');
+    drawPipe(p.x, p.gapY + wave, '#ff8c00', 'rgba(255,140,0,.1)');
   }
 }
 
@@ -811,7 +846,7 @@ function drawScanlines() {
   // Random glitch
   if (Math.random() < 0.04) {
     const gy = Math.random() * H;
-    C.fillStyle = `rgba(255,102,34,${0.05 + Math.random() * 0.08})`;
+    C.fillStyle = `rgba(255,140,0,${0.05 + Math.random() * 0.08})`;
     C.fillRect(0, gy, W, 2 + Math.random() * 5);
   }
   // Color aberration line
@@ -882,6 +917,36 @@ function drawStatic(alpha) {
   // Restore DPR transform
   SC.setTransform(DPR, 0, 0, DPR, 0, 0);
   staticCanvas.style.opacity = '1';
+}
+
+// ======================== PARTICLES ========================
+var fxParticles = [];
+function spawnParticles(x, y, color, count) {
+  for (var i = 0; i < (count || 12); i++) {
+    var angle = Math.random() * Math.PI * 2;
+    var speed = 1 + Math.random() * 3;
+    fxParticles.push({
+      x: x, y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      color: color || '#00f0ff',
+      size: 2 + Math.random() * 3
+    });
+  }
+}
+function updateAndDrawParticles() {
+  for (var i = fxParticles.length - 1; i >= 0; i--) {
+    var p = fxParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.02;
+    if (p.life <= 0) { fxParticles.splice(i, 1); continue; }
+    C.globalAlpha = p.life;
+    C.fillStyle = p.color;
+    C.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+  }
+  C.globalAlpha = 1;
 }
 
 // ======================== MAIN LOOP ========================

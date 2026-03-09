@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/tetris-betrayal.html">
 <meta property="og:title" content="Tetris Betrayal — Play Tetris Badly on Purpose | NEON ARCADE">
 <meta property="og:description" content="Play Tetris Betrayal free — the twist? You must play BADLY on purpose. Stack pieces as inefficiently as possible. Your enemy is your own muscle memory.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/tetris-betrayal.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/tetris-betrayal.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/tetris-betrayal.html">
 <meta name="twitter:title" content="Tetris Betrayal — Play Tetris Badly on Purpose | NEON ARCADE">
 <meta name="twitter:description" content="Play Tetris Betrayal free — the twist? You must play BADLY on purpose. Stack pieces as inefficiently as possible. Your enemy is your own muscle memory.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/tetris-betrayal.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/tetris-betrayal.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/tetris-betrayal.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/tetris-betrayal.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -514,8 +514,9 @@ function showPopup(text,color,board){
 }
 
 function shakeScreen(){
+  document.body.classList.add('shake');
   canvas.classList.add('shake');
-  setTimeout(()=>canvas.classList.remove('shake'),250);
+  setTimeout(function(){document.body.classList.remove('shake');canvas.classList.remove('shake');},250);
 }
 
 // ============ DRAW ============
@@ -697,6 +698,15 @@ function loop(ts){
 
 // ============ INPUT ============
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(gameRunning){
+      gameRunning=false;
+      hud.style.display='none';
+      gameOverScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+      return;
+    }
+  }
   if(!gameRunning)return;
   switch(e.key){
     case'ArrowLeft':e.preventDefault();moveLeft();break;

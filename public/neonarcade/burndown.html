@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/burndown.html">
 <meta property="og:title" content="Burndown — Speedrun Micro-Tasks Challenge | NEON ARCADE">
 <meta property="og:description" content="Play Burndown free online — race through a tower of rapid-fire micro-tasks. Tap, type, swipe, solve — all against the clock. How fast can you burn down the list?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/burndown.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/burndown.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/burndown.html">
 <meta name="twitter:title" content="Burndown — Speedrun Micro-Tasks Challenge | NEON ARCADE">
 <meta name="twitter:description" content="Play Burndown free online — race through a tower of rapid-fire micro-tasks. Tap, type, swipe, solve — all against the clock. How fast can you burn down the list?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/burndown.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/burndown.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/burndown.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/burndown.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -563,6 +563,8 @@
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
 .na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
 .na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+@keyframes bodyShake{0%,100%{transform:translate(0)}25%{transform:translate(-3px,1px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-1px,3px)}}
+.body-shake{animation:bodyShake 0.25s ease-in-out}
 </style>
 </head>
 <body>
@@ -692,6 +694,31 @@
     tick()    { tone(440,'square',0.07,0.07); },
     finish()  { [523,659,784,1047].forEach((n,i)=>setTimeout(()=>tone(n,'sine',0.28,0.28),i*110)); },
   };
+
+  // ── DOM Particles ───────────────────────────────────────
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < (count || 12); i++) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:9998;background:' + (color || '#00f0ff');
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 30 + Math.random() * 60;
+      var dx = Math.cos(angle) * dist;
+      var dy = Math.sin(angle) * dist;
+      el.style.transition = 'all 0.6s ease-out';
+      document.body.appendChild(el);
+      requestAnimationFrame(function() {
+        el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        el.style.opacity = '0';
+      });
+      setTimeout(function() { el.remove(); }, 700);
+    }
+  }
+  function shakeBody() {
+    document.body.classList.add('body-shake');
+    setTimeout(function(){ document.body.classList.remove('body-shake'); }, 250);
+  }
 
   // ── Task pool ─────────────────────────────────────────
   const POOL = [
@@ -943,6 +970,7 @@
     taskArea.classList.add('shake');
 
     snd.wrong();
+    shakeBody();
 
     if (kind === 'input' && triggerEl) {
       triggerEl.classList.remove('wrong');
@@ -964,6 +992,7 @@
   // ── Next task ─────────────────────────────────────────
   function nextTask() {
     snd.tick();
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#39ff14', 10);
     idx++;
     counterEl.textContent = Math.min(idx + 1, TOTAL) + ' / ' + TOTAL;
     refreshTower();
@@ -994,6 +1023,7 @@
 
   function finishGame() {
     active = false; stopTimer(); snd.finish();
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 3, '#ffd700', 20);
     const ts = totalSec(), bs = elapsed / 1000, ps = penalties / 1000;
     let tier, tcls;
     if (ts < 60)       { tier = 'BLAZING';   tcls = 'tier-blazing'; }
@@ -1073,6 +1103,17 @@
   $('shareBtn').addEventListener('click', doShare);
   $('againBtn').addEventListener('click', startGame);
   document.addEventListener('touchstart', () => { try { if (AC.state==='suspended') AC.resume(); } catch(e){} }, {once:true});
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && active) {
+      active = false;
+      stopTimer();
+      GS.classList.add('hidden');
+      RS.classList.add('hidden');
+      SS.classList.remove('hidden');
+      refreshBest();
+    }
+  });
 
   // ── Init ──────────────────────────────────────────────
   refreshBest();

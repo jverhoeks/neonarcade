@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/colorname.html">
 <meta property="og:title" content="ColorName — Free Online Stroop Test Game | NEON ARCADE">
 <meta property="og:description" content="Name the color, not the word. Classic Stroop effect speed game.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/colorname.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/colorname.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neongrind/colorname.html">
 <meta name="twitter:title" content="ColorName — Free Online Stroop Test Game | NEON ARCADE">
 <meta name="twitter:description" content="Name the color, not the word. Classic Stroop effect speed game.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/colorname.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/colorname.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/colorname.png",
+  "image": "https://neonarcade.net/neongrind/screenshots/colorname.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -652,6 +652,16 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
   // KEYBOARD
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (gameActive) {
+        e.preventDefault();
+        gameActive = false;
+        if (timerRAF) cancelAnimationFrame(timerRAF);
+        showScreen('start');
+        initNeon();
+      }
+      return;
+    }
     if (!gameActive) {
       if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();

@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/wordchain-duel.html">
 <meta property="og:title" content="WordChain Duel — Async Word Battle Game | NEON ARCADE">
 <meta property="og:description" content="Play WordChain Duel free — challenge friends to an async word chain battle. Each word must start with the last letter of the previous. Who breaks first?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/wordchain-duel.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/wordchain-duel.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/wordchain-duel.html">
 <meta name="twitter:title" content="WordChain Duel — Async Word Battle Game | NEON ARCADE">
 <meta name="twitter:description" content="Play WordChain Duel free — challenge friends to an async word chain battle. Each word must start with the last letter of the previous. Who breaks first?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/wordchain-duel.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/wordchain-duel.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/wordchain-duel.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/wordchain-duel.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1318,6 +1318,14 @@ body::before {
   });
 
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (gameState === 'game') {
+        if (timerRAF) { cancelAnimationFrame(timerRAF); timerRAF = null; }
+        showScreen('start');
+        updateBestDisplay();
+        return;
+      }
+    }
     if (gameState === 'start' && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
       startGame();

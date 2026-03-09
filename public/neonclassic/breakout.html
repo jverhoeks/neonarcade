@@ -1195,6 +1195,14 @@ canvas {
   // Keyboard (just for launch)
   document.addEventListener('keydown', (e) => {
     ensureAudio();
+    if (e.key === 'Escape' && (state === 'playing' || state === 'levelcomplete')) {
+      e.preventDefault();
+      state = 'start';
+      document.getElementById('startPanel').classList.remove('hidden');
+      document.getElementById('gameoverPanel').classList.add('hidden');
+      Neon.render(document.getElementById('startLB'));
+      return;
+    }
     if (e.code === 'Space' || e.code === 'ArrowUp') {
       if (state === 'playing' && ballAttached) launchBall();
     }

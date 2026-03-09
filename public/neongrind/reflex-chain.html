@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/reflex-chain.html">
 <meta property="og:title" content="Reflex Chain — Reaction Speed Test Game | NEON ARCADE">
 <meta property="og:description" content="Play Reflex Chain free online — chain together perfect reaction hits in sequence. Your reflexes are tested one after another. How long can you keep the chain alive?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/reflex-chain.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/reflex-chain.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neongrind/reflex-chain.html">
 <meta name="twitter:title" content="Reflex Chain — Reaction Speed Test Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Reflex Chain free online — chain together perfect reaction hits in sequence. Your reflexes are tested one after another. How long can you keep the chain alive?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/reflex-chain.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/reflex-chain.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/reflex-chain.png",
+  "image": "https://neonarcade.net/neongrind/screenshots/reflex-chain.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1143,6 +1143,21 @@ btnEndlessGo.addEventListener('click', function() {
 btnBackMenu.addEventListener('click', function() {
   state = 'menu';
   showMenu();
+});
+
+// ESC to quit to start screen
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (state === 'playing' || state === 'intro') {
+      e.preventDefault();
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+      roundActive = false;
+      gameOverPending = false;
+      targets = [];
+      state = 'menu';
+      showMenu();
+    }
+  }
 });
 
 function shareResult() {

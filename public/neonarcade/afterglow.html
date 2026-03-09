@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/afterglow.html">
 <meta property="og:title" content="Afterglow — Memory Trail Action Game | NEON ARCADE">
 <meta property="og:description" content="Play Afterglow free online — navigate through fading neon trails in this mesmerizing action game. Your path glows behind you, but it won't last forever.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/afterglow.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/afterglow.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/afterglow.html">
 <meta name="twitter:title" content="Afterglow — Memory Trail Action Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Afterglow free online — navigate through fading neon trails in this mesmerizing action game. Your path glows behind you, but it won't last forever.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/afterglow.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/afterglow.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/afterglow.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/afterglow.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -96,7 +96,7 @@
 html,body{
   width:100%;height:100%;
   overflow:hidden;
-  background:#000;
+  background:#0a0a12;
   font-family:'Rajdhani',sans-serif;
   color:#fff;
   touch-action:none;
@@ -119,9 +119,9 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 }
 #hud-score,#hud-time{
   font-family:'Orbitron',sans-serif;font-size:18px;
-  text-shadow:0 0 12px rgba(255,255,0,0.5);letter-spacing:1px;
+  text-shadow:0 0 12px rgba(255,215,0,0.5);letter-spacing:1px;
 }
-#hud-score span,#hud-time span{color:#ffff00}
+#hud-score span,#hud-time span{color:#ffd700}
 
 /* Screens */
 .screen{
@@ -139,13 +139,13 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
   font-family:'Orbitron',sans-serif;
   font-size:clamp(42px,10vw,80px);font-weight:900;
   letter-spacing:12px;color:#fff;
-  text-shadow:0 0 20px rgba(255,255,0,0.6),0 0 60px rgba(255,200,0,0.3),0 0 120px rgba(255,100,0,0.15);
+  text-shadow:0 0 20px rgba(255,215,0,0.6),0 0 60px rgba(255,200,0,0.3),0 0 120px rgba(255,140,0,0.15);
   margin-bottom:12px;
   animation:titlePulse 4s ease-in-out infinite;
 }
 @keyframes titlePulse{
-  0%,100%{text-shadow:0 0 20px rgba(255,255,0,0.6),0 0 60px rgba(255,200,0,0.3),0 0 120px rgba(255,100,0,0.15)}
-  50%{text-shadow:0 0 30px rgba(255,255,0,0.8),0 0 80px rgba(255,200,0,0.5),0 0 150px rgba(255,100,0,0.25)}
+  0%,100%{text-shadow:0 0 20px rgba(255,215,0,0.6),0 0 60px rgba(255,200,0,0.3),0 0 120px rgba(255,140,0,0.15)}
+  50%{text-shadow:0 0 30px rgba(255,215,0,0.8),0 0 80px rgba(255,200,0,0.5),0 0 150px rgba(255,140,0,0.25)}
 }
 #start-screen .subtitle{
   font-family:'Rajdhani',sans-serif;
@@ -157,7 +157,7 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
   font-family:'Orbitron',sans-serif;
   font-size:clamp(16px,3vw,22px);font-weight:700;
   letter-spacing:6px;color:#000;
-  background:linear-gradient(135deg,#ffff00,#ffaa00);
+  background:linear-gradient(135deg,#ffd700,#ff8c00);
   border:none;padding:16px 48px;cursor:pointer;
   text-transform:uppercase;transition:all 0.3s;
   box-shadow:0 0 30px rgba(255,200,0,0.4);
@@ -204,7 +204,7 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 }
 .new-best{
   font-family:'Orbitron',sans-serif;font-size:14px;
-  color:#ffff00;text-shadow:0 0 10px rgba(255,255,0,0.6);
+  color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6);
   letter-spacing:3px;margin-bottom:20px;display:none;
   animation:bestPulse 1s ease-in-out infinite;
 }
@@ -232,6 +232,25 @@ canvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
 .na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
 .na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+
+/* Scanline overlay */
+body::after{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
+  z-index:999;
+}
+/* Screen shake */
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-3px)}
+  30%{transform:translateX(3px)}
+  45%{transform:translateX(-2px)}
+  60%{transform:translateX(2px)}
+  75%{transform:translateX(-1px)}
+  90%{transform:translateX(1px)}
+}
+.shake{animation:shake 0.25s ease}
 </style>
 </head>
 <body>
@@ -501,6 +520,17 @@ function setDir(dc, dr) {
 
 window.addEventListener('keydown', function(e) {
   const k = e.key;
+  if (k === 'Escape') {
+    if (state === 'playing') {
+      state = 'start';
+      alive = false;
+      targetDir = null;
+      currentDir = null;
+      showScreen('start');
+      updateHSDisplay();
+      return;
+    }
+  }
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D',' '].includes(k)) {
     e.preventDefault();
   }

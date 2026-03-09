@@ -1390,6 +1390,15 @@ body::before {
 
   // ===== INPUT: KEYBOARD =====
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      // If playing (start screen is hidden, game over not shown), quit to start
+      if (startScreen.classList.contains('hidden') && gameOverOverlay.classList.contains('hidden') && winOverlay.classList.contains('hidden')) {
+        e.preventDefault();
+        gameOver = true;
+        showStart();
+        return;
+      }
+    }
     if (gameOver && !gameOverOverlay.classList.contains('hidden')) return;
     if (!winOverlay.classList.contains('hidden')) return;
     if (!startScreen.classList.contains('hidden')) {

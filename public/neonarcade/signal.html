@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/signal.html">
 <meta property="og:title" content="Signal — Daily Cipher Puzzle Game | NEON ARCADE">
 <meta property="og:description" content="Play Signal free — decode a daily cipher to reveal a funny hidden message. A cryptography puzzle that's equal parts brain teaser and comedy.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/signal.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/signal.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/signal.html">
 <meta name="twitter:title" content="Signal — Daily Cipher Puzzle Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Signal free — decode a daily cipher to reveal a funny hidden message. A cryptography puzzle that's equal parts brain teaser and comedy.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/signal.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/signal.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/signal.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/signal.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -984,6 +984,15 @@ body::after {
     if (e.key === 'Enter') {
       e.preventDefault();
       submitAnswer();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active')) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      showScreen(startScreen);
+      init();
     }
   });
 

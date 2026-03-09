@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/breakout-architect.html">
 <meta property="og:title" content="Breakout Architect — Design & Play Breakout Levels | NEON ARCADE">
 <meta property="og:description" content="Play Breakout Architect free — design your own Breakout levels and challenge friends. Build brick patterns, then smash them with neon-powered physics.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/breakout-architect.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/breakout-architect.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/breakout-architect.html">
 <meta name="twitter:title" content="Breakout Architect — Design & Play Breakout Levels | NEON ARCADE">
 <meta name="twitter:description" content="Play Breakout Architect free — design your own Breakout levels and challenge friends. Build brick patterns, then smash them with neon-powered physics.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/breakout-architect.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/breakout-architect.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/breakout-architect.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/breakout-architect.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -970,6 +970,18 @@ window.addEventListener('touchstart',function(e){
 // Keyboard
 var keys={};
 window.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    if(mode==='play'||mode==='build'){
+      mode='start';
+      playing=false;
+      $buildUI.classList.remove('active');
+      $playHUD.classList.remove('active');
+      $goScreen.classList.remove('active');
+      $gameCanvas.style.display='none';
+      $start.classList.remove('hidden');
+      return;
+    }
+  }
   keys[e.key]=true;
   if(e.key===' '&&mode==='play'&&ball.stuck){launchBall();e.preventDefault()}
   if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&mode==='play')e.preventDefault();

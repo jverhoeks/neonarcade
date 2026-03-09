@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/numbersense.html">
 <meta property="og:title" content="NumberSense — Free Online Dot Estimation Game | NEON ARCADE">
 <meta property="og:description" content="Dots flash on screen — estimate how many. Test your number sense.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/numbersense.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/numbersense.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neongrind/numbersense.html">
 <meta name="twitter:title" content="NumberSense — Free Online Dot Estimation Game | NEON ARCADE">
 <meta name="twitter:description" content="Dots flash on screen — estimate how many. Test your number sense.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/numbersense.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/numbersense.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/numbersense.png",
+  "image": "https://neonarcade.net/neongrind/screenshots/numbersense.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -751,6 +751,20 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   plus.addEventListener('mouseleave', stopHold);
   plus.addEventListener('touchstart', function(e) { e.preventDefault(); startHold(1); var v = parseInt(guessInput.value) || 0; guessInput.value = Math.min(999, v + 1); });
   plus.addEventListener('touchend', function(e) { e.preventDefault(); stopHold(); });
+
+  // === ESC TO QUIT ===
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active')) {
+      e.preventDefault();
+      clearCanvas();
+      countdownOverlay.classList.remove('active');
+      inputOverlay.classList.remove('active');
+      resultOverlay.classList.remove('active');
+      showScreen('startScreen');
+      startIdleAnim();
+      Neon.render(document.getElementById('startLB'));
+    }
+  });
 
   // === START / REPLAY ===
   function startGame() {
