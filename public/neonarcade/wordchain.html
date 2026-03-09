@@ -1233,7 +1233,7 @@
 
   // ─── CHAIN HISTORY ───
   function updateChainHistory() {
-    chainHistory.innerHTML = '';
+    chainHistory.textContent = '';
     const display = chain.slice(-5);
     display.forEach((word, i) => {
       const isLatest = i === display.length - 1;

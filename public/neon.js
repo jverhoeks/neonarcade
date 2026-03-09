@@ -33,8 +33,8 @@ window.Neon = (function() {
     allStats: function() { return _get('/stats'); },
     stats: function(game) { return _get('/stats/' + game); },
     leaderboard: function(game) { return _get('/leaderboard/' + game); },
-    submitScore: function(game, name, score, mode) {
-      return _post('/leaderboard/' + game, { name: name, score: score, mode: mode || 'high' });
+    submitScore: function(game, name, score) {
+      return _post('/leaderboard/' + game, { name: name, score: score });
     },
   };
 
@@ -54,7 +54,7 @@ window.Neon = (function() {
     cfg.key = opts.key || ('neonarcade_scores_' + cfg.game.replace(/-/g, '_'));
     cfg.formatScore = opts.formatScore || null;
     playerName = localStorage.getItem(NAME_KEY) || '';
-    localScores = JSON.parse(localStorage.getItem(cfg.key) || '[]');
+    try { localScores = JSON.parse(localStorage.getItem(cfg.key) || '[]'); } catch(e) { localScores = []; }
     lastGlobalRank = -1;
     globalBoard = [];
 
@@ -128,7 +128,7 @@ window.Neon = (function() {
       isBetter(score, globalBoard[globalBoard.length - 1].score);
 
     if (playerName && qualifies) {
-      return api.submitScore(cfg.game, playerName, score, cfg.mode).then(function(data) {
+      return api.submitScore(cfg.game, playerName, score).then(function(data) {
         if (data && data.leaderboard) {
           globalBoard = data.leaderboard;
           for (var i = 0; i < globalBoard.length; i++) {

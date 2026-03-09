@@ -74,11 +74,18 @@ const KNOWN_GAMES = {
   'frogger':             { mode: 'high', maxScore: 1000000 },
 };
 
+function isAllowedOrigin(request) {
+  const origin = request.headers.get('Origin') || '';
+  return ALLOWED_ORIGINS.includes(origin);
+}
+
 function getCorsHeaders(request) {
   const origin = request.headers.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    return { 'Vary': 'Origin' };
+  }
   return {
-    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Vary': 'Origin',
@@ -148,6 +155,11 @@ export default {
     const segments = path.split('/').filter(Boolean);
 
     try {
+      // Reject POST requests from unknown origins
+      if (request.method === 'POST' && !isAllowedOrigin(request)) {
+        return json({ error: 'forbidden' }, 403);
+      }
+
       // Rate limit all POST requests
       if (request.method === 'POST') {
         const allowed = await checkRateLimit(env.GAME_DATA, request);

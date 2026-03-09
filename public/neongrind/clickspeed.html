@@ -345,7 +345,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   var burstPaused = false;
 
   // Best scores per mode
-  var localBests = JSON.parse(localStorage.getItem('clickspeed_local_bests') || '{}');
+  var localBests;try{localBests=JSON.parse(localStorage.getItem('clickspeed_local_bests')||'{}');}catch(e){localBests={};}
 
   // ====== SOUND ENGINE ======
   var audioCtx = null;

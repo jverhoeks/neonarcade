@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: validate-html
+        name: Validate HTML/JS game files
+        entry: node scripts/validate-html.js
+        language: node
+        files: '\.html$'
+        pass_filenames: true
+
+      - id: check-worker-js
+        name: Check worker.js syntax
+        entry: node --check
+        language: node
+        files: 'src/worker\.js$'
+        pass_filenames: true
+
+      - id: check-neon-js
+        name: Check neon.js syntax
+        entry: node --check
+        language: node
+        files: 'public/neon\.js$'
+        pass_filenames: true

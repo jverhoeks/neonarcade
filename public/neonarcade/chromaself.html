@@ -1383,7 +1383,7 @@ body::after {
   // ===== PERSISTENCE =====
   function savePlay() {
     var key = 'neonarcade_chromaself_plays';
-    var plays = JSON.parse(localStorage.getItem(key) || '[]');
+    var plays;try{plays=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){plays=[];}
     plays.push({ ts: Date.now() });
     plays = plays.slice(-5);
     localStorage.setItem(key, JSON.stringify(plays));

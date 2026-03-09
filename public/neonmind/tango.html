@@ -855,7 +855,7 @@ function updateBestTimes() {
   var ids = ['bestEasy', 'bestMedium', 'bestHard'];
   for (var i = 0; i < diffs.length; i++) {
     var key = 'neonarcade_neonmind_tango_scores_' + DIFFICULTIES[diffs[i]].size;
-    var scores = JSON.parse(localStorage.getItem(key) || '[]');
+    var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
     document.getElementById(ids[i]).textContent = scores.length > 0 ? neonFormatScore(scores[0].score) : '--:--';
   }
 }

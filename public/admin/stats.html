@@ -137,7 +137,7 @@ td.issues{color:#ff2d7b}
     var maxIssues = Math.max.apply(null, entries.map(function(e) { return e.issues; }).concat([1]));
 
     var tbody = document.getElementById('tbody');
-    tbody.innerHTML = '';
+    tbody.textContent = '';
     entries.forEach(function(e, i) {
       var tr = document.createElement('tr');
 
