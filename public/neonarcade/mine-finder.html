@@ -1067,8 +1067,8 @@ body::before {
       }
     }
 
-    let bestIdx = -1;
     let bestProb = 2;
+    let bestCandidates = [];
     const prob = new Array(GRID * GRID).fill(-1);
 
     let remainingMinesGlobal = TOTAL_MINES;
@@ -1088,11 +1088,17 @@ body::before {
         p = globalP;
       }
       prob[i] = p;
-      if (p < bestProb) {
+      if (p < bestProb - 0.001) {
         bestProb = p;
-        bestIdx = i;
+        bestCandidates = [i];
+      } else if (Math.abs(p - bestProb) <= 0.001) {
+        bestCandidates.push(i);
       }
     }
+
+    const bestIdx = bestCandidates.length > 0
+      ? bestCandidates[Math.floor(Math.random() * bestCandidates.length)]
+      : -1;
 
     updateHeatMap(prob);
     return bestIdx >= 0 ? bestIdx : null;
@@ -1279,6 +1285,9 @@ body::before {
         }
 
         if (checkWin()) { aiWins(); return; }
+      } else if (moves.toFlag.length > 0) {
+        // Flags were placed but no reveals yet — re-analyze with updated flags
+        continue;
       } else {
         // No more moves possible, flag remaining and finish
         let allDone = true;
