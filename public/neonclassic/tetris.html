@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Neon Tetris — Free Online Block Stacking Game | NEON ARCADE</title>
+<meta name="description" content="Play Neon Tetris free online — the iconic block-stacking puzzle with neon visuals, ghost pieces, and hold system. Marathon and Sprint modes. No download, no login.">
+<meta name="keywords" content="neon tetris, free tetris game online, browser game, neon arcade, block stacking game">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonclassic/tetris.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonclassic/tetris.html">
+<meta property="og:title" content="Neon Tetris — Free Online Block Stacking Game | NEON ARCADE">
+<meta property="og:description" content="Play Neon Tetris free online — the iconic block-stacking puzzle with neon visuals, ghost pieces, and hold system. Marathon and Sprint modes. No download, no login.">
+<meta property="og:image" content="https://neonarcade.net/neonclassic/screenshots/tetris.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonclassic/tetris.html">
+<meta name="twitter:title" content="Neon Tetris — Free Online Block Stacking Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Neon Tetris free online — the iconic block-stacking puzzle with neon visuals, ghost pieces, and hold system. Marathon and Sprint modes. No download, no login.">
+<meta name="twitter:image" content="https://neonarcade.net/neonclassic/screenshots/tetris.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Neon Tetris",
+  "url": "https://neonarcade.net/neonclassic/tetris.html",
+  "description": "Play Neon Tetris free online — the iconic block-stacking puzzle with neon visuals, ghost pieces, and hold system. Marathon and Sprint modes. No download, no login.",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonclassic/screenshots/tetris.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CLASSIC", "item": "https://neonarcade.net/neonclassic/" },
+    { "@type": "ListItem", "position": 3, "name": "Neon Tetris", "item": "https://neonarcade.net/neonclassic/tetris.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,0,0,0.07)2px,rgba(0,0,0,0.07)4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba(0,240,255,0.06)0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(255,45,123,0.05)0%,transparent 50%)}
+
+#startScreen,#gameOverScreen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:rgba(10,10,18,0.97)}
+#startScreen.hidden,#gameOverScreen.hidden{display:none}
+.title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,6vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-transform:uppercase;margin-bottom:6px}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,2.5vw,20px);letter-spacing:3px;color:#9999bb;text-transform:uppercase;margin-bottom:28px}
+
+.mode-select{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
+.mode-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 24px;border:1px solid #7a7a9a;background:rgba(122,122,154,0.06);color:#9999bb;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.mode-btn:hover{background:rgba(0,240,255,0.08);border-color:#00f0ff;color:#00f0ff}
+.mode-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.12);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s;margin-bottom:20px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#7a7a9a;text-align:center;line-height:1.8;max-width:400px}
+.controls-hint kbd{display:inline-block;padding:1px 6px;border:1px solid #7a7a9a;border-radius:3px;font-family:'Orbitron',monospace;font-size:10px;color:#9999bb;margin:0 2px}
+
+#startLB{margin-top:16px;max-width:380px;width:90%}
+
+.go-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,40px);letter-spacing:4px;margin-bottom:8px}
+.go-subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;letter-spacing:2px;color:#9999bb;text-transform:uppercase;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:20px;text-align:center}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.stat-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3vw,24px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-value.gold{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.go-btns{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 28px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.share-btn:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 15px rgba(57,255,20,0.2)}
+#goLB{max-width:380px;width:90%;margin-top:8px}
+
+#gameWrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+canvas{display:block}
+
+#mobileControls{display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;padding:8px;gap:6px}
+@media(hover:none)and(pointer:coarse){
+  #mobileControls{display:flex;justify-content:center;align-items:center;flex-wrap:wrap}
+}
+.mob-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:1px;padding:12px 14px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:4px;cursor:pointer;touch-action:manipulation;min-width:44px;text-align:center;-webkit-user-select:none;user-select:none}
+.mob-btn:active{background:rgba(0,240,255,0.2)}
+.mob-row{display:flex;gap:6px;justify-content:center}
+
+#pauseOverlay{position:fixed;inset:0;background:rgba(10,10,18,0.9);display:none;align-items:center;justify-content:center;z-index:80;flex-direction:column}
+#pauseOverlay.active{display:flex}
+.pause-text{font-family:'Orbitron',monospace;font-weight:900;font-size:36px;color:#b44dff;text-shadow:0 0 10px rgba(180,77,255,0.6);letter-spacing:6px}
+.pause-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;color:#7a7a9a;margin-top:12px;letter-spacing:2px}
+
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-3px,2px)}20%{transform:translate(3px,-2px)}30%{transform:translate(-2px,-3px)}40%{transform:translate(2px,3px)}50%{transform:translate(-3px,-1px)}60%{transform:translate(3px,1px)}70%{transform:translate(-1px,3px)}80%{transform:translate(1px,-3px)}90%{transform:translate(-2px,2px)}}
+.shake{animation:shake .25s ease}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <div class="title">NEON TETRIS</div>
+  <div class="subtitle">Stack. Clear. Survive.</div>
+  <div class="mode-select">
+    <button class="mode-btn active" data-mode="marathon">MARATHON</button>
+    <button class="mode-btn" data-mode="sprint">40-LINE SPRINT</button>
+  </div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">
+    <kbd>&larr;</kbd><kbd>&rarr;</kbd> Move &nbsp; <kbd>&darr;</kbd> Soft Drop &nbsp; <kbd>SPACE</kbd> Hard Drop<br>
+    <kbd>&uarr;</kbd>/<kbd>X</kbd> Rotate CW &nbsp; <kbd>Z</kbd> Rotate CCW &nbsp; <kbd>C</kbd> Hold &nbsp; <kbd>P</kbd> Pause
+  </div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div id="gameOverScreen" class="hidden">
+  <div class="go-title" id="goTitle">GAME OVER</div>
+  <div class="go-subtitle" id="goSubtitle"></div>
+  <div class="stats-grid" id="goStats"></div>
+  <div class="go-btns">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="retryBtn">PLAY AGAIN</button>
+  </div>
+  <div id="goLB"></div>
+</div>
+
+<!-- GAME -->
+<div id="gameWrap">
+  <canvas id="c"></canvas>
+</div>
+
+<!-- MOBILE CONTROLS -->
+<div id="mobileControls">
+  <div class="mob-row">
+    <button class="mob-btn" data-action="left">&larr;</button>
+    <button class="mob-btn" data-action="down">&darr;</button>
+    <button class="mob-btn" data-action="right">&rarr;</button>
+    <button class="mob-btn" data-action="rotate">ROT</button>
+    <button class="mob-btn" data-action="harddrop">DROP</button>
+    <button class="mob-btn" data-action="hold">HOLD</button>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div id="pauseOverlay">
+  <div class="pause-text">PAUSED</div>
+  <div class="pause-hint">Press P or tap to resume</div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== CONFIG =====
+  const COLS = 10, ROWS = 20, BUFFER = 4;
+  const TOTAL_ROWS = ROWS + BUFFER;
+  const LOCK_DELAY = 500;
+  const DAS_DELAY = 167, DAS_REPEAT = 50;
+  const SOFT_DROP_MULT = 20;
+  const NEXT_COUNT = 3;
+  const SPRINT_LINES = 40;
+  const LINE_SCORES = [0, 100, 300, 500, 800];
+
+  // Tetromino definitions: 4 rotation states, each is array of [col, row] offsets
+  const SHAPES = {
+    I: [
+      [[0,1],[1,1],[2,1],[3,1]],
+      [[2,0],[2,1],[2,2],[2,3]],
+      [[0,2],[1,2],[2,2],[3,2]],
+      [[1,0],[1,1],[1,2],[1,3]]
+    ],
+    O: [
+      [[1,0],[2,0],[1,1],[2,1]],
+      [[1,0],[2,0],[1,1],[2,1]],
+      [[1,0],[2,0],[1,1],[2,1]],
+      [[1,0],[2,0],[1,1],[2,1]]
+    ],
+    T: [
+      [[1,0],[0,1],[1,1],[2,1]],
+      [[1,0],[1,1],[2,1],[1,2]],
+      [[0,1],[1,1],[2,1],[1,2]],
+      [[1,0],[0,1],[1,1],[1,2]]
+    ],
+    S: [
+      [[1,0],[2,0],[0,1],[1,1]],
+      [[1,0],[1,1],[2,1],[2,2]],
+      [[1,1],[2,1],[0,2],[1,2]],
+      [[0,0],[0,1],[1,1],[1,2]]
+    ],
+    Z: [
+      [[0,0],[1,0],[1,1],[2,1]],
+      [[2,0],[1,1],[2,1],[1,2]],
+      [[0,1],[1,1],[1,2],[2,2]],
+      [[1,0],[0,1],[1,1],[0,2]]
+    ],
+    J: [
+      [[0,0],[0,1],[1,1],[2,1]],
+      [[1,0],[2,0],[1,1],[1,2]],
+      [[0,1],[1,1],[2,1],[2,2]],
+      [[1,0],[1,1],[0,2],[1,2]]
+    ],
+    L: [
+      [[2,0],[0,1],[1,1],[2,1]],
+      [[1,0],[1,1],[1,2],[2,2]],
+      [[0,1],[1,1],[2,1],[0,2]],
+      [[0,0],[1,0],[1,1],[1,2]]
+    ]
+  };
+
+  const COLORS = {
+    I: '#00f0ff', O: '#ffd700', T: '#b44dff',
+    S: '#39ff14', Z: '#ff2d7b', J: '#4488ff', L: '#ff8c00'
+  };
+  const PIECE_NAMES = ['I','O','T','S','Z','J','L'];
+
+  // SRS wall kick data: [dx, dy] (dy positive = down in screen coords)
+  const KICKS_JLSTZ = {
+    '0>1':[[0,0],[-1,0],[-1,-1],[0,2],[-1,2]],
+    '1>0':[[0,0],[1,0],[1,1],[0,-2],[1,-2]],
+    '1>2':[[0,0],[1,0],[1,1],[0,-2],[1,-2]],
+    '2>1':[[0,0],[-1,0],[-1,-1],[0,2],[-1,2]],
+    '2>3':[[0,0],[1,0],[1,-1],[0,2],[1,2]],
+    '3>2':[[0,0],[-1,0],[-1,1],[0,-2],[-1,-2]],
+    '3>0':[[0,0],[-1,0],[-1,1],[0,-2],[-1,-2]],
+    '0>3':[[0,0],[1,0],[1,-1],[0,2],[1,2]]
+  };
+  const KICKS_I = {
+    '0>1':[[0,0],[-2,0],[1,0],[-2,1],[1,-2]],
+    '1>0':[[0,0],[2,0],[-1,0],[2,-1],[-1,2]],
+    '1>2':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]],
+    '2>1':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
+    '2>3':[[0,0],[2,0],[-1,0],[2,-1],[-1,2]],
+    '3>2':[[0,0],[-2,0],[1,0],[-2,1],[1,-2]],
+    '3>0':[[0,0],[1,0],[-2,0],[1,2],[-2,-1]],
+    '0>3':[[0,0],[-1,0],[2,0],[-1,-2],[2,1]]
+  };
+
+  // Speed by level (ms per gravity tick)
+  function getDropInterval(lvl) {
+    var speeds = [800,717,633,550,467,383,300,217,133,100,83,83,83,67,67,67,50,50,50,33,33,33,33,33,33,33,33,33,33,17];
+    return speeds[Math.min(lvl, speeds.length - 1)];
+  }
+
+  // ===== DOM =====
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var startScreen = document.getElementById('startScreen');
+  var gameOverScreen = document.getElementById('gameOverScreen');
+  var pauseOverlay = document.getElementById('pauseOverlay');
+  var startBtn = document.getElementById('startBtn');
+  var retryBtn = document.getElementById('retryBtn');
+  var shareBtn = document.getElementById('shareBtn');
+  var modeBtns = document.querySelectorAll('.mode-btn');
+  var goStatsEl = document.getElementById('goStats');
+  var goTitleEl = document.getElementById('goTitle');
+  var goSubEl = document.getElementById('goSubtitle');
+
+  // ===== AUDIO =====
+  var audioCtx = null;
+  function ensureAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+  function playTone(freq, dur, type, vol) {
+    ensureAudio();
+    var g = audioCtx.createGain();
+    g.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    g.connect(audioCtx.destination);
+    var o = audioCtx.createOscillator();
+    o.type = type || 'square';
+    o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    o.connect(g); o.start(); o.stop(audioCtx.currentTime + dur);
+  }
+  function sndMove() { playTone(220, 0.05, 'square', 0.08); }
+  function sndRotate() { playTone(440, 0.06, 'sine', 0.1); }
+  function sndSoftDrop() { playTone(150, 0.03, 'square', 0.06); }
+  function sndHardDrop() { playTone(80, 0.15, 'triangle', 0.2); playTone(120, 0.1, 'square', 0.12); }
+  function sndLineClear(n) {
+    var base = 300 + n * 100;
+    for (var i = 0; i < n; i++) { (function(ii){ setTimeout(function(){ playTone(base + ii * 80, 0.15, 'sine', 0.15); }, ii * 40); })(i); }
+  }
+  function sndTetris() {
+    [523, 659, 784, 1047].forEach(function(f, i){ setTimeout(function(){ playTone(f, 0.2, 'sine', 0.2); }, i * 80); });
+    setTimeout(function(){ playTone(1047, 0.4, 'sawtooth', 0.1); }, 320);
+  }
+  function sndHold() { playTone(330, 0.08, 'triangle', 0.1); }
+  function sndGameOver() { [400, 350, 300, 200].forEach(function(f, i){ setTimeout(function(){ playTone(f, 0.3, 'sawtooth', 0.12); }, i * 150); }); }
+  function sndLevelUp() { [440, 554, 659, 880].forEach(function(f, i){ setTimeout(function(){ playTone(f, 0.15, 'sine', 0.15); }, i * 60); }); }
+
+  // ===== STATE =====
+  var gameMode = 'marathon';
+  var board = [];
+  var cur = null; // { type, rot, x, y }
+  var holdType = null;
+  var holdUsed = false;
+  var nextQueue = [];
+  var bag = [];
+  var score = 0, level = 1, lines = 0, tetrises = 0;
+  var combo = -1, maxCombo = 0, backToBack = false;
+  var playing = false, paused = false, gameOver = false;
+  var dropTimer = 0, lockTimer = 0, lockActive = false, lockMoveCount = 0;
+  var MAX_LOCK_MOVES = 15;
+  var lastTime = 0;
+  var sprintStart = 0, sprintEnd = 0;
+  var clearingRows = [], clearAnim = 0, CLEAR_DUR = 300;
+  var particles = [];
+  var dasDir = 0, dasTimer = 0, dasActive = false;
+  var softDropping = false;
+  var cellSize = 0, boardX = 0, boardY = 0, canvasW = 0, canvasH = 0, dpr = 1;
+
+  // ===== SIZING =====
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    var ww = window.innerWidth;
+    var wh = window.innerHeight;
+    var mobPad = ('ontouchstart' in window) ? 70 : 0;
+    var avH = wh - mobPad;
+    // Total cols: ~5 hold + 10 board + 7 next/stats
+    var tCols = COLS + 12;
+    var tRows = ROWS + 2;
+    cellSize = Math.floor(Math.min(ww / tCols, avH / tRows));
+    cellSize = Math.max(cellSize, 14);
+    canvasW = ww; canvasH = avH;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    canvas.style.width = canvasW + 'px';
+    canvas.style.height = canvasH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    boardX = Math.floor((canvasW - COLS * cellSize) / 2);
+    boardY = Math.floor((canvasH - ROWS * cellSize) / 2);
+  }
+
+  // ===== BAG =====
+  function shuffleBag() {
+    bag = PIECE_NAMES.slice();
+    for (var i = bag.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = bag[i]; bag[i] = bag[j]; bag[j] = tmp;
+    }
+  }
+  function nextFromBag() { if (bag.length === 0) shuffleBag(); return bag.pop(); }
+  function fillQueue() { while (nextQueue.length < NEXT_COUNT + 1) nextQueue.push(nextFromBag()); }
+
+  // ===== PIECE HELPERS =====
+  function getCells(type, rot) { return SHAPES[type][rot]; }
+
+  function spawnPiece() {
+    fillQueue();
+    var type = nextQueue.shift();
+    fillQueue();
+    // Spawn position: center horizontally, at top of buffer
+    var x = 3; // Standard SRS spawn col
+    var y = BUFFER - 2;
+    cur = { type: type, rot: 0, x: x, y: y };
+    lockActive = false; lockTimer = 0; lockMoveCount = 0;
+    holdUsed = false;
+    if (!isValid(type, 0, x, y)) {
+      cur.y--;
+      if (!isValid(type, 0, x, cur.y)) { endGame(false); }
+    }
+  }
+
+  function isValid(type, rot, px, py) {
+    var cells = getCells(type, rot);
+    for (var i = 0; i < cells.length; i++) {
+      var bx = px + cells[i][0];
+      var by = py + cells[i][1];
+      if (bx < 0 || bx >= COLS || by >= TOTAL_ROWS) return false;
+      if (by >= 0 && board[by][bx]) return false;
+    }
+    return true;
+  }
+
+  function getGhostY() {
+    if (!cur) return 0;
+    var gy = cur.y;
+    while (isValid(cur.type, cur.rot, cur.x, gy + 1)) gy++;
+    return gy;
+  }
+
+  // ===== MOVEMENT =====
+  function movePiece(dx, dy) {
+    if (!cur || !playing || paused) return false;
+    if (isValid(cur.type, cur.rot, cur.x + dx, cur.y + dy)) {
+      cur.x += dx; cur.y += dy;
+      if (dy === 0 && lockActive) {
+        lockTimer = 0; lockMoveCount++;
+        if (lockMoveCount >= MAX_LOCK_MOVES) lockPiece();
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function rotatePiece(dir) {
+    if (!cur || !playing || paused) return false;
+    var oldRot = cur.rot;
+    var newRot = (oldRot + dir + 4) % 4;
+    var kickKey = oldRot + '>' + newRot;
+    var kicks = (cur.type === 'I') ? KICKS_I[kickKey] : KICKS_JLSTZ[kickKey];
+    if (!kicks) return false;
+    for (var i = 0; i < kicks.length; i++) {
+      var kx = kicks[i][0], ky = kicks[i][1];
+      if (isValid(cur.type, newRot, cur.x + kx, cur.y - ky)) {
+        cur.x += kx; cur.y -= ky; cur.rot = newRot;
+        if (lockActive) { lockTimer = 0; lockMoveCount++; if (lockMoveCount >= MAX_LOCK_MOVES) lockPiece(); }
+        sndRotate();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function hardDrop() {
+    if (!cur || !playing || paused) return;
+    var dropped = 0;
+    while (isValid(cur.type, cur.rot, cur.x, cur.y + 1)) { cur.y++; dropped++; }
+    score += dropped * 2;
+    sndHardDrop();
+    lockPiece();
+  }
+
+  function holdSwap() {
+    if (!cur || holdUsed || !playing || paused) return;
+    sndHold();
+    holdUsed = true;
+    var type = cur.type;
+    if (holdType) {
+      var old = holdType;
+      holdType = type;
+      cur = { type: old, rot: 0, x: 3, y: BUFFER - 2 };
+    } else {
+      holdType = type;
+      spawnPiece();
+    }
+    lockActive = false; lockTimer = 0; lockMoveCount = 0;
+  }
+
+  // ===== LOCK + LINE CLEAR =====
+  function lockPiece() {
+    if (!cur) return;
+    var cells = getCells(cur.type, cur.rot);
+    var color = COLORS[cur.type];
+    var anyAbove = false;
+    for (var i = 0; i < cells.length; i++) {
+      var bx = cur.x + cells[i][0];
+      var by = cur.y + cells[i][1];
+      if (by < BUFFER) anyAbove = true;
+      if (by >= 0 && by < TOTAL_ROWS && bx >= 0 && bx < COLS) {
+        board[by][bx] = color;
+      }
+      // Lock particles
+      var px = boardX + bx * cellSize + cellSize / 2;
+      var py = boardY + (by - BUFFER) * cellSize + cellSize / 2;
+      for (var j = 0; j < 3; j++) {
+        particles.push({ x: px, y: py, vx: (Math.random()-0.5)*3, vy: (Math.random()-0.5)*3, life: 300, maxLife: 300, color: color, size: 2 });
+      }
+    }
+    if (anyAbove) {
+      var vis = false;
+      for (var i = 0; i < cells.length; i++) { if (cur.y + cells[i][1] >= BUFFER) vis = true; }
+      if (!vis) { endGame(false); return; }
+    }
+    cur = null;
+    checkLines();
+  }
+
+  function checkLines() {
+    clearingRows = [];
+    for (var r = TOTAL_ROWS - 1; r >= 0; r--) {
+      var full = true;
+      for (var c = 0; c < COLS; c++) { if (!board[r][c]) { full = false; break; } }
+      if (full) clearingRows.push(r);
+    }
+    if (clearingRows.length > 0) {
+      clearAnim = CLEAR_DUR;
+      var n = clearingRows.length;
+      if (n === 4) {
+        sndTetris(); tetrises++;
+        document.body.classList.add('shake');
+        setTimeout(function(){ document.body.classList.remove('shake'); }, 250);
+      } else { sndLineClear(n); }
+      combo++; maxCombo = Math.max(maxCombo, combo);
+      var isTetris = n === 4;
+      var b2b = (isTetris && backToBack) ? 1.5 : 1;
+      backToBack = isTetris;
+      score += Math.floor(LINE_SCORES[n] * level * b2b);
+      if (combo > 0) score += 50 * combo * level;
+      lines += n;
+      var newLvl = Math.floor(lines / 10) + 1;
+      if (newLvl > level) { level = newLvl; sndLevelUp(); }
+      // Particles
+      for (var ri = 0; ri < clearingRows.length; ri++) {
+        var row = clearingRows[ri];
+        var py = boardY + (row - BUFFER) * cellSize + cellSize / 2;
+        for (var c = 0; c < COLS; c++) {
+          var px = boardX + c * cellSize + cellSize / 2;
+          var clr = board[row][c] || '#fff';
+          for (var j = 0; j < 4; j++) {
+            particles.push({ x: px, y: py, vx: (Math.random()-0.5)*8, vy: -Math.random()*6-2, life: 600, maxLife: 600, color: clr, size: 3 });
+          }
+        }
+      }
+      if (gameMode === 'sprint' && lines >= SPRINT_LINES) {
+        sprintEnd = performance.now();
+        setTimeout(function(){ removeRows(); endGame(true); }, CLEAR_DUR);
+        return;
+      }
+    } else {
+      combo = -1;
+      spawnPiece();
+    }
+  }
+
+  function removeRows() {
+    var sorted = clearingRows.slice().sort(function(a,b){ return b - a; });
+    for (var i = 0; i < sorted.length; i++) {
+      board.splice(sorted[i], 1);
+      board.unshift(emptyRow());
+    }
+    clearingRows = []; clearAnim = 0;
+  }
+
+  function emptyRow() { var r = []; for (var i = 0; i < COLS; i++) r.push(null); return r; }
+
+  // ===== GAME FLOW =====
+  function initBoard() { board = []; for (var r = 0; r < TOTAL_ROWS; r++) board.push(emptyRow()); }
+
+  function startGame() {
+    ensureAudio();
+    initBoard(); bag = []; nextQueue = []; holdType = null; holdUsed = false;
+    score = 0; level = 1; lines = 0; tetrises = 0;
+    combo = -1; maxCombo = 0; backToBack = false;
+    clearingRows = []; clearAnim = 0; particles = [];
+    dropTimer = 0; lockActive = false; lockTimer = 0;
+    dasDir = 0; dasTimer = 0; dasActive = false; softDropping = false;
+    playing = true; paused = false; gameOver = false;
+    if (gameMode === 'sprint') { sprintStart = performance.now(); sprintEnd = 0; }
+    initNeonForMode();
+    spawnPiece();
+    startScreen.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+    lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function endGame(sprintWin) {
+    playing = false; gameOver = true;
+    sndGameOver();
+    renderGameOver(sprintWin);
+    gameOverScreen.classList.remove('hidden');
+  }
+
+  function renderGameOver(sprintWin) {
+    // Clear previous stats
+    while (goStatsEl.firstChild) goStatsEl.removeChild(goStatsEl.firstChild);
+
+    if (sprintWin) {
+      var elapsed = (sprintEnd - sprintStart) / 1000;
+      goTitleEl.textContent = '40 LINES CLEARED!';
+      goTitleEl.style.color = '#39ff14';
+      goTitleEl.style.textShadow = '0 0 10px rgba(57,255,20,0.6),0 0 40px rgba(57,255,20,0.2)';
+      goSubEl.textContent = '';
+      addStat('TIME', formatTime(elapsed), true);
+      addStat('SCORE', score.toLocaleString(), false);
+      addStat('TETRISES', String(tetrises), false);
+      addStat('LEVEL', String(level), false);
+
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(parseFloat(elapsed.toFixed(1)));
+      }).then(function(result) {
+        Neon.render(document.getElementById('goLB'));
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) Neon.showGlobalSplash(result.globalRank);
+      }).catch(function() {});
+    } else {
+      goTitleEl.textContent = 'GAME OVER';
+      goTitleEl.style.color = '#ff2d7b';
+      goTitleEl.style.textShadow = '0 0 10px rgba(255,45,123,0.6),0 0 40px rgba(255,45,123,0.2)';
+      goSubEl.textContent = gameMode === 'sprint' ? 'You topped out before clearing 40 lines.' : '';
+      addStat('SCORE', score.toLocaleString(), true);
+      addStat('LEVEL', String(level), false);
+      addStat('LINES', String(lines), false);
+      addStat('TETRISES', String(tetrises), false);
+
+      if (gameMode === 'marathon') {
+        var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+        nameReady.then(function() {
+          return Neon.save(score);
+        }).then(function(result) {
+          Neon.render(document.getElementById('goLB'));
+          if (result && result.globalRank >= 1 && result.globalRank <= 5) Neon.showGlobalSplash(result.globalRank);
+        }).catch(function() {});
+      }
+    }
+  }
+
+  function addStat(label, value, isGold) {
+    var wrap = document.createElement('div');
+    var lbl = document.createElement('div');
+    lbl.className = 'stat-label';
+    lbl.textContent = label;
+    var val = document.createElement('div');
+    val.className = 'stat-value' + (isGold ? ' gold' : '');
+    val.textContent = value;
+    wrap.appendChild(lbl);
+    wrap.appendChild(val);
+    goStatsEl.appendChild(wrap);
+  }
+
+  function formatTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = (s % 60).toFixed(1);
+    return (m < 10 ? '0' : '') + m + ':' + (parseFloat(sec) < 10 ? '0' : '') + sec;
+  }
+
+  function togglePause() {
+    if (!playing || gameOver) return;
+    paused = !paused;
+    if (paused) { pauseOverlay.classList.add('active'); }
+    else { pauseOverlay.classList.remove('active'); lastTime = performance.now(); requestAnimationFrame(gameLoop); }
+  }
+
+  // ===== SHARE =====
+  function shareResult() {
+    var text;
+    if (gameMode === 'sprint' && sprintEnd > 0) {
+      var elapsed = (sprintEnd - sprintStart) / 1000;
+      text = '\u26a1 NEON TETRIS \u2014 40 LINE SPRINT\nTime: ' + formatTime(elapsed) + '\nTetrises: ' + tetrises + ' | Score: ' + score.toLocaleString() + '\nneonarcade.net/neonclassic/tetris.html';
+    } else {
+      var artLines = '';
+      for (var r = TOTAL_ROWS - 2; r < TOTAL_ROWS; r++) {
+        var row = '';
+        for (var c = 0; c < COLS; c++) row += board[r][c] ? '\u2593\u2593' : '\u2591\u2591';
+        artLines += row + '\n';
+      }
+      text = '\ud83d\udfe6 NEON TETRIS\nScore: ' + score.toLocaleString() + ' | Level: ' + level + '\nLines: ' + lines + ' | Tetrises: ' + tetrises + '\n' + artLines + 'neonarcade.net/neonclassic/tetris.html';
+    }
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function(){ copyClip(text); });
+    } else { copyClip(text); }
+  }
+  function copyClip(text) {
+    navigator.clipboard.writeText(text).then(function(){
+      shareBtn.textContent = 'COPIED!';
+      setTimeout(function(){ shareBtn.textContent = 'SHARE'; }, 2000);
+    }).catch(function(){});
+  }
+
+  // ===== GAME LOOP =====
+  function gameLoop(now) {
+    if (!playing || paused) return;
+    var dt = now - lastTime;
+    lastTime = now;
+    if (dt > 200) dt = 16; // Clamp after focus loss
+
+    // Particles
+    var newP = [];
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      p.life -= dt; p.x += p.vx; p.y += p.vy; p.vy += 0.1;
+      if (p.life > 0) newP.push(p);
+    }
+    particles = newP;
+
+    // Line clear animation
+    if (clearAnim > 0) {
+      clearAnim -= dt;
+      if (clearAnim <= 0) { removeRows(); spawnPiece(); }
+      draw();
+      requestAnimationFrame(gameLoop);
+      return;
+    }
+
+    if (!cur) { draw(); requestAnimationFrame(gameLoop); return; }
+
+    // DAS
+    if (dasDir !== 0) {
+      dasTimer += dt;
+      if (!dasActive && dasTimer >= DAS_DELAY) {
+        dasActive = true; dasTimer = 0;
+        if (movePiece(dasDir, 0)) sndMove();
+      } else if (dasActive && dasTimer >= DAS_REPEAT) {
+        dasTimer = 0;
+        if (movePiece(dasDir, 0)) sndMove();
+      }
+    }
+
+    // Gravity
+    if (softDropping) { dropTimer += dt * SOFT_DROP_MULT; } else { dropTimer += dt; }
+    var interval = getDropInterval(level - 1);
+    if (dropTimer >= interval) {
+      dropTimer = 0;
+      if (isValid(cur.type, cur.rot, cur.x, cur.y + 1)) {
+        cur.y++;
+        if (softDropping) score++;
+        lockActive = false; lockTimer = 0;
+      } else {
+        if (!lockActive) { lockActive = true; lockTimer = 0; }
+      }
+    }
+
+    // Lock delay
+    if (lockActive) {
+      if (isValid(cur.type, cur.rot, cur.x, cur.y + 1)) {
+        lockActive = false; lockTimer = 0;
+      } else {
+        lockTimer += dt;
+        if (lockTimer >= LOCK_DELAY) lockPiece();
+      }
+    }
+
+    draw();
+    requestAnimationFrame(gameLoop);
+  }
+
+  // ===== DRAWING =====
+  function draw() {
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+    drawBoard();
+    drawGhost();
+    drawCurrentPiece();
+    drawLineClearAnim();
+    drawHUD();
+    drawParticles();
+  }
+
+  function drawBoard() {
+    // Border glow
+    ctx.strokeStyle = 'rgba(0,240,255,0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boardX - 1, boardY - 1, COLS * cellSize + 2, ROWS * cellSize + 2);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    for (var c = 0; c <= COLS; c++) { ctx.beginPath(); ctx.moveTo(boardX + c * cellSize, boardY); ctx.lineTo(boardX + c * cellSize, boardY + ROWS * cellSize); ctx.stroke(); }
+    for (var r = 0; r <= ROWS; r++) { ctx.beginPath(); ctx.moveTo(boardX, boardY + r * cellSize); ctx.lineTo(boardX + COLS * cellSize, boardY + r * cellSize); ctx.stroke(); }
+
+    // Placed blocks
+    for (var r = BUFFER; r < TOTAL_ROWS; r++) {
+      for (var c = 0; c < COLS; c++) {
+        if (board[r][c] && clearingRows.indexOf(r) === -1) {
+          drawCell(boardX + c * cellSize, boardY + (r - BUFFER) * cellSize, board[r][c], 1);
+        }
+      }
+    }
+  }
+
+  function drawCell(x, y, color, alpha) {
+    var s = cellSize, ins = 1;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.fillRect(x + ins, y + ins, s - ins * 2, s - ins * 2);
+    // Highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(x + ins, y + ins, s - ins * 2, 2);
+    ctx.fillRect(x + ins, y + ins, 2, s - ins * 2);
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(x + ins, y + s - ins - 2, s - ins * 2, 2);
+    ctx.fillRect(x + s - ins - 2, y + ins, 2, s - ins * 2);
+    // Glow
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillRect(x + ins, y + ins, s - ins * 2, s - ins * 2);
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  function drawGhost() {
+    if (!cur || clearAnim > 0) return;
+    var gy = getGhostY();
+    if (gy === cur.y) return;
+    var cells = getCells(cur.type, cur.rot);
+    var color = COLORS[cur.type];
+    ctx.globalAlpha = 0.2;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    for (var i = 0; i < cells.length; i++) {
+      var bx = cur.x + cells[i][0];
+      var by = gy + cells[i][1] - BUFFER;
+      if (by < 0) continue;
+      ctx.strokeRect(boardX + bx * cellSize + 2, boardY + by * cellSize + 2, cellSize - 4, cellSize - 4);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawCurrentPiece() {
+    if (!cur || clearAnim > 0) return;
+    var cells = getCells(cur.type, cur.rot);
+    var color = COLORS[cur.type];
+    var alpha = lockActive ? 1 - (lockTimer / LOCK_DELAY) * 0.3 : 1;
+    for (var i = 0; i < cells.length; i++) {
+      var bx = cur.x + cells[i][0];
+      var by = cur.y + cells[i][1] - BUFFER;
+      if (by < 0) continue;
+      drawCell(boardX + bx * cellSize, boardY + by * cellSize, color, alpha);
+    }
+  }
+
+  function drawHUD() {
+    var miniSize = Math.floor(cellSize * 0.6);
+    miniSize = Math.max(miniSize, 10);
+
+    // === RIGHT: Next + Stats ===
+    var rx = boardX + COLS * cellSize + 16;
+    var ry = boardY;
+
+    ctx.font = '700 11px Orbitron, monospace';
+    ctx.fillStyle = '#7a7a9a';
+    ctx.textAlign = 'left';
+    ctx.fillText('NEXT', rx, ry + 12);
+
+    for (var i = 0; i < Math.min(NEXT_COUNT, nextQueue.length); i++) {
+      var type = nextQueue[i];
+      var cells = getCells(type, 0);
+      var color = COLORS[type];
+      var ny = ry + 24 + i * (miniSize * 3 + 8);
+      var mnX = 10, mxX = 0, mnY = 10, mxY = 0;
+      for (var j = 0; j < cells.length; j++) {
+        if (cells[j][0] < mnX) mnX = cells[j][0]; if (cells[j][0] > mxX) mxX = cells[j][0];
+        if (cells[j][1] < mnY) mnY = cells[j][1]; if (cells[j][1] > mxY) mxY = cells[j][1];
+      }
+      for (var j = 0; j < cells.length; j++) {
+        drawCell(rx + 4 + (cells[j][0] - mnX) * miniSize, ny + (cells[j][1] - mnY) * miniSize, color, 1);
+      }
+    }
+
+    var sy = ry + 24 + NEXT_COUNT * (miniSize * 3 + 8) + 12;
+    drawStatLabel('SCORE', score.toLocaleString(), rx, sy, '#00f0ff');
+    drawStatLabel('LEVEL', String(level), rx, sy + 48, '#ffd700');
+    drawStatLabel('LINES', String(lines), rx, sy + 96, '#39ff14');
+
+    if (gameMode === 'sprint') {
+      var el = playing ? (performance.now() - sprintStart) / 1000 : (sprintEnd > 0 ? (sprintEnd - sprintStart) / 1000 : 0);
+      drawStatLabel('TIME', formatTime(el), rx, sy + 144, '#b44dff');
+      drawStatLabel('LEFT', String(Math.max(0, SPRINT_LINES - lines)), rx, sy + 192, '#ff8c00');
+    }
+
+    // === LEFT: Hold ===
+    var lx = boardX - miniSize * 5 - 16;
+    var ly = boardY;
+    ctx.font = '700 11px Orbitron, monospace';
+    ctx.fillStyle = holdUsed ? '#ff2d7b' : '#7a7a9a';
+    ctx.textAlign = 'left';
+    ctx.fillText('HOLD', lx, ly + 12);
+
+    if (holdType) {
+      var cells = getCells(holdType, 0);
+      var color = COLORS[holdType];
+      var mnX = 10, mxX = 0, mnY = 10, mxY = 0;
+      for (var j = 0; j < cells.length; j++) {
+        if (cells[j][0] < mnX) mnX = cells[j][0]; if (cells[j][0] > mxX) mxX = cells[j][0];
+        if (cells[j][1] < mnY) mnY = cells[j][1]; if (cells[j][1] > mxY) mxY = cells[j][1];
+      }
+      for (var j = 0; j < cells.length; j++) {
+        drawCell(lx + 4 + (cells[j][0] - mnX) * miniSize, ly + 24 + (cells[j][1] - mnY) * miniSize, holdUsed ? '#555' : color, holdUsed ? 0.4 : 1);
+      }
+    }
+
+    // Combo
+    if (combo > 0) {
+      ctx.font = '700 14px Orbitron, monospace';
+      ctx.fillStyle = '#ff8c00';
+      ctx.textAlign = 'center';
+      ctx.save();
+      ctx.shadowColor = '#ff8c00'; ctx.shadowBlur = 10;
+      ctx.fillText('COMBO x' + combo, boardX + COLS * cellSize / 2, boardY - 8);
+      ctx.restore();
+    }
+  }
+
+  function drawStatLabel(label, value, x, y, color) {
+    ctx.font = '300 10px Rajdhani, sans-serif';
+    ctx.fillStyle = '#7a7a9a'; ctx.textAlign = 'left';
+    ctx.fillText(label, x, y);
+    ctx.font = '700 18px Orbitron, monospace';
+    ctx.fillStyle = color;
+    ctx.save(); ctx.shadowColor = color; ctx.shadowBlur = 6;
+    ctx.fillText(value, x, y + 20);
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      var alpha = Math.max(0, p.life / p.maxLife);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = p.color;
+      ctx.save(); ctx.shadowColor = p.color; ctx.shadowBlur = 4;
+      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawLineClearAnim() {
+    if (clearAnim <= 0 || clearingRows.length === 0) return;
+    var progress = 1 - (clearAnim / CLEAR_DUR);
+    for (var ri = 0; ri < clearingRows.length; ri++) {
+      var r = clearingRows[ri];
+      var ry = boardY + (r - BUFFER) * cellSize;
+      if (progress < 0.4) {
+        var flash = Math.sin(progress / 0.4 * Math.PI);
+        ctx.globalAlpha = flash * 0.8;
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(boardX, ry, COLS * cellSize, cellSize);
+      } else {
+        var dissolve = (progress - 0.4) / 0.6;
+        for (var c = 0; c < COLS; c++) {
+          if (board[r][c]) {
+            var cx = boardX + c * cellSize;
+            var off = (Math.random() - 0.5) * dissolve * 20;
+            drawCell(cx + off, ry + off * 0.5, board[r][c], 1 - dissolve);
+          }
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ===== INPUT =====
+  var keys = {};
+  document.addEventListener('keydown', function(e) {
+    if (e.repeat && (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'x' || e.key === 'X' || e.key === 'z' || e.key === 'Z' || e.key === 'c' || e.key === 'C')) return;
+    if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') { e.preventDefault(); togglePause(); return; }
+    if (!playing || paused || gameOver || clearAnim > 0) return;
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (!keys['ArrowLeft']) { if (movePiece(-1, 0)) sndMove(); dasDir = -1; dasTimer = 0; dasActive = false; }
+        keys['ArrowLeft'] = true; break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (!keys['ArrowRight']) { if (movePiece(1, 0)) sndMove(); dasDir = 1; dasTimer = 0; dasActive = false; }
+        keys['ArrowRight'] = true; break;
+      case 'ArrowDown':
+        e.preventDefault(); softDropping = true; sndSoftDrop(); break;
+      case 'ArrowUp': case 'x': case 'X':
+        e.preventDefault(); rotatePiece(1); break;
+      case 'z': case 'Z':
+        e.preventDefault(); rotatePiece(-1); break;
+      case ' ':
+        e.preventDefault(); hardDrop(); break;
+      case 'c': case 'C':
+        e.preventDefault(); holdSwap(); break;
+    }
+  });
+  document.addEventListener('keyup', function(e) {
+    keys[e.key] = false;
+    if (e.key === 'ArrowLeft' && dasDir === -1) { dasDir = keys['ArrowRight'] ? 1 : 0; dasTimer = 0; dasActive = false; }
+    if (e.key === 'ArrowRight' && dasDir === 1) { dasDir = keys['ArrowLeft'] ? -1 : 0; dasTimer = 0; dasActive = false; }
+    if (e.key === 'ArrowDown') softDropping = false;
+  });
+
+  // Mobile controls
+  var mobileRepeatTimers = {};
+  document.querySelectorAll('.mob-btn').forEach(function(btn) {
+    var action = btn.dataset.action;
+    btn.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      if (!playing || paused || gameOver) return;
+      ensureAudio();
+      switch (action) {
+        case 'left': if (movePiece(-1, 0)) sndMove(); break;
+        case 'right': if (movePiece(1, 0)) sndMove(); break;
+        case 'down': softDropping = true; sndSoftDrop(); break;
+        case 'rotate': rotatePiece(1); break;
+        case 'harddrop': hardDrop(); break;
+        case 'hold': holdSwap(); break;
+      }
+      if (action === 'left' || action === 'right') {
+        var dir = action === 'left' ? -1 : 1;
+        mobileRepeatTimers[action] = setTimeout(function repeat() {
+          if (movePiece(dir, 0)) sndMove();
+          mobileRepeatTimers[action] = setTimeout(repeat, DAS_REPEAT);
+        }, DAS_DELAY);
+      }
+    });
+    btn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      if (action === 'down') softDropping = false;
+      if (mobileRepeatTimers[action]) { clearTimeout(mobileRepeatTimers[action]); delete mobileRepeatTimers[action]; }
+    });
+    btn.addEventListener('touchcancel', function() {
+      if (action === 'down') softDropping = false;
+      if (mobileRepeatTimers[action]) { clearTimeout(mobileRepeatTimers[action]); delete mobileRepeatTimers[action]; }
+    });
+  });
+
+  // Touch swipes on canvas
+  var touchSX = 0, touchSY = 0, touchST = 0, touchMoved = false;
+  canvas.addEventListener('touchstart', function(e) {
+    if (!playing || paused) return;
+    var t = e.touches[0];
+    touchSX = t.clientX; touchSY = t.clientY; touchST = Date.now(); touchMoved = false;
+  });
+  canvas.addEventListener('touchmove', function(e) {
+    if (!playing || paused) return;
+    e.preventDefault();
+    var t = e.touches[0];
+    var dx = t.clientX - touchSX, dy = t.clientY - touchSY;
+    var thr = cellSize * 0.8;
+    if (Math.abs(dx) > thr && Math.abs(dx) > Math.abs(dy)) {
+      if (movePiece(dx > 0 ? 1 : -1, 0)) sndMove();
+      touchSX = t.clientX; touchMoved = true;
+    }
+    if (dy > thr && Math.abs(dy) > Math.abs(dx)) {
+      softDropping = true; touchSY = t.clientY; touchMoved = true;
+    }
+    if (dy < -thr * 1.5 && Math.abs(dy) > Math.abs(dx)) {
+      hardDrop(); touchMoved = true;
+    }
+  });
+  canvas.addEventListener('touchend', function() {
+    softDropping = false;
+    if (!touchMoved && Date.now() - touchST < 200 && playing && !paused) rotatePiece(1);
+  });
+
+  pauseOverlay.addEventListener('click', function() { if (paused) togglePause(); });
+
+  // ===== UI EVENTS =====
+  modeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      modeBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      gameMode = btn.dataset.mode;
+      initNeonForMode();
+      Neon.render(document.getElementById('startLB'));
+    });
+  });
+
+  function initNeonForMode() {
+    if (gameMode === 'marathon') {
+      Neon.init({ game: 'tetris', mode: 'high', key: 'neonarcade_neonclassic_tetris_scores' });
+    } else {
+      Neon.init({
+        game: 'tetris-sprint', mode: 'low',
+        key: 'neonarcade_neonclassic_tetris_scores_sprint',
+        formatScore: function(s) {
+          var m = Math.floor(s / 60);
+          var sec = (s % 60).toFixed(1);
+          return (m < 10 ? '0' : '') + m + ':' + (parseFloat(sec) < 10 ? '0' : '') + sec;
+        }
+      });
+    }
+  }
+
+  startBtn.addEventListener('click', function() { startGame(); });
+  retryBtn.addEventListener('click', function() { startGame(); });
+  shareBtn.addEventListener('click', function() { shareResult(); });
+
+  // ===== IDLE ANIMATION =====
+  var idleP = [], idleT = 0;
+  function idleLoop(now) {
+    if (playing) return;
+    var dt = now - (idleT || now); idleT = now;
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+    if (Math.random() < 0.1) {
+      var cols = ['#00f0ff','#ff2d7b','#39ff14','#ffd700','#b44dff','#ff8c00'];
+      idleP.push({ x: Math.random()*canvasW, y: canvasH+5, vx: (Math.random()-0.5)*0.5, vy: -Math.random()*1.5-0.5, life: 3000, maxLife: 3000, color: cols[Math.floor(Math.random()*cols.length)], size: Math.random()*3+1 });
+    }
+    var np = [];
+    for (var i = 0; i < idleP.length; i++) { var p = idleP[i]; p.life -= dt; p.x += p.vx; p.y += p.vy; if (p.life > 0) np.push(p); }
+    idleP = np;
+    for (var i = 0; i < idleP.length; i++) {
+      var p = idleP[i];
+      ctx.globalAlpha = Math.max(0, p.life / p.maxLife) * 0.5;
+      ctx.fillStyle = p.color;
+      ctx.save(); ctx.shadowColor = p.color; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(idleLoop);
+  }
+
+  // ===== INIT =====
+  resize();
+  window.addEventListener('resize', resize);
+  initNeonForMode();
+  setTimeout(function() { Neon.render(document.getElementById('startLB')); }, 500);
+  requestAnimationFrame(idleLoop);
+})();
+</script>
+</body>
+</html>

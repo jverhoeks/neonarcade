@@ -702,6 +702,10 @@
       <span class="toc-num">05</span>
       <span class="toc-text">Security Audit &mdash; Hardening a Zero-Auth Game API</span>
     </a></li>
+    <li><a href="#neon-classic">
+      <span class="toc-num">06</span>
+      <span class="toc-text">Bringing Back the Classics &mdash; Why Retro Games Deserve Neon</span>
+    </a></li>
   </ol>
 </nav>
 
@@ -1128,6 +1132,92 @@ Neon.getName() ? Promise.resolve() : Neon.promptName();
   </div>
 
   <p>The full audit report is in the repo as <code>security.md</code>. Every issue was found and fixed by the same AI that built the games in the first place. The irony continues: the robot audited its own work, found it wanting, and fixed the problems. At least it is honest about its mistakes.</p>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 6 -->
+<!-- ================================================================ -->
+<article class="article" id="neon-classic">
+  <p class="article-num">Article 06 &mdash; March 8, 2026</p>
+  <h2 class="article-title">Bringing Back the Classics</h2>
+
+  <p>Here is a question that sounds obvious until you think about it: <strong>why do people still play Space Invaders?</strong> The game is 48 years old. The graphics are 32 pixels wide. A smartphone in your pocket has more computing power than every arcade cabinet ever manufactured, combined. And yet: Space Invaders, Tetris, Breakout, Asteroids, Frogger &mdash; these games refuse to die.</p>
+
+  <p>The answer is that great game design is timeless. The rules of Space Invaders are so elegant that a five-year-old understands them in seconds: the aliens move, you shoot, they get faster. Tetris is pure spatial reasoning distilled into its most addictive form. Frogger is a timing puzzle wrapped in a traffic metaphor. These games survived because their <strong>core loops are perfect</strong>.</p>
+
+  <h3>The Problem with Nostalgia</h3>
+
+  <p>But there is a problem. Playing the original Space Invaders in 2026 feels like visiting a museum. Respectful, educational, a little boring. The controls are stiff. The visuals are charming in a "my grandmother's wallpaper" way. There are no leaderboards (unless you find a working arcade cabinet), no share buttons, no "one more try" hooks optimized for the dopamine economy.</p>
+
+  <p>Most retro game remakes fall into one of two traps:</p>
+
+  <ul>
+    <li><strong>The museum approach</strong> &mdash; pixel-perfect recreation of the original, "faithful to the source material," which means faithfully recreating 1978's idea of game feel. Respectful. Forgettable.</li>
+    <li><strong>The reimagining approach</strong> &mdash; so many new mechanics, modes, and meta-progression systems that the original design is buried under layers of modern game design anxiety. "We added RPG elements and a battle pass." Why.</li>
+  </ul>
+
+  <p>NEON CLASSIC takes a third path: <strong>keep the core loop untouched, replace everything else.</strong></p>
+
+  <h3>What We Changed</h3>
+
+  <p>Every game in the NEON CLASSIC collection uses the exact same rules as the original. Space Invaders has the same 5x11 formation, the same scoring, the same speed-up-as-they-die mechanic. Tetris has the same 7 tetrominoes, the same 10-wide grid, the same line-clear scoring. We did not "improve" the game design because it does not need improving.</p>
+
+  <p>What we did change:</p>
+
+  <ul>
+    <li><strong>Visual identity</strong> &mdash; the NEON ARCADE dark-neon aesthetic. Glowing outlines, particle effects, screen shake, scanline overlays. Every game looks like it belongs in the same family as the 38 original NEON ARCADE titles.</li>
+    <li><strong>Sound design</strong> &mdash; synthesized audio via the Web Audio API. No audio files, no loading, just oscillators generating retro sounds that match the neon aesthetic.</li>
+    <li><strong>Global leaderboards</strong> &mdash; every game connects to the same neon.js infrastructure. Your high score competes with everyone in the world. Top 5 gets a global splash celebration.</li>
+    <li><strong>Share mechanics</strong> &mdash; every game over generates an emoji-art summary you can paste into group chats. "I survived Wave 12 in NEON INVADERS" is more interesting than "I played Space Invaders."</li>
+    <li><strong>Mobile-first controls</strong> &mdash; touch swipes, virtual buttons, responsive canvases. These games were designed for arcade cabinets with joysticks. Now they work on a phone in a bus queue.</li>
+    <li><strong>Modern quality-of-life</strong> &mdash; ghost pieces in Tetris, hold system, undo in 2048. Small additions that modern players expect, without changing the fundamental challenge.</li>
+  </ul>
+
+  <h3>The Seven Classics</h3>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val gold">7</div>
+      <div class="stat-label">Games Launched</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">48</div>
+      <div class="stat-label">Years of History</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">0</div>
+      <div class="stat-label">Downloads Required</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">4</div>
+      <div class="stat-label">Categories Total</div>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>NEON INVADERS</strong> &mdash; Space Invaders. 5 rows of neon aliens, mystery UFOs, wave escalation. The game that started the arcade industry, now in your browser.</li>
+    <li><strong>NEON BREAKOUT</strong> &mdash; Breakout/Arkanoid. Six rows of color-coded bricks, power-ups, combo multipliers. Satisfying destruction with every bounce.</li>
+    <li><strong>NEON TETRIS</strong> &mdash; The block-stacker. Marathon mode and 40-Line Sprint. Ghost pieces, hold, next preview. The game that needs no introduction.</li>
+    <li><strong>NEON 2048</strong> &mdash; The sliding tile puzzle. Each tile value has a unique neon glow. Smooth merge animations. The most "one more try" game ever made, now with global competition.</li>
+    <li><strong>NEON PAIRS</strong> &mdash; Memory/Concentration. 3D card flip animations, three difficulty sizes, star ratings. Deceptively simple, brutally honest about your memory.</li>
+    <li><strong>NEON ASTEROIDS</strong> &mdash; The vector space shooter. Momentum physics, screen wrap, asteroid splitting. The original game was literally neon lines on a vector display &mdash; we are staying true to the source.</li>
+    <li><strong>NEON FROGGER</strong> &mdash; The road-crossing puzzle. Five lanes of traffic, five lanes of river, five home slots. Timer pressure, round escalation, and the eternal question: why did the frog cross the road?</li>
+  </ul>
+
+  <h3>Why a Fourth Category?</h3>
+
+  <p>NEON ARCADE started with three categories: action games (NEON ARCADE), brain puzzles (NEON MIND), and skill challenges (NEON GRIND). Adding a fourth &mdash; NEON CLASSIC &mdash; was a deliberate choice.</p>
+
+  <p>These games do not fit neatly into "action" or "puzzle." They are their own thing: <strong>universally recognized game designs that everyone already knows how to play.</strong> A new visitor sees "NEON INVADERS" and instantly knows what it is. Zero onboarding. Zero explanation needed. That is the superpower of classics &mdash; the marketing is built into the name.</p>
+
+  <p>It also means NEON CLASSIC has a different discovery pattern. People do not search for "neon browser game" when they want to play Tetris. They search for "Tetris online" or "free Breakout game." The SEO game changes completely when you are rebuilding games that have Wikipedia pages.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Thesis</span>
+    <p>The best game designs are finished. They do not need new mechanics, progression systems, or battle passes. They need <strong>new surfaces</strong>: better visuals, modern platforms, social sharing, global competition. Give a timeless game a fresh coat of neon paint and get out of its way.</p>
+  </div>
+
+  <p>Seven games launched today. Seven games that have collectively been played by billions of people over nearly five decades. The difference now: you can play them in a browser tab, compete globally, and share your scores with a single tap. The classics are back. They just glow a little brighter.</p>
 </article>
 
 </div><!-- .articles -->

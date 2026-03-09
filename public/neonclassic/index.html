@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON CLASSIC — Free Online Retro Arcade Games | Play Instantly</title>
+<meta name="description" content="Play free retro arcade classics reimagined with neon visuals. Space Invaders, Breakout, Tetris, Asteroids, Frogger, 2048 and more — no download, no login required.">
+<meta name="keywords" content="free retro games, classic arcade games online, space invaders, breakout, tetris, asteroids, frogger, 2048, browser games, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonclassic/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonclassic/">
+<meta property="og:title" content="NEON CLASSIC — Free Online Retro Arcade Games | Play Instantly">
+<meta property="og:description" content="Play free retro arcade classics reimagined with neon visuals. Space Invaders, Breakout, Tetris, Asteroids, Frogger, 2048 and more.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonclassic/">
+<meta name="twitter:title" content="NEON CLASSIC — Free Online Retro Arcade Games | Play Instantly">
+<meta name="twitter:description" content="Play free retro arcade classics reimagined with neon visuals. Space Invaders, Breakout, Tetris, Asteroids, Frogger, 2048 and more.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "NEON CLASSIC",
+  "url": "https://neonarcade.net/neonclassic/",
+  "description": "Play free retro arcade classics reimagined with neon visuals. Space Invaders, Breakout, Tetris, Asteroids, Frogger, 2048 and more.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What classic games are available?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We have neon-styled versions of Space Invaders, Breakout, Tetris, Asteroids, Frogger, 2048, and Memory — all free to play in your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are these the original games?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "These are modern reimaginings with neon visuals, smooth animations, global leaderboards, and share features — built on the classic gameplay everyone knows and loves."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to download anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No downloads required! Every game runs directly in your browser on any device — desktop, tablet, or phone."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CLASSIC", "item": "https://neonarcade.net/neonclassic/" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #7a7a9a;
+    --text-mid: #9999bb;
+    --text-bright: #cccce0;
+    --border: rgba(255,215,0,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,215,0,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(0,240,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 28px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--neon-cyan); }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(32px, 7vw, 56px);
+    letter-spacing: 6px;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2), 0 0 80px rgba(255,215,0,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 2.5vw, 18px);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 10px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-gold), transparent);
+    margin: 24px auto 0;
+  }
+
+  /* --- SORT BAR --- */
+  .sort-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .sort-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .sort-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .sort-btn:hover { border-color: rgba(255,215,0,0.2); color: var(--text-mid); }
+  .sort-btn.active { border-color: rgba(255,215,0,0.4); color: var(--neon-gold); background: rgba(255,215,0,0.06); }
+
+  /* --- GAME GRID --- */
+  .games-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 24px 60px;
+  }
+
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-4px);
+  }
+
+  .game-card[data-accent="cyan"]:hover { border-color: rgba(0,240,255,0.3); box-shadow: 0 8px 32px rgba(0,240,255,0.08); }
+  .game-card[data-accent="pink"]:hover { border-color: rgba(255,45,123,0.3); box-shadow: 0 8px 32px rgba(255,45,123,0.08); }
+  .game-card[data-accent="green"]:hover { border-color: rgba(57,255,20,0.3); box-shadow: 0 8px 32px rgba(57,255,20,0.08); }
+  .game-card[data-accent="gold"]:hover { border-color: rgba(255,215,0,0.3); box-shadow: 0 8px 32px rgba(255,215,0,0.08); }
+  .game-card[data-accent="purple"]:hover { border-color: rgba(180,77,255,0.3); box-shadow: 0 8px 32px rgba(180,77,255,0.08); }
+  .game-card[data-accent="orange"]:hover { border-color: rgba(255,140,0,0.3); box-shadow: 0 8px 32px rgba(255,140,0,0.08); }
+  .game-card[data-accent="white"]:hover { border-color: rgba(224,224,240,0.3); box-shadow: 0 8px 32px rgba(224,224,240,0.06); }
+
+  .game-card[data-accent="cyan"] .card-title { color: var(--neon-cyan); }
+  .game-card[data-accent="pink"] .card-title { color: var(--neon-pink); }
+  .game-card[data-accent="green"] .card-title { color: var(--neon-green); }
+  .game-card[data-accent="gold"] .card-title { color: var(--neon-gold); }
+  .game-card[data-accent="purple"] .card-title { color: var(--neon-purple); }
+  .game-card[data-accent="orange"] .card-title { color: var(--neon-orange); }
+  .game-card[data-accent="white"] .card-title { color: #e0e0f0; }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-screenshot img { transform: scale(1.03); }
+
+  .card-screenshot .placeholder {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-new { background: rgba(57,255,20,0.12); color: var(--neon-green); border: 1px solid rgba(57,255,20,0.25); }
+  .badge-hot { background: rgba(255,45,123,0.12); color: var(--neon-pink); border: 1px solid rgba(255,45,123,0.25); }
+  .badge-classic { background: rgba(255,215,0,0.12); color: var(--neon-gold); border: 1px solid rgba(255,215,0,0.25); }
+
+  .card-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-number {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    color: var(--text-bright);
+  }
+
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--neon-gold);
+    transition: all 0.2s;
+  }
+
+  .game-card:hover .card-play { letter-spacing: 4px; }
+
+  .play-arrow {
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+
+  .game-card:hover .play-arrow { transform: translateX(4px); }
+
+  /* --- CARD STATS ROW --- */
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .card-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-stat .stat-icon { font-size: 13px; opacity: 0.7; }
+  .card-stat .stat-val { color: var(--text-mid); font-weight: 500; }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #9999bb;
+    text-decoration: underline;
+    text-decoration-color: rgba(153,153,187,0.4);
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover { color: var(--neon-gold); text-decoration-color: rgba(255,215,0,0.4); }
+
+  @media (max-width: 700px) {
+    .games-grid {
+      grid-template-columns: 1fr;
+      padding: 12px 16px 60px;
+      gap: 16px;
+    }
+    header { padding: 40px 16px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <a href="../index.html" class="back-link">&larr; NEON ARCADE HUB</a>
+  <h1 class="logo">NEON<span>CLASSIC</span></h1>
+  <p class="tagline">Retro legends, neon reborn</p>
+  <div class="header-line"></div>
+</header>
+
+<div class="sort-bar">
+  <span class="sort-label">Sort by:</span>
+  <button class="sort-btn active" data-sort="default">Default</button>
+  <button class="sort-btn" data-sort="popular">Most Played</button>
+  <button class="sort-btn" data-sort="liked">Most Liked</button>
+  <button class="sort-btn" data-sort="name">A-Z</button>
+</div>
+
+<main class="games-grid" id="games-grid">
+
+  <!-- 1. NEON INVADERS -->
+  <a href="invaders.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img fetchpriority="high" width="1280" height="800" src="screenshots/invaders.png" alt="Neon Invaders — free online space invaders game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F47E;</div>
+      <span class="card-badge badge-classic">CLASSIC</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 01</span>
+      <h2 class="card-title">NEON INVADERS</h2>
+      <p class="card-desc">The aliens are neon. So are the bullets. Classic Space Invaders with glowing pixel invaders, mystery UFOs, and wave-based escalation. How far can you survive?</p>
+      <div class="card-tags">
+        <span class="tag">Shooter</span>
+        <span class="tag">Waves</span>
+        <span class="tag">Retro</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 2. NEON BREAKOUT -->
+  <a href="breakout.html" class="game-card" data-accent="orange">
+    <div class="card-screenshot">
+      <img fetchpriority="high" width="1280" height="800" src="screenshots/breakout.png" alt="Neon Breakout — free online brick breaker game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F9F1;</div>
+      <span class="card-badge badge-classic">CLASSIC</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 02</span>
+      <h2 class="card-title">NEON BREAKOUT</h2>
+      <p class="card-desc">Smash neon bricks with combos and power-ups. Multi-ball, laser paddle, wide mode — each brick shatters into glowing particles. Chase the high score across levels.</p>
+      <div class="card-tags">
+        <span class="tag">Brick Breaker</span>
+        <span class="tag">Power-Ups</span>
+        <span class="tag">Combos</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 3. NEON TETRIS -->
+  <a href="tetris.html" class="game-card" data-accent="purple">
+    <div class="card-screenshot">
+      <img fetchpriority="high" width="1280" height="800" src="screenshots/tetris.png" alt="Neon Tetris — free online block stacking game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F7E6;</div>
+      <span class="card-badge badge-hot">HOT</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 03</span>
+      <h2 class="card-title">NEON TETRIS</h2>
+      <p class="card-desc">The iconic block-stacking puzzle with neon glow. Ghost pieces, hold system, next preview. Marathon mode for high scores, 40-Line Sprint for speed demons.</p>
+      <div class="card-tags">
+        <span class="tag">Tetris</span>
+        <span class="tag">Marathon</span>
+        <span class="tag">Sprint</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 4. NEON 2048 -->
+  <a href="2048.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img loading="lazy" width="1280" height="800" src="screenshots/2048.png" alt="Neon 2048 — free online sliding tile puzzle" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x2728;</div>
+      <span class="card-badge badge-classic">CLASSIC</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 04</span>
+      <h2 class="card-title">NEON 2048</h2>
+      <p class="card-desc">Slide tiles, merge numbers, chase 2048. Each merge glows brighter. Smooth animations, undo support, and the same addictive "one more try" loop that hooked millions.</p>
+      <div class="card-tags">
+        <span class="tag">Puzzle</span>
+        <span class="tag">Addictive</span>
+        <span class="tag">Casual</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 5. NEON PAIRS -->
+  <a href="pairs.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img loading="lazy" width="1280" height="800" src="screenshots/pairs.png" alt="Neon Pairs — free online memory matching game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F0CF;</div>
+      <span class="card-badge badge-classic">CLASSIC</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 05</span>
+      <h2 class="card-title">NEON PAIRS</h2>
+      <p class="card-desc">Flip. Match. Remember. Classic memory card game with glowing neon symbols. Three grid sizes, 3D card flip animations, and a ticking clock. How sharp is your memory?</p>
+      <div class="card-tags">
+        <span class="tag">Memory</span>
+        <span class="tag">3 Sizes</span>
+        <span class="tag">Timed</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 6. NEON ASTEROIDS -->
+  <a href="asteroids.html" class="game-card" data-accent="cyan">
+    <div class="card-screenshot">
+      <img loading="lazy" width="1280" height="800" src="screenshots/asteroids.png" alt="Neon Asteroids — free online space shooter game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x2604;&#xFE0F;</div>
+      <span class="card-badge badge-classic">CLASSIC</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 06</span>
+      <h2 class="card-title">NEON ASTEROIDS</h2>
+      <p class="card-desc">Vector-style space combat. Drift, thrust, shoot — asteroids split and multiply. UFOs hunt you. The original neon aesthetic, perfected. Pure survival.</p>
+      <div class="card-tags">
+        <span class="tag">Vector</span>
+        <span class="tag">Physics</span>
+        <span class="tag">Survival</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 7. NEON FROGGER -->
+  <a href="frogger.html" class="game-card" data-accent="green">
+    <div class="card-screenshot">
+      <img loading="lazy" width="1280" height="800" src="screenshots/frogger.png" alt="Neon Frogger — free online road crossing game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F438;</div>
+      <span class="card-badge badge-classic">CLASSIC</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 07</span>
+      <h2 class="card-title">NEON FROGGER</h2>
+      <p class="card-desc">Cross the neon highway. Ride glowing logs. Dodge everything. The classic road-crossing adventure with neon traffic, animated rivers, and five home slots to fill.</p>
+      <div class="card-tags">
+        <span class="tag">Road Crossing</span>
+        <span class="tag">Timing</span>
+        <span class="tag">Rounds</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+</main>
+
+<footer>
+  <p>RETRO GAMES &mdash; NEON STYLE &mdash; ZERO INSTALL</p>
+  <p class="credit">Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  var cards = document.querySelectorAll('.game-card');
+  var grid = document.getElementById('games-grid');
+  var defaultOrder = Array.from(cards);
+
+  // Fetch stats for sorting
+  NeonAPI.allStats().then(function(data) {
+    if (!data || !data.games) return;
+    var stats = data.games;
+
+    cards.forEach(function(card) {
+      var href = card.getAttribute('href') || '';
+      var slug = href.replace('.html', '').replace(/^.*\//, '');
+      var g = stats[slug] || {};
+      var plays = g.plays || 0;
+      var likes = g.likes || 0;
+      card.dataset.plays = plays;
+      card.dataset.likes = likes;
+
+      if (plays > 0) {
+        var statsRow = document.createElement('div');
+        statsRow.className = 'card-stats';
+        var playStat = document.createElement('div');
+        playStat.className = 'card-stat';
+        var playIcon = document.createElement('span');
+        playIcon.className = 'stat-icon';
+        playIcon.textContent = '\u25B6';
+        var playVal = document.createElement('span');
+        playVal.className = 'stat-val';
+        playVal.textContent = formatNum(plays) + ' plays';
+        playStat.appendChild(playIcon);
+        playStat.appendChild(playVal);
+        statsRow.appendChild(playStat);
+
+        if (likes > 0) {
+          var likeStat = document.createElement('div');
+          likeStat.className = 'card-stat';
+          var likeIcon = document.createElement('span');
+          likeIcon.className = 'stat-icon';
+          likeIcon.textContent = '\u2764';
+          var likeVal = document.createElement('span');
+          likeVal.className = 'stat-val';
+          likeVal.textContent = formatNum(likes);
+          likeStat.appendChild(likeIcon);
+          likeStat.appendChild(likeVal);
+          statsRow.appendChild(likeStat);
+        }
+
+        var body = card.querySelector('.card-body');
+        var playBtn = body.querySelector('.card-play');
+        body.insertBefore(statsRow, playBtn);
+      }
+    });
+  });
+
+  function formatNum(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return String(n);
+  }
+
+  // Sort buttons
+  document.querySelectorAll('.sort-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.sort-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var sort = btn.dataset.sort;
+      var arr = Array.from(cards);
+
+      if (sort === 'popular') {
+        arr.sort(function(a, b) { return (parseInt(b.dataset.plays) || 0) - (parseInt(a.dataset.plays) || 0); });
+      } else if (sort === 'liked') {
+        arr.sort(function(a, b) { return (parseInt(b.dataset.likes) || 0) - (parseInt(a.dataset.likes) || 0); });
+      } else if (sort === 'name') {
+        arr.sort(function(a, b) {
+          var an = (a.querySelector('.card-title') || {}).textContent || '';
+          var bn = (b.querySelector('.card-title') || {}).textContent || '';
+          return an.localeCompare(bn);
+        });
+      } else {
+        arr = defaultOrder.slice();
+      }
+
+      arr.forEach(function(card) { grid.appendChild(card); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

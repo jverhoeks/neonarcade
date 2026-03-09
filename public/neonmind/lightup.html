@@ -87,7 +87,7 @@ html, body {
   background: var(--bg-deep);
   font-family: 'Rajdhani', sans-serif;
   color: #fff;
-  touch-action: none;
+  touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -223,6 +223,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
 #grid-canvas {
   cursor: pointer;
+  touch-action: none;
 }
 
 .bottom-bar {
