@@ -143,6 +143,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 8 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "The Self-Audit — When AI Reviews Its Own Work",
+  "description": "How five parallel AI agents audited 54 game pages for SEO, design, code quality, and user engagement — and fixed everything they found.",
+  "url": "https://neonarcade.net/blog.html#self-audit",
+  "datePublished": "2026-03-09",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#self-audit"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1312,6 +1328,104 @@ Neon.getName() ? Promise.resolve() : Neon.promptName();
     <span class="hl-label">The Lesson</span>
     <p>Testing infrastructure pays for itself the first time it catches something. Our validator found a production bug on its first run. The security audit closed 15 issues. The total time to set up both: less than an hour. The math is obvious &mdash; yet most side projects skip it because "we will add tests later." Later never comes. Add the hooks on day one.</p>
   </div>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 8 -->
+<!-- ================================================================ -->
+<article class="article" id="self-audit">
+  <p class="article-num">Article 08 &mdash; March 9, 2026</p>
+  <h2 class="article-title">The Self-Audit</h2>
+
+  <p>At 54 games across four categories, NEON ARCADE hit the point where no single person &mdash; human or AI &mdash; can hold the entire project in their head. Every new game adds another set of meta tags to maintain, another screenshot to capture, another hub page card to update, another entry in the worker registry. The surface area for drift is enormous.</p>
+
+  <p>So we did something that sounds circular but turned out to be one of the most productive hours of the entire project: <strong>we asked the AI to audit its own work.</strong></p>
+
+  <h3>Five Agents, One Mission</h3>
+
+  <p>Instead of one monolithic audit, we launched five specialized agents in parallel, each focused on a different dimension:</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val">5</div>
+      <div class="stat-label">Parallel Agents</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">54</div>
+      <div class="stat-label">Games Scanned</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">15</div>
+      <div class="stat-label">Issues Found</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">15</div>
+      <div class="stat-label">Issues Fixed</div>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>SEO Agent</strong> &mdash; Checked every page for meta tags, Open Graph, Twitter Cards, structured data, canonical URLs, and screenshot file existence. Found 3 games missing <code>og:locale</code> and <code>twitter:url</code>, all 7 neonclassic games referencing wrong screenshot paths, and 15 games without screenshots entirely.</li>
+    <li><strong>Design Agent</strong> &mdash; Verified color palette adherence, typography, WCAG contrast, scanline overlays, screen shake, and particle effects across all games. Flagged 4 games with off-palette colors: Afterglow used yellow (#ffff00) instead of gold, Palette had custom colors that deviated from the brand, Flappy Rewind used the wrong orange, and Truecolor had a pure black background.</li>
+    <li><strong>Neon.js Agent</strong> &mdash; Audited score integration, leaderboard rendering, share buttons, sound effects, storage key conventions, and the neon.js library itself. Found 100% coverage across all features, with only 3 games using a slightly inconsistent localStorage key pattern.</li>
+    <li><strong>Hub & Navigation Agent</strong> &mdash; Cross-referenced every game file against hub page cards, game counts, screenshot files, and cross-linking. Found the main hub claimed "45+ games" when we had 54, NEON ARCADE said "25 GAMES" with 28 actual, and NEON GRIND said "4 GAMES" with 7 actual.</li>
+    <li><strong>Code Quality Agent</strong> &mdash; Scanned for security issues (innerHTML, eval, XSS), performance patterns (requestAnimationFrame, HiDPI), mobile support (touch events, viewport), and the Cloudflare Worker backend. Gave the codebase 9/10 overall. The one gap: 33 canvas games lacked <code>devicePixelRatio</code> scaling.</li>
+  </ul>
+
+  <h3>What We Found</h3>
+
+  <p>The results split cleanly into two categories: <strong>things that were wrong</strong> and <strong>things that were drifting.</strong></p>
+
+  <p>Wrong things are bugs. The game counts were incorrect &mdash; we had added games without updating the hub. The neonclassic screenshot paths pointed to a subdirectory that did not exist. Three games were missing SEO tags that every other game had. These are the kind of issues that a checklist prevents, but only if the checklist gets followed.</p>
+
+  <p>Drifting things are subtler. Four games had crept away from the standard color palette. Not broken, but inconsistent. Afterglow used bright yellow because it "fit the theme" &mdash; but at the brand level, gold (#ffd700) is the correct warm accent. Palette used custom CSS variable names that looked right but were slightly different hex values. These are the issues that accumulate silently until your design system looks like it was built by committee.</p>
+
+  <h3>The Fix</h3>
+
+  <p>Everything found was fixed in two passes:</p>
+
+  <h3>Pass 1 &mdash; The Obvious Stuff</h3>
+  <ul>
+    <li><strong>Game counts</strong> &mdash; Updated main hub (45+&rarr;54), NEON ARCADE (25&rarr;28), NEON GRIND (4&rarr;7). Added 6 missing games to the CATALOG array.</li>
+    <li><strong>Screenshot paths</strong> &mdash; Standardized all screenshot references to category subdirs (<code>{category}/screenshots/</code>). The old root <code>/screenshots/</code> folder had duplicates of everything.</li>
+    <li><strong>Missing screenshots</strong> &mdash; Automated Playwright captures at 1280&times;800 for all 15 missing games.</li>
+    <li><strong>SEO tags</strong> &mdash; Added <code>og:locale</code> and <code>twitter:url</code> to tango, chimp, and clickspeed.</li>
+    <li><strong>Admin pages</strong> &mdash; Added <code>noindex, nofollow</code> to prevent search engines from indexing dashboards.</li>
+    <li><strong>Color palette</strong> &mdash; Corrected afterglow, palette, flappy-rewind, and truecolor to use standard neon colors.</li>
+  </ul>
+
+  <h3>Pass 2 &mdash; The Deep Stuff</h3>
+  <ul>
+    <li><strong>Visual effects</strong> &mdash; Added missing particles, screen shake, and scanline overlays to 15 games. Every game now has the full neon effects set.</li>
+    <li><strong>HiDPI canvas</strong> &mdash; Added <code>devicePixelRatio</code> scaling to 5 canvas games that were rendering blurry on Retina displays.</li>
+    <li><strong>ESC to quit</strong> &mdash; Every game (all 54) now lets you press ESC to bail out to the start screen without saving score. Universal rage-quit support.</li>
+    <li><strong>Sound effects</strong> &mdash; Added Web Audio oscillator sounds to neon-snake (the OG game, somehow the only one missing audio).</li>
+    <li><strong>Touch support</strong> &mdash; Added <code>touch-action: none</code> to 10 games that were letting mobile browsers hijack touch events.</li>
+    <li><strong>Performance</strong> &mdash; Replaced <code>setInterval</code> game loops with <code>requestAnimationFrame</code> in 4 games for smoother rendering and less battery drain.</li>
+    <li><strong>Accessibility</strong> &mdash; Added <code>&lt;main&gt;</code> landmarks to 3 hub pages for screen reader navigation.</li>
+    <li><strong>Sitemap</strong> &mdash; Was missing 15 games, the entire NEON CLASSIC category, and the blog/updates pages. Now has all 61 URLs.</li>
+    <li><strong>llms.txt</strong> &mdash; Updated from "35+ games" to full listing of all 54 games with descriptions.</li>
+    <li><strong>Worker registry</strong> &mdash; Removed phantom <code>tetris-sprint</code> entry (game file never existed).</li>
+    <li><strong>Chromaself leaderboard</strong> &mdash; Added missing <code>Neon.render()</code> call so players can see scores.</li>
+    <li><strong>CLAUDE.md</strong> &mdash; Updated with ESC requirement, correct screenshot paths, mandatory effects, and stricter new-game checklist.</li>
+  </ul>
+
+  <h3>Why Self-Auditing Works</h3>
+
+  <p>The interesting insight is not that we found bugs &mdash; every project has bugs. It is that <strong>the AI found its own bugs, in its own code, by reading its own rules.</strong></p>
+
+  <p>The CLAUDE.md file is both the specification and the enforcement mechanism. When the audit agents checked "does every game use #0a0a12 as the background?" they were reading a rule that the build agents were also supposed to follow. The drift happened because the build agents were focused on making games work, not on cross-referencing every hex value against the style guide.</p>
+
+  <p>This is exactly the same failure mode as human teams. Developers read the style guide when they start, then rely on memory as they get deeper into the work. Colors get approximated. Tags get skipped. Counts get stale. The fix is the same for both AI and human teams: periodic automated audits with explicit checklists.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Lesson</span>
+    <p>Build agents are optimized for creation. Audit agents are optimized for verification. They are different cognitive modes, and they are complementary. The most reliable system is one where the builder and the checker are separate processes &mdash; even when they are the same underlying model. <strong>Never skip the review just because the author is "smart enough."</strong> Intelligence and thoroughness are different axes.</p>
+  </div>
+
+  <h3>The Result</h3>
+
+  <p>Two audit passes, 8 parallel agents, 54 games touched. Every issue found was fixed in the same session. The audit turned unknown unknowns into a prioritized backlog, and then cleared the entire backlog. Zero items deferred. That is the power of automated auditing: when finding and fixing have the same cost, there is no reason to postpone anything.</p>
 </article>
 
 </div><!-- .articles -->

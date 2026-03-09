@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/mathblitz.html">
 <meta property="og:title" content="MathBlitz — Speed Math Challenge Game | NEON ARCADE">
 <meta property="og:description" content="Play MathBlitz free online — solve math problems at lightning speed. Addition, subtraction, multiplication — race the clock through 30 levels of increasing difficulty.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/mathblitz.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/mathblitz.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neongrind/mathblitz.html">
 <meta name="twitter:title" content="MathBlitz — Speed Math Challenge Game | NEON ARCADE">
 <meta name="twitter:description" content="Play MathBlitz free online — solve math problems at lightning speed. Addition, subtraction, multiplication — race the clock through 30 levels of increasing difficulty.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/mathblitz.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/mathblitz.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/mathblitz.png",
+  "image": "https://neonarcade.net/neongrind/screenshots/mathblitz.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1574,6 +1574,14 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
   // Keyboard
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (screens.game.classList.contains('active') || screens.intro.classList.contains('active')) {
+        e.preventDefault();
+        stopTimer();
+        showStartScreen();
+      }
+      return;
+    }
     if (screens.game.classList.contains('active') && !state.answered) {
       if (e.key === '1' || e.key === 'q') checkAnswer(0);
       else if (e.key === '2' || e.key === 'w') checkAnswer(1);

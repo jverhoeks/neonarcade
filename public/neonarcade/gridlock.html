@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/gridlock.html">
 <meta property="og:title" content="Gridlock — Free Grid Strategy Game | NEON ARCADE">
 <meta property="og:description" content="Play Gridlock free online — a fast-paced grid strategy game where every move counts. Block, capture, and outmaneuver in this neon tactical challenge.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/gridlock.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/gridlock.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/gridlock.html">
 <meta name="twitter:title" content="Gridlock — Free Grid Strategy Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Gridlock free online — a fast-paced grid strategy game where every move counts. Block, capture, and outmaneuver in this neon tactical challenge.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/gridlock.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/gridlock.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/gridlock.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/gridlock.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -620,6 +620,27 @@
 
   Neon.init({ game: 'gridlock', mode: 'high' });
 
+  // ===== DOM PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < (count || 12); i++) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:9998;background:' + (color || '#00f0ff');
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 30 + Math.random() * 60;
+      var dx = Math.cos(angle) * dist;
+      var dy = Math.sin(angle) * dist;
+      el.style.transition = 'all 0.6s ease-out';
+      document.body.appendChild(el);
+      requestAnimationFrame(function() {
+        el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        el.style.opacity = '0';
+      });
+      setTimeout(function() { el.remove(); }, 700);
+    }
+  }
+
   // ===== CONFIG =====
   const GRID = 6;
   const MAX_WALLS = 6;
@@ -1024,9 +1045,11 @@
         if (allCaptured) {
           solved = true;
           soundSuccess();
+          spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#39ff14', 20);
           setTimeout(showResult, 600);
         } else {
           soundFail();
+          spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#ff2d7b', 12);
           // Shake canvas wrapper
           const wrapper = document.getElementById('canvas-wrapper');
           wrapper.classList.add('shake');
@@ -1509,6 +1532,12 @@
 
   // Keyboard shortcuts
   window.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (!gameScreen.classList.contains('hidden')) {
+        showScreen(startScreen);
+        return;
+      }
+    }
     if (e.key === 'Enter' || e.key === ' ') {
       if (!gameScreen.classList.contains('hidden') && !animating && !solved) {
         e.preventDefault();

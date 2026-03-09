@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/wordchain.html">
 <meta property="og:title" content="WordChain — Word Link Puzzle Game | NEON ARCADE">
 <meta property="og:description" content="Play WordChain free online — build the longest chain of connected words. Each word starts with the last letter of the previous one. How long can you go?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/wordchain.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/wordchain.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/wordchain.html">
 <meta name="twitter:title" content="WordChain — Word Link Puzzle Game | NEON ARCADE">
 <meta name="twitter:description" content="Play WordChain free online — build the longest chain of connected words. Each word starts with the last letter of the previous one. How long can you go?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/wordchain.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/wordchain.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/wordchain.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/wordchain.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1092,9 +1092,16 @@
   const pctx = canvas.getContext('2d');
   let particles = [];
 
+  var canvasLogicalW, canvasLogicalH;
   function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    var dpr = window.devicePixelRatio || 1;
+    canvasLogicalW = window.innerWidth;
+    canvasLogicalH = window.innerHeight;
+    canvas.width = canvasLogicalW * dpr;
+    canvas.height = canvasLogicalH * dpr;
+    canvas.style.width = canvasLogicalW + 'px';
+    canvas.style.height = canvasLogicalH + 'px';
+    pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
@@ -1116,7 +1123,7 @@
   }
 
   function tickParticles() {
-    pctx.clearRect(0, 0, canvas.width, canvas.height);
+    pctx.clearRect(0, 0, canvasLogicalW, canvasLogicalH);
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.x += p.vx;
@@ -1512,6 +1519,15 @@
   againBtn.addEventListener('click', () => {
     showScreen(startScreen);
     initStartScreen();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && gameActive) {
+      gameActive = false;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      showScreen(startScreen);
+      initStartScreen();
+    }
   });
 
   // ─── RAF LOOP ───

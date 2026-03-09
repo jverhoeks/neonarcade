@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonmind/tents.html">
 <meta property="og:title" content="Tents — Free Online Tent & Tree Logic Puzzle | NEON ARCADE">
 <meta property="og:description" content="Place tents next to trees using logic deduction.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/tents.png">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/tents.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonmind/tents.html">
 <meta name="twitter:title" content="Tents — Free Online Tent & Tree Logic Puzzle | NEON ARCADE">
 <meta name="twitter:description" content="Place tents next to trees using logic deduction.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/tents.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/tents.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/tents.png",
+  "image": "https://neonarcade.net/neonmind/screenshots/tents.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -65,7 +65,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
 body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
 body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
 
@@ -271,7 +271,6 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   var moveHistory = [];
   var moveCount = 0;
   var timerStart = 0;
-  var timerInterval = null;
   var elapsed = 0;
   var solved = false;
 
@@ -867,19 +866,24 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   }
 
   // === TIMER ===
+  var timerRunning = false;
+  function updateTimerRAF() {
+    if (!timerRunning) return;
+    elapsed = Math.floor((Date.now() - timerStart) / 1000);
+    $('topTimer').textContent = formatTime(elapsed);
+    requestAnimationFrame(updateTimerRAF);
+  }
+
   function startTimer() {
     elapsed = 0;
     $('topTimer').textContent = '00:00';
     timerStart = Date.now();
-    clearInterval(timerInterval);
-    timerInterval = setInterval(function() {
-      elapsed = Math.floor((Date.now() - timerStart) / 1000);
-      $('topTimer').textContent = formatTime(elapsed);
-    }, 250);
+    timerRunning = true;
+    requestAnimationFrame(updateTimerRAF);
   }
 
   function stopTimer() {
-    clearInterval(timerInterval);
+    timerRunning = false;
     elapsed = Math.floor((Date.now() - timerStart) / 1000);
   }
 
@@ -1013,6 +1017,17 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     });
     Neon.render($('startLB'));
   }
+
+  // ESC key to quit to start screen
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (screens.game.classList.contains('active') && !solved) {
+        stopTimer();
+        showScreen('start');
+        updateStartScreen();
+      }
+    }
+  });
 
   // Handle window resize
   window.addEventListener('resize', function() {

@@ -1226,6 +1226,15 @@ body::before {
 
   // ==================== INPUT ====================
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && (state === 'playing' || state === 'dying')) {
+      e.preventDefault();
+      state = 'start';
+      startScreen.classList.remove('hidden');
+      goScreen.classList.add('hidden');
+      hud.classList.add('hidden');
+      Neon.render(document.getElementById('startLB'));
+      return;
+    }
     if (state !== 'playing') return;
     switch (e.key) {
       case 'ArrowUp': case 'w': case 'W': moveFrog(-1, 0); e.preventDefault(); break;

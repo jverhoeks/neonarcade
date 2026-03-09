@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/truecolor.html">
 <meta property="og:title" content="TrueColor — Color Accuracy Challenge | NEON ARCADE">
 <meta property="og:description" content="Play TrueColor free online — test your color perception by identifying the true color among subtle variations. Gets harder with every level.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/truecolor.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/truecolor.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/truecolor.html">
 <meta name="twitter:title" content="TrueColor — Color Accuracy Challenge | NEON ARCADE">
 <meta name="twitter:description" content="Play TrueColor free online — test your color perception by identifying the true color among subtle variations. Gets harder with every level.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/truecolor.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/truecolor.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/truecolor.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/truecolor.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -289,7 +289,7 @@ body::after {
   <div class="subtitle">Your eyes lie to you. How badly?</div>
 
   <div class="illusion-demo">
-    <div class="demo-half" style="background:#000000;">
+    <div class="demo-half" style="background:#0a0a12;">
       <div class="demo-patch"></div>
     </div>
     <div class="demo-half" style="background:#ffffff;">
@@ -366,7 +366,7 @@ body::after {
   /* ═══ ROUND DATA ══════════════════════════════════════════ */
   const ALL_ROUNDS = [
     {
-      center: '#808080', bg: '#000000',
+      center: '#808080', bg: '#0a0a12',
       label: 'SIMULTANEOUS CONTRAST',
       choices: ['#808080', '#aaaaaa', '#666666', '#b0b0b0'],
       correct: '#808080',
@@ -545,9 +545,16 @@ body::after {
   function soundTimeout() { tone(180, 'square', 0.30, 0.10); }
 
   /* ─── PARTICLES ──────────────────────────────────────────── */
+  var pCanvasLogicalW, pCanvasLogicalH;
   function resizeCanvas() {
-    pCanvas.width  = window.innerWidth;
-    pCanvas.height = window.innerHeight;
+    var dpr = window.devicePixelRatio || 1;
+    pCanvasLogicalW = window.innerWidth;
+    pCanvasLogicalH = window.innerHeight;
+    pCanvas.width  = pCanvasLogicalW * dpr;
+    pCanvas.height = pCanvasLogicalH * dpr;
+    pCanvas.style.width  = pCanvasLogicalW + 'px';
+    pCanvas.style.height = pCanvasLogicalH + 'px';
+    pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
@@ -566,7 +573,7 @@ body::after {
     }
   }
   function tickParticles() {
-    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    pCtx.clearRect(0, 0, pCanvasLogicalW, pCanvasLogicalH);
     particles = particles.filter(function(p){ return p.life > 0; });
     particles.forEach(function(p) {
       p.x  += p.vx;
@@ -799,6 +806,16 @@ body::after {
   document.getElementById('startBtn').addEventListener('click', startGame);
   document.getElementById('startBtn').addEventListener('touchend', function(e){
     e.preventDefault(); startGame();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (gameScreen.classList.contains('active') || revealScreen.classList.contains('active')) {
+        answered = true;
+        if (timerRAF) { cancelAnimationFrame(timerRAF); timerRAF = null; }
+        showScreen('startScreen');
+      }
+    }
   });
 })();
 

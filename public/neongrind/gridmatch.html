@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/gridmatch.html">
 <meta property="og:title" content="GridMatch — Free Online Spot-the-Difference Speed Game | NEON ARCADE">
 <meta property="og:description" content="Two grids, one difference — find it fast.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/gridmatch.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/gridmatch.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neongrind/gridmatch.html">
 <meta name="twitter:title" content="GridMatch — Free Online Spot-the-Difference Speed Game | NEON ARCADE">
 <meta name="twitter:description" content="Two grids, one difference — find it fast.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/gridmatch.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/gridmatch.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/gridmatch.png",
+  "image": "https://neonarcade.net/neongrind/screenshots/gridmatch.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -821,6 +821,18 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       });
     }
   }
+
+  // ===================== ESC TO QUIT =====================
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active') && !gameEnded) {
+      e.preventDefault();
+      stopTimer();
+      roundActive = false;
+      gameEnded = true;
+      showScreen(startScreen);
+      Neon.render(document.getElementById('startLB'));
+    }
+  });
 
   // ===================== EVENT LISTENERS =====================
   startBtn.addEventListener('click', startGame);

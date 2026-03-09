@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/neurosort.html">
 <meta property="og:title" content="NeuroSort — Speed Sorting Brain Game | NEON ARCADE">
 <meta property="og:description" content="Play NeuroSort free online — sort items at blazing speed using quick decisions. A brain-training game that tests your categorization reflexes.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/neurosort.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/neurosort.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neongrind/neurosort.html">
 <meta name="twitter:title" content="NeuroSort — Speed Sorting Brain Game | NEON ARCADE">
 <meta name="twitter:description" content="Play NeuroSort free online — sort items at blazing speed using quick decisions. A brain-training game that tests your categorization reflexes.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/neurosort.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/neurosort.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/neurosort.png",
+  "image": "https://neonarcade.net/neongrind/screenshots/neurosort.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1671,6 +1671,14 @@ canvas{position:absolute;top:0;left:0;z-index:1}
   // INPUT - KEYBOARD
   // ============================================================
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (state === 'playing' || state === 'intro' || state === 'complete') {
+        e.preventDefault();
+        state = 'start';
+        buildStartScreen();
+      }
+      return;
+    }
     if (state !== 'playing') return;
     if (itemState !== 'falling' && itemState !== 'preview' && itemState !== 'entrance') return;
 

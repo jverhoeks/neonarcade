@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/mine-finder.html">
 <meta property="og:title" content="Mine Finder — Reverse Minesweeper vs AI | NEON ARCADE">
 <meta property="og:description" content="Play Mine Finder free online — it's reverse Minesweeper! You place the mines, the AI tries to find them. Outsmart the algorithm in this strategic twist.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/mine-finder.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/mine-finder.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/mine-finder.html">
 <meta name="twitter:title" content="Mine Finder — Reverse Minesweeper vs AI | NEON ARCADE">
 <meta name="twitter:description" content="Play Mine Finder free online — it's reverse Minesweeper! You place the mines, the AI tries to find them. Outsmart the algorithm in this strategic twist.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/mine-finder.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/mine-finder.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/mine-finder.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/mine-finder.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1413,6 +1413,17 @@ body::before {
     heatLegend.style.display = 'none';
     aiStatus.textContent = '';
     buildGrid();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && (phase === 'place' || phase === 'watch')) {
+      aiRunning = false;
+      aiTimeouts.forEach(function(t) { clearTimeout(t); });
+      aiTimeouts = [];
+      phase = 'start';
+      showScreen('start-screen');
+      updateBestDisplay();
+    }
   });
 
   // Init

@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/doodle-drop.html">
 <meta property="og:title" content="Doodle Drop — Draw Platforms While Falling | NEON ARCADE">
 <meta property="og:description" content="Play Doodle Drop free — draw your own platforms as you fall! Quick reflexes meet creativity in this unique falling game. Every playthrough is different.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/doodle-drop.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/doodle-drop.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/doodle-drop.html">
 <meta name="twitter:title" content="Doodle Drop — Draw Platforms While Falling | NEON ARCADE">
 <meta name="twitter:description" content="Play Doodle Drop free — draw your own platforms as you fall! Quick reflexes meet creativity in this unique falling game. Every playthrough is different.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/doodle-drop.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/doodle-drop.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/doodle-drop.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/doodle-drop.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1302,6 +1302,15 @@ canvas { display: block; position: absolute; top: 0; left: 0; }
   btnStart.addEventListener('click', startGame);
   btnRestart.addEventListener('click', startGame);
   btnShare.addEventListener('click', shareResult);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && state === 'playing') {
+      state = 'start';
+      hud.style.display = 'none';
+      gameOverScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+    }
+  });
 
   // === MAIN LOOP ===
   function loop(now) {

@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonmind/lightup.html">
 <meta property="og:title" content="LightUp (Akari) — Free Online Light Puzzle Game | NEON ARCADE">
 <meta property="og:description" content="Place bulbs to illuminate every cell. Classic Akari logic puzzle.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/lightup.png">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/lightup.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonmind/lightup.html">
 <meta name="twitter:title" content="LightUp (Akari) — Free Online Light Puzzle Game | NEON ARCADE">
 <meta name="twitter:description" content="Place bulbs to illuminate every cell. Classic Akari logic puzzle.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/lightup.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/lightup.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/lightup.png",
+  "image": "https://neonarcade.net/neonmind/screenshots/lightup.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1262,6 +1262,12 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     });
 
     document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (gameActive) {
+          backToMenu();
+        }
+        return;
+      }
       if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         undoMove();

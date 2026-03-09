@@ -1352,6 +1352,16 @@ canvas {
 
   // Also allow starting with space/enter from start screen
   document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && (state === 'playing' || state === 'dying' || state === 'waveTransition')) {
+      e.preventDefault();
+      state = 'start';
+      if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+      startScreen.classList.remove('hidden');
+      gameOverScreen.classList.add('hidden');
+      if (typeof Neon !== 'undefined') Neon.render(document.getElementById('startLB'));
+      requestAnimationFrame(idleLoop);
+      return;
+    }
     if (state === 'start' && (e.code === 'Space' || e.code === 'Enter')) {
       e.preventDefault();
       startGame();

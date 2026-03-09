@@ -950,7 +950,19 @@ canvas{display:block}
   var keys = {};
   document.addEventListener('keydown', function(e) {
     if (e.repeat && (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'x' || e.key === 'X' || e.key === 'z' || e.key === 'Z' || e.key === 'c' || e.key === 'C')) return;
-    if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') { e.preventDefault(); togglePause(); return; }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (playing && !gameOver) {
+        playing = false; gameOver = true;
+        if (paused) { paused = false; pauseOverlay.classList.remove('active'); }
+        startScreen.classList.remove('hidden');
+        gameOverScreen.classList.add('hidden');
+        initNeonForMode();
+        Neon.render(document.getElementById('startLB'));
+      }
+      return;
+    }
+    if (e.key === 'p' || e.key === 'P') { e.preventDefault(); togglePause(); return; }
     if (!playing || paused || gameOver || clearAnim > 0) return;
     switch (e.key) {
       case 'ArrowLeft':

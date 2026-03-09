@@ -6,9 +6,9 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 ## Architecture
 - Each game = 1 HTML file (HTML + CSS + JS, all inline)
 - Shared client library: `public/neon.js` — unified API, scores, name input, global leaderboard UI
-- 3 categories: `public/neonarcade/` (action), `public/neonmind/` (puzzles), `public/neongrind/` (skill/speed)
+- 4 categories: `public/neonarcade/` (action), `public/neonmind/` (puzzles), `public/neongrind/` (skill/speed), `public/neonclassic/` (retro)
 - Hub pages: `public/index.html` (main), plus category index pages
-- Screenshots: `public/screenshots/{game-name}.png` — 1280x800 viewport captures
+- Screenshots: `public/{category}/screenshots/{game-name}.png` — 1280x800 viewport captures (each category has its own screenshots subdir)
 - Backend: Cloudflare Worker (`src/worker.js`) with KV storage at `neonarcade.net`
 - Admin dashboards: `public/admin/stats.html`, `public/admin/topscores.html`
 - All deployable web files live in `public/` — control files stay in root
@@ -16,7 +16,7 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 ## File Structure
 ```
 public/                   # Deployed to Cloudflare Pages (wrangler assets directory)
-  index.html              # Main hub page linking to 3 categories
+  index.html              # Main hub page linking to 4 categories
   neon.js                 # Shared client library (API + scores + name + leaderboard + feedback UI)
   blog.html               # Behind-the-scenes blog
   updates.html            # Changelog
@@ -30,9 +30,12 @@ public/                   # Deployed to Cloudflare Pages (wrangler assets direct
   neongrind/              # Skill/speed games
     index.html            # NEON GRIND hub
     mathblitz.html, reflex-chain.html, ...
+  neonclassic/            # Retro games reimagined
+    index.html            # NEON CLASSIC hub
+    tetris.html, invaders.html, breakout.html, ...
   admin/                  # Admin dashboards
     stats.html, topscores.html
-  screenshots/            # PNG screenshots for landing page cards
+  {category}/screenshots/ # PNG screenshots per category (e.g. neonarcade/screenshots/)
 
 src/worker.js             # Cloudflare Worker backend
 wrangler.toml             # Wrangler deployment config (assets.directory = "./public")
@@ -150,7 +153,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
    - Neon.js auto-injects like/report feedback bar — no extra code needed
 6. **Sound effects** — Web Audio API (oscillator-based, no external audio files). At minimum: action sound, success sound, fail/death sound
 7. **Mobile support** — Touch controls, `touch-action: none`, responsive canvas sizing, `user-scalable=no` in viewport meta
-8. **Desktop support** — Keyboard controls (arrows/WASD/space as appropriate)
+8. **Desktop support** — Keyboard controls (arrows/WASD/space as appropriate). **ESC key must quit to start screen** during gameplay — no score save, no game-over flow, just return to menu.
 9. **HiDPI rendering** — Use `devicePixelRatio` for sharp canvas on Retina displays
 10. **60fps** — Use `requestAnimationFrame` with delta-time or fixed timestep (for games with animation loops)
 11. **SEO & meta tags** — Every game page must include (see template below):
@@ -216,7 +219,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 <meta property="og:url" content="https://neonarcade.net/{category}/{game-slug}.html">
 <meta property="og:title" content="{Game Name} — Free Online {Genre} Game | NEON ARCADE">
 <meta property="og:description" content="Play {Game Name} free online — {unique description}.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/{game-slug}.png">
+<meta property="og:image" content="https://neonarcade.net/{category}/screenshots/{game-slug}.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -227,7 +230,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 <meta name="twitter:url" content="https://neonarcade.net/{category}/{game-slug}.html">
 <meta name="twitter:title" content="{Game Name} — Free Online {Genre} Game | NEON ARCADE">
 <meta name="twitter:description" content="Play {Game Name} free online — {unique description}.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/{game-slug}.png">
+<meta name="twitter:image" content="https://neonarcade.net/{category}/screenshots/{game-slug}.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -243,7 +246,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/{game-slug}.png",
+  "image": "https://neonarcade.net/{category}/screenshots/{game-slug}.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -273,12 +276,27 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
    - `public/neonarcade/` — action/arcade games
    - `public/neonmind/` — classic brain puzzles (sudoku, minesweeper, etc.)
    - `public/neongrind/` — skill/speed challenges
+   - `public/neonclassic/` — retro games reimagined
 2. Follow the visual style guide above exactly (colors, typography, effects, contrast)
-3. Copy the SEO head template above and fill in placeholders
+   - **CRITICAL**: Use ONLY the standard palette colors. NEVER use #000/#000000 for backgrounds (use #0a0a12). NEVER use non-standard accent colors like #ffff00, #00e5ff, #ff6622 etc.
+   - **REQUIRED effects**: scanline overlay (body::after), screen shake (@keyframes shake), particle effects, neon glow (text-shadow)
+3. Copy the SEO head template above and fill in ALL placeholders — especially:
+   - `og:locale` (en_US) — MUST be included
+   - `twitter:url` — MUST be included, matching canonical URL
+   - Screenshot path in OG/Twitter/JSON-LD MUST use category subdir: `https://neonarcade.net/{category}/screenshots/{game-slug}.png`
 4. Include `<script src="/neon.js"></script>` and integrate with Neon.init/save/render (see Required Features #5)
 5. Include all required features (start screen, game over, share, neon.js scores, sound, mobile, SEO)
-6. Take a screenshot at 1280x800 and save as `public/screenshots/{game-name}.png`
-7. Add a card to the category's `index.html` hub page following the existing card pattern:
+6. **Canvas games MUST use HiDPI rendering**:
+   ```javascript
+   var dpr = window.devicePixelRatio || 1;
+   canvas.width = logicalWidth * dpr;
+   canvas.height = logicalHeight * dpr;
+   canvas.style.width = logicalWidth + 'px';
+   canvas.style.height = logicalHeight + 'px';
+   ctx.scale(dpr, dpr);
+   ```
+7. Take a screenshot at 1280x800 and save as `public/{category}/screenshots/{game-name}.png`
+8. Add a card to the category's `index.html` hub page following the existing card pattern:
    ```html
    <a href="{game-name}.html" class="game-card" data-accent="{color}">
      <div class="card-screenshot">
@@ -303,9 +321,15 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
      </div>
    </a>
    ```
-8. Update the hub page game count in the stats section
-9. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
-10. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple)
+9. Update the hub page game count in the stats section
+10. **Update `public/index.html` CATALOG array** — add the new game entry with slug, name, desc, img path
+11. **Update `public/index.html` game counts** — update "ALL X GAMES" link text and total game count in header/SEO
+12. **Register game in `src/worker.js` KNOWN_GAMES** — add slug with mode ('high'/'low') and maxScore
+13. **Update `public/updates.html`** — add changelog entry for the new game
+14. **Update `public/sitemap.xml`** — add `<url>` entry for the new game
+15. **Update `public/llms.txt`** — add the game to the appropriate category listing
+16. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
+17. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple)
 
 ## Ideas Backlog
 See `VIRAL_GAME_IDEAS.md` for 25+ ranked game concepts organized in tiers:

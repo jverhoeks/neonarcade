@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/pour.html">
 <meta property="og:title" content="Pour — Free Online Fluid Physics Game | NEON ARCADE">
 <meta property="og:description" content="Play Pour free online — tilt and guide neon particle-fluid into target containers.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/pour.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/pour.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/pour.html">
 <meta name="twitter:title" content="Pour — Free Online Fluid Physics Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Pour free online — tilt and guide neon particle-fluid into target containers.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/pour.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/pour.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/pour.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/pour.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -1026,6 +1026,15 @@ let touchStartX = 0;
 let touchActive = false;
 
 document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    if(state === 'playing' || state === 'levelIntroState' || state === 'levelCompleteState'){
+      state = 'start';
+      pouring = false;
+      pourIndicator.classList.remove('active');
+      showScreen('startScreen');
+      return;
+    }
+  }
   keys[e.code] = true;
   if(e.code === 'Space'){
     e.preventDefault();

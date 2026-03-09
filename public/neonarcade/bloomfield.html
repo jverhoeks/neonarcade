@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/bloomfield.html">
 <meta property="og:title" content="Bloomfield — Free Online Generative Art Game | NEON ARCADE">
 <meta property="og:description" content="Play Bloomfield free online — plant neon seeds and grow a procedural glowing garden.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/bloomfield.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/bloomfield.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/bloomfield.html">
 <meta name="twitter:title" content="Bloomfield — Free Online Generative Art Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Bloomfield free online — plant neon seeds and grow a procedural glowing garden.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/bloomfield.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/bloomfield.png">
 
 <script type="application/ld+json">
 {
@@ -46,7 +46,7 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
-  "image": "https://neonarcade.net/screenshots/bloomfield.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/bloomfield.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -307,6 +307,7 @@ canvas {
   75% { transform: translate(-2px, 1px); }
 }
 .shake { animation: shake 0.25s; }
+body::after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);z-index:9999}
 </style>
 </head>
 <body>
@@ -941,6 +942,16 @@ canvas {
   });
   replayBtn.addEventListener('click', function() {
     startGame();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && state === 'playing') {
+      state = 'start';
+      hud.classList.remove('active');
+      colorPicker.classList.remove('active');
+      endScreen.classList.remove('active');
+      startScreen.classList.add('active');
+    }
   });
 
   // ============ NEON.JS ============

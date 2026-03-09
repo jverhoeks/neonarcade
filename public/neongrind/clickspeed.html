@@ -20,18 +20,20 @@
 <meta property="og:url" content="https://neonarcade.net/neongrind/clickspeed.html">
 <meta property="og:title" content="Click Speed Test — Free Online CPS Test | NEON ARCADE">
 <meta property="og:description" content="Test your click speed. How many clicks per second can you do?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/clickspeed.png">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/clickspeed.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neongrind/clickspeed.html">
 <meta name="twitter:title" content="Click Speed Test — Free Online CPS Test | NEON ARCADE">
 <meta name="twitter:description" content="Test your click speed. How many clicks per second can you do?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/clickspeed.png">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/clickspeed.png">
 
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Click Speed Test","url":"https://neonarcade.net/neongrind/clickspeed.html","description":"Test your click speed. Standard, precision, and burst CPS modes.","genre":"Skill","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/screenshots/clickspeed.png","inLanguage":"en","isFamilyFriendly":true}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Click Speed Test","url":"https://neonarcade.net/neongrind/clickspeed.html","description":"Test your click speed. Standard, precision, and burst CPS modes.","genre":"Skill","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/neongrind/screenshots/clickspeed.png","inLanguage":"en","isFamilyFriendly":true}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON GRIND","item":"https://neonarcade.net/neongrind/"},{"@type":"ListItem","position":3,"name":"Click Speed Test","item":"https://neonarcade.net/neongrind/clickspeed.html"}]}
@@ -1086,6 +1088,24 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       resultBestEl.textContent = (Neon.getHighScore() / 10).toFixed(1);
     });
   }
+
+  // ====== ESC TO QUIT ======
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameActive) {
+      e.preventDefault();
+      gameActive = false;
+      burstPaused = false;
+      if (animFrame) cancelAnimationFrame(animFrame);
+      clearInterval(precisionShrinkTimer);
+      var pt = clickZone.querySelector('.precision-target');
+      if (pt && pt.parentNode) pt.parentNode.removeChild(pt);
+      clickZone.classList.remove('pulse');
+      clickZone.style.borderColor = 'rgba(0,240,255,0.3)';
+      clickZone.style.boxShadow = '';
+      showScreen(startScreen);
+      initNeon();
+    }
+  });
 
   // ====== INIT ======
   initNeon();

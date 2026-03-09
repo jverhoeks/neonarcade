@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/curfew.html">
 <meta property="og:title" content="Curfew — Stealth Survival Game | NEON ARCADE">
 <meta property="og:description" content="Play Curfew free online — sneak past patrols and reach safety before time runs out. A tense stealth survival game with neon noir atmosphere.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/curfew.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/curfew.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -31,7 +31,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/curfew.html">
 <meta name="twitter:title" content="Curfew — Stealth Survival Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Curfew free online — sneak past patrols and reach safety before time runs out. A tense stealth survival game with neon noir atmosphere.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/curfew.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/curfew.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -56,7 +56,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/curfew.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/curfew.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -679,6 +679,14 @@ function handleDir(dc, dr) {
 }
 
 window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (state === 'playing') {
+      state = 'start';
+      stopDrone();
+      showScreen('start');
+      return;
+    }
+  }
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D'].includes(e.key)) {
     e.preventDefault();
   }

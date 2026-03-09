@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/neon-snake.html">
 <meta property="og:title" content="Neon Snake — Free Online Snake Game | NEON ARCADE">
 <meta property="og:description" content="Play Neon Snake free online — the classic snake game reimagined with neon visuals and smooth controls. Eat, grow, survive. How long can you last?">
-<meta property="og:image" content="https://neonarcade.net/screenshots/neon-snake.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/neon-snake.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/neon-snake.html">
 <meta name="twitter:title" content="Neon Snake — Free Online Snake Game | NEON ARCADE">
 <meta name="twitter:description" content="Play Neon Snake free online — the classic snake game reimagined with neon visuals and smooth controls. Eat, grow, survive. How long can you last?">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/neon-snake.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/neon-snake.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/neon-snake.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/neon-snake.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -469,6 +469,50 @@
   const EASY_GROW = 1;
   const HARD_GROW = 3;
 
+  // --- AUDIO ---
+  var audioCtx = null;
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function playEat() {
+    initAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'square';
+    o.frequency.setValueAtTime(400, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    o.start(); o.stop(audioCtx.currentTime + 0.15);
+  }
+
+  function playMove() {
+    initAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(200, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    o.start(); o.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playDeath() {
+    initAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(400, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.4);
+    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+    o.start(); o.stop(audioCtx.currentTime + 0.4);
+  }
+
   // --- ELEMENTS ---
   const canvas = document.getElementById('game-canvas');
   const ctx = canvas.getContext('2d');
@@ -483,15 +527,22 @@
   // --- SIZING ---
   let cols, rows, cellSize;
 
+  let canvasLogicalW, canvasLogicalH;
   function resize() {
+    const dpr = window.devicePixelRatio || 1;
     const maxW = Math.min(window.innerWidth * 0.92, 500);
     const maxH = Math.min(window.innerHeight * 0.65, 500);
     const maxCell = Math.floor(Math.min(maxW, maxH) / GRID);
     cellSize = Math.max(maxCell, 12);
     cols = GRID;
     rows = GRID;
-    canvas.width = cols * cellSize;
-    canvas.height = rows * cellSize;
+    canvasLogicalW = cols * cellSize;
+    canvasLogicalH = rows * cellSize;
+    canvas.width = canvasLogicalW * dpr;
+    canvas.height = canvasLogicalH * dpr;
+    canvas.style.width = canvasLogicalW + 'px';
+    canvas.style.height = canvasLogicalH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   resize();
@@ -651,6 +702,7 @@
     }
 
     if (ate) {
+      playEat();
       scoreEl.textContent = score;
       scoreEl.classList.add('pop');
       setTimeout(() => scoreEl.classList.remove('pop'), 120);
@@ -683,6 +735,7 @@
   function die() {
     gameRunning = false;
     gameOver = true;
+    playDeath();
     canvas.classList.add('shake');
     setTimeout(() => canvas.classList.remove('shake'), 250);
 
@@ -714,7 +767,7 @@
 
   // --- DRAW ---
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvasLogicalW, canvasLogicalH);
 
     // grid
     ctx.strokeStyle = 'rgba(255,255,255,0.02)';
@@ -840,10 +893,21 @@
     // prevent queuing same direction
     if (nextDir.x === dx && nextDir.y === dy) return;
     nextDir = { x: dx, y: dy };
+    playMove();
   }
 
   document.addEventListener('keydown', (e) => {
     if (e.repeat) return;
+
+    if (e.key === 'Escape') {
+      if (gameRunning && !gameOver) {
+        clearTimeout(tickTimer);
+        gameRunning = false;
+        gameoverOverlay.classList.remove('visible');
+        startOverlay.classList.add('visible');
+        return;
+      }
+    }
 
     // start/restart with space
     if (e.code === 'Space') {

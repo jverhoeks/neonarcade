@@ -1,29 +1,90 @@
 # NEON ARCADE
 
-> Play 35+ free online browser games instantly — no download, no login required. Arcade, puzzle and skill games with global leaderboards.
+> Play 54 free online browser games instantly — no download, no login required. Arcade, puzzle, skill and retro games with global leaderboards.
 
-NEON ARCADE is a collection of 35+ free HTML5 browser games organized in three categories:
+NEON ARCADE is a collection of 54 free HTML5 browser games organized in four categories:
 
 ## Categories
 
-- [NEON ARCADE](https://neonarcade.net/neonarcade/) — Quick viral action games (30-60 seconds)
-- [NEON MIND](https://neonarcade.net/neonmind/) — Classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
-- [NEON GRIND](https://neonarcade.net/neongrind/) — Progressive skill challenges
+- [NEON ARCADE](https://neonarcade.net/neonarcade/) — 28 quick viral action games (30-60 seconds)
+- [NEON MIND](https://neonarcade.net/neonmind/) — 12 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
+- [NEON GRIND](https://neonarcade.net/neongrind/) — 7 progressive skill challenges
+- [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 7 retro arcade classics reimagined
 
-## Popular Games
+## All Games
 
-- [Neon Snake](https://neonarcade.net/neonarcade/neon-snake.html) — Classic snake with risk vs reward mechanics
-- [Sudoku](https://neonarcade.net/neonmind/sudoku.html) — 9x9 Sudoku with four difficulty levels
-- [Minesweeper](https://neonarcade.net/neonmind/minesweeper.html) — Six progressive grid sizes
-- [Queens](https://neonarcade.net/neonmind/queens.html) — Place queens on colored regions, no conflicts
-- [MathBlitz](https://neonarcade.net/neongrind/mathblitz.html) — Mental math speed challenge, 30 levels
-- [Tetris Betrayal](https://neonarcade.net/neonarcade/tetris-betrayal.html) — Play Tetris badly on purpose
+### NEON ARCADE
+- [Afterglow](https://neonarcade.net/neonarcade/afterglow.html) — Navigate through fading trails of light
+- [Bloomfield](https://neonarcade.net/neonarcade/bloomfield.html) — Grow flowers in a neon garden
+- [Breakout Architect](https://neonarcade.net/neonarcade/breakout-architect.html) — Design levels, challenge friends
+- [Burndown](https://neonarcade.net/neonarcade/burndown.html) — Speedrun tower of micro-tasks
+- [Catalyst](https://neonarcade.net/neonarcade/catalyst.html) — Chain reactions in a particle field
+- [Chimp Test](https://neonarcade.net/neonarcade/chimp.html) — Memory sequence challenge
+- [Chromaself](https://neonarcade.net/neonarcade/chromaself.html) — Color personality quiz game
+- [Curfew](https://neonarcade.net/neonarcade/curfew.html) — Stealth avoidance under time pressure
+- [Doodle Drop](https://neonarcade.net/neonarcade/doodle-drop.html) — Draw platforms while falling
+- [Faultline](https://neonarcade.net/neonarcade/faultline.html) — Find the shifted pixel row
+- [Flappy Rewind](https://neonarcade.net/neonarcade/flappy-rewind.html) — Flappy Bird with time rewind
+- [Gridlock](https://neonarcade.net/neonarcade/gridlock.html) — Slide blocks to solve the puzzle
 - [Impostor Pixel](https://neonarcade.net/neonarcade/impostor-pixel.html) — Spot the different tile
+- [Mine Finder](https://neonarcade.net/neonarcade/mine-finder.html) — Reverse Minesweeper vs AI
+- [Neon Snake](https://neonarcade.net/neonarcade/neon-snake.html) — Classic snake with risk vs reward
+- [Pac-Man Amnesia](https://neonarcade.net/neonarcade/pacman-amnesia.html) — Pac-Man but the maze fades
+- [Palette](https://neonarcade.net/neonarcade/palette.html) — Match colors from memory
+- [Pong Both Sides](https://neonarcade.net/neonarcade/pong-both-sides.html) — Control both paddles at once
+- [Pour](https://neonarcade.net/neonarcade/pour.html) — Water sorting puzzle
+- [Priorself](https://neonarcade.net/neonarcade/priorself.html) — Ghost-cooperation puzzle
+- [Signal](https://neonarcade.net/neonarcade/signal.html) — Daily cipher puzzle
+- [Split Second](https://neonarcade.net/neonarcade/split-second.html) — Reflex-based decision game
+- [Territory](https://neonarcade.net/neonarcade/territory.html) — Daily grid strategy puzzle
+- [Tetris Betrayal](https://neonarcade.net/neonarcade/tetris-betrayal.html) — Play Tetris badly on purpose
+- [Truecolor](https://neonarcade.net/neonarcade/truecolor.html) — Test your color perception
+- [TypeBlitz](https://neonarcade.net/neonarcade/typeblitz.html) — Speed typing challenge
+- [Wordchain](https://neonarcade.net/neonarcade/wordchain.html) — Build word chains against the clock
+- [Wordchain Duel](https://neonarcade.net/neonarcade/wordchain-duel.html) — Async 1v1 word chain challenge
+
+### NEON MIND
+- [Bridges](https://neonarcade.net/neonmind/bridges.html) — Connect islands with bridges
+- [Kakuro](https://neonarcade.net/neonmind/kakuro.html) — Cross-sum number puzzle
+- [Light Up](https://neonarcade.net/neonmind/lightup.html) — Place bulbs to illuminate the grid
+- [Minesweeper](https://neonarcade.net/neonmind/minesweeper.html) — Six progressive grid sizes
+- [MiniSudoku](https://neonarcade.net/neonmind/minisudoku.html) — Quick 6x6 Sudoku
+- [Nonogram](https://neonarcade.net/neonmind/nonogram.html) — Pixel art logic puzzle
+- [Nurikabe](https://neonarcade.net/neonmind/nurikabe.html) — Island-in-the-stream logic puzzle
+- [Queens](https://neonarcade.net/neonmind/queens.html) — Place queens on colored regions
+- [Skyscrapers](https://neonarcade.net/neonmind/skyscrapers.html) — Latin square with visibility clues
+- [Sudoku](https://neonarcade.net/neonmind/sudoku.html) — 9x9 Sudoku with four difficulty levels
+- [Tango](https://neonarcade.net/neonmind/tango.html) — Binary placement puzzle
+- [Tents](https://neonarcade.net/neonmind/tents.html) — Place tents next to trees
+
+### NEON GRIND
+- [Click Speed](https://neonarcade.net/neongrind/clickspeed.html) — How fast can you click?
+- [ColorName](https://neonarcade.net/neongrind/colorname.html) — Name the color, not the word
+- [GridMatch](https://neonarcade.net/neongrind/gridmatch.html) — Spot the difference in growing grids
+- [MathBlitz](https://neonarcade.net/neongrind/mathblitz.html) — Mental math speed challenge
+- [NeuroSort](https://neonarcade.net/neongrind/neurosort.html) — Sort numbers under pressure
+- [NumberSense](https://neonarcade.net/neongrind/numbersense.html) — Estimate quantities quickly
+- [Reflex Chain](https://neonarcade.net/neongrind/reflex-chain.html) — Sequential reaction time test
+
+### NEON CLASSIC
+- [Neon 2048](https://neonarcade.net/neonclassic/2048.html) — Slide and merge to 2048
+- [Neon Asteroids](https://neonarcade.net/neonclassic/asteroids.html) — Destroy asteroids in neon space
+- [Neon Breakout](https://neonarcade.net/neonclassic/breakout.html) — Smash neon bricks with combos
+- [Neon Frogger](https://neonarcade.net/neonclassic/frogger.html) — Cross the road in neon traffic
+- [Neon Invaders](https://neonarcade.net/neonclassic/invaders.html) — Defend against neon alien waves
+- [Neon Pairs](https://neonarcade.net/neonclassic/pairs.html) — Memory card matching
+- [Neon Tetris](https://neonarcade.net/neonclassic/tetris.html) — Classic block stacking reimagined
 
 ## Features
 
 - All games are free, no account required
 - Every game runs in the browser (HTML5, no plugins)
 - Mobile and desktop support with touch and keyboard controls
+- ESC key quits to menu during gameplay
 - Global leaderboards and score sharing
 - Neon-retro visual style with dark theme
+
+## Other Pages
+
+- [Blog](https://neonarcade.net/blog.html) — Behind-the-scenes development articles
+- [Updates](https://neonarcade.net/updates.html) — Changelog and release notes

@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://neonarcade.net/neonarcade/faultline.html">
 <meta property="og:title" content="Faultline — Find the Shifted Pixel Row | NEON ARCADE">
 <meta property="og:description" content="Play Faultline free online — spot the single shifted pixel row in beautiful photos. A visual precision challenge that tests your eye for detail.">
-<meta property="og:image" content="https://neonarcade.net/screenshots/faultline.png">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/faultline.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
 <meta property="og:site_name" content="NEON ARCADE">
@@ -34,7 +34,7 @@
 <meta name="twitter:url" content="https://neonarcade.net/neonarcade/faultline.html">
 <meta name="twitter:title" content="Faultline — Find the Shifted Pixel Row | NEON ARCADE">
 <meta name="twitter:description" content="Play Faultline free online — spot the single shifted pixel row in beautiful photos. A visual precision challenge that tests your eye for detail.">
-<meta name="twitter:image" content="https://neonarcade.net/screenshots/faultline.png">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/faultline.png">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -59,7 +59,7 @@
     "name": "NEON ARCADE",
     "url": "https://neonarcade.net"
   },
-  "image": "https://neonarcade.net/screenshots/faultline.png",
+  "image": "https://neonarcade.net/neonarcade/screenshots/faultline.png",
   "inLanguage": "en",
   "isFamilyFriendly": true
 }
@@ -950,6 +950,17 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
     ensureAudio();
     soundTap();
     shareResults();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && roundActive) {
+      roundActive = false;
+      scanActive = false;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF = null; }
+      showScreen('startScreen');
+      updateBestDisplay();
+    }
   });
 
   updateBestDisplay();
