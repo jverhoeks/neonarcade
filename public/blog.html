@@ -159,6 +159,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 9 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Battleship: Our First Online Multiplayer Game",
+  "description": "How we added real-time online 2-player multiplayer to NEON ARCADE using room codes, HTTP polling, and a Cloudflare Worker relay — no WebSockets needed.",
+  "url": "https://neonarcade.net/blog.html#battleship-multiplayer",
+  "datePublished": "2026-03-09",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#battleship-multiplayer"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -741,6 +757,14 @@
     <li><a href="#quality-gates">
       <span class="toc-num">07</span>
       <span class="toc-text">Quality Gates &mdash; Pre-Commit Testing and the Second Security Audit</span>
+    </a></li>
+    <li><a href="#self-audit">
+      <span class="toc-num">08</span>
+      <span class="toc-text">The Self-Audit &mdash; When AI Reviews Its Own Work</span>
+    </a></li>
+    <li><a href="#battleship-multiplayer">
+      <span class="toc-num">09</span>
+      <span class="toc-text">Battleship &mdash; Our First Online Multiplayer Game</span>
     </a></li>
   </ol>
 </nav>
@@ -1426,6 +1450,60 @@ Neon.getName() ? Promise.resolve() : Neon.promptName();
   <h3>The Result</h3>
 
   <p>Two audit passes, 8 parallel agents, 54 games touched. Every issue found was fixed in the same session. The audit turned unknown unknowns into a prioritized backlog, and then cleared the entire backlog. Zero items deferred. That is the power of automated auditing: when finding and fixing have the same cost, there is no reason to postpone anything.</p>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 9 -->
+<!-- ================================================================ -->
+<article class="article" id="battleship-multiplayer">
+  <p class="article-num">Article 09 &mdash; March 9, 2026</p>
+  <h2 class="article-title">Battleship: Our First Online Multiplayer Game</h2>
+
+  <p>We added Battleship &mdash; the classic naval strategy game &mdash; with a twist: <strong>real online 2-player mode.</strong> For the first time in NEON ARCADE, you can play against someone on a completely different device.</p>
+
+  <h3>How It Works</h3>
+
+  <p>The flow is dead simple. Create a room &rarr; get a 4-letter code &rarr; share it with a friend &rarr; they join &rarr; you battle. No accounts, no friend lists, no matchmaking queues. Just a code and a browser.</p>
+
+  <p>Both players place their 5-ship fleet on a 10&times;10 grid, then take turns firing shots. You see your own board (with your ships and incoming hits) and the enemy board (a fog of war that reveals hits and misses as you fire). First to sink all 5 enemy ships wins.</p>
+
+  <h3>The Technical Approach</h3>
+
+  <p>Online multiplayer sounds like it requires WebSockets, game servers, and a monthly hosting bill. We did it with none of those. The entire multiplayer system runs through our existing <strong>Cloudflare Worker backend</strong> using simple HTTP polling.</p>
+
+  <p>Here is the architecture: when a player creates a room, the Worker generates a random 4-letter code and stores the room state in KV. Both players poll the Worker every 800ms asking "is it my turn? what happened?" The Worker relays messages between players &mdash; fire coordinates, hit/miss results, ship sunk notifications &mdash; but never makes game decisions. Each client validates moves locally.</p>
+
+  <p>Room codes auto-expire after 10 minutes of inactivity. No zombie rooms, no cleanup cron jobs, no database maintenance. KV's built-in TTL handles garbage collection for free.</p>
+
+  <h3>The AI Opponent</h3>
+
+  <p>Not everyone has a friend online at the same time, so the single-player AI needed to be good. It uses a <strong>hunt-and-target algorithm</strong> with two modes:</p>
+
+  <ul>
+    <li><strong>Hunt mode</strong> &mdash; Fires on a checkerboard pattern. Why? Because every ship is at least 2 cells long, a checkerboard pattern guarantees you will hit every possible ship position with half the total shots. It is mathematically the most efficient random search.</li>
+    <li><strong>Target mode</strong> &mdash; When a shot hits, the AI switches to probing adjacent cells. If it gets a second hit, it follows the line (horizontal or vertical) until it sinks the ship, then returns to hunt mode.</li>
+  </ul>
+
+  <p>The result is an AI that feels smart without being unfair. It does not cheat &mdash; it never peeks at your board. It just uses the same logical deduction a skilled human player would.</p>
+
+  <h3>Privacy by Design</h3>
+
+  <p><strong>Ship positions never leave your browser.</strong> Only fire coordinates and hit/miss results are transmitted. The Worker relays messages between players but never sees your fleet layout. Even if someone intercepted the network traffic, they would only see where shots landed, not where ships are. Your fleet is your secret.</p>
+
+  <h3>A Generic Room System</h3>
+
+  <p>This multiplayer infrastructure is not just for Battleship. It is a <strong>generic room-based relay system</strong> that any future game can use. The Worker does not know or care what game is being played &mdash; it just passes messages between two players in a room. Tetris Battle, Puzzle Races, Word Duels, or any game where players need to exchange moves could plug into the same system.</p>
+
+  <p>The room API is simple: <code>create</code> (returns a code), <code>join</code> (joins with a code), <code>send</code> (posts a message), <code>poll</code> (reads new messages). Four endpoints, no game-specific logic on the server.</p>
+
+  <h3>What's Next</h3>
+
+  <p>Battleship is game 55, and the first with cross-device multiplayer. But the real milestone is the infrastructure. We are working on engagement features like challenge links (share a URL that drops someone straight into a game against you), daily modes with streaks, and percentile rankings in share text. The multiplayer room system opens up an entire category of games we could not build before.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Takeaway</span>
+    <p>You do not need WebSockets or a game server to build online multiplayer. A Cloudflare Worker, KV storage, and 800ms polling intervals give you a surprisingly smooth turn-based multiplayer experience &mdash; for $0/month. Sometimes the simplest architecture is the best one.</p>
+  </div>
 </article>
 
 </div><!-- .articles -->
