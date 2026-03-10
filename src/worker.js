@@ -71,6 +71,7 @@ const KNOWN_GAMES = {
   'pairs':               { mode: 'low', maxScore: 86400 },
   'asteroids':           { mode: 'high', maxScore: 1000000 },
   'frogger':             { mode: 'high', maxScore: 1000000 },
+  'battleship':          { mode: 'low', maxScore: 200 },
 };
 
 function isAllowedOrigin(request) {
@@ -118,6 +119,39 @@ async function checkRateLimit(kv, request) {
   if (current >= 30) return false;
   await kv.put(key, String(current + 1), { expirationTtl: 60 });
   return true;
+}
+
+// Generate a random 4-letter uppercase room code
+function generateRoomCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < 4; i++) {
+    code += chars[Math.floor(Math.random() * 26)];
+  }
+  return code;
+}
+
+// Generate a random token string
+function generateToken() {
+  return Math.random().toString(36).slice(2, 14);
+}
+
+// Sanitize room code: uppercase A-Z only, exactly 4 chars
+function sanitizeRoomCode(code) {
+  if (typeof code !== 'string') return null;
+  const cleaned = code.toUpperCase().replace(/[^A-Z]/g, '');
+  return cleaned.length === 4 ? cleaned : null;
+}
+
+// Safe JSON parse from KV with fallback (object version)
+function safeParseObject(data) {
+  if (!data) return null;
+  try {
+    const parsed = JSON.parse(data);
+    return (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
 // Safe JSON parse from KV with fallback
@@ -304,6 +338,125 @@ export default {
         if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
         const data = safeParseArray(await env.GAME_DATA.get(`lb:${game}`));
         return json({ game, leaderboard: data });
+      }
+
+      // ─── Multiplayer Room Endpoints ────────────────────────────────
+
+      // POST /api/room/create — create a new multiplayer room
+      if (request.method === 'POST' && segments[0] === 'room' && segments[1] === 'create') {
+        let code = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const candidate = generateRoomCode();
+          const existing = await env.GAME_DATA.get(`room:${candidate}`);
+          if (!existing) {
+            code = candidate;
+            break;
+          }
+        }
+        if (!code) return json({ error: 'failed to generate room code, try again' }, 503);
+
+        const p1Token = generateToken();
+        const room = {
+          p1Token,
+          p2Token: null,
+          messages: [],
+          created: Date.now(),
+          state: 'waiting',
+        };
+        await env.GAME_DATA.put(`room:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ code, token: p1Token });
+      }
+
+      // POST /api/room/join — join an existing room
+      if (request.method === 'POST' && segments[0] === 'room' && segments[1] === 'join') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const code = sanitizeRoomCode(body.code);
+        if (!code) return json({ error: 'invalid room code' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`room:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+        if (room.state !== 'waiting') return json({ error: 'room not available' }, 400);
+
+        const p2Token = generateToken();
+        room.p2Token = p2Token;
+        room.state = 'paired';
+        await env.GAME_DATA.put(`room:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ code, token: p2Token });
+      }
+
+      // POST /api/room/send — send a message to the room
+      if (request.method === 'POST' && segments[0] === 'room' && segments[1] === 'send') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const code = sanitizeRoomCode(body.code);
+        if (!code) return json({ error: 'invalid room code' }, 400);
+        if (!body.token) return json({ error: 'token required' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`room:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+
+        // Verify token and determine sender role
+        let from;
+        if (body.token === room.p1Token) from = 'p1';
+        else if (body.token === room.p2Token) from = 'p2';
+        else return json({ error: 'invalid token' }, 403);
+
+        // Append message, keep only last 50
+        room.messages.push({ from, msg: body.msg, ts: Date.now() });
+        if (room.messages.length > 50) {
+          room.messages = room.messages.slice(-50);
+        }
+
+        await env.GAME_DATA.put(`room:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ ok: true });
+      }
+
+      // GET /api/room/poll?code=ABCD&token=...&after=TIMESTAMP — poll for new messages
+      if (request.method === 'GET' && segments[0] === 'room' && segments[1] === 'poll') {
+        const code = sanitizeRoomCode(url.searchParams.get('code'));
+        if (!code) return json({ error: 'invalid room code' }, 400);
+        const token = url.searchParams.get('token');
+        if (!token) return json({ error: 'token required' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`room:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+
+        // Verify token and determine player role
+        let myRole;
+        if (token === room.p1Token) myRole = 'p1';
+        else if (token === room.p2Token) myRole = 'p2';
+        else return json({ error: 'invalid token' }, 403);
+
+        const after = parseInt(url.searchParams.get('after') || '0', 10);
+
+        // Return messages from the OTHER player after the given timestamp
+        const messages = room.messages.filter(m => m.from !== myRole && m.ts > after);
+        return json({ messages, state: room.state });
+      }
+
+      // POST /api/room/close — close a room
+      if (request.method === 'POST' && segments[0] === 'room' && segments[1] === 'close') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const code = sanitizeRoomCode(body.code);
+        if (!code) return json({ error: 'invalid room code' }, 400);
+        if (!body.token) return json({ error: 'token required' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`room:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+
+        // Verify token belongs to either player
+        if (body.token !== room.p1Token && body.token !== room.p2Token) {
+          return json({ error: 'invalid token' }, 403);
+        }
+
+        room.state = 'closed';
+        await env.GAME_DATA.put(`room:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ ok: true });
       }
 
       return json({ error: 'not found' }, 404);

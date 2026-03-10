@@ -1,12 +1,12 @@
 # NEON ARCADE
 
-> Play 54 free online browser games instantly — no download, no login required. Arcade, puzzle, skill and retro games with global leaderboards.
+> Play 55 free online browser games instantly — no download, no login required. Arcade, puzzle, skill and retro games with global leaderboards.
 
-NEON ARCADE is a collection of 54 free HTML5 browser games organized in four categories:
+NEON ARCADE is a collection of 55 free HTML5 browser games organized in four categories:
 
 ## Categories
 
-- [NEON ARCADE](https://neonarcade.net/neonarcade/) — 28 quick viral action games (30-60 seconds)
+- [NEON ARCADE](https://neonarcade.net/neonarcade/) — 29 quick viral action games (30-60 seconds)
 - [NEON MIND](https://neonarcade.net/neonmind/) — 12 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
 - [NEON GRIND](https://neonarcade.net/neongrind/) — 7 progressive skill challenges
 - [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 7 retro arcade classics reimagined
@@ -14,6 +14,7 @@ NEON ARCADE is a collection of 54 free HTML5 browser games organized in four cat
 ## All Games
 
 ### NEON ARCADE
+- [Battleship](https://neonarcade.net/neonarcade/battleship.html) — Classic naval warfare with smart AI and online 2-player multiplayer
 - [Afterglow](https://neonarcade.net/neonarcade/afterglow.html) — Navigate through fading trails of light
 - [Bloomfield](https://neonarcade.net/neonarcade/bloomfield.html) — Grow flowers in a neon garden
 - [Breakout Architect](https://neonarcade.net/neonarcade/breakout-architect.html) — Design levels, challenge friends
