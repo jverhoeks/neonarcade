@@ -1005,6 +1005,8 @@ h1 {
     ufoBullets = [];
     particles = [];
     debris = [];
+    ufoTimer = UFO_INTERVAL_MIN + Math.random() * (UFO_INTERVAL_MAX - UFO_INTERVAL_MIN);
+    shootCooldown = 0;
     resetShip();
     state = 'playing';
     document.getElementById('startScreen').classList.remove('active');
@@ -1017,6 +1019,7 @@ h1 {
 
   function killShip() {
     if (!ship.alive) return;
+    if (state !== 'playing' && state !== 'respawning') return;
     ship.alive = false;
     playDeath();
     spawnParticles(ship.x, ship.y, COL_CYAN, 20, 150);
@@ -1027,6 +1030,8 @@ h1 {
     lives--;
     if (lives <= 0) {
       state = 'gameover';
+      document.getElementById('hud').classList.remove('active');
+      if (isMobile && window._showMobileControls) window._showMobileControls(false);
       setTimeout(showGameOver, 1200);
     } else {
       state = 'respawning';
@@ -1089,7 +1094,7 @@ h1 {
     document.getElementById('goAccuracy').textContent = acc;
 
     const best = Neon.getHighScore();
-    document.getElementById('goBest').textContent = score > best && best > 0 ? 'NEW HIGH SCORE!' : 'BEST: ' + best;
+    document.getElementById('goBest').textContent = score > 0 && (best === 0 || score > best) ? 'NEW HIGH SCORE!' : 'BEST: ' + best;
 
     document.getElementById('gameOverScreen').classList.add('active');
 
@@ -1162,9 +1167,8 @@ h1 {
         if (keys['ArrowLeft'] || keys['KeyA']) turning = -1;
         if (keys['ArrowRight'] || keys['KeyD']) turning = 1;
         if (keys['ArrowUp'] || keys['KeyW']) thrusting = true;
+        ship.angle += turning * SHIP_TURN_SPEED * dt;
       }
-
-      ship.angle += turning * SHIP_TURN_SPEED * dt;
       ship.thrusting = thrusting;
 
       if (thrusting) {
@@ -1580,6 +1584,9 @@ h1 {
       state = 'start';
       stopThrust();
       stopUfoSound();
+      shootPressed = false;
+      hyperspacePressed = false;
+      Object.keys(keys).forEach(k => keys[k] = false);
       bullets = []; asteroids = []; ufos = []; ufoBullets = []; particles = []; debris = [];
       document.getElementById('hud').classList.remove('active');
       document.getElementById('gameOverScreen').classList.remove('active');
