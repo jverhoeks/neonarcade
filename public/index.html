@@ -671,7 +671,7 @@
     ],
   };
 
-  function makeCard(game, basePath, priority) {
+  function makeCard(game, basePath) {
     var path = game.path || basePath;
     var a = document.createElement('a');
     a.href = '/' + path + game.slug + '.html';
@@ -684,8 +684,7 @@
     img.alt = game.name + ' - free online browser game';
     img.width = 1280;
     img.height = 800;
-    if (priority) img.fetchPriority = 'high';
-    else img.loading = 'lazy';
+    img.loading = 'lazy';
     img.onerror = function() { this.style.display = 'none'; };
     ssDiv.appendChild(img);
     if (game.plays) {
@@ -725,42 +724,50 @@
     return String(n);
   }
 
-  function renderCategory(containerId, games, basePath, limit, priorityCount) {
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  // Pick 3 random games per category (fixed for this page load)
+  var picked = {
+    arcade: shuffle(CATALOG.arcade).slice(0, 3),
+    classic: shuffle(CATALOG.classic).slice(0, 3),
+    grind: shuffle(CATALOG.grind).slice(0, 3),
+    mind: shuffle(CATALOG.mind).slice(0, 3)
+  };
+
+  function renderCategory(containerId, games, basePath) {
     var container = document.getElementById(containerId);
     container.textContent = '';
-    var shown = games.slice(0, limit || 3);
-    shown.forEach(function(g, i) {
-      container.appendChild(makeCard(g, basePath, i < (priorityCount || 0)));
+    games.forEach(function(g) {
+      container.appendChild(makeCard(g, basePath, false));
     });
   }
 
-  // Initially render with default order
-  renderCategory('arcade-games', CATALOG.arcade, 'neonarcade/', 3, 3);
-  renderCategory('classic-games', CATALOG.classic, 'neonclassic/', 3);
-  renderCategory('grind-games', CATALOG.grind, 'neongrind/', 3);
-  renderCategory('mind-games', CATALOG.mind, 'neonmind/', 3);
+  // Initially render with random selection
+  renderCategory('arcade-games', picked.arcade, 'neonarcade/');
+  renderCategory('classic-games', picked.classic, 'neonclassic/');
+  renderCategory('grind-games', picked.grind, 'neongrind/');
+  renderCategory('mind-games', picked.mind, 'neonmind/');
 
-  // Fetch stats and re-render sorted by most played
+  // Fetch stats and add play counts to shown games (no re-sort)
   NeonAPI.allStats().then(function(data) {
     if (!data || !data.games) return;
     var stats = data.games;
-
-    function addPlays(games) {
-      games.forEach(function(g) {
+    ['arcade', 'classic', 'grind', 'mind'].forEach(function(cat) {
+      picked[cat].forEach(function(g) {
         g.plays = (stats[g.slug] || {}).plays || 0;
       });
-      games.sort(function(a, b) { return b.plays - a.plays; });
-    }
-
-    addPlays(CATALOG.arcade);
-    addPlays(CATALOG.classic);
-    addPlays(CATALOG.grind);
-    addPlays(CATALOG.mind);
-
-    renderCategory('arcade-games', CATALOG.arcade, 'neonarcade/', 3);
-    renderCategory('classic-games', CATALOG.classic, 'neonclassic/', 3);
-    renderCategory('grind-games', CATALOG.grind, 'neongrind/', 3);
-    renderCategory('mind-games', CATALOG.mind, 'neonmind/', 3);
+    });
+    renderCategory('arcade-games', picked.arcade, 'neonarcade/');
+    renderCategory('classic-games', picked.classic, 'neonclassic/');
+    renderCategory('grind-games', picked.grind, 'neongrind/');
+    renderCategory('mind-games', picked.mind, 'neonmind/');
   });
 })();
 </script>
