@@ -39,6 +39,8 @@ const KNOWN_GAMES = {
   'pour':                { mode: 'high', maxScore: 100000 },
   'bloomfield':          { mode: 'high', maxScore: 100 },
   'typeblitz':           { mode: 'high', maxScore: 5000 },
+  'veto':                { mode: 'high', maxScore: 100 },
+  'mimic':               { mode: 'high', maxScore: 100 },
 
   // NEON GRIND (mode: high)
   'mathblitz':           { mode: 'high', maxScore: 100000 },
@@ -47,6 +49,7 @@ const KNOWN_GAMES = {
   'colorname':           { mode: 'high', maxScore: 1000 },
   'numbersense':         { mode: 'high', maxScore: 2000 },
   'gridmatch':           { mode: 'high', maxScore: 1000 },
+  'sequencer':           { mode: 'high', maxScore: 100000 },
 
   // NEON MIND (mode: low — time-based puzzles)
   'sudoku':              { mode: 'low', maxScore: 86400 },
@@ -62,6 +65,9 @@ const KNOWN_GAMES = {
   'tents':               { mode: 'low', maxScore: 86400 },
   'skyscrapers':         { mode: 'low', maxScore: 86400 },
   'priorself':           { mode: 'low', maxScore: 86400 },
+  'connections':         { mode: 'low', maxScore: 86400 },
+  'hitori':              { mode: 'low', maxScore: 86400 },
+  'kenken':              { mode: 'low', maxScore: 86400 },
 
   // NEON CLASSIC (retro games, mode: high)
   'invaders':            { mode: 'high', maxScore: 1000000 },

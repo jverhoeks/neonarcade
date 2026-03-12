@@ -50,7 +50,7 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 
 ## NEON ARCADE Ideas (Action/Arcade)
 
-### Already Built (25 games)
+### Already Built (31 games)
 | # | Game | Type |
 |---|------|------|
 | 1 | Neon Snake | Classic arcade with risk/reward food placement |
@@ -77,6 +77,12 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 | 22 | Gridlock | Daily block-routing puzzle |
 | 23 | Doodle Drop | Draw platforms while falling |
 | 24 | Breakout Architect | Design + challenge Breakout levels |
+| 25 | Chimp | Memory test — are you smarter than a chimp? |
+| 26 | Pour | Water sorting puzzle |
+| 27 | Bloomfield | Generative neon garden |
+| 28 | TypeBlitz | Speed typing WPM challenge |
+| 29 | Veto | 2-player bracket elimination challenge |
+| 30 | Mimic | Social prediction game with challenge links |
 
 ### New Ideas -- Ranked
 
@@ -168,7 +174,7 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 
 ## NEON MIND Ideas (Brain Puzzles)
 
-### Already Built (8 games)
+### Already Built (15 games)
 | # | Game | Type |
 |---|------|------|
 | 1 | Sudoku | Classic 9x9 number placement |
@@ -179,6 +185,13 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 | 6 | Kakuro | Cross-sum number puzzle |
 | 7 | Bridges (Hashiwokakero) | Island bridge-building logic |
 | 8 | Nurikabe | Wall/island binary logic |
+| 9 | Tango | Binary logic puzzle |
+| 10 | LightUp | Place bulbs to illuminate grid |
+| 11 | Tents | Place tents next to trees |
+| 12 | Skyscrapers | Latin square with visibility clues |
+| 13 | Connections | Word grouping by hidden connection |
+| 14 | Hitori | Elimination logic puzzle |
+| 15 | KenKen | Math logic with arithmetic cages |
 
 ### New Ideas -- Ranked
 
@@ -284,12 +297,17 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 
 ## NEON GRIND Ideas (Skill/Speed)
 
-### Already Built (3 games)
+### Already Built (8 games)
 | # | Game | Type |
 |---|------|------|
 | 1 | MathBlitz | Speed arithmetic |
 | 2 | Reflex Chain | Reaction time sequence |
 | 3 | NeuroSort | Speed sorting/categorization |
+| 4 | ClickSpeed | Tapping speed / CPS test |
+| 5 | ColorName | Stroop effect speed challenge |
+| 6 | NumberSense | Dot estimation speed test |
+| 7 | GridMatch | Spot-the-difference speed test |
+| 8 | Sequencer | Simon Says pattern memory |
 
 ### New Ideas -- Ranked
 

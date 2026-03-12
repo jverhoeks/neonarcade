@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>KenKen — Free Online Math Logic Puzzle | NEON ARCADE</title>
+<meta name="description" content="Play KenKen free online — the math logic puzzle where arithmetic meets Latin squares. Fill cages with numbers using +, -, x, and division. No download, no login.">
+<meta name="keywords" content="kenken, kenken puzzle, math logic puzzle, free kenken online, brain game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonmind/kenken.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/kenken.html">
+<meta property="og:title" content="KenKen — Free Online Math Logic Puzzle | NEON ARCADE">
+<meta property="og:description" content="Play KenKen free online — the math logic puzzle where arithmetic meets Latin squares. Fill cages with numbers using +, -, x, and division.">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/kenken.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/kenken.html">
+<meta name="twitter:title" content="KenKen — Free Online Math Logic Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Play KenKen free online — the math logic puzzle where arithmetic meets Latin squares. Fill cages with numbers using +, -, x, and division.">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/kenken.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "KenKen",
+  "url": "https://neonarcade.net/neonmind/kenken.html",
+  "description": "Play KenKen free online — the math logic puzzle where arithmetic meets Latin squares. Fill cages with numbers using +, -, x, and division.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  },
+  "image": "https://neonarcade.net/neonmind/screenshots/kenken.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://neonarcade.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "NEON MIND",
+      "item": "https://neonarcade.net/neonmind/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "KenKen",
+      "item": "https://neonarcade.net/neonmind/kenken.html"
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+.screen{display:none;position:fixed;z-index:10;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:16px}
+.game-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2)}
+.game-subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;text-transform:uppercase;color:#9999bb;margin-top:-8px}
+.difficulty-selector{display:flex;gap:12px;margin:16px 0}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #7a7a9a;background:rgba(255,255,255,0.03);color:#9999bb;cursor:pointer;border-radius:3px;transition:all 0.2s}
+.diff-btn:hover,.diff-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06);box-shadow:0 0 20px rgba(0,240,255,0.15)}
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;margin-top:8px;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#7a7a9a;text-align:center;margin-top:4px}
+.section-title{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-top:12px}
+#startLB{width:100%;max-width:340px;min-height:40px}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:8px;gap:4px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:500px;padding:4px 8px}
+.top-bar-left{display:flex;align-items:center;gap:12px}
+.back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:#9999bb;cursor:pointer;padding:4px 8px;border:none;background:none}
+.back-btn:hover{color:#00f0ff}
+.diff-label{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#b44dff}
+.timer{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.check-label{font-family:'Rajdhani',sans-serif;font-size:13px;color:#ffd700}
+
+/* GRID via Canvas */
+#gridCanvas{display:block;touch-action:none;cursor:pointer}
+
+/* TOOLS */
+.tools-row{display:flex;gap:8px;width:100%;max-width:500px;justify-content:center;padding:4px 0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;padding:6px 14px;border:1px solid #7a7a9a;background:rgba(255,255,255,0.03);color:#9999bb;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.tool-btn:hover{border-color:#00f0ff;color:#00f0ff}
+.tool-btn.active{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+
+/* NUMBER PAD */
+.numpad{display:grid;gap:4px;width:100%;max-width:500px;padding:4px 0}
+.num-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,4vw,20px);padding:10px 0;border:1px solid #2a2a4a;background:rgba(255,255,255,0.03);color:#fff;cursor:pointer;border-radius:3px;text-align:center;transition:all 0.2s}
+.num-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.num-btn:active{transform:scale(0.95)}
+
+/* COMPLETE SCREEN */
+#completeScreen{gap:16px}
+.solved-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,9vw,60px);letter-spacing:6px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.6),0 0 40px rgba(57,255,20,0.2)}
+.stat-row{display:flex;gap:24px;align-items:center}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:24px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#7a7a9a}
+.stars{font-size:36px;letter-spacing:8px}
+#completeLB{width:100%;max-width:340px;min-height:40px}
+.btn-row{display:flex;gap:12px}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 28px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 20px rgba(57,255,20,0.2)}
+
+/* Screen shake */
+@keyframes screenShake{0%{transform:translate(-2px,1px)}25%{transform:translate(2px,-1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(1px,-2px)}100%{transform:translate(0,0)}}
+.shake{animation:screenShake 0.25s ease}
+
+/* Particles */
+.particle{position:fixed;pointer-events:none;border-radius:50%;z-index:9998}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#9999bb;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="game-title">KENKEN</div>
+  <div class="game-subtitle">MATH MEETS LOGIC. FILL THE CAGES.</div>
+  <div class="difficulty-selector">
+    <button class="diff-btn active" data-size="4" onclick="selectDiff(4)">4x4</button>
+    <button class="diff-btn" data-size="5" onclick="selectDiff(5)">5x5</button>
+    <button class="diff-btn" data-size="6" onclick="selectDiff(6)">6x6</button>
+  </div>
+  <button class="play-btn" onclick="startGame()">START</button>
+  <div class="controls-hint">CLICK CELL + NUMBER | ARROWS TO MOVE | ESC TO QUIT</div>
+  <div class="section-title">LEADERBOARD</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <button class="back-btn" onclick="goBack()">&larr;</button>
+      <span class="diff-label" id="diffLabel">4x4</span>
+    </div>
+    <span class="timer" id="timer">00:00</span>
+    <span class="check-label" id="checkLabel" style="cursor:pointer" onclick="toggleAutoCheck()">CHECK: OFF</span>
+  </div>
+  <div id="gridContainer" style="display:flex;align-items:center;justify-content:center;width:100%;flex:0 0 auto;overflow:hidden">
+    <canvas id="gridCanvas"></canvas>
+  </div>
+  <div class="tools-row">
+    <button class="tool-btn" id="undoBtn" onclick="doUndo()">UNDO</button>
+    <button class="tool-btn" id="pencilBtn" onclick="togglePencil()">PENCIL</button>
+    <button class="tool-btn" id="clearBtn" onclick="clearCell()">CLEAR</button>
+  </div>
+  <div class="numpad" id="numpad"></div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+  <div class="solved-title">SOLVED</div>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-val" id="finalTime">00:00</span><span class="stat-label">TIME</span></div>
+    <div class="stat"><span class="stat-val" id="finalSize">4x4</span><span class="stat-label">SIZE</span></div>
+  </div>
+  <div class="stars" id="stars"></div>
+  <div class="section-title">LEADERBOARD</div>
+  <div id="completeLB"></div>
+  <div class="btn-row">
+    <button class="share-btn" onclick="shareResult()">SHARE</button>
+    <button class="play-btn" onclick="startGame()">PLAY AGAIN</button>
+  </div>
+</div>
+
+<!-- More Games Navigation -->
+<nav class="na-more-games">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE NEON MIND GAMES</div>
+    <div class="na-more-links">
+      <a href="sudoku.html" class="na-more-link">Sudoku</a>
+      <a href="kakuro.html" class="na-more-link">Kakuro</a>
+      <a href="queens.html" class="na-more-link">Queens</a>
+      <a href="minesweeper.html" class="na-more-link">Minesweeper</a>
+      <a href="nonogram.html" class="na-more-link">Nonogram</a>
+      <a href="bridges.html" class="na-more-link">Bridges</a>
+      <a href="./" class="na-more-link na-more-hub">ALL PUZZLES</a>
+    </div>
+  </div>
+</nav>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   AUDIO ENGINE
+   ============================================================ */
+var audioCtx = null;
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol){
+  try{
+    var a = getAudio();
+    var o = a.createOscillator();
+    var g = a.createGain();
+    o.type = type || 'square';
+    o.frequency.value = freq;
+    g.gain.value = vol || 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + dur);
+    o.connect(g);
+    g.connect(a.destination);
+    o.start(a.currentTime);
+    o.stop(a.currentTime + dur);
+  }catch(e){}
+}
+function sndPlace(){ playTone(880, 0.08, 'square', 0.06); }
+function sndClear(){ playTone(440, 0.06, 'sine', 0.04); }
+function sndError(){ playTone(150, 0.2, 'sawtooth', 0.07); }
+function sndUndo(){ playTone(330, 0.05, 'triangle', 0.04); }
+function sndVictory(){
+  var notes = [523, 659, 784, 1047];
+  notes.forEach(function(n, i){
+    setTimeout(function(){ playTone(n, 0.2, 'square', 0.06); }, i * 120);
+  });
+}
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+function spawnParticles(x, y, color, count){
+  count = count || 12;
+  for(var i = 0; i < count; i++){
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var size = 3 + Math.random() * 4;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.background = color;
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.boxShadow = '0 0 6px ' + color;
+    document.body.appendChild(p);
+    var angle = Math.random() * Math.PI * 2;
+    var speed = 40 + Math.random() * 80;
+    var dx = Math.cos(angle) * speed;
+    var dy = Math.sin(angle) * speed;
+    (function(el, ddx, ddy){
+      var sx = x, sy = y, t = 0;
+      var dur = 0.4 + Math.random() * 0.4;
+      function tick(){
+        t += 0.016;
+        if(t > dur){ el.remove(); return; }
+        sx += ddx * 0.016;
+        sy += ddy * 0.016;
+        ddy += 200 * 0.016;
+        el.style.left = sx + 'px';
+        el.style.top = sy + 'px';
+        el.style.opacity = String(1 - t / dur);
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })(p, dx, dy);
+  }
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var currentSize = 4;
+var solution = [];
+var cages = [];
+var cageMap = [];
+var userGrid = [];
+var pencilMarks = [];
+var selectedR = -1;
+var selectedC = -1;
+var pencilMode = false;
+var autoCheck = false;
+var timerStart = 0;
+var timerElapsed = 0;
+var timerInterval = null;
+var undoStack = [];
+var gameActive = false;
+var longPressTimer = null;
+
+/* Canvas */
+var canvas, ctx;
+var dpr = 1;
+var cellSize = 60;
+var gridPx = 0;
+
+/* ============================================================
+   NEON.JS INIT
+   ============================================================ */
+function initNeon(){
+  Neon.init({
+    game: 'kenken',
+    mode: 'low',
+    key: 'neonarcade_neonmind_kenken_scores_' + currentSize,
+    formatScore: function(s){
+      var m = Math.floor(s / 60);
+      var sec = Math.floor(s % 60);
+      return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+  });
+}
+
+/* ============================================================
+   DIFFICULTY SELECTION
+   ============================================================ */
+window.selectDiff = function(size){
+  currentSize = size;
+  var btns = document.querySelectorAll('.diff-btn');
+  btns.forEach(function(b){
+    b.classList.toggle('active', parseInt(b.getAttribute('data-size')) === size);
+  });
+  initNeon();
+  Neon.render(document.getElementById('startLB'));
+};
+
+/* ============================================================
+   SCREEN MANAGEMENT
+   ============================================================ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+window.goBack = function(){
+  gameActive = false;
+  if(timerInterval) clearInterval(timerInterval);
+  showScreen('startScreen');
+  initNeon();
+  Neon.render(document.getElementById('startLB'));
+};
+
+/* ============================================================
+   PUZZLE GENERATION
+   ============================================================ */
+
+function shuffle(arr){
+  for(var i = arr.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+
+/* Generate a random Latin square */
+function generateLatinSquare(n){
+  var grid = [];
+  for(var r = 0; r < n; r++){
+    grid[r] = [];
+    for(var c = 0; c < n; c++){
+      grid[r][c] = ((r + c) % n) + 1;
+    }
+  }
+  /* Shuffle via row swaps, column swaps, and number relabelling */
+  for(var iter = 0; iter < n * 20; iter++){
+    var op = Math.floor(Math.random() * 3);
+    if(op === 0){
+      var r1 = Math.floor(Math.random() * n);
+      var r2 = Math.floor(Math.random() * n);
+      var tmp = grid[r1]; grid[r1] = grid[r2]; grid[r2] = tmp;
+    } else if(op === 1){
+      var c1 = Math.floor(Math.random() * n);
+      var c2 = Math.floor(Math.random() * n);
+      for(var rr = 0; rr < n; rr++){
+        var t = grid[rr][c1]; grid[rr][c1] = grid[rr][c2]; grid[rr][c2] = t;
+      }
+    } else {
+      var a = Math.floor(Math.random() * n) + 1;
+      var b = Math.floor(Math.random() * n) + 1;
+      if(a !== b){
+        for(var rr2 = 0; rr2 < n; rr2++){
+          for(var cc = 0; cc < n; cc++){
+            if(grid[rr2][cc] === a) grid[rr2][cc] = b;
+            else if(grid[rr2][cc] === b) grid[rr2][cc] = a;
+          }
+        }
+      }
+    }
+  }
+  return grid;
+}
+
+/* Partition grid into contiguous cages of 1-4 cells */
+function generateCages(n){
+  var map = [];
+  for(var r = 0; r < n; r++){
+    map[r] = [];
+    for(var c = 0; c < n; c++) map[r][c] = -1;
+  }
+  var cageList = [];
+  var cageId = 0;
+  var cells = [];
+  for(var r2 = 0; r2 < n; r2++){
+    for(var c2 = 0; c2 < n; c2++) cells.push([r2, c2]);
+  }
+  shuffle(cells);
+
+  for(var i = 0; i < cells.length; i++){
+    var cr = cells[i][0], cc = cells[i][1];
+    if(map[cr][cc] !== -1) continue;
+    var maxCageSize = Math.random() < 0.15 ? 1 : (Math.random() < 0.4 ? 2 : (Math.random() < 0.7 ? 3 : 4));
+    var cage = [[cr, cc]];
+    map[cr][cc] = cageId;
+    while(cage.length < maxCageSize){
+      var neighbors = [];
+      for(var j = 0; j < cage.length; j++){
+        var nr = cage[j][0], nc = cage[j][1];
+        var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+        for(var d = 0; d < dirs.length; d++){
+          var rr3 = nr + dirs[d][0], cc3 = nc + dirs[d][1];
+          if(rr3 >= 0 && rr3 < n && cc3 >= 0 && cc3 < n && map[rr3][cc3] === -1){
+            var found = false;
+            for(var k = 0; k < neighbors.length; k++){
+              if(neighbors[k][0] === rr3 && neighbors[k][1] === cc3){ found = true; break; }
+            }
+            if(!found) neighbors.push([rr3, cc3]);
+          }
+        }
+      }
+      if(neighbors.length === 0) break;
+      var pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+      cage.push(pick);
+      map[pick[0]][pick[1]] = cageId;
+    }
+    cageList.push(cage);
+    cageId++;
+  }
+  return { map: map, cages: cageList };
+}
+
+/* Assign operations and targets to cages based on solution values */
+function assignOperations(cageList, sol, n){
+  var result = [];
+  for(var i = 0; i < cageList.length; i++){
+    var cellArr = cageList[i];
+    var vals = cellArr.map(function(c){ return sol[c[0]][c[1]]; });
+
+    if(cellArr.length === 1){
+      result.push({ cells: cellArr, op: '', target: vals[0] });
+      continue;
+    }
+
+    var ops = [];
+    var sum = 0;
+    for(var j = 0; j < vals.length; j++) sum += vals[j];
+    ops.push({ op: '+', target: sum });
+
+    var prod = 1;
+    for(var j2 = 0; j2 < vals.length; j2++) prod *= vals[j2];
+    ops.push({ op: '\u00d7', target: prod });
+
+    if(cellArr.length === 2){
+      var big = Math.max(vals[0], vals[1]);
+      var small = Math.min(vals[0], vals[1]);
+      ops.push({ op: '-', target: big - small });
+      if(small > 0 && big % small === 0){
+        ops.push({ op: '\u00f7', target: big / small });
+      }
+    }
+
+    var chosen = ops[Math.floor(Math.random() * ops.length)];
+    result.push({ cells: cellArr, op: chosen.op, target: chosen.target });
+  }
+  return result;
+}
+
+/* Backtracking solver to verify uniqueness */
+function solvePuzzle(n, cageList, cageMapArr){
+  var grid = [];
+  for(var r = 0; r < n; r++){
+    grid[r] = [];
+    for(var c = 0; c < n; c++) grid[r][c] = 0;
+  }
+  var solutions = 0;
+
+  function isValid(r, c, num){
+    for(var cc = 0; cc < n; cc++){
+      if(cc !== c && grid[r][cc] === num) return false;
+    }
+    for(var rr = 0; rr < n; rr++){
+      if(rr !== r && grid[rr][c] === num) return false;
+    }
+    return true;
+  }
+
+  function checkCageFull(cageIdx){
+    var cage = cageList[cageIdx];
+    var vals = [];
+    for(var i = 0; i < cage.cells.length; i++){
+      var v = grid[cage.cells[i][0]][cage.cells[i][1]];
+      if(v === 0) return true;
+      vals.push(v);
+    }
+    if(cage.op === '') return vals[0] === cage.target;
+    if(cage.op === '+'){
+      var s = 0; for(var j = 0; j < vals.length; j++) s += vals[j];
+      return s === cage.target;
+    }
+    if(cage.op === '\u00d7'){
+      var p = 1; for(var j2 = 0; j2 < vals.length; j2++) p *= vals[j2];
+      return p === cage.target;
+    }
+    if(cage.op === '-'){
+      return Math.max.apply(null, vals) - Math.min.apply(null, vals) === cage.target;
+    }
+    if(cage.op === '\u00f7'){
+      var mx = Math.max.apply(null, vals);
+      var mn = Math.min.apply(null, vals);
+      return mn > 0 && mx / mn === cage.target;
+    }
+    return false;
+  }
+
+  function checkCagePartial(cageIdx){
+    var cage = cageList[cageIdx];
+    var vals = [];
+    var empties = 0;
+    for(var i = 0; i < cage.cells.length; i++){
+      var v = grid[cage.cells[i][0]][cage.cells[i][1]];
+      if(v === 0) empties++;
+      else vals.push(v);
+    }
+    if(empties === 0) return checkCageFull(cageIdx);
+    if(vals.length === 0) return true;
+    if(cage.op === '+'){
+      var s = 0; for(var j = 0; j < vals.length; j++) s += vals[j];
+      if(s + empties > cage.target) return false;
+      if(s + empties * n < cage.target) return false;
+    } else if(cage.op === '\u00d7'){
+      var p = 1; for(var j2 = 0; j2 < vals.length; j2++) p *= vals[j2];
+      if(p > cage.target) return false;
+      if(cage.target % p !== 0) return false;
+    }
+    return true;
+  }
+
+  function solve(pos){
+    if(solutions > 1) return;
+    if(pos === n * n){
+      solutions++;
+      return;
+    }
+    var r = Math.floor(pos / n);
+    var c = pos % n;
+    for(var num = 1; num <= n; num++){
+      if(!isValid(r, c, num)) continue;
+      grid[r][c] = num;
+      var cIdx = cageMapArr[r][c];
+      if(checkCagePartial(cIdx)){
+        solve(pos + 1);
+      }
+      grid[r][c] = 0;
+      if(solutions > 1) return;
+    }
+  }
+
+  solve(0);
+  return solutions;
+}
+
+function generatePuzzle(n){
+  var maxAttempts = 40;
+  for(var attempt = 0; attempt < maxAttempts; attempt++){
+    var sol = generateLatinSquare(n);
+    var cageData = generateCages(n);
+    var cageList = assignOperations(cageData.cages, sol, n);
+    var solCount = solvePuzzle(n, cageList, cageData.map);
+    if(solCount === 1){
+      return { solution: sol, cages: cageList, cageMap: cageData.map };
+    }
+  }
+  return getPregenPuzzle(n);
+}
+
+/* ============================================================
+   PRE-GENERATED FALLBACK PUZZLES
+   ============================================================ */
+function getPregenPuzzle(n){
+  var puzzles = PREGEN[n];
+  if(!puzzles || puzzles.length === 0) return null;
+  var p = puzzles[Math.floor(Math.random() * puzzles.length)];
+  return JSON.parse(JSON.stringify(p));
+}
+
+var PREGEN = {};
+
+PREGEN[4] = [
+  {
+    solution:[[2,1,4,3],[3,4,1,2],[4,3,2,1],[1,2,3,4]],
+    cages:[
+      {cells:[[0,0],[0,1]],op:'-',target:1},
+      {cells:[[0,2],[0,3]],op:'-',target:1},
+      {cells:[[1,0],[2,0]],op:'+',target:7},
+      {cells:[[1,1],[1,2]],op:'+',target:5},
+      {cells:[[1,3],[2,3]],op:'-',target:1},
+      {cells:[[2,1],[2,2]],op:'+',target:5},
+      {cells:[[3,0]],op:'',target:1},
+      {cells:[[3,1],[3,2]],op:'-',target:1},
+      {cells:[[3,3]],op:'',target:4}
+    ],
+    cageMap:[[0,0,1,1],[2,3,3,4],[2,5,5,4],[6,7,7,8]]
+  },
+  {
+    solution:[[1,4,3,2],[2,3,4,1],[4,1,2,3],[3,2,1,4]],
+    cages:[
+      {cells:[[0,0],[1,0]],op:'+',target:3},
+      {cells:[[0,1],[0,2]],op:'-',target:1},
+      {cells:[[0,3],[1,3]],op:'-',target:1},
+      {cells:[[1,1],[1,2],[2,2]],op:'+',target:9},
+      {cells:[[2,0],[3,0]],op:'-',target:1},
+      {cells:[[2,1],[3,1]],op:'-',target:1},
+      {cells:[[2,3],[3,3]],op:'-',target:1},
+      {cells:[[3,2]],op:'',target:1}
+    ],
+    cageMap:[[0,1,1,2],[0,3,3,2],[4,5,3,6],[4,5,7,6]]
+  },
+  {
+    solution:[[3,2,1,4],[4,1,3,2],[1,4,2,3],[2,3,4,1]],
+    cages:[
+      {cells:[[0,0],[0,1]],op:'\u00d7',target:6},
+      {cells:[[0,2],[1,2]],op:'\u00d7',target:3},
+      {cells:[[0,3],[1,3]],op:'+',target:6},
+      {cells:[[1,0],[2,0]],op:'+',target:5},
+      {cells:[[1,1]],op:'',target:1},
+      {cells:[[2,1],[2,2]],op:'\u00d7',target:8},
+      {cells:[[2,3],[3,3]],op:'+',target:4},
+      {cells:[[3,0],[3,1]],op:'\u00f7',target:2},
+      {cells:[[3,2]],op:'',target:4}
+    ],
+    cageMap:[[0,0,1,2],[3,4,1,2],[3,5,5,6],[7,7,8,6]]
+  },
+  {
+    solution:[[4,3,2,1],[1,2,3,4],[3,4,1,2],[2,1,4,3]],
+    cages:[
+      {cells:[[0,0],[0,1],[1,1]],op:'+',target:9},
+      {cells:[[0,2],[0,3]],op:'+',target:3},
+      {cells:[[1,0],[2,0]],op:'+',target:4},
+      {cells:[[1,2],[1,3],[2,3]],op:'\u00d7',target:24},
+      {cells:[[2,1],[2,2]],op:'+',target:5},
+      {cells:[[3,0],[3,1]],op:'+',target:3},
+      {cells:[[3,2],[3,3]],op:'-',target:1}
+    ],
+    cageMap:[[0,0,1,1],[2,0,3,3],[2,4,4,3],[5,5,6,6]]
+  },
+  {
+    solution:[[2,4,1,3],[3,1,4,2],[1,3,2,4],[4,2,3,1]],
+    cages:[
+      {cells:[[0,0],[1,0]],op:'-',target:1},
+      {cells:[[0,1],[0,2]],op:'+',target:5},
+      {cells:[[0,3]],op:'',target:3},
+      {cells:[[1,1],[2,1]],op:'\u00f7',target:3},
+      {cells:[[1,2],[1,3]],op:'+',target:6},
+      {cells:[[2,0],[3,0]],op:'+',target:5},
+      {cells:[[2,2],[2,3],[3,3]],op:'+',target:7},
+      {cells:[[3,1],[3,2]],op:'-',target:1}
+    ],
+    cageMap:[[0,1,1,2],[0,3,4,4],[5,3,6,6],[5,7,7,6]]
+  }
+];
+
+PREGEN[5] = [
+  {
+    solution:[[5,3,1,2,4],[1,4,2,5,3],[3,2,5,4,1],[4,5,3,1,2],[2,1,4,3,5]],
+    cages:[
+      {cells:[[0,0],[0,1]],op:'+',target:8},
+      {cells:[[0,2],[0,3]],op:'-',target:1},
+      {cells:[[0,4],[1,4]],op:'-',target:1},
+      {cells:[[1,0],[1,1]],op:'+',target:5},
+      {cells:[[1,2],[2,2]],op:'+',target:7},
+      {cells:[[1,3],[2,3]],op:'-',target:1},
+      {cells:[[2,0],[2,1]],op:'+',target:5},
+      {cells:[[2,4],[3,4]],op:'-',target:1},
+      {cells:[[3,0],[3,1],[4,0]],op:'+',target:11},
+      {cells:[[3,2],[3,3]],op:'\u00d7',target:3},
+      {cells:[[4,1],[4,2]],op:'+',target:5},
+      {cells:[[4,3],[4,4]],op:'+',target:8}
+    ],
+    cageMap:[[0,0,1,1,2],[3,3,4,5,2],[6,6,4,5,7],[8,8,9,9,7],[8,10,10,11,11]]
+  },
+  {
+    solution:[[3,5,4,1,2],[2,1,3,5,4],[4,2,5,3,1],[1,3,2,4,5],[5,4,1,2,3]],
+    cages:[
+      {cells:[[0,0],[1,0]],op:'-',target:1},
+      {cells:[[0,1],[0,2]],op:'-',target:1},
+      {cells:[[0,3],[0,4]],op:'+',target:3},
+      {cells:[[1,1],[1,2]],op:'+',target:4},
+      {cells:[[1,3],[1,4],[2,4]],op:'\u00d7',target:20},
+      {cells:[[2,0],[2,1]],op:'\u00d7',target:8},
+      {cells:[[2,2],[2,3]],op:'+',target:8},
+      {cells:[[3,0],[4,0]],op:'\u00d7',target:5},
+      {cells:[[3,1],[3,2]],op:'-',target:1},
+      {cells:[[3,3],[3,4]],op:'+',target:9},
+      {cells:[[4,1],[4,2]],op:'+',target:5},
+      {cells:[[4,3],[4,4]],op:'-',target:1}
+    ],
+    cageMap:[[0,1,1,2,2],[0,3,3,4,4],[5,5,6,6,4],[7,8,8,9,9],[7,10,10,11,11]]
+  },
+  {
+    solution:[[1,2,5,4,3],[4,5,3,2,1],[2,3,1,5,4],[5,4,2,3,1],[3,1,4,1,5]],
+    cages:[
+      {cells:[[0,0],[0,1],[1,1]],op:'+',target:8},
+      {cells:[[0,2],[0,3]],op:'+',target:9},
+      {cells:[[0,4],[1,4]],op:'+',target:4},
+      {cells:[[1,0],[2,0]],op:'\u00d7',target:8},
+      {cells:[[1,2],[1,3]],op:'-',target:1},
+      {cells:[[2,1],[2,2]],op:'+',target:4},
+      {cells:[[2,3],[2,4]],op:'+',target:9},
+      {cells:[[3,0],[3,1]],op:'+',target:9},
+      {cells:[[3,2],[4,2]],op:'+',target:6},
+      {cells:[[3,3],[4,3]],op:'+',target:4},
+      {cells:[[3,4],[4,4]],op:'+',target:6},
+      {cells:[[4,0],[4,1]],op:'+',target:4}
+    ],
+    cageMap:[[0,0,1,1,2],[3,0,4,4,2],[3,5,5,6,6],[7,7,8,9,10],[11,11,8,9,10]]
+  }
+];
+
+PREGEN[6] = [
+  {
+    solution:[[5,6,1,4,2,3],[6,1,2,3,5,4],[1,5,3,2,4,6],[4,2,6,5,3,1],[3,4,5,1,6,2],[2,3,4,6,1,5]],
+    cages:[
+      {cells:[[0,0],[0,1]],op:'+',target:11},
+      {cells:[[0,2],[0,3]],op:'+',target:5},
+      {cells:[[0,4],[0,5]],op:'-',target:1},
+      {cells:[[1,0],[1,1]],op:'+',target:7},
+      {cells:[[1,2],[1,3],[2,3]],op:'+',target:7},
+      {cells:[[1,4],[1,5]],op:'-',target:1},
+      {cells:[[2,0],[2,1]],op:'+',target:6},
+      {cells:[[2,2],[3,2]],op:'+',target:9},
+      {cells:[[2,4],[2,5]],op:'\u00d7',target:24},
+      {cells:[[3,0],[3,1]],op:'\u00d7',target:8},
+      {cells:[[3,3],[3,4]],op:'+',target:8},
+      {cells:[[3,5],[4,5]],op:'+',target:3},
+      {cells:[[4,0],[4,1]],op:'-',target:1},
+      {cells:[[4,2],[4,3]],op:'+',target:6},
+      {cells:[[4,4],[5,4]],op:'+',target:7},
+      {cells:[[5,0],[5,1]],op:'+',target:5},
+      {cells:[[5,2],[5,3]],op:'\u00d7',target:24},
+      {cells:[[5,5]],op:'',target:5}
+    ],
+    cageMap:[[0,0,1,1,2,2],[3,3,4,4,5,5],[6,6,7,4,8,8],[9,9,7,10,10,11],[12,12,13,13,14,11],[15,15,16,16,14,17]]
+  },
+  {
+    solution:[[3,1,5,6,4,2],[5,4,6,2,1,3],[4,6,2,3,5,1],[2,5,1,4,3,6],[6,3,4,1,2,5],[1,2,3,5,6,4]],
+    cages:[
+      {cells:[[0,0],[1,0]],op:'\u00d7',target:15},
+      {cells:[[0,1],[0,2]],op:'+',target:6},
+      {cells:[[0,3],[0,4]],op:'+',target:10},
+      {cells:[[0,5],[1,5]],op:'-',target:1},
+      {cells:[[1,1],[1,2]],op:'\u00d7',target:24},
+      {cells:[[1,3],[1,4]],op:'+',target:3},
+      {cells:[[2,0],[2,1]],op:'\u00d7',target:24},
+      {cells:[[2,2],[3,2]],op:'+',target:3},
+      {cells:[[2,3],[2,4]],op:'+',target:8},
+      {cells:[[2,5],[3,5]],op:'+',target:7},
+      {cells:[[3,0],[3,1]],op:'+',target:7},
+      {cells:[[3,3],[3,4]],op:'-',target:1},
+      {cells:[[4,0],[4,1]],op:'\u00d7',target:18},
+      {cells:[[4,2],[4,3]],op:'+',target:5},
+      {cells:[[4,4],[4,5]],op:'+',target:7},
+      {cells:[[5,0],[5,1]],op:'+',target:3},
+      {cells:[[5,2],[5,3]],op:'+',target:8},
+      {cells:[[5,4],[5,5]],op:'\u00d7',target:24}
+    ],
+    cageMap:[[0,1,1,2,2,3],[0,4,4,5,5,3],[6,6,7,8,8,9],[10,10,7,11,11,9],[12,12,13,13,14,14],[15,15,16,16,17,17]]
+  },
+  {
+    solution:[[2,5,4,1,3,6],[1,3,6,5,4,2],[6,4,3,2,5,1],[3,1,5,6,2,4],[5,2,1,4,6,3],[4,6,2,3,1,5]],
+    cages:[
+      {cells:[[0,0],[0,1],[1,0]],op:'+',target:8},
+      {cells:[[0,2],[0,3]],op:'+',target:5},
+      {cells:[[0,4],[0,5]],op:'\u00d7',target:18},
+      {cells:[[1,1],[1,2]],op:'+',target:9},
+      {cells:[[1,3],[2,3]],op:'+',target:7},
+      {cells:[[1,4],[1,5]],op:'\u00f7',target:2},
+      {cells:[[2,0],[2,1]],op:'+',target:10},
+      {cells:[[2,2],[3,2]],op:'+',target:8},
+      {cells:[[2,4],[2,5]],op:'+',target:6},
+      {cells:[[3,0],[3,1]],op:'+',target:4},
+      {cells:[[3,3],[3,4]],op:'+',target:8},
+      {cells:[[3,5],[4,5]],op:'+',target:7},
+      {cells:[[4,0],[4,1]],op:'+',target:7},
+      {cells:[[4,2],[4,3]],op:'+',target:5},
+      {cells:[[4,4],[5,4]],op:'+',target:7},
+      {cells:[[5,0],[5,1]],op:'\u00d7',target:24},
+      {cells:[[5,2],[5,3]],op:'-',target:1},
+      {cells:[[5,5]],op:'',target:5}
+    ],
+    cageMap:[[0,0,1,1,2,2],[0,3,3,4,5,5],[6,6,7,4,8,8],[9,9,7,10,10,11],[12,12,13,13,14,11],[15,15,16,16,14,17]]
+  }
+];
+
+/* ============================================================
+   CANVAS DRAWING
+   ============================================================ */
+function initCanvas(){
+  canvas = document.getElementById('gridCanvas');
+  ctx = canvas.getContext('2d');
+  dpr = window.devicePixelRatio || 1;
+  sizeCanvas();
+}
+
+function sizeCanvas(){
+  var container = document.getElementById('gridContainer');
+  var maxW = container.clientWidth - 16;
+  /* Top-bar 40 + tools 40 + numpad 55 + nav-bar 65 + screen padding 16 + gaps 24 = ~240 */
+  var availH = window.innerHeight - 240;
+  var maxDim = Math.min(maxW, Math.max(200, availH));
+  cellSize = Math.floor(maxDim / currentSize);
+  gridPx = cellSize * currentSize;
+
+  canvas.width = gridPx * dpr;
+  canvas.height = gridPx * dpr;
+  canvas.style.width = gridPx + 'px';
+  canvas.style.height = gridPx + 'px';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+
+  drawGrid();
+}
+
+function drawGrid(){
+  if(!gameActive && !solution.length) return;
+  var n = currentSize;
+
+  ctx.clearRect(0, 0, gridPx, gridPx);
+
+  /* Cell backgrounds */
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      var x = c * cellSize;
+      var y = r * cellSize;
+
+      var bg = '#14142a';
+      if(selectedR === r && selectedC === c){
+        bg = '#1f1f40';
+      } else if(selectedR >= 0 && selectedC >= 0 && cageMap[r] && cageMap[selectedR] &&
+                cageMap[r][c] === cageMap[selectedR][selectedC]){
+        bg = '#181835';
+      }
+
+      if(autoCheck && userGrid[r] && userGrid[r][c] > 0 && hasRowColDuplicate(r, c)){
+        bg = 'rgba(255,45,123,0.12)';
+      }
+
+      ctx.fillStyle = bg;
+      ctx.fillRect(x, y, cellSize, cellSize);
+
+      /* Thin grid lines */
+      ctx.strokeStyle = '#2a2a4a';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 0.5, y + 0.5, cellSize - 1, cellSize - 1);
+    }
+  }
+
+  /* Cage borders (thick neon cyan) */
+  ctx.strokeStyle = '#00f0ff';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = 'rgba(0,240,255,0.3)';
+  ctx.shadowBlur = 4;
+
+  for(var ci = 0; ci < cages.length; ci++){
+    drawCageBorder(cages[ci].cells);
+  }
+  ctx.shadowBlur = 0;
+
+  /* Cage labels (target + op) */
+  for(var ci2 = 0; ci2 < cages.length; ci2++){
+    var cage = cages[ci2];
+    var topLeft = cage.cells[0];
+    for(var j = 1; j < cage.cells.length; j++){
+      if(cage.cells[j][0] < topLeft[0] ||
+        (cage.cells[j][0] === topLeft[0] && cage.cells[j][1] < topLeft[1])){
+        topLeft = cage.cells[j];
+      }
+    }
+    var lx = topLeft[1] * cellSize + 4;
+    var ly = topLeft[0] * cellSize + 4;
+    var labelSize = Math.max(10, Math.min(cellSize * 0.22, 16));
+    ctx.font = '700 ' + labelSize + 'px Rajdhani, sans-serif';
+    ctx.fillStyle = '#ffd700';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(255,215,0,0.4)';
+    ctx.shadowBlur = 4;
+    var label = cage.target + cage.op;
+    ctx.fillText(label, lx, ly);
+    ctx.shadowBlur = 0;
+  }
+
+  /* Selected cell highlight */
+  if(selectedR >= 0 && selectedC >= 0){
+    var sx = selectedC * cellSize;
+    var sy = selectedR * cellSize;
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(0,240,255,0.5)';
+    ctx.shadowBlur = 8;
+    ctx.strokeRect(sx + 2, sy + 2, cellSize - 4, cellSize - 4);
+    ctx.shadowBlur = 0;
+  }
+
+  /* User numbers and pencil marks */
+  for(var r2 = 0; r2 < n; r2++){
+    for(var c2 = 0; c2 < n; c2++){
+      var cx = c2 * cellSize + cellSize / 2;
+      var cy = r2 * cellSize + cellSize / 2;
+
+      if(userGrid[r2][c2] > 0){
+        var numSize = Math.max(16, cellSize * 0.42);
+        ctx.font = '700 ' + numSize + 'px Orbitron, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        if(autoCheck && hasRowColDuplicate(r2, c2)){
+          ctx.fillStyle = '#ff2d7b';
+          ctx.shadowColor = 'rgba(255,45,123,0.5)';
+        } else {
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(255,255,255,0.15)';
+        }
+        ctx.shadowBlur = 4;
+        ctx.fillText(String(userGrid[r2][c2]), cx, cy + 2);
+        ctx.shadowBlur = 0;
+      } else if(pencilMarks[r2] && pencilMarks[r2][c2] && pencilMarks[r2][c2].size > 0){
+        var marks = pencilMarks[r2][c2];
+        var subCols = currentSize <= 4 ? 2 : 3;
+        var subRows = Math.ceil(currentSize / subCols);
+        var subW = cellSize / subCols;
+        var subH = cellSize / subRows;
+        var markSize = Math.max(8, cellSize * 0.16);
+        ctx.font = '500 ' + markSize + 'px Rajdhani, sans-serif';
+        ctx.fillStyle = '#7a7a9a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for(var num = 1; num <= currentSize; num++){
+          if(marks.has(num)){
+            var mi = num - 1;
+            var mr = Math.floor(mi / subCols);
+            var mc = mi % subCols;
+            var pmx = c2 * cellSize + mc * subW + subW / 2;
+            var pmy = r2 * cellSize + mr * subH + subH / 2;
+            ctx.fillText(String(num), pmx, pmy);
+          }
+        }
+      }
+    }
+  }
+}
+
+function drawCageBorder(cells){
+  var n = currentSize;
+  var cellSet = {};
+  for(var i = 0; i < cells.length; i++){
+    cellSet[cells[i][0] + ',' + cells[i][1]] = true;
+  }
+
+  for(var i2 = 0; i2 < cells.length; i2++){
+    var r = cells[i2][0], c = cells[i2][1];
+    var x = c * cellSize, y = r * cellSize;
+
+    if(r === 0 || !cellSet[(r-1) + ',' + c]){
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + cellSize, y); ctx.stroke();
+    }
+    if(r === n - 1 || !cellSet[(r+1) + ',' + c]){
+      ctx.beginPath(); ctx.moveTo(x, y + cellSize); ctx.lineTo(x + cellSize, y + cellSize); ctx.stroke();
+    }
+    if(c === 0 || !cellSet[r + ',' + (c-1)]){
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + cellSize); ctx.stroke();
+    }
+    if(c === n - 1 || !cellSet[r + ',' + (c+1)]){
+      ctx.beginPath(); ctx.moveTo(x + cellSize, y); ctx.lineTo(x + cellSize, y + cellSize); ctx.stroke();
+    }
+  }
+}
+
+/* ============================================================
+   ERROR CHECKING
+   ============================================================ */
+function hasRowColDuplicate(r, c){
+  var n = currentSize;
+  var val = userGrid[r][c];
+  if(val === 0) return false;
+  for(var cc = 0; cc < n; cc++){
+    if(cc !== c && userGrid[r][cc] === val) return true;
+  }
+  for(var rr = 0; rr < n; rr++){
+    if(rr !== r && userGrid[rr][c] === val) return true;
+  }
+  return false;
+}
+
+window.toggleAutoCheck = function(){
+  autoCheck = !autoCheck;
+  document.getElementById('checkLabel').textContent = 'CHECK: ' + (autoCheck ? 'ON' : 'OFF');
+  document.getElementById('checkLabel').style.color = autoCheck ? '#39ff14' : '#ffd700';
+  drawGrid();
+};
+
+/* ============================================================
+   WIN DETECTION
+   ============================================================ */
+function checkWin(){
+  var n = currentSize;
+  for(var r = 0; r < n; r++){
+    for(var c = 0; c < n; c++){
+      if(userGrid[r][c] === 0) return false;
+    }
+  }
+  for(var r2 = 0; r2 < n; r2++){
+    var rowSet = {};
+    for(var c2 = 0; c2 < n; c2++){
+      if(rowSet[userGrid[r2][c2]]) return false;
+      rowSet[userGrid[r2][c2]] = true;
+    }
+  }
+  for(var c3 = 0; c3 < n; c3++){
+    var colSet = {};
+    for(var r3 = 0; r3 < n; r3++){
+      if(colSet[userGrid[r3][c3]]) return false;
+      colSet[userGrid[r3][c3]] = true;
+    }
+  }
+  for(var i = 0; i < cages.length; i++){
+    if(!checkCageConstraint(cages[i])) return false;
+  }
+  return true;
+}
+
+function checkCageConstraint(cage){
+  var vals = cage.cells.map(function(c){ return userGrid[c[0]][c[1]]; });
+  if(cage.op === '') return vals[0] === cage.target;
+  if(cage.op === '+'){
+    var s = 0; for(var j = 0; j < vals.length; j++) s += vals[j];
+    return s === cage.target;
+  }
+  if(cage.op === '\u00d7'){
+    var p = 1; for(var j2 = 0; j2 < vals.length; j2++) p *= vals[j2];
+    return p === cage.target;
+  }
+  if(cage.op === '-'){
+    return Math.max.apply(null, vals) - Math.min.apply(null, vals) === cage.target;
+  }
+  if(cage.op === '\u00f7'){
+    var mx = Math.max.apply(null, vals);
+    var mn = Math.min.apply(null, vals);
+    return mn > 0 && mx / mn === cage.target;
+  }
+  return false;
+}
+
+/* ============================================================
+   GAME ACTIONS
+   ============================================================ */
+function placeNumber(num){
+  if(!gameActive || selectedR < 0 || selectedC < 0) return;
+  if(num < 1 || num > currentSize) return;
+
+  if(pencilMode){
+    undoStack.push({
+      r: selectedR, c: selectedC,
+      val: userGrid[selectedR][selectedC],
+      marks: new Set(pencilMarks[selectedR][selectedC])
+    });
+    if(pencilMarks[selectedR][selectedC].has(num)){
+      pencilMarks[selectedR][selectedC].delete(num);
+    } else {
+      pencilMarks[selectedR][selectedC].add(num);
+    }
+    sndPlace();
+    drawGrid();
+    return;
+  }
+
+  undoStack.push({
+    r: selectedR, c: selectedC,
+    val: userGrid[selectedR][selectedC],
+    marks: new Set(pencilMarks[selectedR][selectedC])
+  });
+
+  userGrid[selectedR][selectedC] = num;
+  pencilMarks[selectedR][selectedC] = new Set();
+
+  if(autoCheck && hasRowColDuplicate(selectedR, selectedC)){
+    sndError();
+    document.body.classList.add('shake');
+    setTimeout(function(){ document.body.classList.remove('shake'); }, 250);
+  } else {
+    sndPlace();
+  }
+
+  /* Particles at cell */
+  var rect = canvas.getBoundingClientRect();
+  var scaleRatio = rect.width / gridPx;
+  var px = rect.left + selectedC * cellSize * scaleRatio + cellSize * scaleRatio / 2;
+  var py = rect.top + selectedR * cellSize * scaleRatio + cellSize * scaleRatio / 2;
+  spawnParticles(px, py, '#00f0ff', 6);
+
+  drawGrid();
+
+  if(checkWin()){
+    gameActive = false;
+    if(timerInterval) clearInterval(timerInterval);
+    sndVictory();
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#39ff14', 20);
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#00f0ff', 15);
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#ffd700', 15);
+    setTimeout(showComplete, 600);
+  }
+}
+
+window.doUndo = function(){
+  if(!gameActive || undoStack.length === 0) return;
+  var entry = undoStack.pop();
+  userGrid[entry.r][entry.c] = entry.val;
+  pencilMarks[entry.r][entry.c] = entry.marks;
+  sndUndo();
+  drawGrid();
+};
+
+window.togglePencil = function(){
+  pencilMode = !pencilMode;
+  document.getElementById('pencilBtn').classList.toggle('active', pencilMode);
+  sndPlace();
+};
+
+window.clearCell = function(){
+  if(!gameActive || selectedR < 0 || selectedC < 0) return;
+  if(userGrid[selectedR][selectedC] === 0 &&
+     (!pencilMarks[selectedR][selectedC] || pencilMarks[selectedR][selectedC].size === 0)) return;
+  undoStack.push({
+    r: selectedR, c: selectedC,
+    val: userGrid[selectedR][selectedC],
+    marks: new Set(pencilMarks[selectedR][selectedC])
+  });
+  userGrid[selectedR][selectedC] = 0;
+  pencilMarks[selectedR][selectedC] = new Set();
+  sndClear();
+  drawGrid();
+};
+
+/* ============================================================
+   INPUT: CANVAS CLICKS
+   ============================================================ */
+function getCellFromEvent(e){
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = gridPx / rect.width;
+  var scaleY = gridPx / rect.height;
+  var clientX, clientY;
+  if(e.touches && e.touches.length > 0){
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else if(e.changedTouches && e.changedTouches.length > 0){
+    clientX = e.changedTouches[0].clientX;
+    clientY = e.changedTouches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  var x = (clientX - rect.left) * scaleX;
+  var y = (clientY - rect.top) * scaleY;
+  var c = Math.floor(x / cellSize);
+  var r = Math.floor(y / cellSize);
+  if(r >= 0 && r < currentSize && c >= 0 && c < currentSize){
+    return { r: r, c: c };
+  }
+  return null;
+}
+
+function onCanvasClick(e){
+  if(!gameActive) return;
+  var cell = getCellFromEvent(e);
+  if(!cell) return;
+
+  if(selectedR === cell.r && selectedC === cell.c){
+    window.clearCell();
+  } else {
+    selectedR = cell.r;
+    selectedC = cell.c;
+    sndPlace();
+  }
+  drawGrid();
+}
+
+function onCanvasTouchStart(e){
+  if(!gameActive) return;
+  longPressTimer = setTimeout(function(){
+    if(!pencilMode) window.togglePencil();
+    longPressTimer = null;
+  }, 500);
+}
+
+function onCanvasTouchEnd(e){
+  if(longPressTimer){
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+}
+
+/* ============================================================
+   INPUT: KEYBOARD
+   ============================================================ */
+document.addEventListener('keydown', function(e){
+  if(!gameActive) return;
+
+  if(e.key === 'Escape'){
+    e.preventDefault();
+    window.goBack();
+    return;
+  }
+
+  if(e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+    e.preventDefault();
+    if(selectedR < 0){ selectedR = 0; selectedC = 0; }
+    else if(e.key === 'ArrowUp') selectedR = Math.max(0, selectedR - 1);
+    else if(e.key === 'ArrowDown') selectedR = Math.min(currentSize - 1, selectedR + 1);
+    else if(e.key === 'ArrowLeft') selectedC = Math.max(0, selectedC - 1);
+    else if(e.key === 'ArrowRight') selectedC = Math.min(currentSize - 1, selectedC + 1);
+    drawGrid();
+    return;
+  }
+
+  var num = parseInt(e.key);
+  if(num >= 1 && num <= currentSize){
+    e.preventDefault();
+    placeNumber(num);
+    return;
+  }
+
+  if(e.key === 'Delete' || e.key === 'Backspace'){
+    e.preventDefault();
+    window.clearCell();
+    return;
+  }
+
+  if(e.key === 'p' || e.key === 'P'){
+    e.preventDefault();
+    window.togglePencil();
+    return;
+  }
+
+  if((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)){
+    e.preventDefault();
+    window.doUndo();
+    return;
+  }
+});
+
+document.addEventListener('contextmenu', function(e){
+  if(gameActive && e.target === canvas){
+    e.preventDefault();
+    if(!pencilMode) window.togglePencil();
+  }
+});
+
+/* ============================================================
+   NUMBER PAD
+   ============================================================ */
+function buildNumpad(){
+  var pad = document.getElementById('numpad');
+  /* Remove existing buttons */
+  while(pad.firstChild) pad.removeChild(pad.firstChild);
+  pad.style.gridTemplateColumns = 'repeat(' + currentSize + ', 1fr)';
+  for(var i = 1; i <= currentSize; i++){
+    var btn = document.createElement('button');
+    btn.className = 'num-btn';
+    btn.textContent = String(i);
+    btn.setAttribute('data-num', String(i));
+    (function(n){
+      btn.addEventListener('click', function(){ placeNumber(n); });
+    })(i);
+    pad.appendChild(btn);
+  }
+}
+
+/* ============================================================
+   TIMER
+   ============================================================ */
+function startTimer(){
+  timerStart = Date.now();
+  timerElapsed = 0;
+  updateTimerDisplay();
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function(){
+    timerElapsed = Math.floor((Date.now() - timerStart) / 1000);
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  var m = Math.floor(timerElapsed / 60);
+  var s = timerElapsed % 60;
+  document.getElementById('timer').textContent =
+    (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function formatTime(secs){
+  var m = Math.floor(secs / 60);
+  var s = secs % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+/* ============================================================
+   START GAME
+   ============================================================ */
+window.startGame = function(){
+  initNeon();
+
+  var puzzle = generatePuzzle(currentSize);
+  solution = puzzle.solution;
+  cages = puzzle.cages;
+  cageMap = puzzle.cageMap;
+
+  var n = currentSize;
+  userGrid = [];
+  pencilMarks = [];
+  for(var r = 0; r < n; r++){
+    userGrid[r] = [];
+    pencilMarks[r] = [];
+    for(var c = 0; c < n; c++){
+      userGrid[r][c] = 0;
+      pencilMarks[r][c] = new Set();
+    }
+  }
+
+  selectedR = -1;
+  selectedC = -1;
+  pencilMode = false;
+  autoCheck = false;
+  undoStack = [];
+  gameActive = true;
+
+  document.getElementById('pencilBtn').classList.remove('active');
+  document.getElementById('checkLabel').textContent = 'CHECK: OFF';
+  document.getElementById('checkLabel').style.color = '#ffd700';
+  document.getElementById('diffLabel').textContent = currentSize + 'x' + currentSize;
+
+  buildNumpad();
+  showScreen('gameScreen');
+  initCanvas();
+  startTimer();
+
+  canvas.removeEventListener('click', onCanvasClick);
+  canvas.addEventListener('click', onCanvasClick);
+  canvas.removeEventListener('touchstart', onCanvasTouchStart);
+  canvas.addEventListener('touchstart', onCanvasTouchStart, { passive: true });
+  canvas.removeEventListener('touchend', onCanvasTouchEnd);
+  canvas.addEventListener('touchend', onCanvasTouchEnd);
+
+  drawGrid();
+};
+
+/* ============================================================
+   COMPLETE SCREEN
+   ============================================================ */
+function showComplete(){
+  var secs = timerElapsed;
+  document.getElementById('finalTime').textContent = formatTime(secs);
+  document.getElementById('finalSize').textContent = currentSize + 'x' + currentSize;
+
+  var thresholds = { 4:[60,120,180], 5:[120,240,360], 6:[180,360,540] };
+  var t = thresholds[currentSize] || [120,240,360];
+  var stars;
+  if(secs <= t[0]) stars = '\u2b50\u2b50\u2b50';
+  else if(secs <= t[1]) stars = '\u2b50\u2b50';
+  else if(secs <= t[2]) stars = '\u2b50';
+  else stars = '\u2014';
+  document.getElementById('stars').textContent = stars;
+
+  showScreen('completeScreen');
+
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function(){
+    return Neon.save(secs);
+  }).then(function(result){
+    Neon.render(document.getElementById('completeLB'));
+    if(result.globalRank >= 1 && result.globalRank <= 5){
+      Neon.showGlobalSplash(result.globalRank);
+    }
+  });
+}
+
+/* ============================================================
+   SHARE
+   ============================================================ */
+window.shareResult = function(){
+  var secs = timerElapsed;
+  var sizeLabel = currentSize + 'x' + currentSize;
+  var diffLabel = currentSize === 4 ? 'Easy' : (currentSize === 5 ? 'Medium' : 'Hard');
+  var text = '\ud83e\uddee KENKEN\n' +
+    sizeLabel + ' ' + diffLabel + ' | \u23f1 ' + formatTime(secs) + '\n' +
+    'Operations: + - \u00d7 \u00f7\n' +
+    'No errors! \ud83c\udfaf\n' +
+    'neonarcade.net/neonmind/kenken.html';
+
+  if(navigator.share){
+    navigator.share({ text: text }).catch(function(){
+      copyToClipboard(text);
+    });
+  } else {
+    copyToClipboard(text);
+  }
+};
+
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(function(){
+    showCopyToast();
+  }).catch(function(){
+    showCopyToast();
+  });
+}
+
+function showCopyToast(){
+  var toast = document.createElement('div');
+  toast.textContent = 'COPIED TO CLIPBOARD';
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);' +
+    'font-family:Orbitron,monospace;font-weight:700;font-size:12px;letter-spacing:2px;' +
+    'color:#39ff14;background:rgba(57,255,20,0.1);border:1px solid #39ff14;' +
+    'padding:10px 24px;border-radius:3px;z-index:10000;' +
+    'text-shadow:0 0 8px rgba(57,255,20,0.5)';
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.remove(); }, 2000);
+}
+
+/* ============================================================
+   RESIZE
+   ============================================================ */
+window.addEventListener('resize', function(){
+  if(gameActive) sizeCanvas();
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+initNeon();
+Neon.render(document.getElementById('startLB'));
+
+})();
+</script>
+</body>
+</html>

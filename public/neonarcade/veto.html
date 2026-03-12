@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>VETO — Free Online Social Bracket Game | NEON ARCADE</title>
+<meta name="description" content="Play VETO free online — a social bracket challenge for 2 players. Eliminate 16 items down to 1 winner. Compare picks and discover your compatibility score. No download, no login.">
+<meta name="keywords" content="veto, bracket game, social game, multiplayer browser game, compatibility game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/veto.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/veto.html">
+<meta property="og:title" content="VETO — Free Online Social Bracket Game | NEON ARCADE">
+<meta property="og:description" content="Play VETO free online — a social bracket challenge for 2 players. Eliminate 16 items down to 1 winner. Compare picks and discover your compatibility score.">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/veto.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/veto.html">
+<meta name="twitter:title" content="VETO — Free Online Social Bracket Game | NEON ARCADE">
+<meta name="twitter:description" content="Play VETO free online — a social bracket challenge for 2 players. Eliminate 16 items down to 1 winner. Compare picks and discover your compatibility score.">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/veto.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "VETO",
+  "url": "https://neonarcade.net/neonarcade/veto.html",
+  "description": "Play VETO free online — a social bracket challenge for 2 players. Eliminate 16 items down to 1 winner. Compare picks and discover your compatibility score.",
+  "genre": "Social Game",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonarcade/screenshots/veto.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON ARCADE", "item": "https://neonarcade.net/neonarcade/" },
+    { "@type": "ListItem", "position": 3, "name": "VETO", "item": "https://neonarcade.net/neonarcade/veto.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); font-family: 'Rajdhani', sans-serif; color: #fff; touch-action: none; -webkit-user-select: none; user-select: none; }
+
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.07) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.05) 0%, transparent 50%);
+}
+
+#app { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+.screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; overflow-y: auto; }
+.screen.active { display: flex; }
+
+.title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(32px, 8vw, 56px); letter-spacing: 8px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2); text-align: center; margin-top: 6vh; }
+.subtitle { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(13px, 2.8vw, 18px); letter-spacing: 3px; color: var(--text-mid); text-transform: uppercase; margin-top: 10px; text-align: center; padding: 0 20px; max-width: 520px; line-height: 1.5; }
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; margin-top: 20px; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.controls-hint { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-top: 12px; text-align: center; }
+
+/* Mode selection */
+.mode-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
+.mode-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px;
+  letter-spacing: 2px; padding: 12px 22px;
+  border: 1px solid var(--neon-purple); background: rgba(180,77,255,0.06);
+  color: var(--neon-purple); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.mode-btn:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 16px rgba(180,77,255,0.2); transform: scale(1.04); }
+.mode-btn.active { background: rgba(180,77,255,0.2); box-shadow: 0 0 16px rgba(180,77,255,0.3); border-color: var(--neon-purple); }
+.mode-btn.gold { border-color: var(--neon-gold); color: var(--neon-gold); background: rgba(255,215,0,0.06); }
+.mode-btn.gold:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 16px rgba(255,215,0,0.2); }
+.mode-btn.gold.active { background: rgba(255,215,0,0.2); box-shadow: 0 0 16px rgba(255,215,0,0.3); }
+.mode-btn.pink { border-color: var(--neon-pink); color: var(--neon-pink); background: rgba(255,45,123,0.06); }
+.mode-btn.pink:hover { background: rgba(255,45,123,0.15); box-shadow: 0 0 16px rgba(255,45,123,0.2); }
+.mode-btn.pink.active { background: rgba(255,45,123,0.2); box-shadow: 0 0 16px rgba(255,45,123,0.3); }
+.mode-btn.green { border-color: var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.06); }
+.mode-btn.green:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 16px rgba(57,255,20,0.2); }
+.mode-btn.green.active { background: rgba(57,255,20,0.2); box-shadow: 0 0 16px rgba(57,255,20,0.3); }
+
+/* Theme picker */
+.theme-section { margin-top: 20px; text-align: center; width: 100%; max-width: 540px; padding: 0 20px; }
+.theme-label { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; }
+.theme-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.theme-btn {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 13px;
+  padding: 6px 14px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);
+  color: var(--text-mid); cursor: pointer; border-radius: 3px; transition: all 0.2s;
+}
+.theme-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,240,255,0.06); }
+.theme-btn.active { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,240,255,0.1); box-shadow: 0 0 12px rgba(0,240,255,0.15); }
+
+.daily-badge { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 2px; color: var(--neon-gold); background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); padding: 2px 8px; border-radius: 2px; margin-left: 6px; }
+
+/* Challenge banner */
+.challenge-banner { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 14px; color: var(--neon-pink); letter-spacing: 2px; margin-top: 14px; padding: 8px 18px; border: 1px solid var(--neon-pink); background: rgba(255,45,123,0.08); border-radius: 3px; text-shadow: 0 0 10px rgba(255,45,123,0.4); text-align: center; max-width: 400px; }
+
+#startLB { margin-top: 16px; width: 100%; max-width: 500px; padding: 0 20px; margin-bottom: 20px; }
+
+/* BRACKET SCREEN */
+#bracket-screen { justify-content: flex-start; padding-top: 2vh; }
+.bracket-header { width: 100%; max-width: 600px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.round-label { font-family: 'Orbitron', monospace; font-weight: 700; font-size: clamp(14px, 3vw, 20px); letter-spacing: 3px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.4); }
+.player-label { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px; letter-spacing: 2px; color: var(--neon-purple); text-shadow: 0 0 8px rgba(180,77,255,0.4); }
+.round-info { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+.theme-display { font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px; color: var(--neon-gold); letter-spacing: 1px; text-shadow: 0 0 8px rgba(255,215,0,0.3); text-align: center; margin-bottom: 6px; }
+
+.bracket-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  width: 100%; max-width: 600px; padding: 0 16px; overflow-y: auto;
+  flex: 1; align-content: start;
+}
+
+.bracket-item {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: clamp(14px, 3vw, 18px);
+  padding: 12px 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);
+  border-radius: 3px; cursor: pointer; transition: all 0.25s; text-align: center;
+  position: relative; overflow: hidden;
+}
+.bracket-item:hover { border-color: var(--neon-cyan); background: rgba(0,240,255,0.06); transform: scale(1.02); }
+.bracket-item:active { transform: scale(0.98); }
+.bracket-item.eliminated {
+  opacity: 0.25; border-color: rgba(255,255,255,0.05); background: rgba(255,255,255,0.01);
+  cursor: default; text-decoration: line-through; color: var(--text-dim);
+  transform: scale(0.96); pointer-events: none;
+}
+.bracket-item.eliminated::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(45deg, transparent 45%, rgba(255,45,123,0.15) 50%, transparent 55%);
+}
+.bracket-item.survived { border-color: var(--neon-green); background: rgba(57,255,20,0.06); color: var(--neon-green); }
+.bracket-item.winner { border-color: var(--neon-gold); background: rgba(255,215,0,0.1); color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.4); animation: winner-glow 1s infinite alternate; }
+@keyframes winner-glow { from { box-shadow: 0 0 10px rgba(255,215,0,0.2); } to { box-shadow: 0 0 25px rgba(255,215,0,0.4); } }
+.bracket-item.selectable { animation: item-pulse 2s infinite; }
+@keyframes item-pulse { 0%, 100% { box-shadow: 0 0 0 rgba(0,240,255,0); } 50% { box-shadow: 0 0 12px rgba(0,240,255,0.15); } }
+
+/* VETO button */
+.veto-row { display: flex; gap: 12px; align-items: center; margin-top: 10px; margin-bottom: 10px; }
+.veto-btn {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 14px;
+  letter-spacing: 4px; padding: 10px 30px;
+  border: 2px solid var(--neon-pink); background: rgba(255,45,123,0.08);
+  color: var(--neon-pink); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.3s; position: relative;
+  text-shadow: 0 0 10px rgba(255,45,123,0.4);
+}
+.veto-btn:hover { background: rgba(255,45,123,0.2); box-shadow: 0 0 25px rgba(255,45,123,0.3); transform: scale(1.06); }
+.veto-btn.used { opacity: 0.3; cursor: default; pointer-events: none; text-decoration: line-through; }
+.veto-btn.active-veto { animation: veto-pulse 0.6s infinite alternate; border-color: var(--neon-orange); color: var(--neon-orange); text-shadow: 0 0 10px rgba(255,140,0,0.6); }
+@keyframes veto-pulse { from { box-shadow: 0 0 10px rgba(255,140,0,0.3); } to { box-shadow: 0 0 30px rgba(255,140,0,0.6); } }
+.veto-hint { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; max-width: 200px; }
+
+.confirm-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 10px 28px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s; margin-top: 8px;
+  display: none;
+}
+.confirm-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+.confirm-btn.visible { display: inline-block; }
+
+.elim-counter { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 2px; color: var(--neon-orange); text-shadow: 0 0 8px rgba(255,140,0,0.3); margin-top: 4px; }
+
+/* HANDOFF SCREEN */
+#handoff-screen { justify-content: center; }
+.handoff-icon { font-size: 64px; margin-bottom: 20px; animation: handoff-bounce 1.5s infinite; }
+@keyframes handoff-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+.handoff-text { font-family: 'Orbitron', monospace; font-weight: 700; font-size: clamp(18px, 4vw, 28px); letter-spacing: 4px; color: var(--neon-purple); text-shadow: 0 0 10px rgba(180,77,255,0.5); text-align: center; }
+.handoff-sub { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 14px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-top: 10px; text-align: center; }
+
+/* REVEAL SCREEN */
+#reveal-screen { justify-content: flex-start; padding-top: 3vh; }
+.reveal-title { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(24px, 6vw, 40px); letter-spacing: 6px; color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2); text-align: center; }
+.reveal-theme { font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 15px; color: var(--text-mid); letter-spacing: 2px; margin-top: 6px; text-align: center; }
+
+.winners-row { display: flex; gap: 20px; margin-top: 16px; justify-content: center; flex-wrap: wrap; padding: 0 16px; }
+.winner-card {
+  text-align: center; padding: 16px 24px; border: 1px solid rgba(255,215,0,0.3); background: rgba(255,215,0,0.06);
+  border-radius: 4px; min-width: 140px;
+}
+.winner-card .wc-label { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+.winner-card .wc-name { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 16px; color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.3); margin-top: 4px; letter-spacing: 2px; }
+.winner-card .wc-pick { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 18px; color: #fff; margin-top: 6px; }
+.winner-card.match { border-color: var(--neon-green); background: rgba(57,255,20,0.08); }
+.winner-card.match .wc-name { color: var(--neon-green); text-shadow: 0 0 8px rgba(57,255,20,0.3); }
+
+.compat-section { margin-top: 20px; text-align: center; }
+.compat-score { font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(36px, 9vw, 60px); letter-spacing: 4px; transition: color 0.5s; }
+.compat-label-text { font-family: 'Orbitron', monospace; font-weight: 700; font-size: clamp(14px, 3vw, 20px); letter-spacing: 4px; margin-top: 4px; }
+.compat-sub { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-top: 6px; }
+
+.comparison-grid {
+  width: 100%; max-width: 560px; padding: 0 16px; margin-top: 16px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+}
+.comp-item {
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px;
+  padding: 6px 10px; border-radius: 3px; text-align: center;
+  border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+  transition: all 0.3s; opacity: 0;
+}
+.comp-item.agree { border-color: rgba(57,255,20,0.2); background: rgba(57,255,20,0.05); color: var(--neon-green); }
+.comp-item.disagree { border-color: rgba(255,45,123,0.2); background: rgba(255,45,123,0.05); color: var(--neon-pink); }
+.comp-item.p1only { border-color: rgba(0,240,255,0.2); background: rgba(0,240,255,0.05); color: var(--neon-cyan); }
+.comp-item.p2only { border-color: rgba(180,77,255,0.2); background: rgba(180,77,255,0.05); color: var(--neon-purple); }
+.comp-item.visible { opacity: 1; }
+
+.comp-header { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 11px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; padding: 8px 0 4px; text-align: center; grid-column: 1 / -1; }
+
+.reveal-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: center; padding: 0 16px; margin-bottom: 24px; }
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); transform: scale(1.04); }
+
+.link-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid var(--neon-orange); background: rgba(255,140,0,0.06);
+  color: var(--neon-orange); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.link-btn:hover { background: rgba(255,140,0,0.15); box-shadow: 0 0 20px rgba(255,140,0,0.2); transform: scale(1.04); }
+
+#revealLB { width: 100%; max-width: 500px; padding: 0 20px; margin-top: 12px; margin-bottom: 24px; }
+
+/* LINK screen */
+#link-screen { justify-content: center; }
+.link-box {
+  width: 90%; max-width: 480px; padding: 10px 14px;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; color: var(--neon-cyan);
+  background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.2);
+  border-radius: 3px; word-break: break-all; margin-top: 16px; text-align: center;
+  -webkit-user-select: all; user-select: all;
+}
+.copy-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 10px 28px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s; margin-top: 12px;
+}
+.copy-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); }
+.copy-feedback { font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--neon-green); margin-top: 8px; letter-spacing: 1px; opacity: 0; transition: opacity 0.3s; }
+.copy-feedback.show { opacity: 1; }
+
+/* Screen shake */
+@keyframes shake {
+  0%, 100% { transform: translate(0); }
+  10% { transform: translate(-3px, -1px); }
+  30% { transform: translate(3px, 2px); }
+  50% { transform: translate(-2px, -2px); }
+  70% { transform: translate(2px, 1px); }
+  90% { transform: translate(-1px, 2px); }
+}
+.shake { animation: shake 0.25s ease-in-out; }
+
+/* Particles container */
+#particles { position: fixed; inset: 0; pointer-events: none; z-index: 9998; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+  font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 14px;
+  padding: 8px 20px; border-radius: 3px; z-index: 9990;
+  opacity: 0; transition: opacity 0.3s;
+  border: 1px solid rgba(57,255,20,0.3); background: rgba(57,255,20,0.1); color: var(--neon-green);
+}
+.toast.visible { opacity: 1; }
+
+/* Scrollbar */
+.screen::-webkit-scrollbar { width: 4px; }
+.screen::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 2px; }
+.screen { scrollbar-width: thin; scrollbar-color: rgba(0,240,255,0.3) transparent; }
+
+/* Responsive */
+@media (max-width: 400px) {
+  .bracket-grid { gap: 6px; padding: 0 10px; }
+  .bracket-item { padding: 10px 8px; font-size: 13px; }
+  .winners-row { gap: 10px; }
+  .winner-card { min-width: 120px; padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen active">
+    <div class="title">VETO</div>
+    <div class="subtitle">Social bracket challenge. Two players eliminate 16 items down to 1 winner. Compare your picks. How compatible are you?</div>
+
+    <div id="challenge-info" class="challenge-banner" style="display:none"></div>
+
+    <div class="theme-section" id="theme-section">
+      <div class="theme-label">Choose a Theme</div>
+      <div class="theme-grid" id="theme-grid"></div>
+    </div>
+
+    <div class="mode-row" id="mode-row">
+      <button class="mode-btn green active" id="btn-same">Same Device</button>
+      <button class="mode-btn pink" id="btn-link">Challenge Link</button>
+      <button class="mode-btn gold" id="btn-solo">Solo</button>
+    </div>
+
+    <button class="play-btn" id="start-btn">START</button>
+    <div class="controls-hint">Tap items to eliminate &bull; One VETO power per player</div>
+    <div class="controls-hint">Press ESC to quit</div>
+
+    <div id="startLB"></div>
+  </div>
+
+  <!-- BRACKET SCREEN -->
+  <div id="bracket-screen" class="screen">
+    <div class="theme-display" id="bracket-theme"></div>
+    <div class="bracket-header">
+      <div class="round-label" id="round-label">ROUND 1</div>
+      <div class="player-label" id="player-label">PLAYER 1</div>
+    </div>
+    <div class="round-info" id="round-info">Eliminate 8 items</div>
+    <div class="elim-counter" id="elim-counter">0 / 8 eliminated</div>
+    <div class="bracket-grid" id="bracket-grid"></div>
+    <div class="veto-row">
+      <button class="veto-btn" id="veto-btn">VETO</button>
+      <div class="veto-hint" id="veto-hint">Bring back 1 eliminated item</div>
+    </div>
+    <button class="confirm-btn" id="confirm-btn">CONFIRM</button>
+  </div>
+
+  <!-- HANDOFF SCREEN -->
+  <div id="handoff-screen" class="screen">
+    <div class="handoff-icon" id="handoff-icon">🔄</div>
+    <div class="handoff-text" id="handoff-text">PASS TO PLAYER 2</div>
+    <div class="handoff-sub" id="handoff-sub">Don't peek! Tap when ready.</div>
+    <button class="play-btn" id="handoff-btn" style="margin-top:30px">I'M READY</button>
+  </div>
+
+  <!-- LINK SCREEN -->
+  <div id="link-screen" class="screen">
+    <div class="title" style="font-size:clamp(22px,5vw,36px);margin-top:12vh">CHALLENGE SENT</div>
+    <div class="subtitle">Share this link with your opponent. They'll play the same bracket, then see how your picks compare.</div>
+    <div class="link-box" id="link-box"></div>
+    <button class="copy-btn" id="copy-link-btn">COPY LINK</button>
+    <div class="copy-feedback" id="copy-feedback">Link copied!</div>
+    <button class="play-btn" id="link-back-btn" style="margin-top:24px">BACK</button>
+  </div>
+
+  <!-- REVEAL SCREEN -->
+  <div id="reveal-screen" class="screen">
+    <div class="reveal-title">RESULTS</div>
+    <div class="reveal-theme" id="reveal-theme"></div>
+
+    <div class="winners-row" id="winners-row"></div>
+
+    <div class="compat-section">
+      <div class="compat-score" id="compat-score">0%</div>
+      <div class="compat-label-text" id="compat-label">CALCULATING...</div>
+      <div class="compat-sub">COMPATIBILITY</div>
+    </div>
+
+    <div class="comparison-grid" id="comparison-grid"></div>
+
+    <div class="reveal-actions">
+      <button class="share-btn" id="share-btn">SHARE</button>
+      <button class="link-btn" id="challenge-btn">CHALLENGE A FRIEND</button>
+      <button class="play-btn" id="again-btn">PLAY AGAIN</button>
+    </div>
+    <div id="revealLB"></div>
+  </div>
+
+</div>
+
+<div id="particles"></div>
+<div class="toast" id="toast"></div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ==================== CONFIG ====================
+  var THEMES = [
+    { name: 'Best Pizza Toppings', emoji: '\uD83C\uDF55', items: ['Pepperoni','Mushroom','Sausage','Olives','Onions','Peppers','Bacon','Pineapple','Jalape\u00f1os','Ham','Anchovies','Tomatoes','Spinach','BBQ Chicken','Garlic','Extra Cheese'] },
+    { name: 'Best Movie Genres', emoji: '\uD83C\uDFAC', items: ['Action','Comedy','Horror','Sci-Fi','Romance','Thriller','Drama','Animation','Documentary','Fantasy','Musical','Mystery','Western','War','Adventure','Crime'] },
+    { name: 'Best Snacks', emoji: '\uD83C\uDF7F', items: ['Chips','Popcorn','Cookies','Nachos','Pretzels','Candy','Trail Mix','Fruit','Ice Cream','Brownies','Granola Bar','Cheese','Nuts','Jerky','Crackers','Gummies'] },
+    { name: 'Best Superpowers', emoji: '\u26A1', items: ['Flight','Invisibility','Teleportation','Super Strength','Time Travel','Mind Reading','Shape Shifting','Speed','Healing','Telekinesis','X-Ray Vision','Fire Control','Ice Control','Elasticity','Cloning','Immortality'] },
+    { name: 'Best Animals', emoji: '\uD83D\uDC3E', items: ['Dog','Cat','Dolphin','Eagle','Tiger','Elephant','Wolf','Penguin','Horse','Panda','Owl','Fox','Otter','Whale','Hawk','Lion'] },
+    { name: 'Best Sports', emoji: '\u26BD', items: ['Soccer','Basketball','Tennis','Swimming','Baseball','Football','Hockey','Volleyball','Golf','Surfing','Skiing','Boxing','Rugby','Cricket','MMA','Cycling'] },
+    { name: 'Best Desserts', emoji: '\uD83C\uDF70', items: ['Chocolate Cake','Ice Cream','Cheesecake','Brownies','Tiramisu','Apple Pie','Cookies','Cr\u00e8me Br\u00fbl\u00e9e','Macarons','Donuts','Churros','Cannoli','Panna Cotta','Baklava','Mochi','Waffles'] },
+    { name: 'Best Music Genres', emoji: '\uD83C\uDFB5', items: ['Pop','Rock','Hip Hop','Jazz','Classical','R&B','Country','Electronic','Metal','Reggae','Blues','Indie','Punk','Latin','Soul','Folk'] },
+    { name: 'Best Holidays', emoji: '\uD83C\uDF84', items: ['Christmas','Halloween','New Year','Thanksgiving','Easter','Valentine\'s Day','Independence Day','St. Patrick\'s','Hanukkah','Diwali','Carnival','Lunar New Year','Oktoberfest','Mardi Gras','Day of Dead','Summer Solstice'] },
+    { name: 'Best Breakfast Foods', emoji: '\uD83E\uDD5E', items: ['Pancakes','Bacon','Eggs Benedict','Waffles','French Toast','Bagels','Cereal','Omelette','Avocado Toast','Croissant','Smoothie','Hash Browns','Yogurt','Muffin','Sausage','Biscuits'] },
+    { name: 'Best Cities', emoji: '\uD83C\uDFD9\uFE0F', items: ['New York','Tokyo','Paris','London','Rome','Barcelona','Sydney','Amsterdam','Bangkok','Dubai','Berlin','Lisbon','Seoul','Istanbul','Singapore','Rio'] },
+    { name: 'Best TV Shows', emoji: '\uD83D\uDCFA', items: ['Breaking Bad','Game of Thrones','The Office','Friends','Stranger Things','The Sopranos','Seinfeld','The Wire','Succession','Sherlock','Black Mirror','Arrested Dev.','Parks & Rec','Mad Men','Better Call Saul','The Crown'] },
+    { name: 'Best Colors', emoji: '\uD83C\uDFA8', items: ['Blue','Red','Green','Purple','Black','Orange','Pink','Yellow','Teal','Gold','Silver','White','Coral','Navy','Lavender','Emerald'] },
+    { name: 'Best Video Games', emoji: '\uD83C\uDFAE', items: ['Minecraft','Zelda: BOTW','GTA V','The Witcher 3','Elden Ring','Mario Odyssey','Red Dead 2','Skyrim','God of War','Halo','Portal 2','Fortnite','Dark Souls','Tetris','Last of Us','Pokemon'] },
+    { name: 'Best Season Activities', emoji: '\u2600\uFE0F', items: ['Beach Day','Skiing','Hiking','Camping','Sledding','Swimming','BBQ','Apple Picking','Bonfire','Road Trip','Fishing','Surfing','Ice Skating','Picnic','Stargazing','Snowball Fight'] },
+    { name: 'Best Fast Food', emoji: '\uD83C\uDF54', items: ['Burger','Pizza','Tacos','Fried Chicken','Hot Dog','Sushi','Burrito','Fries','Nuggets','Wings','Kebab','Ramen','Gyros','Sub Sandwich','Fish & Chips','Quesadilla'] },
+    { name: 'Best Fictional Characters', emoji: '\uD83E\uDDB8', items: ['Batman','Spider-Man','Harry Potter','Darth Vader','Sherlock Holmes','Gandalf','Iron Man','Wolverine','Indiana Jones','Mario','Pikachu','Yoda','Captain America','Joker','Goku','Shrek'] }
+  ];
+
+  var ROUNDS = [
+    { from: 16, to: 8, elim: 8, label: 'ROUND 1' },
+    { from: 8, to: 4, elim: 4, label: 'ROUND 2' },
+    { from: 4, to: 2, elim: 2, label: 'SEMI-FINAL' },
+    { from: 2, to: 1, elim: 1, label: 'FINAL' }
+  ];
+
+  var LABELS = [
+    { min: 90, label: 'SOULMATES', color: '#39ff14' },
+    { min: 70, label: 'BEST FRIENDS', color: '#00f0ff' },
+    { min: 50, label: 'ACQUAINTANCES', color: '#ffd700' },
+    { min: 0, label: 'TOTAL OPPOSITES', color: '#ff2d7b' }
+  ];
+
+  // ==================== STATE ====================
+  var gameMode = 'same';
+  var selectedThemeIdx = 0;
+  var currentTheme = null;
+  var currentPlayer = 1;
+  var currentRound = 0;
+  var vetoUsed = false;
+  var vetoMode = false;
+  var vetoTarget = null;
+  var items = [];
+  var eliminated = new Set();
+  var roundEliminated = new Set();
+  var p1Picks = [];
+  var p2Picks = [];
+  var p1Winner = null;
+  var p2Winner = null;
+  var p1Veto = null;
+  var p2Veto = null;
+  var challengeData = null;
+  var audioCtx = null;
+
+  // ==================== DOM REFS ====================
+  var themeGrid = document.getElementById('theme-grid');
+  var bracketGrid = document.getElementById('bracket-grid');
+  var roundLabelEl = document.getElementById('round-label');
+  var playerLabelEl = document.getElementById('player-label');
+  var roundInfoEl = document.getElementById('round-info');
+  var elimCounterEl = document.getElementById('elim-counter');
+  var vetoBtnEl = document.getElementById('veto-btn');
+  var vetoHintEl = document.getElementById('veto-hint');
+  var confirmBtnEl = document.getElementById('confirm-btn');
+  var bracketThemeEl = document.getElementById('bracket-theme');
+  var particlesEl = document.getElementById('particles');
+  var toastEl = document.getElementById('toast');
+
+  // ==================== DAILY THEME INDEX ====================
+  var today = new Date();
+  var dayIdx = Math.floor(today.getTime() / 86400000) % THEMES.length;
+
+  // ==================== INIT ====================
+  Neon.init({ game: 'veto', mode: 'high', key: 'neonarcade_neonarcade_veto_scores' });
+  checkChallengeLink();
+  buildThemeGrid();
+  selectTheme(dayIdx);
+  Neon.render(document.getElementById('startLB'));
+
+  // Event listeners
+  document.getElementById('btn-same').addEventListener('click', function() { setMode('same'); });
+  document.getElementById('btn-link').addEventListener('click', function() { setMode('link'); });
+  document.getElementById('btn-solo').addEventListener('click', function() { setMode('solo'); });
+  document.getElementById('start-btn').addEventListener('click', startGame);
+  vetoBtnEl.addEventListener('click', toggleVeto);
+  confirmBtnEl.addEventListener('click', confirmRound);
+  document.getElementById('handoff-btn').addEventListener('click', handoffReady);
+  document.getElementById('copy-link-btn').addEventListener('click', copyLink);
+  document.getElementById('link-back-btn').addEventListener('click', function() { showScreen('start-screen'); });
+  document.getElementById('share-btn').addEventListener('click', shareResults);
+  document.getElementById('challenge-btn').addEventListener('click', challengeFromReveal);
+  document.getElementById('again-btn').addEventListener('click', playAgain);
+
+  // ==================== AUDIO ====================
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+
+  function playSound(type) {
+    try {
+      var ctx = getAudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.value = 0.12;
+
+      if (type === 'eliminate') {
+        osc.type = 'sawtooth';
+        osc.frequency.value = 300;
+        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.15);
+      } else if (type === 'veto') {
+        osc.type = 'square';
+        osc.frequency.value = 200;
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.4);
+      } else if (type === 'confirm') {
+        osc.type = 'sine';
+        osc.frequency.value = 440;
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.setValueAtTime(554, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.2);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.35);
+      } else if (type === 'winner') {
+        osc.type = 'sine';
+        gain.gain.value = 0.15;
+        osc.frequency.value = 523;
+        osc.frequency.setValueAtTime(523, ctx.currentTime);
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.12);
+        osc.frequency.setValueAtTime(784, ctx.currentTime + 0.24);
+        osc.frequency.setValueAtTime(1047, ctx.currentTime + 0.36);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.6);
+      } else if (type === 'reveal') {
+        osc.type = 'triangle';
+        osc.frequency.value = 350;
+        osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.2);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+      } else if (type === 'fail') {
+        osc.type = 'sawtooth';
+        osc.frequency.value = 200;
+        osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch(e) { /* audio not supported */ }
+  }
+
+  // ==================== PARTICLES ====================
+  function spawnParticles(x, y, color, count) {
+    count = count || 12;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
+      var dist = 40 + Math.random() * 60;
+      var size = 3 + Math.random() * 4;
+      p.style.position = 'absolute';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.background = color;
+      p.style.borderRadius = '50%';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.pointerEvents = 'none';
+      p.style.opacity = '1';
+      p.style.boxShadow = '0 0 6px ' + color;
+      p.style.zIndex = '9997';
+      particlesEl.appendChild(p);
+      var dx = Math.cos(angle) * dist;
+      var dy = Math.sin(angle) * dist;
+      var anim = p.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0)', opacity: 0 }
+      ], { duration: 500 + Math.random() * 300, easing: 'ease-out' });
+      (function(el) {
+        anim.onfinish = function() { el.remove(); };
+      })(p);
+    }
+  }
+
+  // ==================== THEMES ====================
+  function buildThemeGrid() {
+    themeGrid.textContent = '';
+    THEMES.forEach(function(t, i) {
+      var btn = document.createElement('button');
+      btn.className = 'theme-btn' + (i === selectedThemeIdx ? ' active' : '');
+
+      var emojiSpan = document.createElement('span');
+      emojiSpan.className = 'theme-emoji';
+      emojiSpan.textContent = t.emoji;
+      btn.appendChild(emojiSpan);
+
+      var nameText = document.createTextNode(' ' + t.name);
+      btn.appendChild(nameText);
+
+      if (i === dayIdx) {
+        var badge = document.createElement('span');
+        badge.className = 'daily-badge';
+        badge.textContent = 'TODAY';
+        btn.appendChild(badge);
+      }
+      (function(idx) {
+        btn.addEventListener('click', function() { selectTheme(idx); });
+      })(i);
+      themeGrid.appendChild(btn);
+    });
+  }
+
+  function selectTheme(idx) {
+    selectedThemeIdx = idx;
+    var btns = themeGrid.querySelectorAll('.theme-btn');
+    btns.forEach(function(b, i) { b.classList.toggle('active', i === idx); });
+  }
+
+  // ==================== MODE ====================
+  function setMode(mode) {
+    gameMode = mode;
+    document.getElementById('btn-same').classList.toggle('active', mode === 'same');
+    document.getElementById('btn-link').classList.toggle('active', mode === 'link');
+    document.getElementById('btn-solo').classList.toggle('active', mode === 'solo');
+  }
+
+  // ==================== CHALLENGE LINK ====================
+  function checkChallengeLink() {
+    if (!window.location.hash || window.location.hash.length < 3) return;
+    try {
+      var data = JSON.parse(atob(window.location.hash.slice(1)));
+      if (data && data.theme !== undefined && data.items && data.picks) {
+        challengeData = data;
+        var infoEl = document.getElementById('challenge-info');
+        infoEl.style.display = 'block';
+        infoEl.textContent = 'You\'ve been challenged! Theme: ' + THEMES[data.theme].name;
+        selectedThemeIdx = data.theme;
+        selectTheme(data.theme);
+        gameMode = 'challenge';
+        document.getElementById('btn-same').style.display = 'none';
+        document.getElementById('btn-link').style.display = 'none';
+        document.getElementById('btn-solo').style.display = 'none';
+        document.getElementById('theme-section').style.display = 'none';
+      }
+    } catch(e) { /* invalid hash, ignore */ }
+  }
+
+  // ==================== SCREENS ====================
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    document.getElementById(id).scrollTop = 0;
+  }
+
+  // ==================== GAME START ====================
+  function startGame() {
+    currentTheme = THEMES[selectedThemeIdx];
+    currentPlayer = 1;
+    currentRound = 0;
+    vetoUsed = false;
+    vetoMode = false;
+    vetoTarget = null;
+    p1Picks = [];
+    p2Picks = [];
+    p1Winner = null;
+    p2Winner = null;
+    p1Veto = null;
+    p2Veto = null;
+    eliminated = new Set();
+    roundEliminated = new Set();
+
+    if (challengeData) {
+      items = challengeData.items.slice();
+      currentPlayer = 2;
+      p1Picks = challengeData.picks;
+      p1Winner = challengeData.winner;
+      p1Veto = challengeData.veto || null;
+      eliminated = new Set();
+      roundEliminated = new Set();
+      startBracketRound();
+    } else if (gameMode === 'solo') {
+      items = shuffle(currentTheme.items.slice());
+      currentPlayer = 1;
+      startBracketRound();
+    } else {
+      items = shuffle(currentTheme.items.slice());
+      startBracketRound();
+    }
+  }
+
+  function startBracketRound() {
+    var round = ROUNDS[currentRound];
+    showScreen('bracket-screen');
+    bracketThemeEl.textContent = currentTheme.emoji + ' ' + currentTheme.name;
+    roundLabelEl.textContent = round.label;
+    playerLabelEl.textContent = gameMode === 'solo' ? 'SOLO' : 'PLAYER ' + currentPlayer;
+    roundInfoEl.textContent = 'Eliminate ' + round.elim + (round.elim === 1 ? ' item' : ' items');
+    roundEliminated = new Set();
+    vetoMode = false;
+    updateVetoBtn();
+    renderBracket();
+    updateElimCounter();
+    confirmBtnEl.classList.remove('visible');
+  }
+
+  // ==================== BRACKET RENDER ====================
+  function renderBracket() {
+    bracketGrid.textContent = '';
+    items.forEach(function(item, idx) {
+      if (eliminated.has(idx)) return;
+      var div = document.createElement('div');
+      div.className = 'bracket-item';
+      div.textContent = item;
+      div.setAttribute('data-idx', String(idx));
+
+      if (roundEliminated.has(idx)) {
+        div.classList.add('eliminated');
+        if (vetoMode && !vetoUsed) {
+          div.style.pointerEvents = 'auto';
+          div.style.cursor = 'pointer';
+          div.classList.add('selectable');
+          (function(i) {
+            div.addEventListener('click', function(e) { vetoRestore(i, e); });
+          })(idx);
+        }
+      } else {
+        if (vetoMode && vetoTarget !== null) {
+          div.classList.add('selectable');
+          (function(i) {
+            div.addEventListener('click', function(e) { vetoSwap(i, e); });
+          })(idx);
+        } else if (!vetoMode) {
+          div.classList.add('selectable');
+          (function(i) {
+            div.addEventListener('click', function(e) { eliminateItem(i, e); });
+          })(idx);
+        }
+      }
+      bracketGrid.appendChild(div);
+    });
+  }
+
+  // ==================== ELIMINATE ====================
+  function eliminateItem(idx, e) {
+    var round = ROUNDS[currentRound];
+    if (roundEliminated.has(idx)) return;
+    if (roundEliminated.size >= round.elim) return;
+
+    roundEliminated.add(idx);
+    playSound('eliminate');
+    if (e && e.target) {
+      var rect = e.target.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff2d7b', 8);
+    }
+    renderBracket();
+    updateElimCounter();
+
+    if (roundEliminated.size === round.elim) {
+      confirmBtnEl.classList.add('visible');
+    }
+  }
+
+  function updateElimCounter() {
+    var round = ROUNDS[currentRound];
+    elimCounterEl.textContent = roundEliminated.size + ' / ' + round.elim + ' eliminated';
+  }
+
+  // ==================== VETO ====================
+  function updateVetoBtn() {
+    if (vetoUsed) {
+      vetoBtnEl.classList.add('used');
+      vetoBtnEl.classList.remove('active-veto');
+      vetoHintEl.textContent = 'Veto used';
+    } else if (vetoMode) {
+      vetoBtnEl.classList.add('active-veto');
+      vetoBtnEl.classList.remove('used');
+      vetoHintEl.textContent = vetoTarget !== null ?
+        'Now tap a surviving item to eliminate instead' :
+        'Tap an eliminated item to restore it';
+    } else {
+      vetoBtnEl.classList.remove('used', 'active-veto');
+      vetoHintEl.textContent = 'Bring back 1 eliminated item';
+    }
+  }
+
+  function toggleVeto() {
+    if (vetoUsed) return;
+    if (roundEliminated.size === 0) {
+      showToast('Eliminate an item first, then use VETO');
+      return;
+    }
+    vetoMode = !vetoMode;
+    vetoTarget = null;
+    updateVetoBtn();
+    renderBracket();
+  }
+
+  function vetoRestore(idx, e) {
+    if (!vetoMode || vetoUsed) return;
+    vetoTarget = idx;
+    playSound('veto');
+    if (e && e.target) {
+      var rect = e.target.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff8c00', 15);
+    }
+    updateVetoBtn();
+    renderBracket();
+    // Highlight the restored item
+    var allItems = bracketGrid.querySelectorAll('.bracket-item');
+    allItems.forEach(function(div) {
+      var i = parseInt(div.getAttribute('data-idx'));
+      if (i === idx) {
+        div.classList.remove('eliminated');
+        div.classList.add('survived');
+        div.style.pointerEvents = 'none';
+      }
+    });
+  }
+
+  function vetoSwap(idx, e) {
+    if (!vetoMode || vetoUsed || vetoTarget === null) {
+      if (vetoTarget === null) {
+        vetoHintEl.textContent = 'First tap an eliminated item to restore';
+      }
+      return;
+    }
+    roundEliminated.delete(vetoTarget);
+    roundEliminated.add(idx);
+    var vetoInfo = { brought: vetoTarget, removed: idx };
+    if (currentPlayer === 1) { p1Veto = vetoInfo; }
+    else { p2Veto = vetoInfo; }
+    vetoUsed = true;
+    vetoMode = false;
+    vetoTarget = null;
+
+    playSound('veto');
+    if (e && e.target) {
+      var rect = e.target.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff8c00', 15);
+    }
+    document.body.classList.add('shake');
+    setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+
+    updateVetoBtn();
+    renderBracket();
+    updateElimCounter();
+
+    var round = ROUNDS[currentRound];
+    if (roundEliminated.size === round.elim) {
+      confirmBtnEl.classList.add('visible');
+    } else {
+      confirmBtnEl.classList.remove('visible');
+    }
+  }
+
+  // ==================== CONFIRM ROUND ====================
+  function confirmRound() {
+    var round = ROUNDS[currentRound];
+    if (roundEliminated.size !== round.elim) return;
+
+    playSound('confirm');
+
+    var elimArr = Array.from(roundEliminated);
+    if (currentPlayer === 1) {
+      p1Picks.push(elimArr);
+    } else {
+      p2Picks.push(elimArr);
+    }
+
+    roundEliminated.forEach(function(idx) { eliminated.add(idx); });
+    confirmBtnEl.classList.remove('visible');
+
+    currentRound++;
+
+    if (currentRound >= ROUNDS.length) {
+      var winner = null;
+      for (var i = 0; i < items.length; i++) {
+        if (!eliminated.has(i)) { winner = i; break; }
+      }
+      if (currentPlayer === 1) { p1Winner = winner; }
+      else { p2Winner = winner; }
+
+      playSound('winner');
+
+      if (gameMode === 'same') {
+        if (currentPlayer === 1) {
+          showHandoff();
+        } else {
+          showReveal();
+        }
+      } else if (gameMode === 'link') {
+        generateChallengeLink();
+      } else if (gameMode === 'challenge') {
+        showReveal();
+      } else {
+        showSoloReveal();
+      }
+    } else {
+      startBracketRound();
+    }
+  }
+
+  // ==================== HANDOFF ====================
+  function showHandoff() {
+    showScreen('handoff-screen');
+  }
+
+  function handoffReady() {
+    currentPlayer = 2;
+    currentRound = 0;
+    vetoUsed = false;
+    vetoMode = false;
+    vetoTarget = null;
+    eliminated = new Set();
+    roundEliminated = new Set();
+    startBracketRound();
+  }
+
+  // ==================== CHALLENGE LINK ====================
+  function generateChallengeLink() {
+    var data = {
+      theme: selectedThemeIdx,
+      items: items,
+      picks: p1Picks,
+      winner: p1Winner,
+      veto: p1Veto
+    };
+    var encoded = btoa(JSON.stringify(data));
+    var url = window.location.origin + window.location.pathname + '#' + encoded;
+    document.getElementById('link-box').textContent = url;
+    showScreen('link-screen');
+  }
+
+  function copyLink() {
+    var url = document.getElementById('link-box').textContent;
+    navigator.clipboard.writeText(url).then(function() {
+      document.getElementById('copy-feedback').classList.add('show');
+      setTimeout(function() { document.getElementById('copy-feedback').classList.remove('show'); }, 2000);
+    }).catch(function() {
+      showToast('Could not copy. Select and copy manually.');
+    });
+  }
+
+  // ==================== REVEAL ====================
+  function showReveal() {
+    showScreen('reveal-screen');
+    document.getElementById('reveal-theme').textContent = currentTheme.emoji + ' ' + currentTheme.name;
+
+    var p1AllElim = new Set();
+    p1Picks.forEach(function(arr) { arr.forEach(function(i) { p1AllElim.add(i); }); });
+    var p2AllElim = new Set();
+    p2Picks.forEach(function(arr) { arr.forEach(function(i) { p2AllElim.add(i); }); });
+
+    var agreements = 0;
+    var total = items.length;
+    for (var i = 0; i < total; i++) {
+      if (p1AllElim.has(i) === p2AllElim.has(i)) agreements++;
+    }
+    var compat = Math.round((agreements / total) * 100);
+
+    // Build winners row using DOM methods
+    var winnersRow = document.getElementById('winners-row');
+    winnersRow.textContent = '';
+    var sameWinner = p1Winner === p2Winner;
+
+    var card1 = buildWinnerCard('PLAYER 1', items[p1Winner], sameWinner);
+    winnersRow.appendChild(card1);
+    var card2 = buildWinnerCard('PLAYER 2', items[p2Winner], sameWinner);
+    winnersRow.appendChild(card2);
+
+    // Compatibility score with animated count-up
+    var compatScoreEl = document.getElementById('compat-score');
+    var compatLabelEl = document.getElementById('compat-label');
+    var labelInfo = LABELS.find(function(l) { return compat >= l.min; });
+    compatScoreEl.style.color = labelInfo.color;
+    compatScoreEl.style.textShadow = '0 0 15px ' + labelInfo.color + ', 0 0 40px ' + hexToRgba(labelInfo.color, 0.3);
+    compatLabelEl.style.color = labelInfo.color;
+    compatLabelEl.textContent = labelInfo.label;
+
+    animateScore(compatScoreEl, compat);
+    buildComparisonGrid(p1AllElim, p2AllElim, sameWinner);
+
+    // Save score via neon.js
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(compat);
+    }).then(function(result) {
+      Neon.render(document.getElementById('revealLB'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+  }
+
+  function buildWinnerCard(label, pickText, isMatch) {
+    var card = document.createElement('div');
+    card.className = 'winner-card' + (isMatch ? ' match' : '');
+
+    var wcLabel = document.createElement('div');
+    wcLabel.className = 'wc-label';
+    wcLabel.textContent = label;
+    card.appendChild(wcLabel);
+
+    var wcName = document.createElement('div');
+    wcName.className = 'wc-name';
+    wcName.textContent = '\uD83C\uDFC6';
+    card.appendChild(wcName);
+
+    var wcPick = document.createElement('div');
+    wcPick.className = 'wc-pick';
+    wcPick.textContent = pickText;
+    card.appendChild(wcPick);
+
+    return card;
+  }
+
+  function showSoloReveal() {
+    showScreen('reveal-screen');
+    document.getElementById('reveal-theme').textContent = currentTheme.emoji + ' ' + currentTheme.name;
+
+    var winnersRow = document.getElementById('winners-row');
+    winnersRow.textContent = '';
+    var card = buildWinnerCard('YOUR WINNER', items[p1Winner], true);
+    winnersRow.appendChild(card);
+
+    var compatScoreEl = document.getElementById('compat-score');
+    var compatLabelEl = document.getElementById('compat-label');
+    compatScoreEl.textContent = '\uD83C\uDFC6';
+    compatScoreEl.style.color = '#ffd700';
+    compatScoreEl.style.textShadow = '0 0 15px rgba(255,215,0,0.6)';
+    compatLabelEl.textContent = 'BRACKET COMPLETE';
+    compatLabelEl.style.color = '#ffd700';
+    document.getElementById('comparison-grid').textContent = '';
+
+    playSound('winner');
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 3, '#ffd700', 20);
+  }
+
+  function animateScore(el, target) {
+    var duration = 1500;
+    var start = performance.now();
+    function tick(now) {
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var current = Math.round(eased * target);
+      el.textContent = current + '%';
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        el.textContent = target + '%';
+        spawnParticles(window.innerWidth / 2, el.getBoundingClientRect().top + 20,
+          LABELS.find(function(l) { return target >= l.min; }).color, 20);
+        playSound(target >= 70 ? 'winner' : target >= 50 ? 'confirm' : 'fail');
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function buildComparisonGrid(p1Elim, p2Elim, sameWinner) {
+    var grid = document.getElementById('comparison-grid');
+    grid.textContent = '';
+
+    // Header
+    addCompHeader(grid, sameWinner ? '\u2705 SAME WINNER!' : '\u2694\uFE0F DIFFERENT WINNERS');
+
+    var bothElim = [];
+    var bothKept = [];
+    var p1Only = [];
+    var p2Only = [];
+
+    for (var i = 0; i < items.length; i++) {
+      var in1 = p1Elim.has(i);
+      var in2 = p2Elim.has(i);
+      if (in1 && in2) bothElim.push(i);
+      else if (!in1 && !in2) bothKept.push(i);
+      else if (in1 && !in2) p1Only.push(i);
+      else p2Only.push(i);
+    }
+
+    var delay = 200;
+    var idx = 0;
+
+    if (bothKept.length > 0) {
+      addCompHeader(grid, '\uD83E\uDD1D BOTH KEPT (' + bothKept.length + ')');
+      bothKept.forEach(function(i) {
+        var d = document.createElement('div');
+        d.className = 'comp-item agree';
+        d.textContent = items[i];
+        grid.appendChild(d);
+        scheduleReveal(d, delay + idx * 80);
+        idx++;
+      });
+    }
+
+    if (bothElim.length > 0) {
+      addCompHeader(grid, '\uD83E\uDD1D BOTH ELIMINATED (' + bothElim.length + ')');
+      bothElim.forEach(function(i) {
+        var d = document.createElement('div');
+        d.className = 'comp-item agree';
+        d.textContent = items[i];
+        d.style.textDecoration = 'line-through';
+        d.style.opacity = '0';
+        grid.appendChild(d);
+        scheduleReveal(d, delay + idx * 80);
+        idx++;
+      });
+    }
+
+    if (p1Only.length > 0 || p2Only.length > 0) {
+      addCompHeader(grid, '\uD83D\uDCA5 DISAGREEMENTS (' + (p1Only.length + p2Only.length) + ')');
+
+      var maxLen = Math.max(p1Only.length, p2Only.length);
+      for (var j = 0; j < maxLen; j++) {
+        if (j < p1Only.length) {
+          var d1 = document.createElement('div');
+          d1.className = 'comp-item p1only';
+          d1.textContent = items[p1Only[j]];
+          d1.title = 'P1 eliminated';
+          grid.appendChild(d1);
+          scheduleReveal(d1, delay + idx * 120);
+          idx++;
+        } else {
+          var empty1 = document.createElement('div');
+          empty1.className = 'comp-item';
+          empty1.style.border = 'none';
+          empty1.style.opacity = '0';
+          grid.appendChild(empty1);
+        }
+        if (j < p2Only.length) {
+          var d2 = document.createElement('div');
+          d2.className = 'comp-item p2only';
+          d2.textContent = items[p2Only[j]];
+          d2.title = 'P2 eliminated';
+          grid.appendChild(d2);
+          scheduleReveal(d2, delay + idx * 120);
+          idx++;
+        } else {
+          var empty2 = document.createElement('div');
+          empty2.className = 'comp-item';
+          empty2.style.border = 'none';
+          empty2.style.opacity = '0';
+          grid.appendChild(empty2);
+        }
+      }
+    }
+  }
+
+  function addCompHeader(grid, text) {
+    var h = document.createElement('div');
+    h.className = 'comp-header';
+    h.textContent = text;
+    grid.appendChild(h);
+  }
+
+  function scheduleReveal(el, delay) {
+    setTimeout(function() {
+      el.classList.add('visible');
+      playSound('reveal');
+    }, delay);
+  }
+
+  // ==================== SHARE ====================
+  function shareResults() {
+    var p1Win = items[p1Winner];
+    var p2Win = p2Winner !== null ? items[p2Winner] : null;
+
+    var agreements = 0;
+    var p1AllElim = new Set();
+    p1Picks.forEach(function(arr) { arr.forEach(function(i) { p1AllElim.add(i); }); });
+    var p2AllElim = new Set();
+    if (p2Picks.length > 0) {
+      p2Picks.forEach(function(arr) { arr.forEach(function(i) { p2AllElim.add(i); }); });
+    }
+    for (var i = 0; i < items.length; i++) {
+      if (p1AllElim.has(i) === p2AllElim.has(i)) agreements++;
+    }
+    var compat = Math.round((agreements / items.length) * 100);
+    var labelInfo = LABELS.find(function(l) { return compat >= l.min; });
+
+    var text;
+    if (gameMode === 'solo') {
+      text = '\u2694\uFE0F VETO | ' + currentTheme.name + '\n' +
+        '\uD83C\uDFC6 My Winner: ' + p1Win + '\n' +
+        'neonarcade.net/neonarcade/veto.html';
+    } else {
+      text = '\u2694\uFE0F VETO | ' + currentTheme.name + '\n' +
+        '\uD83C\uDFC6 P1: ' + p1Win + '\n' +
+        '\uD83C\uDFC6 P2: ' + (p2Win || '???') + '\n' +
+        'Compatibility: ' + compat + '% \u2014 ' + labelInfo.label + '\n' +
+        'neonarcade.net/neonarcade/veto.html';
+    }
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {});
+    } else {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('Copied to clipboard!');
+      }).catch(function() {
+        showToast('Could not copy.');
+      });
+    }
+  }
+
+  function challengeFromReveal() {
+    gameMode = 'link';
+    setMode('link');
+    showScreen('start-screen');
+  }
+
+  function playAgain() {
+    if (challengeData) {
+      challengeData = null;
+      window.location.hash = '';
+      document.getElementById('challenge-info').style.display = 'none';
+      document.getElementById('btn-same').style.display = '';
+      document.getElementById('btn-link').style.display = '';
+      document.getElementById('btn-solo').style.display = '';
+      document.getElementById('theme-section').style.display = '';
+      gameMode = 'same';
+      setMode('same');
+    }
+    showScreen('start-screen');
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  // ==================== TOAST ====================
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('visible');
+    setTimeout(function() { toastEl.classList.remove('visible'); }, 2000);
+  }
+
+  // ==================== UTILS ====================
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function hexToRgba(hex, alpha) {
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  // ==================== KEYBOARD ====================
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var bracketActive = document.getElementById('bracket-screen').classList.contains('active');
+      if (bracketActive) {
+        if (challengeData) {
+          challengeData = null;
+          window.location.hash = '';
+          document.getElementById('challenge-info').style.display = 'none';
+          document.getElementById('btn-same').style.display = '';
+          document.getElementById('btn-link').style.display = '';
+          document.getElementById('btn-solo').style.display = '';
+          document.getElementById('theme-section').style.display = '';
+          gameMode = 'same';
+          setMode('same');
+        }
+        showScreen('start-screen');
+        Neon.render(document.getElementById('startLB'));
+      }
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

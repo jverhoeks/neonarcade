@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Sequencer — Free Online Memory Pattern Game | NEON ARCADE</title>
+<meta name="description" content="Play Sequencer free online — a neon Simon Says memory game. Watch the sequence, repeat the pattern. Each round adds one more step. How far can your memory reach? No download, no login.">
+<meta name="keywords" content="sequencer, simon says, memory game, pattern memory, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neongrind/sequencer.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neongrind/sequencer.html">
+<meta property="og:title" content="Sequencer — Free Online Memory Pattern Game | NEON ARCADE">
+<meta property="og:description" content="Play Sequencer free online — neon Simon Says. Watch the sequence, repeat the pattern. How far can your memory reach?">
+<meta property="og:image" content="https://neonarcade.net/neongrind/screenshots/sequencer.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neongrind/sequencer.html">
+<meta name="twitter:title" content="Sequencer — Free Online Memory Pattern Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Sequencer free online — neon Simon Says. Watch the sequence, repeat the pattern. How far can your memory reach?">
+<meta name="twitter:image" content="https://neonarcade.net/neongrind/screenshots/sequencer.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Sequencer",
+  "url": "https://neonarcade.net/neongrind/sequencer.html",
+  "description": "Play Sequencer free online — a neon Simon Says memory game. Watch the sequence, repeat the pattern. Each round adds one more step. How far can your memory reach?",
+  "genre": "Memory",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neongrind/screenshots/sequencer.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON GRIND", "item": "https://neonarcade.net/neongrind/" },
+    { "@type": "ListItem", "position": 3, "name": "Sequencer", "item": "https://neonarcade.net/neongrind/sequencer.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:12px}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,7vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,3vw,20px);letter-spacing:3px;color:#9999bb;text-transform:uppercase;text-align:center;max-width:440px}
+
+.mode-selector{display:flex;gap:8px;margin:8px 0}
+.mode-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;padding:10px 18px;border:1px solid #333;background:rgba(255,255,255,0.02);color:#7a7a9a;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.mode-btn:hover{border-color:#7a7a9a;color:#9999bb}
+.mode-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.08);box-shadow:0 0 12px rgba(0,240,255,0.15)}
+.mode-desc{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-align:center;height:18px}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:4px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:4px}
+#startLB{width:100%;max-width:400px;margin-top:8px}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:12px;gap:0}
+.game-hud{display:flex;width:100%;max-width:500px;justify-content:space-between;align-items:center;padding:8px 4px}
+.hud-item{text-align:center}
+.hud-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.hud-value{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.hud-value.round-val{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.hud-value.score-val{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
+
+.game-status{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,20px);letter-spacing:4px;text-transform:uppercase;margin:12px 0 8px 0;height:28px;display:flex;align-items:center;justify-content:center;transition:color 0.2s}
+.game-status.watching{color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.4)}
+.game-status.your-turn{color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.4)}
+.game-status.success{color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.4)}
+
+/* PAD GRID */
+.pad-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2.5vw,18px);width:clamp(200px,55vw,340px);height:clamp(200px,55vw,340px);margin:auto}
+
+.pad{position:relative;border-radius:12px;cursor:pointer;transition:all 0.15s;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pad::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;border-radius:12px;transition:opacity 0.15s}
+.pad .pad-label{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,2.5vw,16px);letter-spacing:3px;opacity:0.5;position:relative;z-index:1;transition:opacity 0.15s}
+
+/* Pad colors - idle state */
+.pad-cyan{background:rgba(0,240,255,0.08);border:2px solid rgba(0,240,255,0.3);color:#00f0ff}
+.pad-cyan::before{background:radial-gradient(circle,rgba(0,240,255,0.15) 0%,transparent 70%);opacity:0}
+.pad-pink{background:rgba(255,45,123,0.08);border:2px solid rgba(255,45,123,0.3);color:#ff2d7b}
+.pad-pink::before{background:radial-gradient(circle,rgba(255,45,123,0.15) 0%,transparent 70%);opacity:0}
+.pad-green{background:rgba(57,255,20,0.08);border:2px solid rgba(57,255,20,0.3);color:#39ff14}
+.pad-green::before{background:radial-gradient(circle,rgba(57,255,20,0.15) 0%,transparent 70%);opacity:0}
+.pad-gold{background:rgba(255,215,0,0.08);border:2px solid rgba(255,215,0,0.3);color:#ffd700}
+.pad-gold::before{background:radial-gradient(circle,rgba(255,215,0,0.15) 0%,transparent 70%);opacity:0}
+
+/* Pad lit state */
+.pad-cyan.lit{background:rgba(0,240,255,0.35);border-color:#00f0ff;box-shadow:0 0 30px rgba(0,240,255,0.5),0 0 60px rgba(0,240,255,0.2),inset 0 0 30px rgba(0,240,255,0.15)}
+.pad-cyan.lit::before{opacity:1}
+.pad-cyan.lit .pad-label{opacity:1}
+.pad-pink.lit{background:rgba(255,45,123,0.35);border-color:#ff2d7b;box-shadow:0 0 30px rgba(255,45,123,0.5),0 0 60px rgba(255,45,123,0.2),inset 0 0 30px rgba(255,45,123,0.15)}
+.pad-pink.lit::before{opacity:1}
+.pad-pink.lit .pad-label{opacity:1}
+.pad-green.lit{background:rgba(57,255,20,0.35);border-color:#39ff14;box-shadow:0 0 30px rgba(57,255,20,0.5),0 0 60px rgba(57,255,20,0.2),inset 0 0 30px rgba(57,255,20,0.15)}
+.pad-green.lit::before{opacity:1}
+.pad-green.lit .pad-label{opacity:1}
+.pad-gold.lit{background:rgba(255,215,0,0.35);border-color:#ffd700;box-shadow:0 0 30px rgba(255,215,0,0.5),0 0 60px rgba(255,215,0,0.2),inset 0 0 30px rgba(255,215,0,0.15)}
+.pad-gold.lit::before{opacity:1}
+.pad-gold.lit .pad-label{opacity:1}
+
+/* Pad pressed (player tap) */
+.pad.pressed{transform:scale(0.95)}
+
+/* Audio mode: all pads same color */
+.pad.audio-mode{background:rgba(180,77,255,0.08);border-color:rgba(180,77,255,0.3);color:#b44dff}
+.pad.audio-mode::before{background:radial-gradient(circle,rgba(180,77,255,0.15) 0%,transparent 70%)}
+.pad.audio-mode.lit{background:rgba(180,77,255,0.35);border-color:#b44dff;box-shadow:0 0 30px rgba(180,77,255,0.5),0 0 60px rgba(180,77,255,0.2),inset 0 0 30px rgba(180,77,255,0.15)}
+
+/* Idle pulse animation */
+@keyframes idlePulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(255,255,255,0.06)}}
+.pad:not(.lit){animation:idlePulse 3s ease-in-out infinite}
+.pad:nth-child(2):not(.lit){animation-delay:0.75s}
+.pad:nth-child(3):not(.lit){animation-delay:1.5s}
+.pad:nth-child(4):not(.lit){animation-delay:2.25s}
+
+/* Wrong pad flash */
+.pad.wrong-flash{background:rgba(255,45,123,0.4) !important;border-color:#ff2d7b !important;box-shadow:0 0 40px rgba(255,45,123,0.6) !important}
+
+/* RESULT SCREEN */
+#resultScreen{gap:14px}
+.result-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,6vw,44px);letter-spacing:4px;text-align:center}
+.result-score{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(40px,10vw,72px);color:#00f0ff;text-shadow:0 0 15px rgba(0,240,255,0.5),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.result-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase}
+.result-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.result-stat{text-align:center}
+.result-stat .val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(16px,3.5vw,22px);color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.3)}
+.result-stat .lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.new-best{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5);animation:bestPulse 1s ease-in-out infinite}
+@keyframes bestPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.8;transform:scale(1.05)}}
+.result-buttons{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.08);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(180,77,255,0.18);box-shadow:0 0 16px rgba(180,77,255,0.2);transform:scale(1.04)}
+#endLB{width:100%;max-width:400px;margin-top:4px}
+
+/* Feedback flash */
+.feedback-flash{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;opacity:0;transition:opacity 0.15s}
+.feedback-flash.correct{background:rgba(57,255,20,0.08);opacity:1}
+.feedback-flash.wrong{background:rgba(255,45,123,0.12);opacity:1}
+
+/* SCREEN SHAKE */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-3px,1px)}20%{transform:translate(3px,-2px)}30%{transform:translate(-2px,3px)}40%{transform:translate(2px,-1px)}50%{transform:translate(-3px,2px)}60%{transform:translate(3px,-3px)}70%{transform:translate(-1px,2px)}80%{transform:translate(2px,-2px)}90%{transform:translate(-2px,1px)}}
+.shaking{animation:shake 0.3s ease-in-out}
+
+/* PARTICLES */
+.particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:200}
+
+/* Progress dots */
+.progress-wrap{display:flex;align-items:center;justify-content:center;gap:4px;height:20px;margin:8px 0 0 0;flex-wrap:wrap;max-width:500px}
+.progress-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.1);transition:all 0.2s}
+.progress-dot.done{background:#39ff14;box-shadow:0 0 6px rgba(57,255,20,0.5)}
+.progress-dot.current{background:#ffd700;box-shadow:0 0 6px rgba(255,215,0,0.5);transform:scale(1.3)}
+.progress-dot.pending{background:rgba(255,255,255,0.1)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="main-title">SEQUENCER</div>
+  <div class="subtitle">How far can your memory reach? Watch the pattern, repeat the sequence.</div>
+  <div class="mode-selector">
+    <button class="mode-btn active" data-mode="visual">VISUAL</button>
+    <button class="mode-btn" data-mode="audio">AUDIO</button>
+    <button class="mode-btn" data-mode="dual">DUAL</button>
+  </div>
+  <div class="mode-desc" id="modeDesc">COLOR FLASHES ONLY — CLASSIC MEMORY</div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">KEYS: Q W A S OR 1 2 3 4 | TAP PADS</div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="game-hud">
+    <div class="hud-item"><div class="hud-label">ROUND</div><div class="hud-value round-val" id="hudRound">1</div></div>
+    <div class="hud-item"><div class="hud-label">SCORE</div><div class="hud-value score-val" id="hudScore">0</div></div>
+    <div class="hud-item"><div class="hud-label">BEST</div><div class="hud-value" id="hudBest">0</div></div>
+  </div>
+  <div class="game-status watching" id="gameStatus">WATCH</div>
+  <div class="pad-grid" id="padGrid">
+    <div class="pad pad-cyan" data-idx="0"><span class="pad-label">Q / 1</span></div>
+    <div class="pad pad-pink" data-idx="1"><span class="pad-label">W / 2</span></div>
+    <div class="pad pad-green" data-idx="2"><span class="pad-label">A / 3</span></div>
+    <div class="pad pad-gold" data-idx="3"><span class="pad-label">S / 4</span></div>
+  </div>
+  <div class="progress-wrap" id="progressWrap"></div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="screen">
+  <div class="result-title" id="resultTitle" style="color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.5)">GAME OVER</div>
+  <div class="result-label">SCORE</div>
+  <div class="result-score" id="resultScore">0</div>
+  <div class="new-best" id="newBest" style="display:none">NEW BEST!</div>
+  <div class="result-stats">
+    <div class="result-stat"><div class="val" id="statRound">0</div><div class="lbl">ROUND</div></div>
+    <div class="result-stat"><div class="val" id="statLength">0</div><div class="lbl">LONGEST SEQ</div></div>
+    <div class="result-stat"><div class="val" id="statMode">VISUAL</div><div class="lbl">MODE</div></div>
+  </div>
+  <div class="result-buttons">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+  </div>
+  <div id="endLB"></div>
+</div>
+
+<div class="feedback-flash" id="feedbackFlash"></div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // CONFIG
+  const PADS = [
+    { name: 'CYAN',  hex: '#00f0ff', cls: 'pad-cyan',  freq: 261.63 }, // C4
+    { name: 'PINK',  hex: '#ff2d7b', cls: 'pad-pink',  freq: 329.63 }, // E4
+    { name: 'GREEN', hex: '#39ff14', cls: 'pad-green', freq: 392.00 }, // G4
+    { name: 'GOLD',  hex: '#ffd700', cls: 'pad-gold',  freq: 523.25 }  // C5
+  ];
+
+  const PAD_EMOJIS = ['\uD83D\uDFE6', '\uD83D\uDFE5', '\uD83D\uDFE9', '\uD83D\uDFE8']; // blue, red, green, yellow squares
+
+  const MODE_DESC = {
+    visual: 'COLOR FLASHES ONLY \u2014 CLASSIC MEMORY',
+    audio: 'SOUND ONLY \u2014 ALL PADS LOOK THE SAME',
+    dual: 'VISUAL + AUDIO \u2014 FULL SENSORY MODE'
+  };
+
+  const FLASH_START = 600;   // ms initial flash duration
+  const FLASH_MIN = 200;     // ms minimum flash duration
+  const FLASH_DECAY = 25;    // ms reduction per round
+  const GAP_START = 200;     // ms gap between flashes
+  const GAP_MIN = 80;        // ms minimum gap
+  const GAP_DECAY = 10;      // ms gap reduction per round
+
+  // KEY MAPPINGS
+  const KEY_MAP = { q: 0, w: 1, a: 2, s: 3, '1': 0, '2': 1, '3': 2, '4': 3 };
+
+  // DOM
+  const screens = {
+    start: document.getElementById('startScreen'),
+    game: document.getElementById('gameScreen'),
+    result: document.getElementById('resultScreen')
+  };
+  const $ = id => document.getElementById(id);
+  const padEls = document.querySelectorAll('.pad');
+  const $padGrid = $('padGrid');
+  const $hudRound = $('hudRound');
+  const $hudScore = $('hudScore');
+  const $hudBest = $('hudBest');
+  const $gameStatus = $('gameStatus');
+  const $progressWrap = $('progressWrap');
+  const $feedbackFlash = $('feedbackFlash');
+  const $modeDesc = $('modeDesc');
+  const $resultTitle = $('resultTitle');
+  const $resultScore = $('resultScore');
+  const $newBest = $('newBest');
+  const $statRound = $('statRound');
+  const $statLength = $('statLength');
+  const $statMode = $('statMode');
+
+  // STATE
+  let currentMode = 'visual';
+  let sequence = [];
+  let playerIdx = 0;
+  let round = 0;
+  let score = 0;
+  let gameActive = false;
+  let isPlayingSequence = false;
+  let inputLocked = true;
+  let playbackTimeouts = [];
+
+  // AUDIO
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(padIdx, duration) {
+    if (!audioCtx) return;
+    try {
+      var now = audioCtx.currentTime;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(PADS[padIdx].freq, now);
+      var dur = (duration || 300) / 1000;
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.setValueAtTime(0.15, now + dur * 0.7);
+      gain.gain.linearRampToValueAtTime(0, now + dur);
+      osc.start(now);
+      osc.stop(now + dur);
+    } catch (e) {}
+  }
+
+  function playSuccessJingle() {
+    if (!audioCtx) return;
+    try {
+      var now = audioCtx.currentTime;
+      var notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach(function(freq, i) {
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        var t = now + i * 0.08;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.1, t);
+        gain.gain.linearRampToValueAtTime(0, t + 0.15);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      });
+    } catch (e) {}
+  }
+
+  function playFailBuzzer() {
+    if (!audioCtx) return;
+    try {
+      var now = audioCtx.currentTime;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.linearRampToValueAtTime(80, now + 0.4);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.5);
+      osc.start(now);
+      osc.stop(now + 0.5);
+      // Second dissonant tone
+      var osc2 = audioCtx.createOscillator();
+      var gain2 = audioCtx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.type = 'sawtooth';
+      osc2.frequency.setValueAtTime(160, now);
+      osc2.frequency.linearRampToValueAtTime(70, now + 0.4);
+      gain2.gain.setValueAtTime(0.08, now);
+      gain2.gain.linearRampToValueAtTime(0, now + 0.5);
+      osc2.start(now);
+      osc2.stop(now + 0.5);
+    } catch (e) {}
+  }
+
+  // PARTICLES
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      document.body.appendChild(p);
+      var angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      var speed = 60 + Math.random() * 100;
+      var dx = Math.cos(angle) * speed;
+      var dy = Math.sin(angle) * speed;
+      var size = 3 + Math.random() * 4;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.animate([
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px)', opacity: 0 }
+      ], { duration: 400 + Math.random() * 200, easing: 'cubic-bezier(0,.8,.5,1)' })
+      .onfinish = function() { p.remove(); };
+    }
+  }
+
+  function showScreen(name) {
+    Object.values(screens).forEach(function(s) { s.classList.remove('active'); });
+    screens[name].classList.add('active');
+  }
+
+  // MODE SELECTOR
+  document.querySelectorAll('.mode-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+      $modeDesc.textContent = MODE_DESC[currentMode];
+      initNeon();
+    });
+  });
+
+  // NEON.JS
+  function initNeon() {
+    if (typeof Neon !== 'undefined') {
+      Neon.init({
+        game: 'sequencer',
+        mode: 'high',
+        key: 'neonarcade_neongrind_sequencer_scores'
+      });
+      Neon.render($('startLB'));
+      var best = Neon.getHighScore();
+      $hudBest.textContent = best || 0;
+    }
+  }
+
+  // AUDIO MODE VISUALS
+  function applyAudioMode(enable) {
+    padEls.forEach(function(el) {
+      if (enable) {
+        el.classList.add('audio-mode');
+      } else {
+        el.classList.remove('audio-mode');
+      }
+    });
+  }
+
+  // PAD FLASH
+  function flashPad(idx, duration, playSound) {
+    var el = padEls[idx];
+    el.classList.add('lit');
+    if (playSound) {
+      playTone(idx, duration);
+    }
+    setTimeout(function() {
+      el.classList.remove('lit');
+    }, duration);
+  }
+
+  // PROGRESS DOTS
+  function renderProgress() {
+    while ($progressWrap.firstChild) $progressWrap.removeChild($progressWrap.firstChild);
+    var len = sequence.length;
+    // Only show dots for current sequence (max ~30 visible)
+    var maxDots = Math.min(len, 30);
+    var startFrom = len > 30 ? len - 30 : 0;
+    for (var i = startFrom; i < len; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'progress-dot';
+      if (i < playerIdx) {
+        dot.classList.add('done');
+      } else if (i === playerIdx) {
+        dot.classList.add('current');
+      } else {
+        dot.classList.add('pending');
+      }
+      $progressWrap.appendChild(dot);
+    }
+  }
+
+  function updateProgressDot(idx) {
+    var dots = $progressWrap.children;
+    var len = sequence.length;
+    var startFrom = len > 30 ? len - 30 : 0;
+    var dotIdx = idx - startFrom;
+    if (dotIdx >= 0 && dotIdx < dots.length) {
+      dots[dotIdx].classList.remove('current', 'pending');
+      dots[dotIdx].classList.add('done');
+    }
+    // Highlight next
+    var nextDotIdx = (idx + 1) - startFrom;
+    if (nextDotIdx >= 0 && nextDotIdx < dots.length) {
+      dots[nextDotIdx].classList.remove('pending');
+      dots[nextDotIdx].classList.add('current');
+    }
+  }
+
+  // GET FLASH DURATION FOR CURRENT ROUND
+  function getFlashDuration() {
+    return Math.max(FLASH_MIN, FLASH_START - round * FLASH_DECAY);
+  }
+
+  function getGapDuration() {
+    return Math.max(GAP_MIN, GAP_START - round * GAP_DECAY);
+  }
+
+  // PLAY SEQUENCE
+  function playSequence() {
+    isPlayingSequence = true;
+    inputLocked = true;
+    $gameStatus.textContent = 'WATCH';
+    $gameStatus.className = 'game-status watching';
+
+    var shouldPlaySound = currentMode === 'audio' || currentMode === 'dual';
+    var shouldShowVisual = currentMode === 'visual' || currentMode === 'dual';
+    var flashDur = getFlashDuration();
+    var gapDur = getGapDuration();
+
+    // In audio mode, still flash the pad (but all same color via CSS)
+    var delay = 400;
+    for (var i = 0; i < sequence.length; i++) {
+      (function(idx, d) {
+        var t = setTimeout(function() {
+          if (!gameActive) return;
+          flashPad(sequence[idx], flashDur, shouldPlaySound || shouldShowVisual);
+        }, d);
+        playbackTimeouts.push(t);
+      })(i, delay + i * (flashDur + gapDur));
+    }
+
+    var totalTime = delay + sequence.length * (flashDur + gapDur);
+    var t2 = setTimeout(function() {
+      if (!gameActive) return;
+      isPlayingSequence = false;
+      inputLocked = false;
+      playerIdx = 0;
+      $gameStatus.textContent = 'YOUR TURN';
+      $gameStatus.className = 'game-status your-turn';
+      renderProgress();
+    }, totalTime);
+    playbackTimeouts.push(t2);
+  }
+
+  // CANCEL ALL PLAYBACK
+  function cancelPlayback() {
+    playbackTimeouts.forEach(function(t) { clearTimeout(t); });
+    playbackTimeouts = [];
+    isPlayingSequence = false;
+    padEls.forEach(function(el) { el.classList.remove('lit'); });
+  }
+
+  // NEXT ROUND
+  function nextRound() {
+    round++;
+    $hudRound.textContent = round;
+
+    // Add a random pad to the sequence
+    var next = Math.floor(Math.random() * 4);
+    sequence.push(next);
+    playerIdx = 0;
+
+    // Short pause then play sequence
+    var t = setTimeout(function() {
+      if (!gameActive) return;
+      playSequence();
+    }, round === 1 ? 600 : 800);
+    playbackTimeouts.push(t);
+  }
+
+  // HANDLE PAD INPUT
+  function handlePadInput(idx) {
+    if (!gameActive || inputLocked || isPlayingSequence) return;
+
+    var el = padEls[idx];
+    var shouldPlaySound = currentMode === 'audio' || currentMode === 'dual';
+    var flashDur = Math.min(getFlashDuration(), 250);
+
+    // Flash pad on press
+    el.classList.add('lit', 'pressed');
+    if (shouldPlaySound || currentMode === 'visual') {
+      playTone(idx, flashDur);
+    }
+    setTimeout(function() {
+      el.classList.remove('lit', 'pressed');
+    }, flashDur);
+
+    if (idx === sequence[playerIdx]) {
+      // Correct
+      updateProgressDot(playerIdx);
+      playerIdx++;
+
+      if (playerIdx === sequence.length) {
+        // Round complete!
+        inputLocked = true;
+        score += sequence.length;
+        $hudScore.textContent = score;
+
+        $gameStatus.textContent = 'CORRECT!';
+        $gameStatus.className = 'game-status success';
+
+        // Success flash + particles
+        $feedbackFlash.className = 'feedback-flash correct';
+        setTimeout(function() { $feedbackFlash.className = 'feedback-flash'; }, 200);
+
+        var gr = $padGrid.getBoundingClientRect();
+        spawnParticles(gr.left + gr.width / 2, gr.top + gr.height / 2, '#39ff14', 16);
+        playSuccessJingle();
+
+        // Next round after delay
+        var t = setTimeout(function() {
+          if (!gameActive) return;
+          nextRound();
+        }, 1000);
+        playbackTimeouts.push(t);
+      }
+    } else {
+      // Wrong!
+      gameActive = false;
+      inputLocked = true;
+      playFailBuzzer();
+
+      // Show wrong flash
+      el.classList.remove('lit');
+      el.classList.add('wrong-flash');
+      $feedbackFlash.className = 'feedback-flash wrong';
+      document.body.classList.add('shaking');
+
+      setTimeout(function() {
+        el.classList.remove('wrong-flash');
+        $feedbackFlash.className = 'feedback-flash';
+        document.body.classList.remove('shaking');
+      }, 400);
+
+      // Flash the correct pad
+      setTimeout(function() {
+        var correctEl = padEls[sequence[playerIdx]];
+        correctEl.classList.add('lit');
+        playTone(sequence[playerIdx], 400);
+        setTimeout(function() {
+          correctEl.classList.remove('lit');
+          endGame();
+        }, 500);
+      }, 500);
+    }
+  }
+
+  // PAD CLICK/TOUCH
+  padEls.forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      handlePadInput(parseInt(el.dataset.idx));
+    });
+    el.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      handlePadInput(parseInt(el.dataset.idx));
+    }, { passive: false });
+  });
+
+  // START GAME
+  function startGame() {
+    ensureAudio();
+
+    sequence = [];
+    playerIdx = 0;
+    round = 0;
+    score = 0;
+    gameActive = true;
+    inputLocked = true;
+    isPlayingSequence = false;
+    playbackTimeouts = [];
+
+    $hudRound.textContent = '1';
+    $hudScore.textContent = '0';
+    var best = 0;
+    if (typeof Neon !== 'undefined') {
+      best = Neon.getHighScore() || 0;
+    }
+    $hudBest.textContent = best;
+
+    applyAudioMode(currentMode === 'audio');
+
+    showScreen('game');
+    while ($progressWrap.firstChild) $progressWrap.removeChild($progressWrap.firstChild);
+
+    $gameStatus.textContent = 'GET READY';
+    $gameStatus.className = 'game-status watching';
+
+    nextRound();
+  }
+
+  // END GAME
+  function endGame() {
+    cancelPlayback();
+    gameActive = false;
+
+    var roundReached = round;
+    var longestSeq = sequence.length - 1; // failed on current, so completed length - 1
+
+    showScreen('result');
+
+    $resultScore.textContent = score;
+    $statRound.textContent = roundReached;
+    $statLength.textContent = longestSeq;
+    $statMode.textContent = currentMode.toUpperCase();
+    $newBest.style.display = 'none';
+
+    if (typeof Neon !== 'undefined') {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(score);
+      }).then(function(result) {
+        if (result && result.isNewBest) {
+          $newBest.style.display = '';
+        }
+        Neon.render($('endLB'));
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      });
+    }
+
+    var sr = $resultScore.getBoundingClientRect();
+    spawnParticles(sr.left + sr.width / 2, sr.top + sr.height / 2, '#00f0ff', 20);
+  }
+
+  // SHARE
+  function getShareText() {
+    var modeLabel = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+    var longestSeq = Math.max(0, sequence.length - 1);
+    // Show last 10 of completed sequence
+    var completedSeq = sequence.slice(0, longestSeq);
+    var showCount = Math.min(completedSeq.length, 10);
+    var seqEmojis = '';
+    for (var i = completedSeq.length - showCount; i < completedSeq.length; i++) {
+      seqEmojis += PAD_EMOJIS[completedSeq[i]];
+    }
+    if (!seqEmojis) seqEmojis = '\u2014';
+    return '\uD83C\uDFB5 SEQUENCER\n' +
+      'Round: ' + round + ' | Score: ' + score + ' | Mode: ' + modeLabel + '\n' +
+      seqEmojis + '\n' +
+      'Can you beat my memory? \uD83E\uDDE0\n' +
+      'neonarcade.net/neongrind/sequencer.html';
+  }
+
+  $('shareBtn').addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() {
+          $('shareBtn').textContent = 'COPIED!';
+          setTimeout(function() { $('shareBtn').textContent = 'SHARE'; }, 2000);
+        });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() {
+        $('shareBtn').textContent = 'COPIED!';
+        setTimeout(function() { $('shareBtn').textContent = 'SHARE'; }, 2000);
+      });
+    }
+  });
+
+  // KEYBOARD
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (gameActive || isPlayingSequence) {
+        e.preventDefault();
+        cancelPlayback();
+        gameActive = false;
+        inputLocked = true;
+        isPlayingSequence = false;
+        applyAudioMode(false);
+        showScreen('start');
+        initNeon();
+      }
+      return;
+    }
+
+    if (!gameActive) {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        if (screens.start.classList.contains('active')) startGame();
+        else if (screens.result.classList.contains('active')) restartGame();
+      }
+      return;
+    }
+
+    var key = e.key.toLowerCase();
+    if (key in KEY_MAP) {
+      e.preventDefault();
+      handlePadInput(KEY_MAP[key]);
+    }
+  });
+
+  $('startBtn').addEventListener('click', startGame);
+  $('replayBtn').addEventListener('click', restartGame);
+
+  function restartGame() {
+    cancelPlayback();
+    gameActive = false;
+    applyAudioMode(false);
+    showScreen('start');
+    initNeon();
+  }
+
+  // INIT
+  initNeon();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hitori — Free Online Elimination Logic Puzzle | NEON ARCADE</title>
+<meta name="description" content="Play Hitori free online — shade duplicate numbers so no repeats remain in any row or column. Shaded cells can't touch. All unshaded cells stay connected. No download, no login.">
+<meta name="keywords" content="hitori, hitori puzzle, free logic puzzle online, number elimination puzzle, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonmind/hitori.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/hitori.html">
+<meta property="og:title" content="Hitori — Free Online Elimination Logic Puzzle | NEON ARCADE">
+<meta property="og:description" content="Play Hitori free online — shade duplicate numbers so no repeats remain in any row or column.">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/hitori.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/hitori.html">
+<meta name="twitter:title" content="Hitori — Free Online Elimination Logic Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Play Hitori free online — shade duplicate numbers so no repeats remain in any row or column.">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/hitori.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Hitori",
+  "url": "https://neonarcade.net/neonmind/hitori.html",
+  "description": "Play Hitori free online — shade duplicate numbers so no repeats remain in any row or column. Shaded cells can't touch. All unshaded cells stay connected.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  },
+  "image": "https://neonarcade.net/neonmind/screenshots/hitori.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://neonarcade.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "NEON MIND",
+      "item": "https://neonarcade.net/neonmind/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Hitori",
+      "item": "https://neonarcade.net/neonmind/hitori.html"
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:fixed;z-index:10;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:10px}
+.brand-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:3px;color:#b44dff;text-transform:uppercase;text-shadow:0 0 8px rgba(180,77,255,0.3)}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(40px,10vw,68px);letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(13px,2.8vw,18px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:2px;max-width:400px;line-height:1.4}
+
+/* Difficulty grid */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:400px;margin:8px 0}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:14px 10px;border:1px solid rgba(0,240,255,0.25);background:rgba(0,240,255,0.04);color:#00f0ff;cursor:pointer;border-radius:4px;text-transform:uppercase;transition:all 0.2s;text-align:center}
+.diff-btn:hover{background:rgba(0,240,255,0.12);border-color:rgba(0,240,255,0.5);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+.diff-btn.selected{border-color:#00f0ff;background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2)}
+.diff-btn .diff-size{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:12px;letter-spacing:1px;color:#7a7a9a;margin-top:2px;display:block}
+.diff-btn .diff-best{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#7a7a9a;margin-top:4px;display:block}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:10px;gap:0}
+
+.game-top-bar{display:flex;width:100%;max-width:500px;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:4px}
+.top-diff{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;color:#8888aa;text-transform:uppercase}
+.top-timer{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(14px,3vw,18px);letter-spacing:1px;color:#8888aa}
+.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#7a7a9a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
+.top-back:hover{color:#00f0ff}
+
+/* Auto-check toggle */
+.auto-check-wrap{display:flex;align-items:center;gap:6px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#7a7a9a;text-transform:uppercase}
+.auto-check-toggle{width:36px;height:18px;border-radius:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);position:relative;cursor:pointer;transition:all 0.2s}
+.auto-check-toggle.on{background:rgba(0,240,255,0.2);border-color:rgba(0,240,255,0.5)}
+.auto-check-toggle::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#7a7a9a;transition:all 0.2s}
+.auto-check-toggle.on::after{left:20px;background:#00f0ff}
+
+/* GRID */
+.grid-wrap{position:relative;margin:4px 0 8px 0;display:flex;align-items:center;justify-content:center}
+.grid{display:grid;border:2px solid rgba(0,240,255,0.3);border-radius:4px;overflow:hidden;background:#0e0e1a;touch-action:none}
+.cell{display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background 0.15s,box-shadow 0.15s;background:#12121f;border:1px solid rgba(255,255,255,0.06);font-family:'Orbitron',monospace;font-weight:700;color:#9999bb}
+.cell:hover{background:rgba(255,255,255,0.04)}
+.cell .num{position:relative;z-index:2;transition:all 0.15s}
+
+/* Shaded cell */
+.cell.shaded{background:#08080e}
+.cell.shaded .num{color:#3a3a5a;text-shadow:none}
+.cell.shaded::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:1}
+
+/* Circled cell (confirmed unshaded) */
+.cell.circled{box-shadow:inset 0 0 0 2px #00f0ff;background:rgba(0,240,255,0.04)}
+.cell.circled .num{color:#00f0ff;text-shadow:0 0 6px rgba(0,240,255,0.4)}
+
+/* Error states */
+.cell.error-dup .num{color:#ff2d7b !important;text-shadow:0 0 8px rgba(255,45,123,0.6) !important}
+.cell.error-adj{box-shadow:inset 0 0 0 2px #ff2d7b !important;background:rgba(255,45,123,0.1) !important}
+.cell.error-adj.shaded::before{background:rgba(255,45,123,0.3)}
+.cell.error-disco{background:rgba(255,140,0,0.1) !important}
+.cell.error-disco .num{color:#ff8c00 !important;text-shadow:0 0 8px rgba(255,140,0,0.5) !important}
+
+/* Pop animation */
+.cell .num.pop{animation:popIn 0.2s ease-out}
+@keyframes popIn{0%{transform:scale(0.6);opacity:0.5}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:clamp(6px,1.5vw,12px);width:100%;max-width:500px;justify-content:center;margin:6px 0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(11px,2.5vw,13px);letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#8888aa;cursor:pointer;border-radius:4px;transition:all 0.15s;display:flex;align-items:center;gap:5px;flex:1;justify-content:center}
+.tool-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
+.tool-btn:active{transform:scale(0.96)}
+.tool-btn .tool-icon{font-size:16px}
+
+/* Legend */
+.legend{display:flex;gap:16px;justify-content:center;margin:4px 0;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;color:#7a7a9a;text-transform:uppercase}
+.legend-swatch{width:16px;height:16px;border-radius:2px;border:1px solid rgba(255,255,255,0.1)}
+
+/* Rules hint */
+.rules-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:1px;color:#7a7a9a;text-align:center;max-width:420px;line-height:1.5;margin:2px 0}
+
+/* COMPLETE SCREEN */
+#completeScreen{gap:12px}
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,44px);color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5),0 0 40px rgba(57,255,20,0.2);letter-spacing:6px}
+.complete-stat{text-align:center;margin:2px 0}
+.complete-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(20px,5vw,30px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.complete-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.complete-best{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;margin:2px 0}
+.complete-size{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;letter-spacing:2px;color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.3)}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.play-btn.share-btn{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.share-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
+.play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:2px;text-align:center}
+
+/* LEADERBOARD */
+.leaderboard{width:100%;max-width:300px;margin:6px 0}
+
+/* Screen shake */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
+.shaking{animation:shake 0.3s ease-in-out}
+
+/* Particles */
+.particle{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:9998}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:8px 20px;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="brand-tag">NEON MIND</div>
+  <h1 class="main-title">HITORI</h1>
+  <p class="subtitle">Shade the duplicates. Stay connected.</p>
+
+  <div class="diff-grid" id="diffGrid">
+    <button class="diff-btn" data-size="5" id="btn5">
+      EASY
+      <span class="diff-size">5 &times; 5</span>
+      <span class="diff-best" id="best5">--:--</span>
+    </button>
+    <button class="diff-btn selected" data-size="7" id="btn7">
+      MEDIUM
+      <span class="diff-size">7 &times; 7</span>
+      <span class="diff-best" id="best7">--:--</span>
+    </button>
+    <button class="diff-btn" data-size="9" id="btn9">
+      HARD
+      <span class="diff-size">9 &times; 9</span>
+      <span class="diff-best" id="best9">--:--</span>
+    </button>
+  </div>
+
+  <button class="play-btn" id="startBtn">START</button>
+
+  <div class="start-stats" id="startStats">
+    <div class="start-stat">
+      <div class="stat-val" id="statPlayed">0</div>
+      <div class="stat-lbl">PLAYED</div>
+    </div>
+    <div class="start-stat">
+      <div class="stat-val" id="statSolved">0</div>
+      <div class="stat-lbl">SOLVED</div>
+    </div>
+  </div>
+
+  <div class="leaderboard" id="startLB"></div>
+
+  <div class="controls-hint">TAP CELL: NORMAL &rarr; SHADED &rarr; CIRCLED &rarr; NORMAL</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="game-top-bar">
+    <button class="top-back" id="backBtn">&#x2190;</button>
+    <span class="top-diff" id="topDiff">7x7 MEDIUM</span>
+    <div class="auto-check-wrap">
+      <span>CHECK</span>
+      <div class="auto-check-toggle on" id="autoCheckToggle"></div>
+    </div>
+    <span class="top-timer" id="topTimer">00:00</span>
+  </div>
+
+  <div class="grid-wrap" id="gridWrap">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn" id="validateBtn">
+      <span class="tool-icon">&#10003;</span> CHECK
+    </button>
+    <button class="tool-btn" id="undoBtn">
+      <span class="tool-icon">&#x21A9;</span> UNDO
+    </button>
+    <button class="tool-btn" id="clearBtn">
+      <span class="tool-icon">&#x21BA;</span> CLEAR
+    </button>
+    <button class="tool-btn" id="newBtn">
+      <span class="tool-icon">&#x2605;</span> NEW
+    </button>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-swatch" style="background:#12121f;border-color:rgba(255,255,255,0.15)"></span> Normal</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#08080e;border-color:rgba(255,255,255,0.1)"></span> Shaded</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:rgba(0,240,255,0.08);border-color:#00f0ff"></span> Circled</span>
+  </div>
+
+  <div class="rules-hint">No duplicate numbers in any row/col. Shaded cells never touch. Unshaded cells form one group.</div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div class="screen" id="completeScreen">
+  <div class="complete-title">SOLVED</div>
+  <div class="complete-size" id="completeSize">7x7</div>
+  <div class="complete-stat">
+    <div class="stat-val" id="completeTime"></div>
+    <div class="stat-lbl">SOLVE TIME</div>
+  </div>
+  <div class="complete-best" id="completeBest" style="display:none">NEW PERSONAL BEST!</div>
+
+  <div class="btn-row">
+    <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="nextBtn">NEW PUZZLE</button>
+    <button class="play-btn menu-btn" id="menuBtn">MENU</button>
+  </div>
+
+  <div class="leaderboard" id="completeLB"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- More Games -->
+<nav class="na-more-games" id="moreGames" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE NEON MIND</div>
+    <div class="na-more-links">
+      <a href="sudoku.html" class="na-more-link">Sudoku</a>
+      <a href="queens.html" class="na-more-link">Queens</a>
+      <a href="minesweeper.html" class="na-more-link">Minesweeper</a>
+      <a href="kakuro.html" class="na-more-link">Kakuro</a>
+      <a href="nonogram.html" class="na-more-link">Nonogram</a>
+      <a href="tango.html" class="na-more-link">Tango</a>
+      <a href="bridges.html" class="na-more-link">Bridges</a>
+      <a href="./" class="na-more-link na-more-hub">ALL PUZZLES &rarr;</a>
+    </div>
+  </div>
+</nav>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+'use strict';
+
+// ── CONSTANTS ──
+var SIZES = {
+  5:  { label: 'EASY',   shadeFrac: 0.24 },
+  7:  { label: 'MEDIUM', shadeFrac: 0.22 },
+  9:  { label: 'HARD',   shadeFrac: 0.20 }
+};
+
+var PLAYED_KEY = 'neonarcade_neonmind_hitori_played';
+var SOLVED_KEY = 'neonarcade_neonmind_hitori_solved';
+
+// Cell states
+var NORMAL = 0;
+var SHADED = 1;
+var CIRCLED = 2;
+
+// ── AUDIO ──
+var audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, vol) {
+  var ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = vol || 0.08;
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+function soundShade() {
+  playTone(300, 0.12, 'triangle', 0.07);
+}
+
+function soundCircle() {
+  playTone(880, 0.08, 'sine', 0.06);
+}
+
+function soundNormal() {
+  playTone(600, 0.08, 'sine', 0.05);
+}
+
+function soundError() {
+  playTone(180, 0.25, 'sawtooth', 0.06);
+  setTimeout(function() { playTone(140, 0.25, 'sawtooth', 0.05); }, 100);
+}
+
+function soundSolve() {
+  var notes = [523, 659, 784, 1047];
+  notes.forEach(function(f, i) {
+    setTimeout(function() { playTone(f, 0.3, 'sine', 0.08); }, i * 120);
+  });
+}
+
+// ── DOM REFS ──
+var startScreen = document.getElementById('startScreen');
+var gameScreen = document.getElementById('gameScreen');
+var completeScreen = document.getElementById('completeScreen');
+var gridEl = document.getElementById('grid');
+var timerEl = document.getElementById('topTimer');
+var topDiffEl = document.getElementById('topDiff');
+var backBtn = document.getElementById('backBtn');
+var startBtn = document.getElementById('startBtn');
+var shareBtn = document.getElementById('shareBtn');
+var nextBtn = document.getElementById('nextBtn');
+var menuBtn = document.getElementById('menuBtn');
+var validateBtn = document.getElementById('validateBtn');
+var undoBtn = document.getElementById('undoBtn');
+var clearBtn = document.getElementById('clearBtn');
+var newBtn = document.getElementById('newBtn');
+var autoCheckToggle = document.getElementById('autoCheckToggle');
+var toastEl = document.getElementById('toast');
+var moreGames = document.getElementById('moreGames');
+
+// ── STATE ──
+var currentSize = 7;
+var puzzleGrid = [];
+var cellState = [];
+var solutionShaded = [];
+var timerStart = 0;
+var timerInterval = null;
+var elapsedSec = 0;
+var gameActive = false;
+var autoCheck = true;
+var undoStack = [];
+
+// ── NEON INIT ──
+var neonFormatScore = function(s) {
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+};
+
+function initNeon(size) {
+  Neon.init({
+    game: 'hitori',
+    mode: 'low',
+    key: 'neonarcade_neonmind_hitori_scores_' + size,
+    formatScore: neonFormatScore
+  });
+}
+
+// ── HELPERS ──
+function showScreen(screen) {
+  [startScreen, gameScreen, completeScreen].forEach(function(s) {
+    s.classList.remove('active');
+  });
+  screen.classList.add('active');
+  moreGames.style.display = (screen === startScreen || screen === completeScreen) ? 'block' : 'none';
+}
+
+function showToast(msg, dur) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(function() { toastEl.classList.remove('show'); }, dur || 2000);
+}
+
+function formatTime(s) {
+  var m = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// ── PUZZLE GENERATION ──
+
+function shuffle(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+
+// Generate a random Latin square of size N
+function generateLatinSquare(n) {
+  // Start with shifted rows then shuffle
+  var grid = [];
+  for (var r = 0; r < n; r++) {
+    grid[r] = [];
+    for (var c = 0; c < n; c++) {
+      grid[r][c] = ((r + c) % n) + 1;
+    }
+  }
+  // Shuffle rows
+  shuffle(grid);
+  // Shuffle columns via index array
+  var colOrder = [];
+  for (var i = 0; i < n; i++) colOrder.push(i);
+  shuffle(colOrder);
+  var result = [];
+  for (var r = 0; r < n; r++) {
+    result[r] = [];
+    for (var c = 0; c < n; c++) {
+      result[r][c] = grid[r][colOrder[c]];
+    }
+  }
+  // Relabel numbers randomly
+  var labels = [];
+  for (var i = 1; i <= n; i++) labels.push(i);
+  shuffle(labels);
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      result[r][c] = labels[result[r][c] - 1];
+    }
+  }
+  return result;
+}
+
+// BFS connectivity check for unshaded cells
+function isConnected(shaded, n) {
+  var visited = [];
+  for (var r = 0; r < n; r++) {
+    visited[r] = [];
+    for (var c = 0; c < n; c++) visited[r][c] = false;
+  }
+  var startR = -1, startC = -1;
+  for (var r = 0; r < n && startR === -1; r++) {
+    for (var c = 0; c < n; c++) {
+      if (!shaded[r][c]) { startR = r; startC = c; break; }
+    }
+  }
+  if (startR === -1) return false;
+  var queue = [[startR, startC]];
+  visited[startR][startC] = true;
+  var count = 1;
+  var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  while (queue.length > 0) {
+    var pos = queue.shift();
+    for (var d = 0; d < 4; d++) {
+      var nr = pos[0] + dirs[d][0], nc = pos[1] + dirs[d][1];
+      if (nr >= 0 && nr < n && nc >= 0 && nc < n && !visited[nr][nc] && !shaded[nr][nc]) {
+        visited[nr][nc] = true;
+        count++;
+        queue.push([nr, nc]);
+      }
+    }
+  }
+  var totalUnshaded = 0;
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (!shaded[r][c]) totalUnshaded++;
+    }
+  }
+  return count === totalUnshaded;
+}
+
+// Check no two shaded cells are orthogonally adjacent
+function noAdjacentShaded(shaded, n) {
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (!shaded[r][c]) continue;
+      if (r + 1 < n && shaded[r + 1][c]) return false;
+      if (c + 1 < n && shaded[r][c + 1]) return false;
+    }
+  }
+  return true;
+}
+
+// Generate a valid shading pattern: no adjacent, all unshaded connected
+function generateShadingPattern(n, shadeFrac) {
+  var targetCount = Math.floor(n * n * shadeFrac);
+  var bestShaded = null;
+  var bestCount = 0;
+
+  for (var attempt = 0; attempt < 100; attempt++) {
+    var shaded = [];
+    for (var r = 0; r < n; r++) {
+      shaded[r] = [];
+      for (var c = 0; c < n; c++) shaded[r][c] = false;
+    }
+
+    var cells = [];
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) cells.push([r, c]);
+    }
+    shuffle(cells);
+
+    var count = 0;
+    for (var i = 0; i < cells.length && count < targetCount; i++) {
+      var cr = cells[i][0], cc = cells[i][1];
+      // Check adjacency constraint
+      var ok = true;
+      var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+      for (var d = 0; d < 4; d++) {
+        var nr = cr + dirs[d][0], nc = cc + dirs[d][1];
+        if (nr >= 0 && nr < n && nc >= 0 && nc < n && shaded[nr][nc]) {
+          ok = false; break;
+        }
+      }
+      if (!ok) continue;
+
+      shaded[cr][cc] = true;
+      if (isConnected(shaded, n)) {
+        count++;
+      } else {
+        shaded[cr][cc] = false;
+      }
+    }
+
+    if (count > bestCount) {
+      bestCount = count;
+      bestShaded = [];
+      for (var r = 0; r < n; r++) bestShaded[r] = shaded[r].slice();
+    }
+    if (count >= targetCount) break;
+  }
+
+  return bestShaded;
+}
+
+// Build the puzzle grid: for shaded cells, replace value with a duplicate from same row/col
+function buildPuzzleFromLatinAndShading(latin, shaded, n) {
+  var puzzle = [];
+  for (var r = 0; r < n; r++) {
+    puzzle[r] = latin[r].slice();
+  }
+
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (!shaded[r][c]) continue;
+      // Gather values of unshaded cells in same row and column
+      var candidates = [];
+      for (var k = 0; k < n; k++) {
+        if (k !== c && !shaded[r][k]) candidates.push(latin[r][k]);
+        if (k !== r && !shaded[k][c]) candidates.push(latin[k][c]);
+      }
+      if (candidates.length > 0) {
+        puzzle[r][c] = candidates[Math.floor(Math.random() * candidates.length)];
+      }
+    }
+  }
+  return puzzle;
+}
+
+// Verify the intended solution is valid
+function verifySolution(puzzle, shaded, n) {
+  // No adjacent shaded
+  if (!noAdjacentShaded(shaded, n)) return false;
+  // Connected
+  if (!isConnected(shaded, n)) return false;
+  // No duplicate unshaded per row
+  for (var r = 0; r < n; r++) {
+    var seen = {};
+    for (var c = 0; c < n; c++) {
+      if (shaded[r][c]) continue;
+      var v = puzzle[r][c];
+      if (seen[v]) return false;
+      seen[v] = true;
+    }
+  }
+  // No duplicate unshaded per col
+  for (var c = 0; c < n; c++) {
+    var seen = {};
+    for (var r = 0; r < n; r++) {
+      if (shaded[r][c]) continue;
+      var v = puzzle[r][c];
+      if (seen[v]) return false;
+      seen[v] = true;
+    }
+  }
+  // Ensure every row and col has at least one duplicate (otherwise trivial)
+  var hasDups = false;
+  for (var r = 0; r < n && !hasDups; r++) {
+    var vals = {};
+    for (var c = 0; c < n; c++) {
+      if (vals[puzzle[r][c]]) { hasDups = true; break; }
+      vals[puzzle[r][c]] = true;
+    }
+  }
+  if (!hasDups) return false;
+  return true;
+}
+
+// ── SOLVER for uniqueness verification (5x5 only for performance) ──
+function solveHitori(puzzle, n, maxSolutions) {
+  var solutions = [];
+  maxSolutions = maxSolutions || 2;
+
+  // state: -1=undecided, 0=unshaded, 1=shaded
+  var state = [];
+  for (var r = 0; r < n; r++) {
+    state[r] = [];
+    for (var c = 0; c < n; c++) state[r][c] = -1;
+  }
+
+  // Pre-set: cells with no duplicates in row AND col must be unshaded
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      var v = puzzle[r][c];
+      var rowDup = false, colDup = false;
+      for (var k = 0; k < n; k++) {
+        if (k !== c && puzzle[r][k] === v) rowDup = true;
+        if (k !== r && puzzle[k][c] === v) colDup = true;
+      }
+      if (!rowDup && !colDup) state[r][c] = 0;
+    }
+  }
+
+  function solve() {
+    if (solutions.length >= maxSolutions) return;
+
+    // Find next undecided
+    var br = -1, bc = -1;
+    for (var r = 0; r < n && br === -1; r++) {
+      for (var c = 0; c < n; c++) {
+        if (state[r][c] === -1) { br = r; bc = c; break; }
+      }
+    }
+
+    if (br === -1) {
+      // All decided, check full validity
+      var shadedMap = [];
+      for (var r = 0; r < n; r++) {
+        shadedMap[r] = [];
+        for (var c = 0; c < n; c++) shadedMap[r][c] = (state[r][c] === 1);
+      }
+      if (isConnected(shadedMap, n)) {
+        var sol = [];
+        for (var r = 0; r < n; r++) sol[r] = state[r].slice();
+        solutions.push(sol);
+      }
+      return;
+    }
+
+    // Try unshaded (0) then shaded (1)
+    for (var val = 0; val <= 1; val++) {
+      if (solutions.length >= maxSolutions) return;
+
+      state[br][bc] = val;
+      var valid = true;
+
+      if (val === 1) {
+        // Check no adjacent shaded
+        var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+        for (var d = 0; d < 4; d++) {
+          var nr = br + dirs[d][0], nc = bc + dirs[d][1];
+          if (nr >= 0 && nr < n && nc >= 0 && nc < n && state[nr][nc] === 1) {
+            valid = false; break;
+          }
+        }
+      }
+
+      if (val === 0 && valid) {
+        // Check no duplicate unshaded in row/col
+        var v = puzzle[br][bc];
+        for (var k = 0; k < n && valid; k++) {
+          if (k !== bc && state[br][k] === 0 && puzzle[br][k] === v) valid = false;
+          if (k !== br && state[k][bc] === 0 && puzzle[k][bc] === v) valid = false;
+        }
+      }
+
+      if (valid) {
+        solve();
+      }
+
+      state[br][bc] = -1;
+    }
+  }
+
+  solve();
+  return solutions;
+}
+
+// Main generation entry point
+function generatePuzzle(n) {
+  var config = SIZES[n];
+
+  for (var attempt = 0; attempt < 80; attempt++) {
+    var latin = generateLatinSquare(n);
+    var shaded = generateShadingPattern(n, config.shadeFrac);
+    if (!shaded) continue;
+
+    var puzzle = buildPuzzleFromLatinAndShading(latin, shaded, n);
+    if (!verifySolution(puzzle, shaded, n)) continue;
+
+    // For 5x5, verify unique solution
+    if (n <= 5) {
+      var sols = solveHitori(puzzle, n, 2);
+      if (sols.length !== 1) continue;
+    }
+
+    return { grid: puzzle, solution: shaded };
+  }
+
+  // Fallback: keep trying with simpler shading
+  for (var attempt = 0; attempt < 50; attempt++) {
+    var latin = generateLatinSquare(n);
+    var shaded = generateShadingPattern(n, 0.12);
+    if (!shaded) continue;
+    var puzzle = buildPuzzleFromLatinAndShading(latin, shaded, n);
+    if (verifySolution(puzzle, shaded, n)) {
+      return { grid: puzzle, solution: shaded };
+    }
+  }
+
+  // Last resort fallback
+  var latin = generateLatinSquare(n);
+  var shaded = [];
+  for (var r = 0; r < n; r++) {
+    shaded[r] = [];
+    for (var c = 0; c < n; c++) shaded[r][c] = false;
+  }
+  // Shade a few safe cells
+  var cells = [];
+  for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) cells.push([r,c]);
+  shuffle(cells);
+  for (var i = 0; i < cells.length && i < Math.floor(n * n * 0.1); i++) {
+    var cr = cells[i][0], cc = cells[i][1];
+    var ok = true;
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var d = 0; d < 4; d++) {
+      var nr = cr + dirs[d][0], nc = cc + dirs[d][1];
+      if (nr >= 0 && nr < n && nc >= 0 && nc < n && shaded[nr][nc]) { ok = false; break; }
+    }
+    if (!ok) continue;
+    shaded[cr][cc] = true;
+    if (!isConnected(shaded, n)) { shaded[cr][cc] = false; }
+  }
+  var puzzle = buildPuzzleFromLatinAndShading(latin, shaded, n);
+  return { grid: puzzle, solution: shaded };
+}
+
+// ── RENDERING ──
+function buildGrid() {
+  var n = currentSize;
+  // Remove old cells
+  while (gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+
+  // Calculate cell size
+  var maxGridPx = Math.min(window.innerWidth - 24, window.innerHeight - 220, 450);
+  var cellSize = Math.floor(maxGridPx / n);
+  cellSize = Math.max(cellSize, 32);
+  cellSize = Math.min(cellSize, 60);
+
+  var fontSize = Math.max(Math.floor(cellSize * 0.42), 12);
+
+  gridEl.style.gridTemplateColumns = 'repeat(' + n + ', ' + cellSize + 'px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + n + ', ' + cellSize + 'px)';
+
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.setAttribute('data-r', r);
+      cell.setAttribute('data-c', c);
+
+      var numSpan = document.createElement('span');
+      numSpan.className = 'num';
+      numSpan.textContent = puzzleGrid[r][c];
+      numSpan.style.fontSize = fontSize + 'px';
+      cell.appendChild(numSpan);
+
+      (function(row, col) {
+        cell.addEventListener('click', function(e) {
+          if (touchHandled) { touchHandled = false; return; }
+          toggleCell(row, col);
+        });
+        cell.addEventListener('touchstart', function(e) {
+          touchHandled = true;
+          toggleCell(row, col);
+        }, { passive: true });
+      })(r, c);
+
+      gridEl.appendChild(cell);
+    }
+  }
+
+  updateCellVisuals();
+}
+
+function updateCellVisuals() {
+  var n = currentSize;
+  var cells = gridEl.children;
+  for (var i = 0; i < cells.length; i++) {
+    var cell = cells[i];
+    var r = parseInt(cell.getAttribute('data-r'));
+    var c = parseInt(cell.getAttribute('data-c'));
+    var st = cellState[r][c];
+
+    cell.classList.remove('shaded', 'circled', 'error-dup', 'error-adj', 'error-disco');
+
+    if (st === SHADED) {
+      cell.classList.add('shaded');
+    } else if (st === CIRCLED) {
+      cell.classList.add('circled');
+    }
+  }
+
+  if (autoCheck) {
+    highlightErrors();
+  }
+}
+
+function getCellEl(r, c) {
+  var idx = r * currentSize + c;
+  return gridEl.children[idx];
+}
+
+function highlightErrors() {
+  var n = currentSize;
+
+  // Clear errors
+  var cells = gridEl.children;
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].classList.remove('error-dup', 'error-adj', 'error-disco');
+  }
+
+  // Check duplicate unshaded in rows
+  for (var r = 0; r < n; r++) {
+    var seen = {};
+    for (var c = 0; c < n; c++) {
+      if (cellState[r][c] === SHADED) continue;
+      var v = puzzleGrid[r][c];
+      if (!seen[v]) seen[v] = [];
+      seen[v].push(c);
+    }
+    for (var v in seen) {
+      if (seen[v].length > 1) {
+        for (var k = 0; k < seen[v].length; k++) {
+          getCellEl(r, seen[v][k]).classList.add('error-dup');
+        }
+      }
+    }
+  }
+
+  // Check duplicate unshaded in cols
+  for (var c = 0; c < n; c++) {
+    var seen = {};
+    for (var r = 0; r < n; r++) {
+      if (cellState[r][c] === SHADED) continue;
+      var v = puzzleGrid[r][c];
+      if (!seen[v]) seen[v] = [];
+      seen[v].push(r);
+    }
+    for (var v in seen) {
+      if (seen[v].length > 1) {
+        for (var k = 0; k < seen[v].length; k++) {
+          getCellEl(seen[v][k], c).classList.add('error-dup');
+        }
+      }
+    }
+  }
+
+  // Check adjacent shaded
+  var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (cellState[r][c] !== SHADED) continue;
+      for (var d = 0; d < 4; d++) {
+        var nr = r + dirs[d][0], nc = c + dirs[d][1];
+        if (nr >= 0 && nr < n && nc >= 0 && nc < n && cellState[nr][nc] === SHADED) {
+          getCellEl(r, c).classList.add('error-adj');
+          getCellEl(nr, nc).classList.add('error-adj');
+        }
+      }
+    }
+  }
+
+  // Check connectivity of unshaded
+  var shadedMap = [];
+  var unshadedCount = 0;
+  for (var r = 0; r < n; r++) {
+    shadedMap[r] = [];
+    for (var c = 0; c < n; c++) {
+      shadedMap[r][c] = (cellState[r][c] === SHADED);
+      if (!shadedMap[r][c]) unshadedCount++;
+    }
+  }
+
+  if (unshadedCount > 0 && !isConnected(shadedMap, n)) {
+    // BFS from first unshaded to find main component
+    var visited = [];
+    for (var r = 0; r < n; r++) {
+      visited[r] = [];
+      for (var c = 0; c < n; c++) visited[r][c] = false;
+    }
+    var sr = -1, sc = -1;
+    for (var r = 0; r < n && sr === -1; r++) {
+      for (var c = 0; c < n; c++) {
+        if (!shadedMap[r][c]) { sr = r; sc = c; break; }
+      }
+    }
+    var queue = [[sr, sc]];
+    visited[sr][sc] = true;
+    while (queue.length > 0) {
+      var pos = queue.shift();
+      for (var d = 0; d < 4; d++) {
+        var nr = pos[0] + dirs[d][0], nc = pos[1] + dirs[d][1];
+        if (nr >= 0 && nr < n && nc >= 0 && nc < n && !visited[nr][nc] && !shadedMap[nr][nc]) {
+          visited[nr][nc] = true;
+          queue.push([nr, nc]);
+        }
+      }
+    }
+    // Mark disconnected unshaded
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        if (!shadedMap[r][c] && !visited[r][c]) {
+          getCellEl(r, c).classList.add('error-disco');
+        }
+      }
+    }
+  }
+}
+
+// ── INTERACTION ──
+var touchHandled = false;
+
+function toggleCell(r, c) {
+  if (!gameActive) return;
+  getAudioCtx();
+
+  var prev = cellState[r][c];
+  undoStack.push({ r: r, c: c, prev: prev });
+
+  if (prev === NORMAL) {
+    cellState[r][c] = SHADED;
+    soundShade();
+  } else if (prev === SHADED) {
+    cellState[r][c] = CIRCLED;
+    soundCircle();
+  } else {
+    cellState[r][c] = NORMAL;
+    soundNormal();
+  }
+
+  var cellEl = getCellEl(r, c);
+  var numEl = cellEl.querySelector('.num');
+  numEl.classList.remove('pop');
+  void numEl.offsetWidth;
+  numEl.classList.add('pop');
+
+  updateCellVisuals();
+  checkWin();
+}
+
+function undoMove() {
+  if (undoStack.length === 0) return;
+  var move = undoStack.pop();
+  cellState[move.r][move.c] = move.prev;
+  soundNormal();
+  updateCellVisuals();
+}
+
+function clearAll() {
+  var n = currentSize;
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      cellState[r][c] = NORMAL;
+    }
+  }
+  undoStack = [];
+  updateCellVisuals();
+  showToast('CLEARED');
+}
+
+// ── WIN CHECK ──
+function checkWin() {
+  var n = currentSize;
+
+  // Check no duplicate unshaded in row/col
+  for (var r = 0; r < n; r++) {
+    var seen = {};
+    for (var c = 0; c < n; c++) {
+      if (cellState[r][c] === SHADED) continue;
+      var v = puzzleGrid[r][c];
+      if (seen[v]) return;
+      seen[v] = true;
+    }
+  }
+  for (var c = 0; c < n; c++) {
+    var seen = {};
+    for (var r = 0; r < n; r++) {
+      if (cellState[r][c] === SHADED) continue;
+      var v = puzzleGrid[r][c];
+      if (seen[v]) return;
+      seen[v] = true;
+    }
+  }
+
+  // No adjacent shaded
+  var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (cellState[r][c] !== SHADED) continue;
+      for (var d = 0; d < 4; d++) {
+        var nr = r + dirs[d][0], nc = c + dirs[d][1];
+        if (nr >= 0 && nr < n && nc >= 0 && nc < n && cellState[nr][nc] === SHADED) return;
+      }
+    }
+  }
+
+  // Connectivity
+  var shadedMap = [];
+  for (var r = 0; r < n; r++) {
+    shadedMap[r] = [];
+    for (var c = 0; c < n; c++) shadedMap[r][c] = (cellState[r][c] === SHADED);
+  }
+  if (!isConnected(shadedMap, n)) return;
+
+  // Must have at least one shaded cell
+  var hasShaded = false;
+  for (var r = 0; r < n; r++) {
+    for (var c = 0; c < n; c++) {
+      if (cellState[r][c] === SHADED) { hasShaded = true; break; }
+    }
+    if (hasShaded) break;
+  }
+  if (!hasShaded) return;
+
+  onWin();
+}
+
+function onWin() {
+  gameActive = false;
+  clearInterval(timerInterval);
+  soundSolve();
+  spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 20, ['#39ff14', '#00f0ff', '#ffd700', '#b44dff']);
+
+  var finalTime = elapsedSec;
+  document.getElementById('completeTime').textContent = formatTime(finalTime);
+  document.getElementById('completeSize').textContent = currentSize + '\u00D7' + currentSize;
+
+  // Update stats
+  var solved = parseInt(localStorage.getItem(SOLVED_KEY) || '0') + 1;
+  localStorage.setItem(SOLVED_KEY, String(solved));
+
+  // Save score via Neon
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function() {
+    return Neon.save(finalTime);
+  }).then(function(result) {
+    if (result && result.isNewBest) {
+      document.getElementById('completeBest').style.display = 'block';
+    } else {
+      document.getElementById('completeBest').style.display = 'none';
+    }
+    Neon.render(document.getElementById('completeLB'));
+    if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+      Neon.showGlobalSplash(result.globalRank);
+    }
+  });
+
+  setTimeout(function() {
+    showScreen(completeScreen);
+  }, 600);
+}
+
+// ── TIMER ──
+function startTimer() {
+  timerStart = Date.now();
+  elapsedSec = 0;
+  timerEl.textContent = '00:00';
+  clearInterval(timerInterval);
+  timerInterval = setInterval(function() {
+    elapsedSec = Math.floor((Date.now() - timerStart) / 1000);
+    timerEl.textContent = formatTime(elapsedSec);
+  }, 500);
+}
+
+// ── PARTICLES ──
+function spawnParticles(x, y, count, colors) {
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+    var dist = 60 + Math.random() * 120;
+    var dx = Math.cos(angle) * dist;
+    var dy = Math.sin(angle) * dist;
+    var color = colors[Math.floor(Math.random() * colors.length)];
+    var size = 3 + Math.random() * 4;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.background = color;
+    p.style.boxShadow = '0 0 6px ' + color;
+    p.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    p.style.opacity = '1';
+    document.body.appendChild(p);
+    (function(el, ddx, ddy) {
+      setTimeout(function() {
+        el.style.transform = 'translate(' + ddx + 'px, ' + ddy + 'px)';
+        el.style.opacity = '0';
+      }, 20);
+      setTimeout(function() {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 900);
+    })(p, dx, dy);
+  }
+}
+
+// ── SHARING ──
+function shareResult() {
+  var n = currentSize;
+  var lines = [];
+  for (var r = 0; r < n; r++) {
+    var row = '';
+    for (var c = 0; c < n; c++) {
+      row += cellState[r][c] === SHADED ? '\u2B1B' : '\u2B1C';
+    }
+    lines.push(row);
+  }
+
+  var text = '\uD83D\uDD32 HITORI\n' +
+    n + '\u00D7' + n + ' | \u23F1 ' + formatTime(elapsedSec) + '\n' +
+    lines.join('\n') + '\n' +
+    'neonarcade.net/neonmind/hitori.html';
+
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function() {
+      copyToClipboard(text);
+    });
+  } else {
+    copyToClipboard(text);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('COPIED TO CLIPBOARD!');
+  }).catch(function() {
+    showToast('SHARE FAILED');
+  });
+}
+
+// ── VALIDATE BUTTON ──
+function manualValidate() {
+  highlightErrors();
+
+  var n = currentSize;
+  var hasError = false;
+
+  // Check duplicates in rows
+  for (var r = 0; r < n && !hasError; r++) {
+    var seen = {};
+    for (var c = 0; c < n; c++) {
+      if (cellState[r][c] === SHADED) continue;
+      var v = puzzleGrid[r][c];
+      if (seen[v]) { hasError = true; break; }
+      seen[v] = true;
+    }
+  }
+
+  // Check duplicates in cols
+  if (!hasError) {
+    for (var c = 0; c < n && !hasError; c++) {
+      var seen = {};
+      for (var r = 0; r < n; r++) {
+        if (cellState[r][c] === SHADED) continue;
+        var v = puzzleGrid[r][c];
+        if (seen[v]) { hasError = true; break; }
+        seen[v] = true;
+      }
+    }
+  }
+
+  // Check adjacent shaded
+  if (!hasError) {
+    var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var r = 0; r < n && !hasError; r++) {
+      for (var c = 0; c < n && !hasError; c++) {
+        if (cellState[r][c] !== SHADED) continue;
+        for (var d = 0; d < 4; d++) {
+          var nr = r + dirs[d][0], nc = c + dirs[d][1];
+          if (nr >= 0 && nr < n && nc >= 0 && nc < n && cellState[nr][nc] === SHADED) {
+            hasError = true; break;
+          }
+        }
+      }
+    }
+  }
+
+  // Check connectivity
+  if (!hasError) {
+    var shadedMap = [];
+    for (var r = 0; r < n; r++) {
+      shadedMap[r] = [];
+      for (var c = 0; c < n; c++) shadedMap[r][c] = (cellState[r][c] === SHADED);
+    }
+    var anyShaded = false;
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (shadedMap[r][c]) anyShaded = true;
+    if (anyShaded && !isConnected(shadedMap, n)) hasError = true;
+  }
+
+  if (hasError) {
+    soundError();
+    document.body.classList.add('shaking');
+    setTimeout(function() { document.body.classList.remove('shaking'); }, 300);
+    showToast('ERRORS FOUND');
+  } else {
+    showToast('LOOKING GOOD!');
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 3, 8, ['#39ff14', '#00f0ff']);
+  }
+}
+
+// ── GAME START ──
+function startGame() {
+  var n = currentSize;
+  initNeon(n);
+
+  var result = generatePuzzle(n);
+  puzzleGrid = result.grid;
+  solutionShaded = result.solution;
+
+  cellState = [];
+  for (var r = 0; r < n; r++) {
+    cellState[r] = [];
+    for (var c = 0; c < n; c++) cellState[r][c] = NORMAL;
+  }
+
+  undoStack = [];
+  gameActive = true;
+
+  topDiffEl.textContent = n + 'x' + n + ' ' + SIZES[n].label;
+
+  buildGrid();
+  startTimer();
+  showScreen(gameScreen);
+
+  // Update played count
+  var played = parseInt(localStorage.getItem(PLAYED_KEY) || '0') + 1;
+  localStorage.setItem(PLAYED_KEY, String(played));
+}
+
+function goToMenu() {
+  gameActive = false;
+  clearInterval(timerInterval);
+  updateStartScreen();
+  showScreen(startScreen);
+}
+
+function updateStartScreen() {
+  // Update best times
+  [5, 7, 9].forEach(function(size) {
+    var key = 'neonarcade_neonmind_hitori_scores_' + size;
+    var data = localStorage.getItem(key);
+    var bestEl = document.getElementById('best' + size);
+    if (data) {
+      try {
+        var scores = JSON.parse(data);
+        if (scores && scores.length > 0) {
+          var best = Infinity;
+          scores.forEach(function(s) {
+            var val = typeof s === 'object' ? s.score : s;
+            if (val < best) best = val;
+          });
+          if (best < Infinity) {
+            bestEl.textContent = neonFormatScore(best);
+          }
+        }
+      } catch(e) {}
+    }
+  });
+
+  // Stats
+  document.getElementById('statPlayed').textContent = localStorage.getItem(PLAYED_KEY) || '0';
+  document.getElementById('statSolved').textContent = localStorage.getItem(SOLVED_KEY) || '0';
+
+  // Render leaderboard for current size
+  initNeon(currentSize);
+  Neon.render(document.getElementById('startLB'));
+}
+
+// ── DIFFICULTY SELECTION ──
+function selectSize(size) {
+  currentSize = size;
+  var btns = document.querySelectorAll('.diff-btn');
+  btns.forEach(function(btn) {
+    btn.classList.toggle('selected', parseInt(btn.getAttribute('data-size')) === size);
+  });
+  initNeon(size);
+  Neon.render(document.getElementById('startLB'));
+}
+
+// ── EVENT LISTENERS ──
+document.querySelectorAll('.diff-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    selectSize(parseInt(this.getAttribute('data-size')));
+  });
+});
+
+startBtn.addEventListener('click', startGame);
+shareBtn.addEventListener('click', shareResult);
+nextBtn.addEventListener('click', startGame);
+menuBtn.addEventListener('click', goToMenu);
+backBtn.addEventListener('click', goToMenu);
+validateBtn.addEventListener('click', manualValidate);
+undoBtn.addEventListener('click', undoMove);
+clearBtn.addEventListener('click', clearAll);
+newBtn.addEventListener('click', function() {
+  if (gameActive) {
+    startGame();
+  }
+});
+
+autoCheckToggle.addEventListener('click', function() {
+  autoCheck = !autoCheck;
+  this.classList.toggle('on', autoCheck);
+  if (autoCheck) {
+    highlightErrors();
+  } else {
+    var cells = gridEl.children;
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].classList.remove('error-dup', 'error-adj', 'error-disco');
+    }
+  }
+});
+
+// ESC key: back to start
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (gameScreen.classList.contains('active')) {
+      goToMenu();
+    }
+  }
+});
+
+// Handle resize
+window.addEventListener('resize', function() {
+  if (gameScreen.classList.contains('active') && puzzleGrid.length > 0) {
+    buildGrid();
+  }
+});
+
+// ── INIT ──
+initNeon(currentSize);
+updateStartScreen();
+
+})();
+</script>
+</body>
+</html>

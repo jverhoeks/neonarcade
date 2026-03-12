@@ -41,7 +41,17 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- NEON ARCADE Games (29) -->
+  <!-- NEON ARCADE Games (31) -->
+  <url>
+    <loc>https://neonarcade.net/neonarcade/veto.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonarcade/mimic.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <url>
     <loc>https://neonarcade.net/neonarcade/battleship.html</loc>
     <changefreq>monthly</changefreq>
@@ -188,7 +198,22 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- NEON MIND Games (12) -->
+  <!-- NEON MIND Games (15) -->
+  <url>
+    <loc>https://neonarcade.net/neonmind/connections.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonmind/hitori.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonmind/kenken.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <url>
     <loc>https://neonarcade.net/neonmind/bridges.html</loc>
     <changefreq>monthly</changefreq>
@@ -250,7 +275,12 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- NEON GRIND Games (7) -->
+  <!-- NEON GRIND Games (8) -->
+  <url>
+    <loc>https://neonarcade.net/neongrind/sequencer.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <url>
     <loc>https://neonarcade.net/neongrind/clickspeed.html</loc>
     <changefreq>monthly</changefreq>

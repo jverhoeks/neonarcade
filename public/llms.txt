@@ -1,14 +1,14 @@
 # NEON ARCADE
 
-> Play 55 free online browser games instantly — no download, no login required. Arcade, puzzle, skill and retro games with global leaderboards.
+> Play 61 free online browser games instantly — no download, no login required. Arcade, puzzle, skill and retro games with global leaderboards.
 
-NEON ARCADE is a collection of 55 free HTML5 browser games organized in four categories:
+NEON ARCADE is a collection of 61 free HTML5 browser games organized in four categories:
 
 ## Categories
 
-- [NEON ARCADE](https://neonarcade.net/neonarcade/) — 29 quick viral action games (30-60 seconds)
-- [NEON MIND](https://neonarcade.net/neonmind/) — 12 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
-- [NEON GRIND](https://neonarcade.net/neongrind/) — 7 progressive skill challenges
+- [NEON ARCADE](https://neonarcade.net/neonarcade/) — 31 quick viral action games (30-60 seconds)
+- [NEON MIND](https://neonarcade.net/neonmind/) — 15 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
+- [NEON GRIND](https://neonarcade.net/neongrind/) — 8 progressive skill challenges
 - [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 7 retro arcade classics reimagined
 
 ## All Games
@@ -43,6 +43,8 @@ NEON ARCADE is a collection of 55 free HTML5 browser games organized in four cat
 - [TypeBlitz](https://neonarcade.net/neonarcade/typeblitz.html) — Speed typing challenge
 - [Wordchain](https://neonarcade.net/neonarcade/wordchain.html) — Build word chains against the clock
 - [Wordchain Duel](https://neonarcade.net/neonarcade/wordchain-duel.html) — Async 1v1 word chain challenge
+- [Veto](https://neonarcade.net/neonarcade/veto.html) — 2-player bracket elimination challenge
+- [Mimic](https://neonarcade.net/neonarcade/mimic.html) — Social prediction game with challenge links
 
 ### NEON MIND
 - [Bridges](https://neonarcade.net/neonmind/bridges.html) — Connect islands with bridges
@@ -57,6 +59,9 @@ NEON ARCADE is a collection of 55 free HTML5 browser games organized in four cat
 - [Sudoku](https://neonarcade.net/neonmind/sudoku.html) — 9x9 Sudoku with four difficulty levels
 - [Tango](https://neonarcade.net/neonmind/tango.html) — Binary placement puzzle
 - [Tents](https://neonarcade.net/neonmind/tents.html) — Place tents next to trees
+- [Connections](https://neonarcade.net/neonmind/connections.html) — Find 4 groups of 4 words by hidden connection
+- [Hitori](https://neonarcade.net/neonmind/hitori.html) — Shade cells to eliminate duplicates
+- [KenKen](https://neonarcade.net/neonmind/kenken.html) — Math logic with arithmetic cages
 
 ### NEON GRIND
 - [Click Speed](https://neonarcade.net/neongrind/clickspeed.html) — How fast can you click?
@@ -66,6 +71,7 @@ NEON ARCADE is a collection of 55 free HTML5 browser games organized in four cat
 - [NeuroSort](https://neonarcade.net/neongrind/neurosort.html) — Sort numbers under pressure
 - [NumberSense](https://neonarcade.net/neongrind/numbersense.html) — Estimate quantities quickly
 - [Reflex Chain](https://neonarcade.net/neongrind/reflex-chain.html) — Sequential reaction time test
+- [Sequencer](https://neonarcade.net/neongrind/sequencer.html) — Simon Says pattern memory challenge
 
 ### NEON CLASSIC
 - [Neon 2048](https://neonarcade.net/neonclassic/2048.html) — Slide and merge to 2048

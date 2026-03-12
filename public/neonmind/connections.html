@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Connections — Free Online Word Grouping Puzzle | NEON ARCADE</title>
+<meta name="description" content="Play Connections free online — find 4 groups of 4 words that share a hidden link. Daily puzzle, no download, no login.">
+<meta name="keywords" content="connections puzzle, word grouping game, free puzzle game online, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonmind/connections.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/connections.html">
+<meta property="og:title" content="Connections — Free Online Word Grouping Puzzle | NEON ARCADE">
+<meta property="og:description" content="Find 4 groups of 4 words that share a hidden link. Daily puzzle.">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/connections.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/connections.html">
+<meta name="twitter:title" content="Connections — Free Online Word Grouping Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Find 4 groups of 4 words that share a hidden link. Daily puzzle.">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/connections.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Connections","url":"https://neonarcade.net/neonmind/connections.html","description":"Play Connections free online — find 4 groups of 4 words that share a hidden link. Daily puzzle.","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/neonmind/screenshots/connections.png","inLanguage":"en","isFamilyFriendly":true}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON MIND","item":"https://neonarcade.net/neonmind/"},{"@type":"ListItem","position":3,"name":"Connections","item":"https://neonarcade.net/neonmind/connections.html"}]}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:fixed;z-index:10;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* START SCREEN */
+#startScreen{gap:10px}
+.brand-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:3px;color:#b44dff;text-transform:uppercase;text-shadow:0 0 8px rgba(180,77,255,0.3)}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,58px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(13px,2.8vw,18px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;margin-bottom:2px;max-width:420px;line-height:1.4}
+.puzzle-num{font-family:'Orbitron',monospace;font-weight:400;font-size:13px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.3);margin:4px 0}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.start-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.start-stat{text-align:center}
+.start-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(14px,3vw,18px);color:#00f0ff}
+.start-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:4px;text-align:center}
+
+.leaderboard{width:100%;max-width:300px;margin:6px 0}
+
+/* GAME SCREEN */
+#gameScreen{justify-content:flex-start;padding:10px;gap:0}
+
+.game-top-bar{display:flex;width:100%;max-width:520px;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:8px}
+.top-puzzle{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,14px);letter-spacing:2px;color:#8888aa;text-transform:uppercase}
+.top-timer{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(14px,3vw,18px);letter-spacing:1px;color:#8888aa}
+.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#7a7a9a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
+.top-back:hover{color:#00f0ff}
+
+/* LIVES */
+.lives-bar{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.lives-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.life-dot{width:10px;height:10px;border-radius:50%;background:#ff2d7b;box-shadow:0 0 6px rgba(255,45,123,0.5);transition:all 0.3s}
+.life-dot.lost{background:rgba(255,45,123,0.15);box-shadow:none}
+
+/* SOLVED GROUPS */
+.solved-area{width:100%;max-width:520px;display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.solved-group{border-radius:6px;padding:12px 16px;text-align:center;animation:groupReveal 0.5s ease-out}
+.solved-group .group-label{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2.5vw,13px);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.solved-group .group-words{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(13px,3vw,16px);letter-spacing:1px}
+@keyframes groupReveal{0%{transform:scaleY(0);opacity:0}50%{transform:scaleY(1.05)}100%{transform:scaleY(1);opacity:1}}
+
+.solved-group.diff-cyan{background:rgba(0,240,255,0.15);border:1px solid rgba(0,240,255,0.4)}
+.solved-group.diff-cyan .group-label{color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.solved-group.diff-cyan .group-words{color:rgba(0,240,255,0.8)}
+
+.solved-group.diff-green{background:rgba(57,255,20,0.12);border:1px solid rgba(57,255,20,0.35)}
+.solved-group.diff-green .group-label{color:#39ff14;text-shadow:0 0 8px rgba(57,255,20,0.4)}
+.solved-group.diff-green .group-words{color:rgba(57,255,20,0.8)}
+
+.solved-group.diff-gold{background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35)}
+.solved-group.diff-gold .group-label{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.solved-group.diff-gold .group-words{color:rgba(255,215,0,0.8)}
+
+.solved-group.diff-purple{background:rgba(180,77,255,0.12);border:1px solid rgba(180,77,255,0.35)}
+.solved-group.diff-purple .group-label{color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.4)}
+.solved-group.diff-purple .group-words{color:rgba(180,77,255,0.8)}
+
+/* WORD GRID */
+.word-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(4px,1vw,8px);width:100%;max-width:520px;margin-bottom:8px}
+.word-tile{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(12px,2.8vw,16px);letter-spacing:1px;text-transform:uppercase;padding:clamp(12px,3vw,18px) 4px;border:1px solid rgba(255,255,255,0.1);background:rgba(18,18,31,0.9);color:#9999bb;cursor:pointer;border-radius:5px;text-align:center;transition:all 0.2s;position:relative;overflow:hidden;word-break:break-word;line-height:1.2}
+.word-tile:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2)}
+.word-tile.selected{color:#00f0ff;border-color:rgba(0,240,255,0.6);background:rgba(0,240,255,0.12);box-shadow:0 0 12px rgba(0,240,255,0.2);transform:scale(1.03)}
+.word-tile.selected:hover{background:rgba(0,240,255,0.18)}
+.word-tile.wrong{animation:tileWrong 0.5s ease-out}
+@keyframes tileWrong{0%{transform:translateX(0)}15%{transform:translateX(-4px)}30%{transform:translateX(4px)}45%{transform:translateX(-3px)}60%{transform:translateX(3px)}75%{transform:translateX(-1px)}100%{transform:translateX(0)}}
+.word-tile.bounce{animation:tileBounce 0.3s ease-out}
+@keyframes tileBounce{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:clamp(6px,1.5vw,12px);width:100%;max-width:520px;justify-content:center;margin:4px 0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(11px,2.5vw,13px);letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#8888aa;cursor:pointer;border-radius:4px;transition:all 0.15s;display:flex;align-items:center;gap:5px;flex:1;justify-content:center}
+.tool-btn:hover{background:rgba(255,255,255,0.06);color:#fff}
+.tool-btn:active{transform:scale(0.96)}
+.tool-btn:disabled{opacity:0.3;cursor:default;pointer-events:none}
+.tool-btn.submit-btn{border-color:rgba(0,240,255,0.3);color:#00f0ff}
+.tool-btn.submit-btn:hover{background:rgba(0,240,255,0.1);border-color:rgba(0,240,255,0.5)}
+.tool-btn.submit-btn:disabled{border-color:rgba(255,255,255,0.08);color:#8888aa}
+
+/* HINT MESSAGE */
+.hint-msg{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:15px;letter-spacing:1px;color:#ff8c00;text-shadow:0 0 8px rgba(255,140,0,0.3);height:22px;text-align:center;transition:opacity 0.3s}
+
+/* COMPLETE SCREEN */
+#completeScreen{gap:12px}
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,7vw,44px);letter-spacing:6px;text-shadow:0 0 10px rgba(57,255,20,0.5),0 0 40px rgba(57,255,20,0.2)}
+.complete-title.win{color:#39ff14}
+.complete-title.lose{color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.5),0 0 40px rgba(255,45,123,0.2)}
+
+.result-groups{display:flex;flex-direction:column;gap:6px;width:100%;max-width:420px;margin:4px 0}
+
+.complete-stats{display:flex;gap:20px;justify-content:center;margin:4px 0}
+.complete-stat{text-align:center}
+.complete-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(18px,4vw,26px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.complete-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.play-btn.share-btn{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.share-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
+.play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
+
+/* Screen shake */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
+.shaking{animation:shake 0.3s ease-in-out}
+
+/* Particles */
+.particle{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:100}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);padding:8px 20px;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+
+/* Difficulty legend on start */
+.diff-legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:6px 0}
+.diff-legend-item{display:flex;align-items:center;gap:5px;font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.diff-dot{width:8px;height:8px;border-radius:50%}
+.diff-dot.cyan{background:#00f0ff;box-shadow:0 0 6px rgba(0,240,255,0.5)}
+.diff-dot.green{background:#39ff14;box-shadow:0 0 6px rgba(57,255,20,0.5)}
+.diff-dot.gold{background:#ffd700;box-shadow:0 0 6px rgba(255,215,0,0.5)}
+.diff-dot.purple{background:#b44dff;box-shadow:0 0 6px rgba(180,77,255,0.5)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="brand-tag">NEON MIND</div>
+  <h1 class="main-title">CONNECTIONS</h1>
+  <p class="subtitle">Find 4 groups of 4 words that share a hidden link. 4 mistakes allowed.</p>
+  <div class="puzzle-num" id="puzzleNum">PUZZLE #1</div>
+
+  <div class="diff-legend">
+    <div class="diff-legend-item"><div class="diff-dot cyan"></div><span style="color:#7a7a9a">Easy</span></div>
+    <div class="diff-legend-item"><div class="diff-dot green"></div><span style="color:#7a7a9a">Medium</span></div>
+    <div class="diff-legend-item"><div class="diff-dot gold"></div><span style="color:#7a7a9a">Hard</span></div>
+    <div class="diff-legend-item"><div class="diff-dot purple"></div><span style="color:#7a7a9a">Tricky</span></div>
+  </div>
+
+  <button class="play-btn" id="startBtn">START</button>
+
+  <div class="start-stats" id="startStats">
+    <div class="start-stat"><div class="stat-val" id="statWins">0</div><div class="stat-lbl">Wins</div></div>
+    <div class="start-stat"><div class="stat-val" id="statStreak">0</div><div class="stat-lbl">Streak</div></div>
+    <div class="start-stat"><div class="stat-val" id="statBest">--:--</div><div class="stat-lbl">Best</div></div>
+  </div>
+
+  <div class="controls-hint">Tap 4 words &bull; Submit &bull; ESC to quit</div>
+
+  <div class="leaderboard" id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="game-top-bar">
+    <button class="top-back" id="backBtn" title="Back to menu">&#8592;</button>
+    <div class="top-puzzle" id="topPuzzle">PUZZLE #1</div>
+    <div class="top-timer" id="topTimer">00:00</div>
+  </div>
+
+  <div class="lives-bar" id="livesBar">
+    <span class="lives-label">Mistakes:</span>
+    <div class="life-dot" id="life0"></div>
+    <div class="life-dot" id="life1"></div>
+    <div class="life-dot" id="life2"></div>
+    <div class="life-dot" id="life3"></div>
+  </div>
+
+  <div class="solved-area" id="solvedArea"></div>
+
+  <div class="word-grid" id="wordGrid"></div>
+
+  <div class="hint-msg" id="hintMsg">&nbsp;</div>
+
+  <div class="toolbar">
+    <button class="tool-btn" id="shuffleBtn">Shuffle</button>
+    <button class="tool-btn" id="deselectBtn">Deselect All</button>
+    <button class="tool-btn submit-btn" id="submitBtn" disabled>Submit</button>
+  </div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div class="screen" id="completeScreen">
+  <div class="brand-tag">NEON MIND</div>
+  <h1 class="complete-title" id="completeTitle">SOLVED</h1>
+
+  <div class="result-groups" id="resultGroups"></div>
+
+  <div class="complete-stats">
+    <div class="complete-stat"><div class="stat-val" id="finalTime">00:00</div><div class="stat-lbl">Time</div></div>
+    <div class="complete-stat"><div class="stat-val" id="finalMistakes">0/4</div><div class="stat-lbl">Mistakes</div></div>
+    <div class="complete-stat"><div class="stat-val" id="finalGroups">4/4</div><div class="stat-lbl">Groups</div></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="playAgainBtn">PLAY AGAIN</button>
+    <button class="play-btn menu-btn" id="menuBtn">MENU</button>
+  </div>
+
+  <div class="leaderboard" id="completeLB"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Copied!</div>
+
+<!-- More Games -->
+<div class="na-more-games" id="moreGames">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE NEON MIND</div>
+    <div class="na-more-links">
+      <a href="/neonmind/" class="na-more-link na-more-hub">All Puzzles</a>
+      <a href="sudoku.html" class="na-more-link">Sudoku</a>
+      <a href="queens.html" class="na-more-link">Queens</a>
+      <a href="minesweeper.html" class="na-more-link">Minesweeper</a>
+      <a href="tango.html" class="na-more-link">Tango</a>
+      <a href="nonogram.html" class="na-more-link">Nonogram</a>
+    </div>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== PUZZLES =====
+  const PUZZLES = [
+    {
+      groups: [
+        { label: 'Types of pasta', words: ['PENNE','RIGATONI','FUSILLI','ORZO'], diff: 'cyan' },
+        { label: 'Chess pieces', words: ['ROOK','BISHOP','KNIGHT','PAWN'], diff: 'green' },
+        { label: '___ light', words: ['FLASH','SPOT','HIGH','STAR'], diff: 'gold' },
+        { label: '___ break', words: ['LUNCH','PRISON','HEART','DAY'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Planets', words: ['MARS','VENUS','SATURN','NEPTUNE'], diff: 'cyan' },
+        { label: 'Card games', words: ['POKER','BRIDGE','HEARTS','SOLITAIRE'], diff: 'green' },
+        { label: 'Candy bars', words: ['SNICKERS','TWIX','BOUNTY','MILKY WAY'], diff: 'gold' },
+        { label: 'Things that orbit', words: ['MOON','SATELLITE','COMET','ELECTRON'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Kitchen appliances', words: ['TOASTER','BLENDER','KETTLE','MIXER'], diff: 'cyan' },
+        { label: 'Dance styles', words: ['SALSA','WALTZ','TANGO','SWING'], diff: 'green' },
+        { label: 'Words meaning "great"', words: ['STELLAR','BRILLIANT','CRACKING','WICKED'], diff: 'gold' },
+        { label: '___ ball', words: ['BASKET','SNOW','CRYSTAL','FIRE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Fruits', words: ['MANGO','PEACH','PLUM','KIWI'], diff: 'cyan' },
+        { label: 'Music genres', words: ['JAZZ','BLUES','FUNK','SOUL'], diff: 'green' },
+        { label: 'Shades of blue', words: ['NAVY','COBALT','AZURE','TEAL'], diff: 'gold' },
+        { label: '___ stone', words: ['LIME','KEY','MILE','CORNER'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Dog breeds', words: ['POODLE','BEAGLE','BOXER','COLLIE'], diff: 'cyan' },
+        { label: 'Car makers', words: ['FORD','TESLA','HONDA','VOLVO'], diff: 'green' },
+        { label: 'Types of cloud', words: ['CIRRUS','CUMULUS','STRATUS','NIMBUS'], diff: 'gold' },
+        { label: 'Harry Potter spells', words: ['LUMOS','ACCIO','STUPEFY','EXPECTO'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Colors of the rainbow', words: ['INDIGO','VIOLET','ORANGE','GREEN'], diff: 'cyan' },
+        { label: 'Olympic sports', words: ['FENCING','ROWING','JUDO','ARCHERY'], diff: 'green' },
+        { label: 'Silent first letter', words: ['KNIGHT','GNOME','PSALM','WRECK'], diff: 'gold' },
+        { label: 'Famous Johns', words: ['ELTON','LENNON','LEGEND','WAYNE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Body joints', words: ['ELBOW','ANKLE','WRIST','KNEE'], diff: 'cyan' },
+        { label: 'Old currencies', words: ['POUND','FRANC','MARK','CROWN'], diff: 'green' },
+        { label: 'Shakespeare plays', words: ['HAMLET','OTHELLO','TEMPEST','MACBETH'], diff: 'gold' },
+        { label: 'Words in "Happy Birthday"', words: ['HAPPY','BIRTHDAY','DEAR','YOU'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Things in a wallet', words: ['CASH','CARD','LICENSE','RECEIPT'], diff: 'cyan' },
+        { label: 'Greek letters', words: ['ALPHA','DELTA','SIGMA','OMEGA'], diff: 'green' },
+        { label: 'Types of triangle', words: ['RIGHT','ACUTE','OBTUSE','SCALENE'], diff: 'gold' },
+        { label: 'COVID terms', words: ['VARIANT','BOOSTER','LOCKDOWN','BUBBLE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Root vegetables', words: ['CARROT','CELERY','TURNIP','RADISH'], diff: 'cyan' },
+        { label: 'Board games', words: ['CHESS','RISK','CLUE','SORRY'], diff: 'green' },
+        { label: 'Musical instruments', words: ['DRUM','BASS','HORN','ORGAN'], diff: 'gold' },
+        { label: 'Parts of a fish', words: ['SCALE','FIN','GILL','TAIL'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Types of hat', words: ['BERET','FEDORA','TURBAN','BONNET'], diff: 'cyan' },
+        { label: 'Zodiac signs', words: ['ARIES','LEO','GEMINI','VIRGO'], diff: 'green' },
+        { label: 'End in -tion', words: ['NATION','ACTION','POTION','MOTION'], diff: 'gold' },
+        { label: 'Anagrams of LISTEN', words: ['SILENT','ENLIST','TINSEL','INLETS'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Breakfast foods', words: ['WAFFLE','PANCAKE','CEREAL','BAGEL'], diff: 'cyan' },
+        { label: 'Types of rock', words: ['GRANITE','MARBLE','SLATE','CHALK'], diff: 'green' },
+        { label: '___ house', words: ['WARE','FIRE','POWER','GREEN'], diff: 'gold' },
+        { label: 'Things that are pitched', words: ['TENT','IDEA','BALL','VOICE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Baby animals', words: ['KITTEN','PUPPY','CALF','FOAL'], diff: 'cyan' },
+        { label: 'Types of shoe', words: ['BOOT','SANDAL','LOAFER','CLOG'], diff: 'green' },
+        { label: 'Words meaning "leave"', words: ['SPLIT','BAIL','BOUNCE','JET'], diff: 'gold' },
+        { label: '___ line', words: ['PUNCH','FINISH','BOTTOM','PICK UP'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Flowers', words: ['DAISY','TULIP','LILY','IRIS'], diff: 'cyan' },
+        { label: 'Precious metals', words: ['IRON','GOLD','SILVER','COPPER'], diff: 'green' },
+        { label: 'Things with rings', words: ['SATURN','PHONE','TREE','CIRCUS'], diff: 'gold' },
+        { label: 'Also a girl\'s name', words: ['ROSE','RUBY','PEARL','GRACE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Furniture', words: ['CHAIR','TABLE','COUCH','DESK'], diff: 'cyan' },
+        { label: 'Martial arts', words: ['KARATE','JUDO','BOXING','AIKIDO'], diff: 'green' },
+        { label: 'Contain "AND"', words: ['BAND','SAND','WAND','LAND'], diff: 'gold' },
+        { label: 'Things you can run', words: ['BATH','ERRAND','RISK','FEVER'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Weather events', words: ['THUNDER','HAIL','FROST','SLEET'], diff: 'cyan' },
+        { label: 'Social media sites', words: ['TWITTER','REDDIT','TUMBLR','FLICKR'], diff: 'green' },
+        { label: 'Words without A E I O U', words: ['MYTH','HYMN','LYNX','CRYPT'], diff: 'gold' },
+        { label: 'Things that can be broken', words: ['RECORD','HEART','NEWS','ICE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Desserts', words: ['BROWNIE','MOUSSE','FUDGE','TRIFLE'], diff: 'cyan' },
+        { label: 'Famous scientists', words: ['NEWTON','DARWIN','CURIE','TESLA'], diff: 'green' },
+        { label: 'Units of measure', words: ['GALLON','OUNCE','FATHOM','KNOT'], diff: 'gold' },
+        { label: 'Animal = verb', words: ['DUCK','CRANE','RAM','BADGER'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'School subjects', words: ['MATH','HISTORY','SCIENCE','ENGLISH'], diff: 'cyan' },
+        { label: 'Types of bag', words: ['TOTE','CLUTCH','SATCHEL','DUFFEL'], diff: 'green' },
+        { label: 'Deep space objects', words: ['NEBULA','PULSAR','QUASAR','VOID'], diff: 'gold' },
+        { label: 'Hiding a number', words: ['OFTEN','TWINE','FREIGHT','STONE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: '___ berry', words: ['STRAW','BLUE','BLACK','RASP'], diff: 'cyan' },
+        { label: 'Latin dances', words: ['FOXTROT','RUMBA','CHA CHA','MAMBO'], diff: 'green' },
+        { label: 'Things with teeth', words: ['COMB','SAW','ZIPPER','GEAR'], diff: 'gold' },
+        { label: '___ jack', words: ['FLAP','LUMBER','CAR','CRACKER'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Pizza toppings', words: ['OLIVE','PEPPER','ONION','BACON'], diff: 'cyan' },
+        { label: 'Fabrics', words: ['SILK','DENIM','LINEN','VELVET'], diff: 'green' },
+        { label: '___ wave', words: ['RADIO','HEAT','SHOCK','BRAIN'], diff: 'gold' },
+        { label: 'Things that are cast', words: ['SPELL','SHADOW','DOUBT','VOTE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Insects', words: ['BEETLE','CRICKET','MANTIS','HORNET'], diff: 'cyan' },
+        { label: 'Pasta shapes', words: ['SHELL','BOW TIE','ELBOW','ANGEL HAIR'], diff: 'green' },
+        { label: 'Things that sting', words: ['NETTLE','WASP','COMMENT','DEFEAT'], diff: 'gold' },
+        { label: 'Prefix for "man"', words: ['SUPER','SPIDER','BAT','IRON'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Citrus fruits', words: ['LEMON','LIME','GRAPEFRUIT','TANGERINE'], diff: 'cyan' },
+        { label: 'Poker terms', words: ['BLUFF','FOLD','RAISE','FLOP'], diff: 'green' },
+        { label: 'Things with keys', words: ['PIANO','KEYBOARD','MAP','ANSWER'], diff: 'gold' },
+        { label: '___ drop', words: ['TEAR','BACK','AIR','GUM'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Spices', words: ['CUMIN','PAPRIKA','SAFFRON','THYME'], diff: 'cyan' },
+        { label: 'Court terms', words: ['JURY','VERDICT','WITNESS','APPEAL'], diff: 'green' },
+        { label: 'Things with necks', words: ['BOTTLE','GUITAR','GIRAFFE','SWEATER'], diff: 'gold' },
+        { label: '___ work', words: ['FRAME','NET','DREAM','CLOCK'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Tools', words: ['HAMMER','WRENCH','PLIERS','DRILL'], diff: 'cyan' },
+        { label: 'Card suits', words: ['SPADE','CLUB','DIAMOND','HEART'], diff: 'green' },
+        { label: 'Things that are dealt', words: ['HAND','BLOW','CARDS','JUSTICE'], diff: 'gold' },
+        { label: 'Geometric shapes', words: ['CIRCLE','OVAL','ARCH','CONE'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Dairy products', words: ['BUTTER','CHEESE','YOGURT','CREAM'], diff: 'cyan' },
+        { label: 'River features', words: ['DELTA','RAPID','MEANDER','GORGE'], diff: 'green' },
+        { label: 'Eat greedily', words: ['DEVOUR','SCOFF','WOLF','INHALE'], diff: 'gold' },
+        { label: 'Things that flow', words: ['TRAFFIC','LAVA','CASH','MUSIC'], diff: 'purple' }
+      ]
+    },
+    {
+      groups: [
+        { label: 'Trees', words: ['MAPLE','CEDAR','WILLOW','BIRCH'], diff: 'cyan' },
+        { label: 'Movie genres', words: ['HORROR','COMEDY','DRAMA','THRILLER'], diff: 'green' },
+        { label: 'Things with branches', words: ['BANK','RIVER','LIBRARY','ANTLER'], diff: 'gold' },
+        { label: 'Dead ___', words: ['LINE','LOCK','PAN','BEAT'], diff: 'purple' }
+      ]
+    }
+  ];
+
+  // ===== CONFIG =====
+  var DIFF_COLORS = {
+    cyan:   { bg: 'rgba(0,240,255,0.15)', border: 'rgba(0,240,255,0.4)', text: '#00f0ff', emoji: '\u{1F7E6}' },
+    green:  { bg: 'rgba(57,255,20,0.12)', border: 'rgba(57,255,20,0.35)', text: '#39ff14', emoji: '\u{1F7E9}' },
+    gold:   { bg: 'rgba(255,215,0,0.12)', border: 'rgba(255,215,0,0.35)', text: '#ffd700', emoji: '\u{1F7E8}' },
+    purple: { bg: 'rgba(180,77,255,0.12)', border: 'rgba(180,77,255,0.35)', text: '#b44dff', emoji: '\u{1F7EA}' }
+  };
+  var DIFF_ORDER = ['cyan','green','gold','purple'];
+  var MAX_MISTAKES = 4;
+  var MAX_SELECTED = 4;
+
+  // ===== DOM =====
+  var startScreen = document.getElementById('startScreen');
+  var gameScreen = document.getElementById('gameScreen');
+  var completeScreen = document.getElementById('completeScreen');
+  var puzzleNumEl = document.getElementById('puzzleNum');
+  var topPuzzleEl = document.getElementById('topPuzzle');
+  var topTimerEl = document.getElementById('topTimer');
+  var solvedArea = document.getElementById('solvedArea');
+  var wordGrid = document.getElementById('wordGrid');
+  var hintMsg = document.getElementById('hintMsg');
+  var shuffleBtn = document.getElementById('shuffleBtn');
+  var deselectBtn = document.getElementById('deselectBtn');
+  var submitBtn = document.getElementById('submitBtn');
+  var startBtn = document.getElementById('startBtn');
+  var backBtn = document.getElementById('backBtn');
+  var shareBtn = document.getElementById('shareBtn');
+  var playAgainBtn = document.getElementById('playAgainBtn');
+  var menuBtn = document.getElementById('menuBtn');
+  var completeTitle = document.getElementById('completeTitle');
+  var resultGroups = document.getElementById('resultGroups');
+  var finalTime = document.getElementById('finalTime');
+  var finalMistakes = document.getElementById('finalMistakes');
+  var finalGroups = document.getElementById('finalGroups');
+  var startLB = document.getElementById('startLB');
+  var completeLB = document.getElementById('completeLB');
+  var statWins = document.getElementById('statWins');
+  var statStreak = document.getElementById('statStreak');
+  var statBest = document.getElementById('statBest');
+  var toastEl = document.getElementById('toast');
+
+  // ===== AUDIO =====
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function playTone(freq, dur, type, vol) {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.value = vol || 0.12;
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+  function soundSelect() { playTone(520, 0.08, 'sine', 0.1); }
+  function soundDeselect() { playTone(380, 0.06, 'sine', 0.06); }
+  function soundCorrect(diffIdx) {
+    var baseFreq = [440, 523, 659, 784];
+    var f = baseFreq[diffIdx] || 523;
+    playTone(f, 0.15, 'sine', 0.15);
+    setTimeout(function() { playTone(f * 1.25, 0.15, 'sine', 0.12); }, 100);
+    setTimeout(function() { playTone(f * 1.5, 0.25, 'sine', 0.1); }, 200);
+  }
+  function soundWrong() {
+    playTone(180, 0.15, 'sawtooth', 0.1);
+    setTimeout(function() { playTone(140, 0.2, 'sawtooth', 0.08); }, 100);
+  }
+  function soundOneAway() {
+    playTone(350, 0.1, 'triangle', 0.1);
+    setTimeout(function() { playTone(280, 0.15, 'triangle', 0.08); }, 80);
+  }
+  function soundVictory() {
+    var freqs = [440, 554, 659, 880];
+    freqs.forEach(function(f, i) {
+      setTimeout(function() { playTone(f, 0.3, 'sine', 0.12); }, i * 120);
+    });
+  }
+  function soundLose() {
+    var freqs = [330, 280, 220, 160];
+    freqs.forEach(function(f, i) {
+      setTimeout(function() { playTone(f, 0.25, 'sawtooth', 0.08); }, i * 150);
+    });
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    count = count || 12;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 60 + Math.random() * 120;
+      var dx = Math.cos(angle) * speed;
+      var dy = Math.sin(angle) * speed;
+      var size = 3 + Math.random() * 4;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      document.body.appendChild(p);
+      var dur = 600 + Math.random() * 400;
+      p.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0)', opacity: 0 }
+      ], { duration: dur, easing: 'ease-out' });
+      (function(el, d) { setTimeout(function() { el.remove(); }, d); })(p, dur);
+    }
+  }
+
+  // ===== TOAST =====
+  var toastTimer = null;
+  function showToast(msg, dur) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toastEl.classList.remove('show'); }, dur || 2000);
+  }
+
+  // ===== STATE =====
+  var puzzleIndex = 0;
+  var currentPuzzle = null;
+  var remainingWords = [];
+  var selectedWords = [];
+  var solvedGroupsList = [];
+  var mistakes = 0;
+  var guessHistory = [];
+  var timerStart = 0;
+  var timerInterval = null;
+  var elapsed = 0;
+  var gameActive = false;
+  var previousGuesses = [];
+
+  // ===== PERSISTENCE =====
+  var STATS_KEY = 'neonarcade_neonmind_connections_stats';
+  function loadStats() {
+    try {
+      return JSON.parse(localStorage.getItem(STATS_KEY)) || { wins: 0, streak: 0, bestTime: null };
+    } catch(e) { return { wins: 0, streak: 0, bestTime: null }; }
+  }
+  function saveStats(stats) {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch(e) {}
+  }
+
+  // ===== PUZZLE SELECTION =====
+  function getPuzzleIndex() {
+    var now = new Date();
+    var start = new Date(now.getFullYear(), 0, 0);
+    var diff = now - start;
+    var dayOfYear = Math.floor(diff / 86400000);
+    return dayOfYear % PUZZLES.length;
+  }
+
+  // ===== FORMAT TIME =====
+  function fmtTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  // ===== NEON INIT =====
+  Neon.init({
+    game: 'connections',
+    mode: 'low',
+    key: 'neonarcade_neonmind_connections_scores',
+    formatScore: function(s) { return fmtTime(s); }
+  });
+
+  function updateStartScreen() {
+    puzzleIndex = getPuzzleIndex();
+    puzzleNumEl.textContent = 'PUZZLE #' + (puzzleIndex + 1);
+    var stats = loadStats();
+    statWins.textContent = stats.wins;
+    statStreak.textContent = stats.streak;
+    statBest.textContent = stats.bestTime ? fmtTime(stats.bestTime) : '--:--';
+    Neon.render(startLB);
+  }
+
+  // ===== SHUFFLE =====
+  function shuffleArray(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  // ===== SCREEN MANAGEMENT =====
+  function showScreen(screen) {
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    completeScreen.classList.remove('active');
+    screen.classList.add('active');
+  }
+
+  // ===== SAFE DOM HELPERS =====
+  function createSolvedGroupEl(g) {
+    var div = document.createElement('div');
+    div.className = 'solved-group diff-' + g.diff;
+    var labelDiv = document.createElement('div');
+    labelDiv.className = 'group-label';
+    labelDiv.textContent = g.label;
+    var wordsDiv = document.createElement('div');
+    wordsDiv.className = 'group-words';
+    wordsDiv.textContent = g.words.join(', ');
+    div.appendChild(labelDiv);
+    div.appendChild(wordsDiv);
+    return div;
+  }
+
+  // ===== RENDER WORD GRID =====
+  function renderGrid() {
+    wordGrid.textContent = '';
+    remainingWords.forEach(function(word) {
+      var tile = document.createElement('div');
+      tile.className = 'word-tile';
+      tile.textContent = word;
+      tile.dataset.word = word;
+      if (selectedWords.indexOf(word) >= 0) {
+        tile.classList.add('selected');
+      }
+      tile.addEventListener('click', function() { onTileClick(word); });
+      tile.addEventListener('touchend', function(e) { e.preventDefault(); onTileClick(word); });
+      wordGrid.appendChild(tile);
+    });
+    updateSubmitBtn();
+  }
+
+  // ===== TILE CLICK =====
+  function onTileClick(word) {
+    if (!gameActive) return;
+    var idx = selectedWords.indexOf(word);
+    if (idx >= 0) {
+      selectedWords.splice(idx, 1);
+      soundDeselect();
+    } else {
+      if (selectedWords.length >= MAX_SELECTED) return;
+      selectedWords.push(word);
+      soundSelect();
+      var tile = wordGrid.querySelector('[data-word="' + CSS.escape(word) + '"]');
+      if (tile) {
+        tile.classList.remove('bounce');
+        void tile.offsetWidth;
+        tile.classList.add('bounce');
+      }
+    }
+    renderGrid();
+  }
+
+  // ===== UPDATE SUBMIT BTN =====
+  function updateSubmitBtn() {
+    submitBtn.disabled = selectedWords.length !== MAX_SELECTED;
+  }
+
+  // ===== RENDER LIVES =====
+  function renderLives() {
+    for (var i = 0; i < MAX_MISTAKES; i++) {
+      var dot = document.getElementById('life' + i);
+      if (i < mistakes) { dot.classList.add('lost'); }
+      else { dot.classList.remove('lost'); }
+    }
+  }
+
+  // ===== RENDER SOLVED =====
+  function renderSolved() {
+    solvedArea.textContent = '';
+    solvedGroupsList.forEach(function(g) {
+      solvedArea.appendChild(createSolvedGroupEl(g));
+    });
+  }
+
+  // ===== CHECK GUESS =====
+  function checkGuess() {
+    if (selectedWords.length !== MAX_SELECTED || !gameActive) return;
+
+    var sortedSel = selectedWords.slice().sort();
+    var guessKey = sortedSel.join('|');
+    if (previousGuesses.indexOf(guessKey) >= 0) {
+      showHint('Already guessed!');
+      return;
+    }
+    previousGuesses.push(guessKey);
+
+    var puzzle = currentPuzzle;
+    var matchedGroup = null;
+    for (var gi = 0; gi < puzzle.groups.length; gi++) {
+      var group = puzzle.groups[gi];
+      var alreadySolved = false;
+      for (var si = 0; si < solvedGroupsList.length; si++) {
+        if (solvedGroupsList[si].label === group.label) { alreadySolved = true; break; }
+      }
+      if (alreadySolved) continue;
+
+      var groupWords = group.words.map(function(w) { return w.toUpperCase(); });
+      var selWords = selectedWords.map(function(w) { return w.toUpperCase(); });
+      var allMatch = groupWords.length === selWords.length;
+      if (allMatch) {
+        for (var wi = 0; wi < groupWords.length; wi++) {
+          if (selWords.indexOf(groupWords[wi]) < 0) { allMatch = false; break; }
+        }
+      }
+      if (allMatch) { matchedGroup = group; break; }
+    }
+
+    if (matchedGroup) {
+      var diffIdx = DIFF_ORDER.indexOf(matchedGroup.diff);
+      soundCorrect(diffIdx);
+      solvedGroupsList.push(matchedGroup);
+      guessHistory.push({ words: selectedWords.slice(), correct: true, groupDiff: matchedGroup.diff, wordColors: null });
+
+      var matchWords = matchedGroup.words.map(function(x) { return x.toUpperCase(); });
+      remainingWords = remainingWords.filter(function(w) { return matchWords.indexOf(w.toUpperCase()) < 0; });
+      selectedWords = [];
+
+      renderSolved();
+      renderGrid();
+      renderLives();
+
+      var solvedEl = solvedArea.lastElementChild;
+      if (solvedEl) {
+        var rect = solvedEl.getBoundingClientRect();
+        spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, DIFF_COLORS[matchedGroup.diff].text, 16);
+      }
+
+      showHint('');
+
+      if (solvedGroupsList.length === 4) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        setTimeout(function() { endGame(true); }, 600);
+      }
+    } else {
+      mistakes++;
+      renderLives();
+
+      var oneAway = false;
+      for (var oi = 0; oi < puzzle.groups.length; oi++) {
+        var oGroup = puzzle.groups[oi];
+        var oSolved = false;
+        for (var osi = 0; osi < solvedGroupsList.length; osi++) {
+          if (solvedGroupsList[osi].label === oGroup.label) { oSolved = true; break; }
+        }
+        if (oSolved) continue;
+        var oGroupWords = oGroup.words.map(function(w) { return w.toUpperCase(); });
+        var oSelWords = selectedWords.map(function(w) { return w.toUpperCase(); });
+        var overlap = 0;
+        for (var owi = 0; owi < oSelWords.length; owi++) {
+          if (oGroupWords.indexOf(oSelWords[owi]) >= 0) overlap++;
+        }
+        if (overlap === 3) { oneAway = true; break; }
+      }
+
+      if (oneAway) {
+        soundOneAway();
+        showHint('One away!');
+      } else {
+        soundWrong();
+        showHint('');
+      }
+
+      var wordColors = selectedWords.map(function(w) {
+        for (var wci = 0; wci < puzzle.groups.length; wci++) {
+          var wcGroup = puzzle.groups[wci];
+          if (wcGroup.words.map(function(x) { return x.toUpperCase(); }).indexOf(w.toUpperCase()) >= 0) {
+            return wcGroup.diff;
+          }
+        }
+        return 'cyan';
+      });
+      guessHistory.push({ words: selectedWords.slice(), correct: false, groupDiff: null, wordColors: wordColors });
+
+      document.body.classList.add('shaking');
+      setTimeout(function() { document.body.classList.remove('shaking'); }, 300);
+
+      var tiles = wordGrid.querySelectorAll('.word-tile.selected');
+      for (var ti = 0; ti < tiles.length; ti++) {
+        tiles[ti].classList.add('wrong');
+        (function(t) { setTimeout(function() { t.classList.remove('wrong'); }, 500); })(tiles[ti]);
+      }
+
+      selectedWords = [];
+      renderGrid();
+
+      if (mistakes >= MAX_MISTAKES) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        setTimeout(function() { revealRemaining(); }, 500);
+      }
+    }
+  }
+
+  // ===== REVEAL REMAINING =====
+  function revealRemaining() {
+    var puzzle = currentPuzzle;
+    var unsolved = [];
+    DIFF_ORDER.forEach(function(d) {
+      var g = null;
+      for (var i = 0; i < puzzle.groups.length; i++) {
+        if (puzzle.groups[i].diff === d) { g = puzzle.groups[i]; break; }
+      }
+      if (!g) return;
+      var isSolved = false;
+      for (var j = 0; j < solvedGroupsList.length; j++) {
+        if (solvedGroupsList[j].label === g.label) { isSolved = true; break; }
+      }
+      if (!isSolved) unsolved.push(g);
+    });
+
+    var delay = 0;
+    unsolved.forEach(function(g) {
+      setTimeout(function() {
+        solvedGroupsList.push(g);
+        var matchWords = g.words.map(function(x) { return x.toUpperCase(); });
+        remainingWords = remainingWords.filter(function(w) { return matchWords.indexOf(w.toUpperCase()) < 0; });
+        renderSolved();
+        renderGrid();
+        soundCorrect(DIFF_ORDER.indexOf(g.diff));
+      }, delay);
+      delay += 400;
+    });
+    setTimeout(function() { endGame(false); }, delay + 400);
+  }
+
+  // ===== SHOW HINT =====
+  function showHint(msg) {
+    hintMsg.textContent = msg || '\u00A0';
+  }
+
+  // ===== TIMER =====
+  function startTimer() {
+    timerStart = Date.now();
+    elapsed = 0;
+    topTimerEl.textContent = '00:00';
+    timerInterval = setInterval(function() {
+      elapsed = (Date.now() - timerStart) / 1000;
+      topTimerEl.textContent = fmtTime(elapsed);
+    }, 250);
+  }
+
+  // ===== START GAME =====
+  function startGame() {
+    puzzleIndex = getPuzzleIndex();
+    currentPuzzle = PUZZLES[puzzleIndex];
+    topPuzzleEl.textContent = 'PUZZLE #' + (puzzleIndex + 1);
+
+    remainingWords = [];
+    currentPuzzle.groups.forEach(function(g) {
+      g.words.forEach(function(w) { remainingWords.push(w.toUpperCase()); });
+    });
+    shuffleArray(remainingWords);
+
+    selectedWords = [];
+    solvedGroupsList = [];
+    mistakes = 0;
+    guessHistory = [];
+    previousGuesses = [];
+    gameActive = true;
+
+    renderLives();
+    renderSolved();
+    renderGrid();
+    showHint('');
+    showScreen(gameScreen);
+    startTimer();
+  }
+
+  // ===== END GAME =====
+  function endGame(won) {
+    clearInterval(timerInterval);
+    var totalTime = Math.floor(elapsed);
+
+    if (won) {
+      soundVictory();
+      completeTitle.textContent = 'SOLVED';
+      completeTitle.className = 'complete-title win';
+    } else {
+      soundLose();
+      completeTitle.textContent = 'GAME OVER';
+      completeTitle.className = 'complete-title lose';
+    }
+
+    resultGroups.textContent = '';
+    DIFF_ORDER.forEach(function(d) {
+      var g = null;
+      for (var i = 0; i < currentPuzzle.groups.length; i++) {
+        if (currentPuzzle.groups[i].diff === d) { g = currentPuzzle.groups[i]; break; }
+      }
+      if (!g) return;
+      resultGroups.appendChild(createSolvedGroupEl(g));
+    });
+
+    finalTime.textContent = fmtTime(totalTime);
+    finalMistakes.textContent = mistakes + '/' + MAX_MISTAKES;
+    var solvedCount = 0;
+    for (var sci = 0; sci < guessHistory.length; sci++) {
+      if (guessHistory[sci].correct) solvedCount++;
+    }
+    finalGroups.textContent = solvedCount + '/4';
+
+    var stats = loadStats();
+    if (won) {
+      stats.wins++;
+      stats.streak++;
+      if (!stats.bestTime || totalTime < stats.bestTime) {
+        stats.bestTime = totalTime;
+      }
+    } else {
+      stats.streak = 0;
+    }
+    saveStats(stats);
+
+    if (won) {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(totalTime);
+      }).then(function(result) {
+        Neon.render(completeLB);
+        if (result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      });
+    } else {
+      Neon.render(completeLB);
+    }
+
+    showScreen(completeScreen);
+
+    if (won) {
+      var colors = ['#00f0ff','#39ff14','#ffd700','#b44dff'];
+      for (var pi = 0; pi < 4; pi++) {
+        (function(idx) {
+          setTimeout(function() {
+            spawnParticles(
+              window.innerWidth * (0.2 + Math.random() * 0.6),
+              window.innerHeight * (0.2 + Math.random() * 0.4),
+              colors[idx], 15
+            );
+          }, idx * 200);
+        })(pi);
+      }
+    }
+  }
+
+  // ===== SHARE =====
+  function buildShareText() {
+    var num = puzzleIndex + 1;
+    var text = '\u{1F517} CONNECTIONS #' + num + '\n';
+
+    guessHistory.forEach(function(entry) {
+      if (entry.correct) {
+        var emoji = DIFF_COLORS[entry.groupDiff].emoji;
+        text += emoji + emoji + emoji + emoji + '\n';
+      } else if (entry.wordColors) {
+        var row = '';
+        entry.wordColors.forEach(function(c) { row += DIFF_COLORS[c].emoji; });
+        text += row + '\n';
+      }
+    });
+
+    var totalTime = Math.floor(elapsed);
+    text += mistakes + '/' + MAX_MISTAKES + ' mistakes | ' + fmtTime(totalTime) + '\n';
+    text += 'neonarcade.net/neonmind/connections.html';
+    return text;
+  }
+
+  function doShare() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); }).catch(function() {});
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); }).catch(function() { showToast('Could not copy'); });
+    }
+  }
+
+  // ===== EVENT LISTENERS =====
+  startBtn.addEventListener('click', startGame);
+  backBtn.addEventListener('click', function() {
+    if (gameActive) {
+      gameActive = false;
+      clearInterval(timerInterval);
+    }
+    showScreen(startScreen);
+    updateStartScreen();
+  });
+
+  shuffleBtn.addEventListener('click', function() {
+    if (!gameActive) return;
+    shuffleArray(remainingWords);
+    renderGrid();
+    soundSelect();
+  });
+
+  deselectBtn.addEventListener('click', function() {
+    if (!gameActive) return;
+    selectedWords = [];
+    renderGrid();
+    soundDeselect();
+  });
+
+  submitBtn.addEventListener('click', function() {
+    checkGuess();
+  });
+
+  shareBtn.addEventListener('click', doShare);
+  playAgainBtn.addEventListener('click', startGame);
+  menuBtn.addEventListener('click', function() {
+    showScreen(startScreen);
+    updateStartScreen();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (gameScreen.classList.contains('active') && gameActive) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        showScreen(startScreen);
+        updateStartScreen();
+      }
+    }
+    if (e.key === 'Enter' && gameScreen.classList.contains('active') && gameActive && selectedWords.length === MAX_SELECTED) {
+      checkGuess();
+    }
+  });
+
+  // ===== INIT =====
+  updateStartScreen();
+
+})();
+</script>
+</body>
+</html>

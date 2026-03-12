@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mimic — Free Online Social Prediction Game | NEON ARCADE</title>
+<meta name="description" content="Play Mimic free online — how well do your friends really know you? Answer 10 questions, share the challenge link, and find out. No download, no login.">
+<meta name="keywords" content="mimic, friendship quiz, how well do you know me, social game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/mimic.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/mimic.html">
+<meta property="og:title" content="Mimic — Free Online Social Prediction Game | NEON ARCADE">
+<meta property="og:description" content="How well do your friends really know you? Answer 10 questions, share the link, find out.">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/mimic.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/mimic.html">
+<meta name="twitter:title" content="Mimic — Free Online Social Prediction Game | NEON ARCADE">
+<meta name="twitter:description" content="How well do your friends really know you? Answer 10 questions, share the link, find out.">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/mimic.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Mimic",
+  "url": "https://neonarcade.net/neonarcade/mimic.html",
+  "description": "How well do your friends really know you? Answer 10 questions, share the challenge link, and find out.",
+  "genre": "Social",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonarcade/screenshots/mimic.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON ARCADE", "item": "https://neonarcade.net/neonarcade/" },
+    { "@type": "ListItem", "position": 3, "name": "Mimic", "item": "https://neonarcade.net/neonarcade/mimic.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+}
+
+.shake { animation: shake 0.25s ease; }
+
+/* ===== SCREENS ===== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 20px;
+  overflow-y: auto;
+}
+.screen.active { display: flex; }
+
+/* ===== START SCREEN ===== */
+#start-screen {
+  gap: 16px;
+  text-align: center;
+}
+
+.game-icon {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 20px rgba(180,77,255,0.5));
+}
+
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 8vw, 56px);
+  letter-spacing: 6px;
+  color: #b44dff;
+  text-shadow: 0 0 10px rgba(180,77,255,0.6), 0 0 40px rgba(180,77,255,0.2);
+}
+
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 18px);
+  color: #9999bb;
+  letter-spacing: 2px;
+  max-width: 400px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  width: 100%;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.play-btn.secondary {
+  border-color: #b44dff;
+  background: rgba(180,77,255,0.06);
+  color: #b44dff;
+  font-size: 12px;
+  padding: 10px 30px;
+}
+.play-btn.secondary:hover { background: rgba(180,77,255,0.15); box-shadow: 0 0 20px rgba(180,77,255,0.2); }
+
+.play-btn.solo {
+  border-color: #7a7a9a;
+  background: rgba(122,122,154,0.06);
+  color: #9999bb;
+  font-size: 11px;
+  padding: 8px 20px;
+  letter-spacing: 2px;
+}
+.play-btn.solo:hover { background: rgba(122,122,154,0.15); box-shadow: 0 0 15px rgba(122,122,154,0.15); }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  color: #7a7a9a;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+#startLB { margin-top: 12px; width: 100%; max-width: 400px; }
+
+/* ===== NAME INPUT SCREEN ===== */
+#name-screen { gap: 20px; text-align: center; }
+
+.name-prompt {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 4vw, 22px);
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+  letter-spacing: 3px;
+}
+
+.name-sub {
+  font-size: 15px;
+  color: #9999bb;
+  max-width: 300px;
+}
+
+.name-input-wrap {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.name-char {
+  width: 52px;
+  height: 64px;
+  background: rgba(180,77,255,0.08);
+  border: 1px solid rgba(180,77,255,0.4);
+  border-radius: 4px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 28px;
+  color: #b44dff;
+  text-align: center;
+  line-height: 64px;
+  text-transform: uppercase;
+  caret-color: #b44dff;
+  outline: none;
+  transition: all 0.2s;
+}
+.name-char:focus { border-color: #b44dff; box-shadow: 0 0 15px rgba(180,77,255,0.3); }
+
+/* ===== QUESTION SCREEN ===== */
+#question-screen { gap: 14px; text-align: center; }
+
+.progress-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(180,77,255,0.4);
+  background: transparent;
+  transition: all 0.3s;
+}
+.progress-dot.done { background: #b44dff; border-color: #b44dff; box-shadow: 0 0 8px rgba(180,77,255,0.5); }
+.progress-dot.current { border-color: #00f0ff; box-shadow: 0 0 8px rgba(0,240,255,0.4); }
+
+.q-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: #7a7a9a;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.q-category {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  color: #b44dff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+.q-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(14px, 3.5vw, 20px);
+  color: #fff;
+  letter-spacing: 1px;
+  max-width: 500px;
+  line-height: 1.4;
+  text-shadow: 0 0 10px rgba(255,255,255,0.1);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.q-predicting {
+  font-size: 14px;
+  color: #ff8c00;
+  letter-spacing: 2px;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+.choices-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
+}
+
+.choice-btn {
+  flex: 1;
+  max-width: 230px;
+  padding: 28px 16px;
+  border: 1px solid rgba(0,240,255,0.3);
+  background: rgba(18,18,31,0.9);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.choice-btn:hover {
+  border-color: #00f0ff;
+  background: rgba(0,240,255,0.08);
+  box-shadow: 0 0 20px rgba(0,240,255,0.15);
+  transform: translateY(-2px);
+}
+.choice-btn:active { transform: scale(0.97); }
+
+.choice-emoji {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.choice-label {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(11px, 2.5vw, 14px);
+  color: #00f0ff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ===== CHALLENGE / PASS SCREEN ===== */
+#challenge-screen { gap: 20px; text-align: center; }
+
+.challenge-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(18px, 5vw, 28px);
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57,255,20,0.5);
+  letter-spacing: 4px;
+}
+
+.challenge-sub {
+  font-size: 16px;
+  color: #9999bb;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.challenge-link-box {
+  background: rgba(18,18,31,0.9);
+  border: 1px solid rgba(0,240,255,0.3);
+  border-radius: 6px;
+  padding: 16px 20px;
+  max-width: 500px;
+  width: 100%;
+  word-break: break-all;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  color: #00f0ff;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.challenge-link-box:hover { border-color: #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+
+.pass-screen-blank {
+  background: #0a0a12;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+.pass-screen-blank.active { display: flex; }
+
+.pass-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 4vw, 22px);
+  color: #ff8c00;
+  text-shadow: 0 0 10px rgba(255,140,0,0.4);
+  letter-spacing: 3px;
+}
+
+.pass-sub {
+  font-size: 16px;
+  color: #9999bb;
+  max-width: 320px;
+}
+
+/* ===== REVEAL SCREEN ===== */
+#reveal-screen {
+  gap: 10px;
+  text-align: center;
+  overflow-y: auto;
+  justify-content: flex-start;
+  padding-top: 30px;
+  padding-bottom: 40px;
+}
+
+.reveal-header {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(14px, 3.5vw, 20px);
+  color: #b44dff;
+  text-shadow: 0 0 10px rgba(180,77,255,0.4);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.reveal-score-live {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(28px, 7vw, 44px);
+  color: #00f0ff;
+  text-shadow: 0 0 15px rgba(0,240,255,0.5), 0 0 40px rgba(0,240,255,0.2);
+  transition: all 0.3s;
+}
+
+.reveal-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+  margin: 6px 0;
+}
+
+.reveal-card {
+  background: rgba(18,18,31,0.9);
+  border: 1px solid rgba(122,122,154,0.2);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+}
+.reveal-card.shown {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-card.correct { border-color: rgba(57,255,20,0.4); }
+.reveal-card.wrong { border-color: rgba(255,45,123,0.4); }
+
+.reveal-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+}
+
+.reveal-q-text {
+  flex: 1;
+  text-align: left;
+  font-size: 13px;
+  color: #9999bb;
+  line-height: 1.3;
+}
+
+.reveal-answers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.reveal-answer-a, .reveal-answer-b {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.reveal-answer-a {
+  color: #b44dff;
+  background: rgba(180,77,255,0.1);
+}
+.reveal-answer-b {
+  color: #00f0ff;
+  background: rgba(0,240,255,0.1);
+}
+
+/* ===== RESULTS SCREEN ===== */
+#results-screen { gap: 14px; text-align: center; }
+
+.result-label-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(20px, 5vw, 32px);
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(0,240,255,0.5), 0 0 40px rgba(0,240,255,0.2);
+}
+
+.result-score-big {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(48px, 12vw, 72px);
+  letter-spacing: 2px;
+}
+
+.result-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  color: #9999bb;
+  max-width: 360px;
+  line-height: 1.4;
+}
+
+.result-surprise {
+  background: rgba(255,140,0,0.1);
+  border: 1px solid rgba(255,140,0,0.3);
+  border-radius: 6px;
+  padding: 10px 16px;
+  max-width: 400px;
+  font-size: 14px;
+  color: #ff8c00;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.result-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  padding: 12px 32px;
+  border: 1px solid #39ff14;
+  background: rgba(57,255,20,0.08);
+  color: #39ff14;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.18); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+
+.challenge-share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  padding: 12px 32px;
+  border: 1px solid #ff8c00;
+  background: rgba(255,140,0,0.08);
+  color: #ff8c00;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.challenge-share-btn:hover { background: rgba(255,140,0,0.18); box-shadow: 0 0 20px rgba(255,140,0,0.2); }
+
+#resultLB { margin-top: 8px; width: 100%; max-width: 400px; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: rgba(57,255,20,0.15);
+  border: 1px solid #39ff14;
+  color: #39ff14;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border-radius: 4px;
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== PARTICLES ===== */
+.particle {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 500;
+}
+
+@keyframes particleFly {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .choices-row { flex-direction: column; align-items: center; }
+  .choice-btn { max-width: 100%; padding: 20px 16px; }
+  .reveal-card { padding: 10px 12px; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== START SCREEN ===== -->
+<div id="start-screen" class="screen active">
+  <div class="game-icon">&#x1F3AD;</div>
+  <h1 class="game-title">MIMIC</h1>
+  <p class="game-subtitle">How well do your friends really know you? Answer 10 questions. Share the link. Find out.</p>
+  <div class="mode-buttons">
+    <button id="btn-challenge" class="play-btn">CHALLENGE A FRIEND</button>
+    <button id="btn-samedevice" class="play-btn secondary">SAME DEVICE</button>
+    <button id="btn-solo" class="play-btn solo">SOLO MODE</button>
+  </div>
+  <p class="controls-hint">ESC to return to menu</p>
+  <div id="startLB"></div>
+</div>
+
+<!-- ===== NAME INPUT SCREEN ===== -->
+<div id="name-screen" class="screen">
+  <p class="name-prompt" id="name-prompt-text">ENTER YOUR NAME</p>
+  <p class="name-sub" id="name-sub-text">3 characters — your friends will see this</p>
+  <div class="name-input-wrap">
+    <input type="text" class="name-char" id="name-char-0" maxlength="1" autocomplete="off">
+    <input type="text" class="name-char" id="name-char-1" maxlength="1" autocomplete="off">
+    <input type="text" class="name-char" id="name-char-2" maxlength="1" autocomplete="off">
+  </div>
+  <button id="name-go-btn" class="play-btn" style="max-width:200px;opacity:0.4;pointer-events:none;">GO</button>
+</div>
+
+<!-- ===== QUESTION SCREEN ===== -->
+<div id="question-screen" class="screen">
+  <div class="progress-row" id="progress-dots"></div>
+  <p class="q-number" id="q-number">QUESTION 1 OF 10</p>
+  <p class="q-category" id="q-category"></p>
+  <p class="q-predicting" id="q-predicting" style="display:none"></p>
+  <div class="q-text" id="q-text"></div>
+  <div class="choices-row" id="choices-row">
+    <button class="choice-btn" id="choice-a">
+      <span class="choice-emoji" id="choice-a-emoji"></span>
+      <span class="choice-label" id="choice-a-label"></span>
+    </button>
+    <button class="choice-btn" id="choice-b">
+      <span class="choice-emoji" id="choice-b-emoji"></span>
+      <span class="choice-label" id="choice-b-label"></span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== CHALLENGE SCREEN ===== -->
+<div id="challenge-screen" class="screen">
+  <div style="font-size:48px;filter:drop-shadow(0 0 15px rgba(57,255,20,0.4));">&#x1F517;</div>
+  <h2 class="challenge-title">CHALLENGE READY!</h2>
+  <p class="challenge-sub">Share this link with a friend. They'll try to predict YOUR answers.</p>
+  <div class="challenge-link-box" id="challenge-link-box"></div>
+  <div class="result-btns">
+    <button id="btn-copy-link" class="play-btn">COPY LINK</button>
+    <button id="btn-share-link" class="share-btn" style="display:none;">SHARE</button>
+  </div>
+  <p class="controls-hint">Or use SAME DEVICE mode to play right now</p>
+  <button id="btn-pass-instead" class="play-btn secondary" style="max-width:280px;">PLAY ON THIS DEVICE</button>
+</div>
+
+<!-- ===== PASS DEVICE SCREEN ===== -->
+<div class="pass-screen-blank" id="pass-screen">
+  <div style="font-size:48px;">&#x1F4F1;</div>
+  <h2 class="pass-title" id="pass-title">PASS THE DEVICE</h2>
+  <p class="pass-sub" id="pass-sub">Hand it to your friend. They can't see your answers!</p>
+  <button id="btn-im-ready" class="play-btn">I'M READY</button>
+</div>
+
+<!-- ===== REVEAL SCREEN ===== -->
+<div id="reveal-screen" class="screen">
+  <p class="reveal-header" id="reveal-header">THE MOMENT OF TRUTH</p>
+  <div class="reveal-score-live" id="reveal-score-live">0 / 10</div>
+  <div class="reveal-cards" id="reveal-cards"></div>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div id="results-screen" class="screen">
+  <div class="game-icon" id="result-emoji">&#x1F3AD;</div>
+  <div class="result-label-title" id="result-label"></div>
+  <div class="result-score-big" id="result-score-big"></div>
+  <p class="result-subtitle" id="result-subtitle"></p>
+  <div class="result-surprise" id="result-surprise" style="display:none"></div>
+  <div class="result-btns">
+    <button id="btn-share-result" class="share-btn">SHARE RESULT</button>
+    <button id="btn-challenge-them" class="challenge-share-btn" style="display:none">CHALLENGE BACK</button>
+  </div>
+  <div class="result-btns">
+    <button id="btn-new-game" class="play-btn" style="max-width:200px;">NEW GAME</button>
+  </div>
+  <div id="resultLB"></div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">COPIED!</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== QUESTION BANK (60 questions) =====
+  var QUESTIONS = [
+    // Would You Rather (20)
+    { cat: 'WOULD YOU RATHER', q: 'Beach vacation or Mountain retreat?', a: ['Beach vacation', 'Mountain retreat'], e: ['\u{1F3D6}\u{FE0F}', '\u{26F0}\u{FE0F}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Morning person or Night owl?', a: ['Morning person', 'Night owl'], e: ['\u{1F305}', '\u{1F319}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Cats or Dogs?', a: ['Cats', 'Dogs'], e: ['\u{1F431}', '\u{1F436}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Sweet or Savory?', a: ['Sweet', 'Savory'], e: ['\u{1F36D}', '\u{1F356}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Movies at home or Movies in theater?', a: ['At home', 'In theater'], e: ['\u{1F6CB}\u{FE0F}', '\u{1F3AC}'] },
+    { cat: 'WOULD YOU RATHER', q: 'City life or Country life?', a: ['City life', 'Country life'], e: ['\u{1F3D9}\u{FE0F}', '\u{1F333}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Summer or Winter?', a: ['Summer', 'Winter'], e: ['\u{2600}\u{FE0F}', '\u{2744}\u{FE0F}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Books or Podcasts?', a: ['Books', 'Podcasts'], e: ['\u{1F4DA}', '\u{1F3A7}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Cook at home or Eat out?', a: ['Cook at home', 'Eat out'], e: ['\u{1F373}', '\u{1F37D}\u{FE0F}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Window seat or Aisle seat?', a: ['Window seat', 'Aisle seat'], e: ['\u{1FA9F}', '\u{1F6B6}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Road trip or Fly there?', a: ['Road trip', 'Fly there'], e: ['\u{1F697}', '\u{2708}\u{FE0F}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Big party or Small gathering?', a: ['Big party', 'Small gathering'], e: ['\u{1F389}', '\u{1F37B}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Spicy food or Mild food?', a: ['Spicy food', 'Mild food'], e: ['\u{1F336}\u{FE0F}', '\u{1F957}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Wake up early or Stay up late?', a: ['Wake up early', 'Stay up late'], e: ['\u{23F0}', '\u{1F303}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Phone call or Voice message?', a: ['Phone call', 'Voice message'], e: ['\u{1F4DE}', '\u{1F3A4}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Minimalist room or Cozy cluttered room?', a: ['Minimalist', 'Cozy clutter'], e: ['\u{1F532}', '\u{1F9F8}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Shower or Bath?', a: ['Shower', 'Bath'], e: ['\u{1F6BF}', '\u{1F6C1}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Board games or Video games?', a: ['Board games', 'Video games'], e: ['\u{1F3B2}', '\u{1F3AE}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Salty snacks or Sweet snacks?', a: ['Salty snacks', 'Sweet snacks'], e: ['\u{1F35F}', '\u{1F36A}'] },
+    { cat: 'WOULD YOU RATHER', q: 'Live without music or Live without movies?', a: ['No music', 'No movies'], e: ['\u{1F3B5}', '\u{1F3A5}'] },
+
+    // Pick One (20)
+    { cat: 'PICK ONE', q: 'Pizza or Tacos?', a: ['Pizza', 'Tacos'], e: ['\u{1F355}', '\u{1F32E}'] },
+    { cat: 'PICK ONE', q: 'Coffee or Tea?', a: ['Coffee', 'Tea'], e: ['\u{2615}', '\u{1F375}'] },
+    { cat: 'PICK ONE', q: 'Rain or Snow?', a: ['Rain', 'Snow'], e: ['\u{1F327}\u{FE0F}', '\u{1F328}\u{FE0F}'] },
+    { cat: 'PICK ONE', q: 'Sunrise or Sunset?', a: ['Sunrise', 'Sunset'], e: ['\u{1F305}', '\u{1F307}'] },
+    { cat: 'PICK ONE', q: 'Texting or Calling?', a: ['Texting', 'Calling'], e: ['\u{1F4AC}', '\u{1F4F1}'] },
+    { cat: 'PICK ONE', q: 'Introvert or Extrovert?', a: ['Introvert', 'Extrovert'], e: ['\u{1F4D6}', '\u{1F4E3}'] },
+    { cat: 'PICK ONE', q: 'Planning ahead or Spontaneous?', a: ['Planning ahead', 'Spontaneous'], e: ['\u{1F4CB}', '\u{26A1}'] },
+    { cat: 'PICK ONE', q: 'Netflix or YouTube?', a: ['Netflix', 'YouTube'], e: ['\u{1F4FA}', '\u{25B6}\u{FE0F}'] },
+    { cat: 'PICK ONE', q: 'Hot chocolate or Lemonade?', a: ['Hot chocolate', 'Lemonade'], e: ['\u{2615}', '\u{1F34B}'] },
+    { cat: 'PICK ONE', q: 'Breakfast or Dinner?', a: ['Breakfast', 'Dinner'], e: ['\u{1F95E}', '\u{1F372}'] },
+    { cat: 'PICK ONE', q: 'Cake or Ice cream?', a: ['Cake', 'Ice cream'], e: ['\u{1F382}', '\u{1F366}'] },
+    { cat: 'PICK ONE', q: 'Comedy or Thriller?', a: ['Comedy', 'Thriller'], e: ['\u{1F602}', '\u{1F630}'] },
+    { cat: 'PICK ONE', q: 'Sneakers or Boots?', a: ['Sneakers', 'Boots'], e: ['\u{1F45F}', '\u{1F462}'] },
+    { cat: 'PICK ONE', q: 'Ocean or Lake?', a: ['Ocean', 'Lake'], e: ['\u{1F30A}', '\u{1F6F6}'] },
+    { cat: 'PICK ONE', q: 'Pen or Pencil?', a: ['Pen', 'Pencil'], e: ['\u{1F58A}\u{FE0F}', '\u{270F}\u{FE0F}'] },
+    { cat: 'PICK ONE', q: 'Headphones or Speaker?', a: ['Headphones', 'Speaker'], e: ['\u{1F3A7}', '\u{1F50A}'] },
+    { cat: 'PICK ONE', q: 'Pancakes or Waffles?', a: ['Pancakes', 'Waffles'], e: ['\u{1F95E}', '\u{1F9C7}'] },
+    { cat: 'PICK ONE', q: 'Socks or Barefoot?', a: ['Socks', 'Barefoot'], e: ['\u{1F9E6}', '\u{1F9B6}'] },
+    { cat: 'PICK ONE', q: 'Candles or Fairy lights?', a: ['Candles', 'Fairy lights'], e: ['\u{1F56F}\u{FE0F}', '\u{2728}'] },
+    { cat: 'PICK ONE', q: 'Astronomy or Marine biology?', a: ['Astronomy', 'Marine biology'], e: ['\u{1F52D}', '\u{1F419}'] },
+
+    // This or That (20)
+    { cat: 'THIS OR THAT', q: 'Invisibility or Flying?', a: ['Invisibility', 'Flying'], e: ['\u{1F47B}', '\u{1F985}'] },
+    { cat: 'THIS OR THAT', q: 'Time travel to the Past or Future?', a: ['Past', 'Future'], e: ['\u{1F3DB}\u{FE0F}', '\u{1F680}'] },
+    { cat: 'THIS OR THAT', q: 'Fame or Fortune?', a: ['Fame', 'Fortune'], e: ['\u{2B50}', '\u{1F4B0}'] },
+    { cat: 'THIS OR THAT', q: 'Brains or Beauty?', a: ['Brains', 'Beauty'], e: ['\u{1F9E0}', '\u{1F48E}'] },
+    { cat: 'THIS OR THAT', q: 'Love or Money?', a: ['Love', 'Money'], e: ['\u{2764}\u{FE0F}', '\u{1F4B5}'] },
+    { cat: 'THIS OR THAT', q: 'Silence or Music always playing?', a: ['Silence', 'Music always'], e: ['\u{1F910}', '\u{1F3B6}'] },
+    { cat: 'THIS OR THAT', q: 'Live forever or Live twice?', a: ['Live forever', 'Live twice'], e: ['\u{267E}\u{FE0F}', '\u{1F503}'] },
+    { cat: 'THIS OR THAT', q: 'Read minds or See the future?', a: ['Read minds', 'See future'], e: ['\u{1F9E0}', '\u{1F52E}'] },
+    { cat: 'THIS OR THAT', q: 'Super strength or Super speed?', a: ['Super strength', 'Super speed'], e: ['\u{1F4AA}', '\u{26A1}'] },
+    { cat: 'THIS OR THAT', q: 'Rewind time or Pause time?', a: ['Rewind time', 'Pause time'], e: ['\u{23EA}', '\u{23F8}\u{FE0F}'] },
+    { cat: 'THIS OR THAT', q: 'Know every language or Play every instrument?', a: ['Every language', 'Every instrument'], e: ['\u{1F310}', '\u{1F3B8}'] },
+    { cat: 'THIS OR THAT', q: 'Always cold or Always hot?', a: ['Always cold', 'Always hot'], e: ['\u{1F976}', '\u{1F975}'] },
+    { cat: 'THIS OR THAT', q: 'Teleportation or Mind control?', a: ['Teleportation', 'Mind control'], e: ['\u{1FA84}', '\u{1F9BF}'] },
+    { cat: 'THIS OR THAT', q: 'No internet for a year or No friends for a year?', a: ['No internet', 'No friends'], e: ['\u{1F4F5}', '\u{1F614}'] },
+    { cat: 'THIS OR THAT', q: 'Be a hero or Be a villain?', a: ['Hero', 'Villain'], e: ['\u{1F9B8}', '\u{1F9B9}'] },
+    { cat: 'THIS OR THAT', q: 'Photographic memory or Forget anything?', a: ['Remember all', 'Forget anything'], e: ['\u{1F4F7}', '\u{1F9F9}'] },
+    { cat: 'THIS OR THAT', q: 'Breathe underwater or Survive in space?', a: ['Underwater', 'Space'], e: ['\u{1F42C}', '\u{1F680}'] },
+    { cat: 'THIS OR THAT', q: 'Control fire or Control water?', a: ['Control fire', 'Control water'], e: ['\u{1F525}', '\u{1F4A7}'] },
+    { cat: 'THIS OR THAT', q: 'Giant hamster or Tiny elephant?', a: ['Giant hamster', 'Tiny elephant'], e: ['\u{1F439}', '\u{1F418}'] },
+    { cat: 'THIS OR THAT', q: 'Speak to animals or All human languages?', a: ['Talk to animals', 'All languages'], e: ['\u{1F43E}', '\u{1F5E3}\u{FE0F}'] },
+  ];
+
+  var NUM_QUESTIONS = 10;
+  var LABELS = {
+    10: { text: 'MIND READER', emoji: '\u{1F9E0}', color: '#ffd700' },
+    9:  { text: 'BEST FRIENDS FOREVER', emoji: '\u{1F46F}', color: '#39ff14' },
+    8:  { text: 'BEST FRIENDS FOREVER', emoji: '\u{1F46F}', color: '#39ff14' },
+    7:  { text: 'PRETTY GOOD FRIENDS', emoji: '\u{1F91D}', color: '#00f0ff' },
+    6:  { text: 'PRETTY GOOD FRIENDS', emoji: '\u{1F91D}', color: '#00f0ff' },
+    5:  { text: 'CASUAL ACQUAINTANCES', emoji: '\u{1F937}', color: '#ff8c00' },
+    4:  { text: 'CASUAL ACQUAINTANCES', emoji: '\u{1F937}', color: '#ff8c00' },
+    3:  { text: 'DO YOU EVEN KNOW THEM?', emoji: '\u{1F914}', color: '#ff2d7b' },
+    2:  { text: 'DO YOU EVEN KNOW THEM?', emoji: '\u{1F914}', color: '#ff2d7b' },
+    1:  { text: 'COMPLETE STRANGERS', emoji: '\u{1F47D}', color: '#ff2d7b' },
+    0:  { text: 'COMPLETE STRANGERS', emoji: '\u{1F47D}', color: '#ff2d7b' },
+  };
+
+  // ===== AUDIO =====
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function playTone(freq, dur, type, vol) {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.value = vol || 0.1;
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+  function sfxSelect() { playTone(520, 0.12, 'sine', 0.08); setTimeout(function(){ playTone(780, 0.1, 'sine', 0.06); }, 50); }
+  function sfxCorrect() { playTone(660, 0.15, 'sine', 0.1); setTimeout(function(){ playTone(880, 0.2, 'sine', 0.08); }, 100); }
+  function sfxWrong() { playTone(220, 0.25, 'sawtooth', 0.06); playTone(180, 0.3, 'sawtooth', 0.04); }
+  function sfxReveal() { playTone(440, 0.08, 'triangle', 0.06); }
+  function sfxDrumroll() { playTone(110, 0.06, 'square', 0.04); }
+  function sfxFanfare() {
+    playTone(523, 0.15, 'sine', 0.1);
+    setTimeout(function(){ playTone(659, 0.15, 'sine', 0.1); }, 120);
+    setTimeout(function(){ playTone(784, 0.2, 'sine', 0.1); }, 240);
+    setTimeout(function(){ playTone(1047, 0.4, 'sine', 0.12); }, 360);
+  }
+
+  // ===== STATE =====
+  var gameMode = '';
+  var playerAName = '';
+  var playerBName = '';
+  var selectedQuestions = [];
+  var playerAAnswers = [];
+  var playerBAnswers = [];
+  var currentQ = 0;
+  var phase = 'start';
+  var challengeData = null;
+  var revealTimer = null;
+
+  // ===== DOM REFS =====
+  var startScreen = document.getElementById('start-screen');
+  var nameScreen = document.getElementById('name-screen');
+  var questionScreen = document.getElementById('question-screen');
+  var challengeScreen = document.getElementById('challenge-screen');
+  var passScreen = document.getElementById('pass-screen');
+  var revealScreen = document.getElementById('reveal-screen');
+  var resultsScreen = document.getElementById('results-screen');
+
+  var namePromptText = document.getElementById('name-prompt-text');
+  var nameSubText = document.getElementById('name-sub-text');
+  var nameChars = [document.getElementById('name-char-0'), document.getElementById('name-char-1'), document.getElementById('name-char-2')];
+  var nameGoBtn = document.getElementById('name-go-btn');
+
+  var progressDots = document.getElementById('progress-dots');
+  var qNumber = document.getElementById('q-number');
+  var qCategory = document.getElementById('q-category');
+  var qPredicting = document.getElementById('q-predicting');
+  var qText = document.getElementById('q-text');
+  var choiceA = document.getElementById('choice-a');
+  var choiceB = document.getElementById('choice-b');
+  var choiceAEmoji = document.getElementById('choice-a-emoji');
+  var choiceBEmoji = document.getElementById('choice-b-emoji');
+  var choiceALabel = document.getElementById('choice-a-label');
+  var choiceBLabel = document.getElementById('choice-b-label');
+
+  var challengeLinkBox = document.getElementById('challenge-link-box');
+  var passTitle = document.getElementById('pass-title');
+  var passSub = document.getElementById('pass-sub');
+
+  var revealHeader = document.getElementById('reveal-header');
+  var revealScoreLive = document.getElementById('reveal-score-live');
+  var revealCards = document.getElementById('reveal-cards');
+
+  var resultEmoji = document.getElementById('result-emoji');
+  var resultLabel = document.getElementById('result-label');
+  var resultScoreBig = document.getElementById('result-score-big');
+  var resultSubtitle = document.getElementById('result-subtitle');
+  var resultSurprise = document.getElementById('result-surprise');
+
+  var toastEl = document.getElementById('toast');
+
+  // ===== INIT =====
+  Neon.init({ game: 'mimic', mode: 'high', key: 'neonarcade_neonarcade_mimic_scores' });
+
+  // Check for challenge hash on load (defer to next tick so DOM is fully settled)
+  var hasChallengeOnLoad = (function() {
+    var hash = window.location.hash;
+    return hash && hash.indexOf('#c=') === 0;
+  })();
+
+  if (!hasChallengeOnLoad) {
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  setTimeout(function() { checkChallengeHash(); }, 0);
+
+  // ===== SCREEN MANAGEMENT =====
+  function showScreen(id) {
+    [startScreen, nameScreen, questionScreen, challengeScreen, revealScreen, resultsScreen].forEach(function(s) {
+      s.classList.remove('active');
+    });
+    passScreen.classList.remove('active');
+    if (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    count = count || 12;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      var angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      var dist = 40 + Math.random() * 80;
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      p.style.animation = 'particleFly 0.7s ease-out forwards';
+      document.body.appendChild(p);
+      setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 750);
+    }
+  }
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('visible');
+    setTimeout(function() { toastEl.classList.remove('visible'); }, 2000);
+  }
+
+  // ===== QUESTION SELECTION =====
+  function pickQuestions() {
+    var indices = [];
+    for (var i = 0; i < QUESTIONS.length; i++) indices.push(i);
+    for (var j = indices.length - 1; j > 0; j--) {
+      var k = Math.floor(Math.random() * (j + 1));
+      var tmp = indices[j];
+      indices[j] = indices[k];
+      indices[k] = tmp;
+    }
+    return indices.slice(0, NUM_QUESTIONS);
+  }
+
+  // ===== CHALLENGE LINK ENCODING =====
+  function encodeChallenge(name, questionIndices, answers) {
+    var data = { n: name, q: questionIndices, a: answers };
+    var json = JSON.stringify(data);
+    try {
+      return btoa(unescape(encodeURIComponent(json)));
+    } catch(e) {
+      return btoa(json);
+    }
+  }
+
+  function decodeChallenge(hash) {
+    try {
+      var json = decodeURIComponent(escape(atob(hash)));
+      var data = JSON.parse(json);
+      if (data.n && data.q && data.a && data.q.length === data.a.length) {
+        return data;
+      }
+    } catch(e) {}
+    try {
+      var json2 = atob(hash);
+      var data2 = JSON.parse(json2);
+      if (data2.n && data2.q && data2.a) return data2;
+    } catch(e2) {}
+    return null;
+  }
+
+  function getChallengeURL(encoded) {
+    var base = window.location.href.split('#')[0].split('?')[0];
+    return base + '#c=' + encoded;
+  }
+
+  function checkChallengeHash() {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('#c=') === 0) {
+      var encoded = hash.substring(3);
+      var data = decodeChallenge(encoded);
+      if (data) {
+        challengeData = data;
+        playerAName = data.n;
+        selectedQuestions = data.q;
+        playerAAnswers = data.a;
+        startChallengeResponse();
+        return;
+      }
+    }
+  }
+
+  // ===== NAME INPUT HANDLING =====
+  function setupNameInput(onComplete) {
+    nameChars.forEach(function(inp, idx) {
+      inp.value = '';
+      inp.oninput = function() {
+        var v = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        inp.value = v;
+        if (v && idx < 2) nameChars[idx + 1].focus();
+        updateNameBtn();
+      };
+      inp.onkeydown = function(e) {
+        if (e.key === 'Backspace' && !inp.value && idx > 0) {
+          nameChars[idx - 1].focus();
+        }
+        if (e.key === 'Enter') {
+          var full = getNameValue();
+          if (full.length === 3) onComplete(full);
+        }
+      };
+    });
+    nameGoBtn.onclick = function() {
+      var full = getNameValue();
+      if (full.length === 3) onComplete(full);
+    };
+    setTimeout(function() { nameChars[0].focus(); }, 100);
+  }
+
+  function getNameValue() {
+    return (nameChars[0].value + nameChars[1].value + nameChars[2].value).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+
+  function updateNameBtn() {
+    var full = getNameValue();
+    if (full.length === 3) {
+      nameGoBtn.style.opacity = '1';
+      nameGoBtn.style.pointerEvents = 'auto';
+    } else {
+      nameGoBtn.style.opacity = '0.4';
+      nameGoBtn.style.pointerEvents = 'none';
+    }
+  }
+
+  function prefillName() {
+    var existing = Neon.getName();
+    if (existing && existing.length === 3) {
+      for (var i = 0; i < 3; i++) {
+        nameChars[i].value = existing[i] || '';
+      }
+      updateNameBtn();
+    }
+  }
+
+  // ===== GAME MODES =====
+
+  document.getElementById('btn-challenge').onclick = function() {
+    gameMode = 'challenge';
+    phase = 'nameA';
+    namePromptText.textContent = 'ENTER YOUR NAME';
+    nameSubText.textContent = '3 characters \u2014 your friends will see this';
+    showScreen('name-screen');
+    prefillName();
+    setupNameInput(function(name) {
+      playerAName = name;
+      Neon.setName(name);
+      selectedQuestions = pickQuestions();
+      playerAAnswers = [];
+      currentQ = 0;
+      phase = 'questionsA';
+      showQuestionScreen(false);
+    });
+  };
+
+  document.getElementById('btn-samedevice').onclick = function() {
+    gameMode = 'samedevice';
+    phase = 'nameA';
+    namePromptText.textContent = 'PLAYER 1 \u2014 ENTER YOUR NAME';
+    nameSubText.textContent = "You'll answer 10 questions about yourself";
+    showScreen('name-screen');
+    prefillName();
+    setupNameInput(function(name) {
+      playerAName = name;
+      Neon.setName(name);
+      selectedQuestions = pickQuestions();
+      playerAAnswers = [];
+      currentQ = 0;
+      phase = 'questionsA';
+      showQuestionScreen(false);
+    });
+  };
+
+  document.getElementById('btn-solo').onclick = function() {
+    gameMode = 'solo';
+    phase = 'nameA';
+    namePromptText.textContent = 'ENTER YOUR NAME';
+    nameSubText.textContent = 'Answer 10 questions and share your challenge link';
+    showScreen('name-screen');
+    prefillName();
+    setupNameInput(function(name) {
+      playerAName = name;
+      Neon.setName(name);
+      selectedQuestions = pickQuestions();
+      playerAAnswers = [];
+      currentQ = 0;
+      phase = 'questionsA';
+      showQuestionScreen(false);
+    });
+  };
+
+  function startChallengeResponse() {
+    gameMode = 'challenge';
+    phase = 'nameB';
+    namePromptText.textContent = 'HOW WELL DO YOU KNOW ' + playerAName + '?';
+    nameSubText.textContent = 'Enter YOUR name to start predicting';
+    showScreen('name-screen');
+    setupNameInput(function(name) {
+      playerBName = name;
+      Neon.setName(name);
+      playerBAnswers = [];
+      currentQ = 0;
+      phase = 'questionsB';
+      showQuestionScreen(true);
+    });
+  }
+
+  // ===== QUESTION SCREEN =====
+  function showQuestionScreen(isPredicting) {
+    showScreen('question-screen');
+    renderProgressDots();
+    renderQuestion(isPredicting);
+  }
+
+  function renderProgressDots() {
+    while (progressDots.firstChild) progressDots.removeChild(progressDots.firstChild);
+    for (var i = 0; i < NUM_QUESTIONS; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'progress-dot';
+      if (i < currentQ) dot.classList.add('done');
+      if (i === currentQ) dot.classList.add('current');
+      progressDots.appendChild(dot);
+    }
+  }
+
+  function renderQuestion(isPredicting) {
+    var qi = selectedQuestions[currentQ];
+    var q = QUESTIONS[qi];
+
+    qNumber.textContent = 'QUESTION ' + (currentQ + 1) + ' OF ' + NUM_QUESTIONS;
+    qCategory.textContent = q.cat;
+
+    if (isPredicting) {
+      qPredicting.style.display = 'block';
+      qPredicting.textContent = 'WHAT DID ' + playerAName + ' PICK?';
+      qText.textContent = q.q;
+    } else {
+      qPredicting.style.display = 'none';
+      qText.textContent = q.q;
+    }
+
+    choiceAEmoji.textContent = q.e[0];
+    choiceBEmoji.textContent = q.e[1];
+    choiceALabel.textContent = q.a[0];
+    choiceBLabel.textContent = q.a[1];
+
+    choiceA.style.borderColor = 'rgba(0,240,255,0.3)';
+    choiceA.style.background = 'rgba(18,18,31,0.9)';
+    choiceB.style.borderColor = 'rgba(0,240,255,0.3)';
+    choiceB.style.background = 'rgba(18,18,31,0.9)';
+
+    choiceA.onclick = function(ev) { selectAnswer(0, ev); };
+    choiceB.onclick = function(ev) { selectAnswer(1, ev); };
+  }
+
+  function selectAnswer(choice, ev) {
+    sfxSelect();
+
+    var btn = choice === 0 ? choiceA : choiceB;
+    var other = choice === 0 ? choiceB : choiceA;
+    btn.style.borderColor = '#00f0ff';
+    btn.style.background = 'rgba(0,240,255,0.12)';
+    other.style.borderColor = 'rgba(122,122,154,0.15)';
+    other.style.background = 'rgba(18,18,31,0.5)';
+
+    if (ev) {
+      var rect = btn.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#00f0ff', 8);
+    }
+
+    choiceA.onclick = null;
+    choiceB.onclick = null;
+
+    if (phase === 'questionsA') {
+      playerAAnswers.push(choice);
+    } else if (phase === 'questionsB') {
+      playerBAnswers.push(choice);
+    }
+
+    setTimeout(function() {
+      currentQ++;
+      if (currentQ >= NUM_QUESTIONS) {
+        finishPhase();
+      } else {
+        renderProgressDots();
+        renderQuestion(phase === 'questionsB');
+      }
+    }, 400);
+  }
+
+  function finishPhase() {
+    if (phase === 'questionsA') {
+      if (gameMode === 'challenge') {
+        var encoded = encodeChallenge(playerAName, selectedQuestions, playerAAnswers);
+        var url = getChallengeURL(encoded);
+        challengeLinkBox.textContent = url;
+        showScreen('challenge-screen');
+
+        if (navigator.share) {
+          document.getElementById('btn-share-link').style.display = 'inline-block';
+        }
+
+      } else if (gameMode === 'samedevice') {
+        passTitle.textContent = 'PASS THE DEVICE';
+        passSub.textContent = playerAName + "'s answers are locked. Hand it to your friend!";
+        showScreen('');
+        passScreen.classList.add('active');
+
+        document.getElementById('btn-im-ready').onclick = function() {
+          passScreen.classList.remove('active');
+          phase = 'nameB';
+          namePromptText.textContent = 'PLAYER 2 \u2014 ENTER YOUR NAME';
+          nameSubText.textContent = 'Predict what ' + playerAName + ' answered for each question';
+          showScreen('name-screen');
+          nameChars.forEach(function(c) { c.value = ''; });
+          updateNameBtn();
+          setupNameInput(function(name) {
+            playerBName = name;
+            playerBAnswers = [];
+            currentQ = 0;
+            phase = 'questionsB';
+            showQuestionScreen(true);
+          });
+        };
+
+      } else if (gameMode === 'solo') {
+        showSoloResults();
+      }
+
+    } else if (phase === 'questionsB') {
+      startReveal();
+    }
+  }
+
+  // ===== CHALLENGE SCREEN BUTTONS =====
+  document.getElementById('btn-copy-link').onclick = function() {
+    var url = challengeLinkBox.textContent;
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('LINK COPIED!');
+    }).catch(function() {
+      showToast('COPY FAILED');
+    });
+  };
+
+  document.getElementById('btn-share-link').onclick = function() {
+    var url = challengeLinkBox.textContent;
+    navigator.share({
+      title: 'MIMIC \u2014 How well do you know ' + playerAName + '?',
+      text: 'Think you know me? Prove it! Answer 10 questions as me.',
+      url: url
+    }).catch(function() {});
+  };
+
+  document.getElementById('btn-pass-instead').onclick = function() {
+    passTitle.textContent = 'PASS THE DEVICE';
+    passSub.textContent = playerAName + "'s answers are locked. Hand it to your friend!";
+    showScreen('');
+    passScreen.classList.add('active');
+
+    document.getElementById('btn-im-ready').onclick = function() {
+      passScreen.classList.remove('active');
+      phase = 'nameB';
+      namePromptText.textContent = 'YOUR NAME';
+      nameSubText.textContent = 'Predict what ' + playerAName + ' answered for each question';
+      showScreen('name-screen');
+      nameChars.forEach(function(c) { c.value = ''; });
+      updateNameBtn();
+      setupNameInput(function(name) {
+        playerBName = name;
+        playerBAnswers = [];
+        currentQ = 0;
+        phase = 'questionsB';
+        showQuestionScreen(true);
+      });
+    };
+  };
+
+  // ===== REVEAL SEQUENCE =====
+  function startReveal() {
+    phase = 'reveal';
+    showScreen('reveal-screen');
+    while (revealCards.firstChild) revealCards.removeChild(revealCards.firstChild);
+    revealScoreLive.textContent = '0 / ' + NUM_QUESTIONS;
+    revealHeader.textContent = playerBName + ' vs ' + playerAName;
+
+    var score = 0;
+    var revealIdx = 0;
+
+    // Build all cards (hidden)
+    for (var i = 0; i < NUM_QUESTIONS; i++) {
+      var qi = selectedQuestions[i];
+      var q = QUESTIONS[qi];
+      var isCorrect = playerAAnswers[i] === playerBAnswers[i];
+
+      var card = document.createElement('div');
+      card.className = 'reveal-card';
+      card.dataset.correct = isCorrect ? '1' : '0';
+      card.dataset.qIdx = String(i);
+
+      var icon = document.createElement('div');
+      icon.className = 'reveal-icon';
+      icon.textContent = '?';
+
+      var text = document.createElement('div');
+      text.className = 'reveal-q-text';
+      text.textContent = q.q;
+
+      var answers = document.createElement('div');
+      answers.className = 'reveal-answers';
+
+      var ansA = document.createElement('span');
+      ansA.className = 'reveal-answer-a';
+      ansA.textContent = playerAName + ': ?';
+      ansA.dataset.real = q.a[playerAAnswers[i]];
+
+      var ansB = document.createElement('span');
+      ansB.className = 'reveal-answer-b';
+      ansB.textContent = playerBName + ': ' + q.a[playerBAnswers[i]];
+
+      answers.appendChild(ansA);
+      answers.appendChild(ansB);
+
+      card.appendChild(icon);
+      card.appendChild(text);
+      card.appendChild(answers);
+      revealCards.appendChild(card);
+    }
+
+    // Reveal one by one with suspense
+    function revealNext() {
+      if (revealIdx >= NUM_QUESTIONS) {
+        setTimeout(function() { showFinalResults(score); }, 1200);
+        return;
+      }
+
+      var card = revealCards.children[revealIdx];
+      var isCorrect = card.dataset.correct === '1';
+
+      sfxDrumroll();
+
+      // Show the card sliding in
+      setTimeout(function() {
+        card.classList.add('shown');
+        sfxReveal();
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 400);
+
+      // Reveal the answer after suspense
+      setTimeout(function() {
+        var icon = card.querySelector('.reveal-icon');
+        var ansA = card.querySelector('.reveal-answer-a');
+
+        ansA.textContent = playerAName + ': ' + ansA.dataset.real;
+
+        if (isCorrect) {
+          icon.textContent = '\u2705';
+          card.classList.add('correct');
+          score++;
+          sfxCorrect();
+          var rect = card.getBoundingClientRect();
+          spawnParticles(rect.left + 30, rect.top + rect.height / 2, '#39ff14', 10);
+        } else {
+          icon.textContent = '\u274C';
+          card.classList.add('wrong');
+          sfxWrong();
+          document.body.classList.add('shake');
+          setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+        }
+
+        revealScoreLive.textContent = score + ' / ' + NUM_QUESTIONS;
+        revealScoreLive.style.color = score > (revealIdx + 1) / 2 ? '#39ff14' : '#ff2d7b';
+
+        revealIdx++;
+        revealTimer = setTimeout(revealNext, 1500);
+      }, 1200);
+    }
+
+    revealTimer = setTimeout(revealNext, 800);
+  }
+
+  // ===== FINAL RESULTS =====
+  function showFinalResults(score) {
+    phase = 'results';
+    showScreen('results-screen');
+
+    var label = LABELS[score];
+    resultEmoji.textContent = label.emoji;
+    resultLabel.textContent = '"' + label.text + '"';
+    resultLabel.style.color = label.color;
+    resultLabel.style.textShadow = '0 0 10px ' + label.color + '99, 0 0 40px ' + label.color + '33';
+    resultScoreBig.textContent = score + '/' + NUM_QUESTIONS;
+    resultScoreBig.style.color = label.color;
+
+    resultSubtitle.textContent = playerBName + ' predicted ' + score + ' of ' + playerAName + "'s 10 answers correctly.";
+
+    // Find most surprising wrong answer
+    var wrongIndices = [];
+    for (var i = 0; i < NUM_QUESTIONS; i++) {
+      if (playerAAnswers[i] !== playerBAnswers[i]) wrongIndices.push(i);
+    }
+    if (wrongIndices.length > 0) {
+      var surpriseIdx = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+      var qi = selectedQuestions[surpriseIdx];
+      var q = QUESTIONS[qi];
+      resultSurprise.style.display = 'block';
+      // Build surprise text safely with DOM
+      while (resultSurprise.firstChild) resultSurprise.removeChild(resultSurprise.firstChild);
+      var sLine1 = document.createTextNode('Most surprising: ');
+      var sStrong1 = document.createElement('strong');
+      sStrong1.textContent = q.q;
+      resultSurprise.appendChild(sLine1);
+      resultSurprise.appendChild(sStrong1);
+      resultSurprise.appendChild(document.createElement('br'));
+      var sLine2a = document.createTextNode(playerAName + ' said ');
+      var sStrong2 = document.createElement('strong');
+      sStrong2.textContent = q.a[playerAAnswers[surpriseIdx]];
+      var sLine2b = document.createTextNode(', ' + playerBName + ' guessed ');
+      var sStrong3 = document.createElement('strong');
+      sStrong3.textContent = q.a[playerBAnswers[surpriseIdx]];
+      resultSurprise.appendChild(sLine2a);
+      resultSurprise.appendChild(sStrong2);
+      resultSurprise.appendChild(sLine2b);
+      resultSurprise.appendChild(sStrong3);
+    } else {
+      resultSurprise.style.display = 'none';
+    }
+
+    // Show challenge-back button if B came via link
+    if (challengeData) {
+      document.getElementById('btn-challenge-them').style.display = 'inline-block';
+    }
+
+    // Fanfare for high scores
+    if (score >= 8) sfxFanfare();
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 3, label.color, 20);
+
+    // Save score to leaderboard (0-100 scale)
+    var leaderboardScore = score * 10;
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(leaderboardScore);
+    }).then(function(result) {
+      Neon.render(document.getElementById('resultLB'));
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+  }
+
+  // ===== SOLO RESULTS =====
+  function showSoloResults() {
+    phase = 'results';
+    showScreen('results-screen');
+
+    resultEmoji.textContent = '\u{1F3AD}';
+    resultLabel.textContent = 'YOUR CHOICES';
+    resultLabel.style.color = '#b44dff';
+    resultLabel.style.textShadow = '0 0 10px rgba(180,77,255,0.5)';
+    resultScoreBig.textContent = '10/10';
+    resultScoreBig.style.color = '#b44dff';
+    resultSubtitle.textContent = 'Challenge a friend to predict your answers! Share the link below.';
+    resultSurprise.style.display = 'none';
+
+    // Generate a challenge link for solo mode
+    var encoded = encodeChallenge(playerAName, selectedQuestions, playerAAnswers);
+    var url = getChallengeURL(encoded);
+
+    var challengeBtn = document.getElementById('btn-challenge-them');
+    challengeBtn.style.display = 'inline-block';
+    challengeBtn.textContent = 'SHARE CHALLENGE LINK';
+    challengeBtn.onclick = function() {
+      copyOrShare(url, 'Think you know ' + playerAName + '? Prove it!');
+    };
+
+    Neon.render(document.getElementById('resultLB'));
+  }
+
+  // ===== SHARE =====
+  document.getElementById('btn-share-result').onclick = function() {
+    var score = 0;
+    for (var i = 0; i < NUM_QUESTIONS; i++) {
+      if (playerAAnswers[i] === playerBAnswers[i]) score++;
+    }
+    var label = LABELS[score] || LABELS[0];
+
+    var wrongQ = [];
+    for (var j = 0; j < NUM_QUESTIONS; j++) {
+      if (playerAAnswers[j] !== playerBAnswers[j]) {
+        var qi = selectedQuestions[j];
+        wrongQ.push(QUESTIONS[qi].a[0] + ' vs ' + QUESTIONS[qi].a[1]);
+      }
+    }
+
+    var checks = '';
+    for (var k = 0; k < NUM_QUESTIONS; k++) {
+      checks += playerAAnswers[k] === playerBAnswers[k] ? '\u2705' : '\u274C';
+    }
+
+    var text = '\u{1F3AD} MIMIC\n';
+    if (gameMode !== 'solo') {
+      text += playerBName + ' knows ' + playerAName + ': ' + score + '/' + NUM_QUESTIONS + '\n';
+    }
+    text += checks + '\n';
+    if (wrongQ.length > 0 && wrongQ.length <= 3) {
+      wrongQ.forEach(function(w) { text += '\u274C ' + w + '\n'; });
+    }
+    text += '"' + label.text + '"\n';
+    text += 'How well do YOUR friends know you?\nneonarcade.net/neonarcade/mimic.html';
+
+    copyOrShare(text, 'MIMIC Results');
+  };
+
+  document.getElementById('btn-challenge-them').onclick = function() {
+    if (challengeData) {
+      var encoded = encodeChallenge(playerBName, selectedQuestions, playerBAnswers);
+      var url = getChallengeURL(encoded);
+      copyOrShare(url, 'Think you know ' + playerBName + '? Prove it!');
+    }
+  };
+
+  function copyOrShare(text, title) {
+    if (navigator.share) {
+      navigator.share({ title: title, text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() {
+          showToast('COPIED!');
+        });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('COPIED!');
+      }).catch(function() {
+        showToast('COPY FAILED');
+      });
+    }
+  }
+
+  // ===== NEW GAME =====
+  document.getElementById('btn-new-game').onclick = function() {
+    resetGame();
+  };
+
+  function resetGame() {
+    if (revealTimer) clearTimeout(revealTimer);
+    revealTimer = null;
+    gameMode = '';
+    playerAName = '';
+    playerBName = '';
+    selectedQuestions = [];
+    playerAAnswers = [];
+    playerBAnswers = [];
+    currentQ = 0;
+    phase = 'start';
+    challengeData = null;
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+    document.getElementById('btn-challenge-them').style.display = 'none';
+    document.getElementById('btn-challenge-them').textContent = 'CHALLENGE BACK';
+    showScreen('start-screen');
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  // ===== ESC KEY =====
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (phase !== 'start') {
+        resetGame();
+      }
+    }
+    if (phase === 'questionsA' || phase === 'questionsB') {
+      if (e.key === '1' || e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        if (choiceA.onclick) choiceA.onclick(null);
+      }
+      if (e.key === '2' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        if (choiceB.onclick) choiceB.onclick(null);
+      }
+    }
+  });
+
+  // ===== TOUCH: Swipe on question screen =====
+  var touchStartX = 0;
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    if (phase !== 'questionsA' && phase !== 'questionsB') return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      if (dx > 0 && choiceA.onclick) choiceA.onclick(null);
+      if (dx < 0 && choiceB.onclick) choiceB.onclick(null);
+    }
+  }, { passive: true });
+
+})();
+</script>
+</body>
+</html>
