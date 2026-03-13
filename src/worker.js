@@ -78,6 +78,7 @@ const KNOWN_GAMES = {
   'asteroids':           { mode: 'high', maxScore: 1000000 },
   'frogger':             { mode: 'high', maxScore: 1000000 },
   'battleship':          { mode: 'low', maxScore: 200 },
+  'tictactoe':           { mode: 'high', maxScore: 10000 },
 };
 
 function isAllowedOrigin(request) {
