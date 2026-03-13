@@ -323,6 +323,28 @@
     border: 1px solid rgba(0,240,255,0.25);
   }
 
+  .mode-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .mode-tag {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .mode-tag.tag-1p { background: rgba(122,122,154,0.12); color: var(--text-dim); border: 1px solid rgba(122,122,154,0.2); }
+  .mode-tag.tag-ai { background: rgba(180,77,255,0.12); color: var(--neon-purple); border: 1px solid rgba(180,77,255,0.25); }
+  .mode-tag.tag-local { background: rgba(57,255,20,0.12); color: var(--neon-green); border: 1px solid rgba(57,255,20,0.25); }
+  .mode-tag.tag-online { background: rgba(0,240,255,0.12); color: var(--neon-cyan); border: 1px solid rgba(0,240,255,0.25); }
+
   .card-body {
     padding: 16px;
     flex: 1;
@@ -573,6 +595,12 @@
     </div>
   </div>
   <div class="more-row">
+    <a href="/multiplayer.html" class="more-card" style="border-color:rgba(57,255,20,0.15);">
+      <div class="card-icon">&#x1F91D;</div>
+      <h2 class="card-title" style="color:var(--neon-green);">MULTIPLAYER</h2>
+      <p class="card-desc">All games with 2-player modes — VS AI, same-device local, or online challenges via link.</p>
+      <div class="card-play" style="color:var(--neon-green);">BROWSE 10 GAMES <span class="play-arrow">&rarr;</span></div>
+    </a>
     <a href="/updates.html" class="more-card">
       <div class="card-icon">&#x1F4CB;</div>
       <h2 class="card-title">UPDATES</h2>
@@ -607,74 +635,74 @@
   // Game catalog — all games with metadata
   var CATALOG = {
     arcade: [
-      { slug: 'battleship', name: 'BATTLESHIP', desc: 'Classic naval warfare meets neon. Place your fleet, hunt the enemy grid shot by shot. Smart AI or online 2-player with room codes.', img: 'neonarcade/screenshots/battleship.png' },
-      { slug: 'neon-snake', name: 'NEON SNAKE', desc: 'Classic snake with risk vs reward. Gold food near walls is worth 5x.', img: 'neonarcade/screenshots/neon-snake.png' },
-      { slug: 'impostor-pixel', name: 'IMPOSTOR PIXEL', desc: 'Spot the different tile. Each round the difference shrinks.', img: 'neonarcade/screenshots/impostor-pixel.png' },
-      { slug: 'catalyst', name: 'CATALYST', desc: 'One touch. Infinite chaos. Chain reactions with exploders and attractors.', img: 'neonarcade/screenshots/catalyst.png' },
-      { slug: 'pong-both-sides', name: 'PONG: BOTH SIDES', desc: 'Control BOTH paddles. How long before your brain short-circuits?', img: 'neonarcade/screenshots/pong-both-sides.png' },
-      { slug: 'afterglow', name: 'AFTERGLOW', desc: 'Navigate a dark maze. Your trail glows — but touch it and you die.', img: 'neonarcade/screenshots/afterglow.png' },
-      { slug: 'flappy-rewind', name: 'FLAPPY REWIND', desc: 'Fly forward, then rewind with inverted gravity through the same pipes.', img: 'neonarcade/screenshots/flappy-rewind.png' },
-      { slug: 'palette', name: 'PALETTE', desc: 'Test your color perception. Match hues precisely. Daily challenge.', img: 'neonarcade/screenshots/palette.png' },
-      { slug: 'pacman-amnesia', name: 'PAC-MAN AMNESIA', desc: 'Pac-Man in a maze you can barely see. Fog of war meets arcade.', img: 'neonarcade/screenshots/pacman-amnesia.png' },
-      { slug: 'territory', name: 'TERRITORY', desc: 'Claim grid squares. Surround enemies. Daily strategy puzzle.', img: 'neonarcade/screenshots/territory.png' },
-      { slug: 'tetris-betrayal', name: 'TETRIS BETRAYAL', desc: 'Play Tetris badly on purpose. Stack high, survive long.', img: 'neonarcade/screenshots/tetris-betrayal.png' },
-      { slug: 'signal', name: 'SIGNAL', desc: 'Daily cipher puzzle. Decode the hidden message.', img: 'neonarcade/screenshots/signal.png' },
-      { slug: 'faultline', name: 'FAULTLINE', desc: 'Find the shifted pixel row in distorted images.', img: 'neonarcade/screenshots/faultline.png' },
-      { slug: 'doodle-drop', name: 'DOODLE DROP', desc: 'Draw platforms while falling. Quick reflexes, creative solutions.', img: 'neonarcade/screenshots/doodle-drop.png' },
-      { slug: 'priorself', name: 'PRIORSELF', desc: 'Ghost-cooperation puzzle. Work with your past selves.', img: 'neonarcade/screenshots/priorself.png' },
-      { slug: 'burndown', name: 'BURNDOWN', desc: 'Speedrun a tower of micro-tasks. Race the clock.', img: 'neonarcade/screenshots/burndown.png' },
-      { slug: 'mine-finder', name: 'MINE FINDER', desc: 'Reverse minesweeper. Place mines to fool the AI.', img: 'neonarcade/screenshots/mine-finder.png' },
-      { slug: 'wordchain-duel', name: 'WORDCHAIN DUEL', desc: 'Async 1v1 word chain challenge.', img: 'neonarcade/screenshots/wordchain-duel.png' },
-      { slug: 'gridlock', name: 'GRIDLOCK', desc: 'Sliding puzzle speedrun. Race your ghost.', img: 'neonarcade/screenshots/gridlock.png' },
-      { slug: 'truecolor', name: 'TRUECOLOR', desc: 'Advanced color perception test. How precise are your eyes?', img: 'neonarcade/screenshots/truecolor.png' },
-      { slug: 'breakout-architect', name: 'BREAKOUT ARCHITECT', desc: 'Design breakout levels, challenge friends.', img: 'neonarcade/screenshots/breakout-architect.png' },
-      { slug: 'split-second', name: 'SPLIT SECOND', desc: 'Split-second reaction challenges.', img: 'neonarcade/screenshots/split-second.png' },
-      { slug: 'wordchain', name: 'WORDCHAIN', desc: 'Word chain puzzle. Each word starts with the last letter.', img: 'neonarcade/screenshots/wordchain.png' },
-      { slug: 'curfew', name: 'CURFEW', desc: 'Stealth puzzle. Get home before curfew.', img: 'neonarcade/screenshots/curfew.png' },
-      { slug: 'chromaself', name: 'CHROMASELF', desc: 'Personality quiz reveals your unique color palette.', img: 'neonarcade/screenshots/chromaself.png' },
-      { slug: 'chimp', name: 'CHIMP TEST', desc: 'Are you smarter than a chimpanzee? Numbers flash, then hide. Tap in order.', img: 'neonarcade/screenshots/chimp.png' },
-      { slug: 'pour', name: 'POUR', desc: 'Water sorting puzzle. Pour between tubes until each holds one color.', img: 'neonarcade/screenshots/pour.png' },
-      { slug: 'bloomfield', name: 'BLOOMFIELD', desc: 'Plant neon seeds and grow a procedural glowing garden. Every garden is unique.', img: 'neonarcade/screenshots/bloomfield.png' },
-      { slug: 'typeblitz', name: 'TYPEBLITZ', desc: 'Speed typing challenge. How fast can you type? WPM test with accuracy tracking.', img: 'neonarcade/screenshots/typeblitz.png' },
-      { slug: 'veto', name: 'VETO', desc: '2-player bracket challenge. Eliminate 16 items to a winner, compare picks. Soulmates or opposites?', img: 'neonarcade/screenshots/veto.png' },
-      { slug: 'mimic', name: 'MIMIC', desc: 'Answer 10 questions, challenge a friend to predict your answers. How well do they know you?', img: 'neonarcade/screenshots/mimic.png' },
+      { slug: 'battleship', name: 'BATTLESHIP', desc: 'Classic naval warfare meets neon. Place your fleet, hunt the enemy grid shot by shot. Smart AI or online 2-player with room codes.', img: 'neonarcade/screenshots/battleship.png', modes: ['1p','ai','online'] },
+      { slug: 'neon-snake', name: 'NEON SNAKE', desc: 'Classic snake with risk vs reward. Gold food near walls is worth 5x.', img: 'neonarcade/screenshots/neon-snake.png', modes: ['1p'] },
+      { slug: 'impostor-pixel', name: 'IMPOSTOR PIXEL', desc: 'Spot the different tile. Each round the difference shrinks.', img: 'neonarcade/screenshots/impostor-pixel.png', modes: ['1p'] },
+      { slug: 'catalyst', name: 'CATALYST', desc: 'One touch. Infinite chaos. Chain reactions with exploders and attractors.', img: 'neonarcade/screenshots/catalyst.png', modes: ['1p'] },
+      { slug: 'pong-both-sides', name: 'PONG: BOTH SIDES', desc: 'Control BOTH paddles. How long before your brain short-circuits?', img: 'neonarcade/screenshots/pong-both-sides.png', modes: ['1p'] },
+      { slug: 'afterglow', name: 'AFTERGLOW', desc: 'Navigate a dark maze. Your trail glows — but touch it and you die.', img: 'neonarcade/screenshots/afterglow.png', modes: ['1p'] },
+      { slug: 'flappy-rewind', name: 'FLAPPY REWIND', desc: 'Fly forward, then rewind with inverted gravity through the same pipes.', img: 'neonarcade/screenshots/flappy-rewind.png', modes: ['1p'] },
+      { slug: 'palette', name: 'PALETTE', desc: 'Test your color perception. Match hues precisely. Daily challenge.', img: 'neonarcade/screenshots/palette.png', modes: ['1p'] },
+      { slug: 'pacman-amnesia', name: 'PAC-MAN AMNESIA', desc: 'Pac-Man in a maze you can barely see. Fog of war meets arcade.', img: 'neonarcade/screenshots/pacman-amnesia.png', modes: ['1p'] },
+      { slug: 'territory', name: 'TERRITORY', desc: 'Claim grid squares. Surround enemies. Daily strategy puzzle.', img: 'neonarcade/screenshots/territory.png', modes: ['1p'] },
+      { slug: 'tetris-betrayal', name: 'TETRIS BETRAYAL', desc: 'Play Tetris badly on purpose. Stack high, survive long.', img: 'neonarcade/screenshots/tetris-betrayal.png', modes: ['1p'] },
+      { slug: 'signal', name: 'SIGNAL', desc: 'Daily cipher puzzle. Decode the hidden message.', img: 'neonarcade/screenshots/signal.png', modes: ['1p'] },
+      { slug: 'faultline', name: 'FAULTLINE', desc: 'Find the shifted pixel row in distorted images.', img: 'neonarcade/screenshots/faultline.png', modes: ['1p'] },
+      { slug: 'doodle-drop', name: 'DOODLE DROP', desc: 'Draw platforms while falling. Quick reflexes, creative solutions.', img: 'neonarcade/screenshots/doodle-drop.png', modes: ['1p'] },
+      { slug: 'priorself', name: 'PRIORSELF', desc: 'Ghost-cooperation puzzle. Work with your past selves.', img: 'neonarcade/screenshots/priorself.png', modes: ['1p'] },
+      { slug: 'burndown', name: 'BURNDOWN', desc: 'Speedrun a tower of micro-tasks. Race the clock.', img: 'neonarcade/screenshots/burndown.png', modes: ['1p'] },
+      { slug: 'mine-finder', name: 'MINE FINDER', desc: 'Reverse minesweeper. Place mines to fool the AI.', img: 'neonarcade/screenshots/mine-finder.png', modes: ['1p','ai'] },
+      { slug: 'wordchain-duel', name: 'WORDCHAIN DUEL', desc: 'Async 1v1 word chain challenge.', img: 'neonarcade/screenshots/wordchain-duel.png', modes: ['1p','online'] },
+      { slug: 'gridlock', name: 'GRIDLOCK', desc: 'Sliding puzzle speedrun. Race your ghost.', img: 'neonarcade/screenshots/gridlock.png', modes: ['1p'] },
+      { slug: 'truecolor', name: 'TRUECOLOR', desc: 'Advanced color perception test. How precise are your eyes?', img: 'neonarcade/screenshots/truecolor.png', modes: ['1p'] },
+      { slug: 'breakout-architect', name: 'BREAKOUT ARCHITECT', desc: 'Design breakout levels, challenge friends.', img: 'neonarcade/screenshots/breakout-architect.png', modes: ['1p','online'] },
+      { slug: 'split-second', name: 'SPLIT SECOND', desc: 'Split-second reaction challenges.', img: 'neonarcade/screenshots/split-second.png', modes: ['1p'] },
+      { slug: 'wordchain', name: 'WORDCHAIN', desc: 'Word chain puzzle. Each word starts with the last letter.', img: 'neonarcade/screenshots/wordchain.png', modes: ['1p'] },
+      { slug: 'curfew', name: 'CURFEW', desc: 'Stealth puzzle. Get home before curfew.', img: 'neonarcade/screenshots/curfew.png', modes: ['1p'] },
+      { slug: 'chromaself', name: 'CHROMASELF', desc: 'Personality quiz reveals your unique color palette.', img: 'neonarcade/screenshots/chromaself.png', modes: ['1p'] },
+      { slug: 'chimp', name: 'CHIMP TEST', desc: 'Are you smarter than a chimpanzee? Numbers flash, then hide. Tap in order.', img: 'neonarcade/screenshots/chimp.png', modes: ['1p'] },
+      { slug: 'pour', name: 'POUR', desc: 'Water sorting puzzle. Pour between tubes until each holds one color.', img: 'neonarcade/screenshots/pour.png', modes: ['1p'] },
+      { slug: 'bloomfield', name: 'BLOOMFIELD', desc: 'Plant neon seeds and grow a procedural glowing garden. Every garden is unique.', img: 'neonarcade/screenshots/bloomfield.png', modes: ['1p'] },
+      { slug: 'typeblitz', name: 'TYPEBLITZ', desc: 'Speed typing challenge. How fast can you type? WPM test with accuracy tracking.', img: 'neonarcade/screenshots/typeblitz.png', modes: ['1p'] },
+      { slug: 'veto', name: 'VETO', desc: '2-player bracket challenge. Eliminate 16 items to a winner, compare picks. Soulmates or opposites?', img: 'neonarcade/screenshots/veto.png', modes: ['1p','local','online'] },
+      { slug: 'mimic', name: 'MIMIC', desc: 'Answer 10 questions, challenge a friend to predict your answers. How well do they know you?', img: 'neonarcade/screenshots/mimic.png', modes: ['1p','local','online'] },
     ],
     grind: [
-      { slug: 'mathblitz', name: 'MATHBLITZ', desc: 'Mental math at speed. 30 levels from 3+0 to chained operations.', img: 'neongrind/screenshots/mathblitz.png', path: 'neongrind/' },
-      { slug: 'reflex-chain', name: 'REFLEX CHAIN', desc: 'Tap targets before they vanish. 25 levels of escalating reflexes.', img: 'neongrind/screenshots/reflex-chain.png', path: 'neongrind/' },
-      { slug: 'neurosort', name: 'NEUROSORT', desc: 'Sort falling items by color, shape, then both. Rules invert.', img: 'neongrind/screenshots/neurosort.png', path: 'neongrind/' },
-      { slug: 'clickspeed', name: 'CLICKSPEED', desc: 'How fast can you click? CPS test with standard, precision, and burst modes.', img: 'neongrind/screenshots/clickspeed.png', path: 'neongrind/' },
-      { slug: 'colorname', name: 'COLORNAME', desc: 'Name the color, not the word. Stroop effect speed challenge.', img: 'neongrind/screenshots/colorname.png', path: 'neongrind/' },
-      { slug: 'numbersense', name: 'NUMBERSENSE', desc: 'Estimate quantities fast. How good is your number intuition?', img: 'neongrind/screenshots/numbersense.png', path: 'neongrind/' },
-      { slug: 'gridmatch', name: 'GRIDMATCH', desc: 'Match the grid pattern from memory. Visual recall speed test.', img: 'neongrind/screenshots/gridmatch.png', path: 'neongrind/' },
-      { slug: 'sequencer', name: 'SEQUENCER', desc: 'Simon Says with neon pads. Watch, repeat, survive. How far can your memory reach?', img: 'neongrind/screenshots/sequencer.png', path: 'neongrind/' },
+      { slug: 'mathblitz', name: 'MATHBLITZ', desc: 'Mental math at speed. 30 levels from 3+0 to chained operations.', img: 'neongrind/screenshots/mathblitz.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'reflex-chain', name: 'REFLEX CHAIN', desc: 'Tap targets before they vanish. 25 levels of escalating reflexes.', img: 'neongrind/screenshots/reflex-chain.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'neurosort', name: 'NEUROSORT', desc: 'Sort falling items by color, shape, then both. Rules invert.', img: 'neongrind/screenshots/neurosort.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'clickspeed', name: 'CLICKSPEED', desc: 'How fast can you click? CPS test with standard, precision, and burst modes.', img: 'neongrind/screenshots/clickspeed.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'colorname', name: 'COLORNAME', desc: 'Name the color, not the word. Stroop effect speed challenge.', img: 'neongrind/screenshots/colorname.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'numbersense', name: 'NUMBERSENSE', desc: 'Estimate quantities fast. How good is your number intuition?', img: 'neongrind/screenshots/numbersense.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'gridmatch', name: 'GRIDMATCH', desc: 'Match the grid pattern from memory. Visual recall speed test.', img: 'neongrind/screenshots/gridmatch.png', path: 'neongrind/', modes: ['1p'] },
+      { slug: 'sequencer', name: 'SEQUENCER', desc: 'Simon Says with neon pads. Watch, repeat, survive. How far can your memory reach?', img: 'neongrind/screenshots/sequencer.png', path: 'neongrind/', modes: ['1p'] },
     ],
     classic: [
-      { slug: 'invaders', name: 'NEON INVADERS', desc: 'Classic Space Invaders with glowing neon aliens and mystery UFOs.', img: 'neonclassic/screenshots/invaders.png', path: 'neonclassic/' },
-      { slug: 'breakout', name: 'NEON BREAKOUT', desc: 'Smash neon bricks with combos and power-ups. Multi-ball madness.', img: 'neonclassic/screenshots/breakout.png', path: 'neonclassic/' },
-      { slug: 'tetris', name: 'NEON TETRIS', desc: 'The iconic block-stacker with ghost pieces, hold, and sprint mode.', img: 'neonclassic/screenshots/tetris.png', path: 'neonclassic/' },
-      { slug: '2048', name: 'NEON 2048', desc: 'Slide tiles, merge numbers, chase 2048. Each merge glows brighter.', img: 'neonclassic/screenshots/2048.png', path: 'neonclassic/' },
-      { slug: 'pairs', name: 'NEON PAIRS', desc: 'Flip, match, remember. Memory card game with neon symbols.', img: 'neonclassic/screenshots/pairs.png', path: 'neonclassic/' },
-      { slug: 'asteroids', name: 'NEON ASTEROIDS', desc: 'Vector-style space combat. Drift, shoot, survive.', img: 'neonclassic/screenshots/asteroids.png', path: 'neonclassic/' },
-      { slug: 'frogger', name: 'NEON FROGGER', desc: 'Cross the neon highway. Ride glowing logs. Dodge everything.', img: 'neonclassic/screenshots/frogger.png', path: 'neonclassic/' },
-      { slug: 'tictactoe', name: 'TIC TAC TOE', desc: 'The classic in neon. 3x3 or 4x4, VS AI or VS Friend. Animated marks and glowing win lines.', img: 'neonclassic/screenshots/tictactoe.png', path: 'neonclassic/' },
+      { slug: 'invaders', name: 'NEON INVADERS', desc: 'Classic Space Invaders with glowing neon aliens and mystery UFOs.', img: 'neonclassic/screenshots/invaders.png', path: 'neonclassic/', modes: ['1p'] },
+      { slug: 'breakout', name: 'NEON BREAKOUT', desc: 'Smash neon bricks with combos and power-ups. Multi-ball madness.', img: 'neonclassic/screenshots/breakout.png', path: 'neonclassic/', modes: ['1p'] },
+      { slug: 'tetris', name: 'NEON TETRIS', desc: 'The iconic block-stacker with ghost pieces, hold, and sprint mode.', img: 'neonclassic/screenshots/tetris.png', path: 'neonclassic/', modes: ['1p'] },
+      { slug: '2048', name: 'NEON 2048', desc: 'Slide tiles, merge numbers, chase 2048. Each merge glows brighter.', img: 'neonclassic/screenshots/2048.png', path: 'neonclassic/', modes: ['1p'] },
+      { slug: 'pairs', name: 'NEON PAIRS', desc: 'Flip, match, remember. Memory card game with neon symbols. Solo or 2-player!', img: 'neonclassic/screenshots/pairs.png', path: 'neonclassic/', modes: ['1p','local'] },
+      { slug: 'asteroids', name: 'NEON ASTEROIDS', desc: 'Vector-style space combat. Drift, shoot, survive.', img: 'neonclassic/screenshots/asteroids.png', path: 'neonclassic/', modes: ['1p'] },
+      { slug: 'frogger', name: 'NEON FROGGER', desc: 'Cross the neon highway. Ride glowing logs. Dodge everything.', img: 'neonclassic/screenshots/frogger.png', path: 'neonclassic/', modes: ['1p'] },
+      { slug: 'tictactoe', name: 'TIC TAC TOE', desc: 'The classic in neon. 3x3 or 4x4, VS AI or VS Friend. Animated marks and glowing win lines.', img: 'neonclassic/screenshots/tictactoe.png', path: 'neonclassic/', modes: ['1p','ai','local'] },
     ],
     mind: [
-      { slug: 'minisudoku', name: 'MINISUDOKU', desc: '6x6 logic puzzle. 4 difficulties, daily puzzles, streak tracking.', img: 'neonmind/screenshots/minisudoku.png', path: 'neonmind/' },
-      { slug: 'sudoku', name: 'SUDOKU', desc: 'The classic 9x9, beautifully reimagined. Four difficulty levels.', img: 'neonmind/screenshots/sudoku.png', path: 'neonmind/' },
-      { slug: 'queens', name: 'QUEENS', desc: 'Place queens on colored grid. One per region, row, column. No touching.', img: 'neonmind/screenshots/queens.png', path: 'neonmind/' },
-      { slug: 'minesweeper', name: 'MINESWEEPER', desc: 'Six progressive sizes. Cascade reveals. First-click safety.', img: 'neonmind/screenshots/minesweeper.png', path: 'neonmind/' },
-      { slug: 'nonogram', name: 'NONOGRAM', desc: 'Reveal pixel art from row and column clues. Logic meets creativity.', img: 'neonmind/screenshots/nonogram.png', path: 'neonmind/' },
-      { slug: 'kakuro', name: 'KAKURO', desc: 'Cross-sum puzzles. Fill digits 1-9, no repeats. Sudoku meets crosswords.', img: 'neonmind/screenshots/kakuro.png', path: 'neonmind/' },
-      { slug: 'bridges', name: 'BRIDGES', desc: 'Connect islands with bridges. Match the numbers. No crossings.', img: 'neonmind/screenshots/bridges.png', path: 'neonmind/' },
-      { slug: 'nurikabe', name: 'NURIKABE', desc: 'Shade cells around numbered islands. Connected walls, no 2x2 blocks.', img: 'neonmind/screenshots/nurikabe.png', path: 'neonmind/' },
-      { slug: 'tango', name: 'TANGO', desc: 'Fill the grid with suns and moons. No three in a row. Pure logic.', img: 'neonmind/screenshots/tango.png', path: 'neonmind/' },
-      { slug: 'lightup', name: 'LIGHTUP', desc: 'Place bulbs to illuminate every cell. No two bulbs can see each other.', img: 'neonmind/screenshots/lightup.png', path: 'neonmind/' },
-      { slug: 'tents', name: 'TENTS', desc: 'Every tree needs a tent. No touching. Row and column counts guide you.', img: 'neonmind/screenshots/tents.png', path: 'neonmind/' },
-      { slug: 'skyscrapers', name: 'SKYSCRAPERS', desc: 'Fill heights so edge clues match visible buildings. 3D logic in 2D.', img: 'neonmind/screenshots/skyscrapers.png', path: 'neonmind/' },
-      { slug: 'connections', name: 'CONNECTIONS', desc: 'Find 4 groups of 4 words sharing a hidden connection. Daily puzzles, 4 difficulty tiers.', img: 'neonmind/screenshots/connections.png', path: 'neonmind/' },
-      { slug: 'hitori', name: 'HITORI', desc: 'Shade cells to eliminate duplicates. Shaded can\'t touch. Unshaded must connect.', img: 'neonmind/screenshots/hitori.png', path: 'neonmind/' },
-      { slug: 'kenken', name: 'KENKEN', desc: 'Math meets logic. Latin square with arithmetic cages. +, -, ×, ÷.', img: 'neonmind/screenshots/kenken.png', path: 'neonmind/' },
+      { slug: 'minisudoku', name: 'MINISUDOKU', desc: '6x6 logic puzzle. 4 difficulties, daily puzzles, streak tracking.', img: 'neonmind/screenshots/minisudoku.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'sudoku', name: 'SUDOKU', desc: 'The classic 9x9, beautifully reimagined. Four difficulty levels.', img: 'neonmind/screenshots/sudoku.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'queens', name: 'QUEENS', desc: 'Place queens on colored grid. One per region, row, column. No touching.', img: 'neonmind/screenshots/queens.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'minesweeper', name: 'MINESWEEPER', desc: 'Six progressive sizes. Cascade reveals. First-click safety. Challenge friends!', img: 'neonmind/screenshots/minesweeper.png', path: 'neonmind/', modes: ['1p','online'] },
+      { slug: 'nonogram', name: 'NONOGRAM', desc: 'Reveal pixel art from row and column clues. Logic meets creativity.', img: 'neonmind/screenshots/nonogram.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'kakuro', name: 'KAKURO', desc: 'Cross-sum puzzles. Fill digits 1-9, no repeats. Sudoku meets crosswords.', img: 'neonmind/screenshots/kakuro.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'bridges', name: 'BRIDGES', desc: 'Connect islands with bridges. Match the numbers. No crossings.', img: 'neonmind/screenshots/bridges.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'nurikabe', name: 'NURIKABE', desc: 'Shade cells around numbered islands. Connected walls, no 2x2 blocks.', img: 'neonmind/screenshots/nurikabe.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'tango', name: 'TANGO', desc: 'Fill the grid with suns and moons. No three in a row. Pure logic.', img: 'neonmind/screenshots/tango.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'lightup', name: 'LIGHTUP', desc: 'Place bulbs to illuminate every cell. No two bulbs can see each other.', img: 'neonmind/screenshots/lightup.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'tents', name: 'TENTS', desc: 'Every tree needs a tent. No touching. Row and column counts guide you.', img: 'neonmind/screenshots/tents.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'skyscrapers', name: 'SKYSCRAPERS', desc: 'Fill heights so edge clues match visible buildings. 3D logic in 2D.', img: 'neonmind/screenshots/skyscrapers.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'connections', name: 'CONNECTIONS', desc: 'Find 4 groups of 4 words sharing a hidden connection. Daily puzzles, 4 difficulty tiers. Challenge friends!', img: 'neonmind/screenshots/connections.png', path: 'neonmind/', modes: ['1p','online'] },
+      { slug: 'hitori', name: 'HITORI', desc: 'Shade cells to eliminate duplicates. Shaded can\'t touch. Unshaded must connect.', img: 'neonmind/screenshots/hitori.png', path: 'neonmind/', modes: ['1p'] },
+      { slug: 'kenken', name: 'KENKEN', desc: 'Math meets logic. Latin square with arithmetic cages. +, -, ×, ÷.', img: 'neonmind/screenshots/kenken.png', path: 'neonmind/', modes: ['1p'] },
     ],
   };
 
@@ -712,6 +740,20 @@
     desc.className = 'card-desc';
     desc.textContent = game.desc;
     body.appendChild(desc);
+    // Mode tags
+    if (game.modes && game.modes.length > 1) {
+      var modeLabels = { '1p': 'SOLO', 'ai': 'VS AI', 'local': '2P LOCAL', 'online': 'ONLINE' };
+      var tags = document.createElement('div');
+      tags.className = 'mode-tags';
+      game.modes.forEach(function(m) {
+        var tag = document.createElement('span');
+        tag.className = 'mode-tag tag-' + m;
+        tag.textContent = modeLabels[m] || m;
+        tags.appendChild(tag);
+      });
+      body.appendChild(tags);
+    }
+
     var play = document.createElement('div');
     play.className = 'card-play';
     play.textContent = 'PLAY NOW ';

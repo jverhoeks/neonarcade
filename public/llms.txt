@@ -96,3 +96,4 @@ NEON ARCADE is a collection of 62 free HTML5 browser games organized in four cat
 
 - [Blog](https://neonarcade.net/blog.html) — Behind-the-scenes development articles
 - [Updates](https://neonarcade.net/updates.html) — Changelog and release notes
+- [Multiplayer](https://neonarcade.net/multiplayer.html) — All 10 multiplayer games: VS AI, 2P Local, and Online challenge links

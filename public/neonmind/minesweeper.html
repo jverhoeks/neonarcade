@@ -456,6 +456,42 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 .btn.share:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
 .btn.next-diff { border-color: var(--neon-gold); color: var(--neon-gold); background: rgba(255,215,0,0.06); }
 .btn.next-diff:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+.btn.challenge { border-color: var(--neon-gold); color: var(--neon-gold); background: rgba(255,215,0,0.06); }
+.btn.challenge:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+
+/* ---- CHALLENGE MODE ---- */
+.challenge-badge {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 11px; letter-spacing: 3px;
+  padding: 6px 20px; z-index: 200;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-top: none; border-radius: 0 0 6px 6px;
+  color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  box-shadow: 0 0 20px rgba(255,215,0,0.15);
+  display: none;
+}
+.challenge-badge.visible { display: block; }
+
+.challenge-toast {
+  position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%) translateY(80px);
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 13px; letter-spacing: 3px;
+  padding: 12px 28px; z-index: 300;
+  background: rgba(10,10,18,0.95);
+  border: 1px solid rgba(255,215,0,0.4);
+  border-radius: 4px;
+  color: var(--neon-gold);
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+  box-shadow: 0 0 20px rgba(255,215,0,0.2);
+  opacity: 0; transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  pointer-events: none;
+}
+.challenge-toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
 
 /* ---- LEADERBOARD ---- */
 .leaderboard {
@@ -493,6 +529,8 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 <body>
 
 <canvas id="particles"></canvas>
+<div class="challenge-badge" id="challenge-badge">CHALLENGE MODE</div>
+<div class="challenge-toast" id="challenge-toast">LINK COPIED!</div>
 
 <!-- START SCREEN -->
 <div id="start-screen" class="screen active">
@@ -542,6 +580,7 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     <div class="leaderboard" id="win-lb"></div>
     <div class="overlay-btns">
       <button class="btn share" id="share-btn">SHARE</button>
+      <button class="btn challenge" id="challenge-btn">CHALLENGE</button>
       <button class="btn next-diff" id="next-btn">NEXT</button>
       <button class="btn secondary" id="win-menu-btn">MENU</button>
     </div>
@@ -552,6 +591,33 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 <script>
 (() => {
   'use strict';
+
+  // ============ SEEDED PRNG ============
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // ============ CHALLENGE STATE ============
+  var challengeMode = false;
+  var challengeSeed = 0;
+  var challengeSizeIndex = -1;
+
+  function parseChallengeHash() {
+    var hash = window.location.hash;
+    if (!hash || hash.indexOf('#c=') !== 0) return null;
+    var parts = hash.substring(3).split('-');
+    if (parts.length !== 2) return null;
+    var seed = parseInt(parts[0], 10);
+    var sizeIdx = parseInt(parts[1], 10);
+    if (isNaN(seed) || isNaN(sizeIdx)) return null;
+    if (sizeIdx < 0 || sizeIdx >= 6) return null; // 6 difficulties
+    return { seed: seed, sizeIndex: sizeIdx };
+  }
 
   // ============ NEON INIT ============
   var neonFormatScore = function(s) {
@@ -619,6 +685,9 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   const nextBtn        = document.getElementById('next-btn');
   const winMenuBtn     = document.getElementById('win-menu-btn');
   const zoomIndicator  = document.getElementById('zoom-indicator');
+  const challengeBtn   = document.getElementById('challenge-btn');
+  const challengeBadge = document.getElementById('challenge-badge');
+  const challengeToast = document.getElementById('challenge-toast');
   const particleCanvas = document.getElementById('particles');
   const pCtx           = particleCanvas.getContext('2d');
 
@@ -839,6 +908,34 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   function renderStartScreen() {
     while (diffListEl.firstChild) diffListEl.removeChild(diffListEl.firstChild);
 
+    // If in challenge mode, show a single locked-in difficulty button
+    if (challengeMode) {
+      var cDiff = DIFFICULTIES[challengeSizeIndex];
+      var cBtn = document.createElement('button');
+      cBtn.className = 'diff-btn';
+      cBtn.style.borderColor = 'rgba(255,215,0,0.3)';
+      cBtn.style.background = 'rgba(255,215,0,0.06)';
+
+      var cNameSpan = document.createElement('span');
+      cNameSpan.className = 'diff-name';
+      cNameSpan.style.color = '#ffd700';
+      cNameSpan.textContent = cDiff.name;
+
+      var cInfoSpan = document.createElement('span');
+      cInfoSpan.className = 'diff-info';
+      cInfoSpan.textContent = cDiff.cols + 'x' + cDiff.rows + ' \u2022 ' + cDiff.mines + ' mines \u2022 CHALLENGE';
+
+      cBtn.appendChild(cNameSpan);
+      cBtn.appendChild(cInfoSpan);
+
+      cBtn.addEventListener('click', function() {
+        initAudio();
+        startGame(challengeSizeIndex, challengeSeed);
+      });
+
+      diffListEl.appendChild(cBtn);
+    }
+
     // Global stats
     globalStatsEl.textContent = '';
     var t1 = document.createTextNode('Played: ');
@@ -854,56 +951,60 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     globalStatsEl.appendChild(t3); globalStatsEl.appendChild(s3);
     globalStatsEl.appendChild(t4); globalStatsEl.appendChild(s4);
 
-    // Difficulty list
+    // Difficulty list (normal mode shows all, challenge mode already added its button above)
     var lastUnlockedIdx = 0;
-    DIFFICULTIES.forEach(function(d, idx) {
-      var unlocked = isUnlocked(idx);
-      var s = stats.perDifficulty[d.key];
-      var btn = document.createElement('button');
-      btn.className = 'diff-btn' + (unlocked ? '' : ' locked');
+    if (!challengeMode) {
+      DIFFICULTIES.forEach(function(d, idx) {
+        var unlocked = isUnlocked(idx);
+        var s = stats.perDifficulty[d.key];
+        var btn = document.createElement('button');
+        btn.className = 'diff-btn' + (unlocked ? '' : ' locked');
 
-      var nameSpan = document.createElement('span');
-      nameSpan.className = 'diff-name';
-      nameSpan.textContent = d.name;
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'diff-name';
+        nameSpan.textContent = d.name;
 
-      var infoSpan = document.createElement('span');
-      infoSpan.className = 'diff-info';
-      infoSpan.textContent = d.cols + 'x' + d.rows + ' \u2022 ' + d.mines + ' mines';
+        var infoSpan = document.createElement('span');
+        infoSpan.className = 'diff-info';
+        infoSpan.textContent = d.cols + 'x' + d.rows + ' \u2022 ' + d.mines + ' mines';
 
-      btn.appendChild(nameSpan);
-      btn.appendChild(infoSpan);
+        btn.appendChild(nameSpan);
+        btn.appendChild(infoSpan);
 
-      if (unlocked) {
-        lastUnlockedIdx = idx;
-        var starsSpan = document.createElement('span');
-        starsSpan.className = 'diff-stars';
-        if (s.bestTime !== null) {
-          var starStr = '';
-          for (var i = 0; i < 3; i++) starStr += (i < s.stars ? '\u2605' : '\u2606');
-          starsSpan.textContent = starStr;
+        if (unlocked) {
+          lastUnlockedIdx = idx;
+          var starsSpan = document.createElement('span');
+          starsSpan.className = 'diff-stars';
+          if (s.bestTime !== null) {
+            var starStr = '';
+            for (var i = 0; i < 3; i++) starStr += (i < s.stars ? '\u2605' : '\u2606');
+            starsSpan.textContent = starStr;
+          }
+          btn.appendChild(starsSpan);
+
+          var timeSpan = document.createElement('span');
+          timeSpan.className = 'diff-time';
+          if (s.bestTime !== null) timeSpan.textContent = formatTime(s.bestTime);
+          btn.appendChild(timeSpan);
+
+          btn.addEventListener('click', (function(i) {
+            return function() {
+              initAudio();
+              startGame(i);
+            };
+          })(idx));
+        } else {
+          var lockSpan = document.createElement('span');
+          lockSpan.className = 'diff-lock';
+          lockSpan.textContent = 'LOCKED';
+          btn.appendChild(lockSpan);
         }
-        btn.appendChild(starsSpan);
 
-        var timeSpan = document.createElement('span');
-        timeSpan.className = 'diff-time';
-        if (s.bestTime !== null) timeSpan.textContent = formatTime(s.bestTime);
-        btn.appendChild(timeSpan);
-
-        btn.addEventListener('click', (function(i) {
-          return function() {
-            initAudio();
-            startGame(i);
-          };
-        })(idx));
-      } else {
-        var lockSpan = document.createElement('span');
-        lockSpan.className = 'diff-lock';
-        lockSpan.textContent = 'LOCKED';
-        btn.appendChild(lockSpan);
-      }
-
-      diffListEl.appendChild(btn);
-    });
+        diffListEl.appendChild(btn);
+      });
+    } else {
+      lastUnlockedIdx = challengeSizeIndex;
+    }
 
     // Controls hint
     var isMobile = 'ontouchstart' in window;
@@ -988,8 +1089,78 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     return { grid: g, mines: mineSet };
   }
 
+  function generateBoardSeeded(rows, cols, mines, seed, safeR, safeC) {
+    var rng = mulberry32(seed);
+    var g = [];
+    var mineSet = new Set();
+
+    for (var r = 0; r < rows; r++) {
+      g[r] = [];
+      for (var c = 0; c < cols; c++) g[r][c] = 0;
+    }
+
+    // Build list of all cells
+    var allCells = [];
+    for (var r2 = 0; r2 < rows; r2++) {
+      for (var c2 = 0; c2 < cols; c2++) {
+        allCells.push({ r: r2, c: c2 });
+      }
+    }
+
+    // Fisher-Yates shuffle with seeded RNG
+    for (var i = allCells.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = allCells[i];
+      allCells[i] = allCells[j];
+      allCells[j] = tmp;
+    }
+
+    // safe zone: clicked cell + all 8 neighbors
+    var safeSet = new Set();
+    if (safeR !== undefined && safeC !== undefined) {
+      for (var dr = -1; dr <= 1; dr++) {
+        for (var dc = -1; dc <= 1; dc++) {
+          var sr = safeR + dr, sc = safeC + dc;
+          if (sr >= 0 && sr < rows && sc >= 0 && sc < cols) {
+            safeSet.add(sr + ',' + sc);
+          }
+        }
+      }
+    }
+
+    // Place mines from shuffled list, skipping safe zone
+    var placed = 0;
+    for (var k = 0; k < allCells.length && placed < mines; k++) {
+      var cell = allCells[k];
+      var key = cell.r + ',' + cell.c;
+      if (!safeSet.has(key)) {
+        mineSet.add(key);
+        g[cell.r][cell.c] = -1;
+        placed++;
+      }
+    }
+
+    // calculate numbers
+    for (var r3 = 0; r3 < rows; r3++) {
+      for (var c3 = 0; c3 < cols; c3++) {
+        if (g[r3][c3] === -1) continue;
+        var count = 0;
+        for (var dr2 = -1; dr2 <= 1; dr2++) {
+          for (var dc2 = -1; dc2 <= 1; dc2++) {
+            if (dr2 === 0 && dc2 === 0) continue;
+            var nr = r3 + dr2, nc = c3 + dc2;
+            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && g[nr][nc] === -1) count++;
+          }
+        }
+        g[r3][c3] = count;
+      }
+    }
+
+    return { grid: g, mines: mineSet };
+  }
+
   // ============ START GAME ============
-  function startGame(idx) {
+  function startGame(idx, optSeed) {
     diffIndex = idx;
     diff = DIFFICULTIES[idx];
     neonInitForDifficulty(diff.key);
@@ -1002,6 +1173,16 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     elapsed = 0;
     zoom = 1; panX = 0; panY = 0;
     isPinching = false;
+
+    // Challenge seed: use provided seed or generate new one
+    if (optSeed !== undefined) {
+      challengeSeed = optSeed;
+    } else {
+      challengeSeed = Math.floor(Math.random() * 2147483647);
+    }
+
+    // Show/hide challenge badge
+    challengeBadge.classList.toggle('visible', challengeMode);
 
     flagBtn.classList.remove('flag-active');
     flagBtn.textContent = 'FLAG';
@@ -1024,7 +1205,9 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     }
 
     updateMineCounter();
-    diffLabelEl.textContent = diff.name;
+    diffLabelEl.textContent = challengeMode ? diff.name + ' \u2022 CHALLENGE' : diff.name;
+    if (challengeMode) diffLabelEl.style.color = '#ffd700';
+    else diffLabelEl.style.color = '';
     timerEl.textContent = '00:00';
     if (timerInterval) clearInterval(timerInterval);
 
@@ -1188,7 +1371,8 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
     if (firstClick) {
       firstClick = false;
-      var result = generateBoard(diff.rows, diff.cols, diff.mines, r, c);
+      // Always use seeded generation so challenge links reproduce the same board
+      var result = generateBoardSeeded(diff.rows, diff.cols, diff.mines, challengeSeed, r, c);
       grid = result.grid;
       startTimer();
     }
@@ -1716,34 +1900,84 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
   newGameBtn.addEventListener('click', function() {
     clearCurrentGame();
-    startGame(diffIndex);
+    if (challengeMode) {
+      startGame(diffIndex, challengeSeed);
+    } else {
+      startGame(diffIndex);
+    }
   });
 
   menuBtn.addEventListener('click', function() {
     if (timerInterval) clearInterval(timerInterval);
-    saveCurrentGame();
+    if (!challengeMode) saveCurrentGame();
     gameState = 'idle';
+    challengeBadge.classList.remove('visible');
     renderStartScreen();
     showScreen('start-screen');
   });
 
-  retryBtn.addEventListener('click', function() { startGame(diffIndex); });
+  retryBtn.addEventListener('click', function() {
+    if (challengeMode) {
+      startGame(diffIndex, challengeSeed);
+    } else {
+      startGame(diffIndex);
+    }
+  });
 
   goMenuBtn.addEventListener('click', function() {
+    challengeBadge.classList.remove('visible');
     renderStartScreen();
     showScreen('start-screen');
   });
 
   shareBtn.addEventListener('click', shareResult);
 
+  challengeBtn.addEventListener('click', function() {
+    var url = window.location.origin + window.location.pathname + '#c=' + challengeSeed + '-' + diffIndex;
+    var shareText = '\uD83D\uDCA3 MINESWEEPER CHALLENGE [' + diff.name + ']\n' +
+      'I cleared ' + diff.cols + 'x' + diff.rows + ' with ' + diff.mines + ' mines in ' + formatTime(elapsed) + '.\n' +
+      'Can you beat my time?\n' + url;
+
+    if (navigator.share) {
+      navigator.share({ text: shareText, url: url }).catch(function() {
+        copyChallengeLink(url);
+      });
+    } else {
+      copyChallengeLink(url);
+    }
+  });
+
+  function copyChallengeLink(url) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function() {
+        showChallengeToast('LINK COPIED!');
+      }).catch(function() {
+        showChallengeToast('LINK COPIED!');
+      });
+    } else {
+      showChallengeToast('LINK COPIED!');
+    }
+  }
+
+  function showChallengeToast(msg) {
+    challengeToast.textContent = msg;
+    challengeToast.classList.add('show');
+    setTimeout(function() {
+      challengeToast.classList.remove('show');
+    }, 2000);
+  }
+
   nextBtn.addEventListener('click', function() {
     if (diffIndex < DIFFICULTIES.length - 1) {
+      challengeMode = false;
+      challengeBadge.classList.remove('visible');
       initAudio();
       startGame(diffIndex + 1);
     }
   });
 
   winMenuBtn.addEventListener('click', function() {
+    challengeBadge.classList.remove('visible');
     renderStartScreen();
     showScreen('start-screen');
   });
@@ -1758,8 +1992,9 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     if (e.key === 'Escape') {
       if (gameState === 'playing' || gameState === 'won' || gameState === 'lost') {
         if (timerInterval) clearInterval(timerInterval);
-        saveCurrentGame();
+        if (!challengeMode) saveCurrentGame();
         gameState = 'idle';
+        challengeBadge.classList.remove('visible');
         renderStartScreen();
         showScreen('start-screen');
       }
@@ -1767,14 +2002,26 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   });
 
   // ============ INIT ============
-  // Check for saved in-progress game
-  var saved = loadCurrentGame();
-  if (saved) {
+  // Check for challenge link first
+  var challengeParams = parseChallengeHash();
+  if (challengeParams) {
+    challengeMode = true;
+    challengeSeed = challengeParams.seed;
+    challengeSizeIndex = challengeParams.sizeIndex;
+    // Clear hash to keep URL clean after parsing
+    // (don't clear — keep it so the user can re-share)
     initAudio();
-    restoreGame(saved);
+    startGame(challengeSizeIndex, challengeSeed);
   } else {
-    renderStartScreen();
-    showScreen('start-screen');
+    // Check for saved in-progress game
+    var saved = loadCurrentGame();
+    if (saved) {
+      initAudio();
+      restoreGame(saved);
+    } else {
+      renderStartScreen();
+      showScreen('start-screen');
+    }
   }
 
 })();

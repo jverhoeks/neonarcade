@@ -388,6 +388,86 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
 .leaderboard { width: 100%; max-width: 340px; margin: 8px 0; }
 
+/* ---- 2P MODE ---- */
+.vs-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-pink); background: rgba(255,45,123,0.06);
+  color: var(--neon-pink); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+  margin: 0 0 12px;
+}
+.vs-btn:hover { background: rgba(255,45,123,0.15); box-shadow: 0 0 20px rgba(255,45,123,0.2); transform: scale(1.04); }
+.vs-btn:active { transform: scale(0.97); }
+
+.top-bar-2p {
+  display: none; align-items: center; justify-content: space-between;
+  padding: 8px 16px; width: 100%;
+  font-family: 'Orbitron', monospace; font-size: 13px;
+  background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05);
+  min-height: 44px; z-index: 10;
+}
+.top-bar-2p.active { display: flex; }
+
+.p-score {
+  min-width: 80px; letter-spacing: 1px; transition: all 0.3s;
+  padding: 4px 8px; border-radius: 3px;
+}
+.p-score.p1 { text-align: left; color: var(--neon-cyan); }
+.p-score.p2 { text-align: right; color: var(--neon-pink); }
+.p-score.active-turn {
+  text-shadow: 0 0 10px currentColor, 0 0 30px currentColor;
+  background: rgba(255,255,255,0.05);
+}
+
+.turn-label {
+  font-size: 11px; letter-spacing: 2px; color: var(--text-mid);
+  text-align: center; white-space: nowrap;
+}
+
+.turn-overlay {
+  display: none; position: absolute; inset: 0;
+  background: rgba(10,10,18,0.85);
+  flex-direction: column; align-items: center; justify-content: center;
+  z-index: 40; gap: 6px;
+  animation: fadeIn 0.2s ease-out;
+}
+.turn-overlay.active { display: flex; }
+
+.turn-overlay-text {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(1.2rem, 5vw, 2rem); letter-spacing: 4px;
+  text-shadow: 0 0 20px currentColor, 0 0 50px currentColor;
+}
+.turn-overlay-sub {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: 14px; color: var(--text-dim); letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.winner-title {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(1.5rem, 6vw, 2.5rem); letter-spacing: 5px;
+  text-shadow: 0 0 30px currentColor, 0 0 80px currentColor;
+}
+
+.vs-scores {
+  display: flex; gap: 24px; margin: 8px 0;
+  font-family: 'Orbitron', monospace; font-size: 14px;
+}
+.vs-scores .vs-p {
+  text-align: center; padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px; background: rgba(255,255,255,0.03);
+  min-width: 90px;
+}
+.vs-scores .vs-p.winner {
+  border-color: var(--neon-gold);
+  box-shadow: 0 0 15px rgba(255,215,0,0.2);
+}
+.vs-scores .vs-p .vs-label { font-size: 10px; letter-spacing: 2px; display: block; margin-bottom: 4px; }
+.vs-scores .vs-p .vs-val { font-size: 22px; font-weight: 700; display: block; }
+
 /* ---- SCROLLBAR ---- */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -421,7 +501,8 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     </button>
   </div>
 
-  <button class="play-btn" onclick="startGame()">START</button>
+  <button class="play-btn" onclick="startGame()">START SOLO</button>
+  <button class="vs-btn" onclick="startGame(true)">VS FRIEND</button>
 
   <div class="controls-hint">Tap or click cards to flip</div>
   <div class="leaderboard" id="start-lb"></div>
@@ -429,10 +510,15 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
 <!-- GAME SCREEN -->
 <div id="game-screen" class="screen">
-  <div class="top-bar">
+  <div class="top-bar" id="top-bar-solo">
     <div class="moves-counter" id="moves-counter">MOVES: 0</div>
     <div class="pairs-counter" id="pairs-counter">0 / 8</div>
     <div class="timer" id="timer">00:00</div>
+  </div>
+  <div class="top-bar-2p" id="top-bar-2p">
+    <div class="p-score p1 active-turn" id="p1-score">P1: 0</div>
+    <div class="turn-label" id="turn-label">P1's TURN</div>
+    <div class="p-score p2" id="p2-score">P2: 0</div>
   </div>
   <div class="grid-wrapper" id="grid-wrapper">
     <div class="card-grid" id="card-grid"></div>
@@ -442,7 +528,13 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     <button class="bar-btn" onclick="goToMenu()">MENU</button>
   </div>
 
-  <!-- COMPLETE OVERLAY -->
+  <!-- TURN TRANSITION OVERLAY (2P) -->
+  <div class="turn-overlay" id="turn-overlay">
+    <div class="turn-overlay-text" id="turn-overlay-text">PLAYER 1's TURN</div>
+    <div class="turn-overlay-sub">get ready</div>
+  </div>
+
+  <!-- SOLO COMPLETE OVERLAY -->
   <div class="overlay" id="complete-overlay">
     <div class="overlay-title">COMPLETE!</div>
     <div class="star-display" id="star-display"></div>
@@ -454,6 +546,18 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
       <button class="btn secondary" onclick="goToMenu()">CHANGE SIZE</button>
     </div>
     <div class="leaderboard" id="complete-lb"></div>
+  </div>
+
+  <!-- 2P COMPLETE OVERLAY -->
+  <div class="overlay" id="complete-overlay-2p">
+    <div class="winner-title" id="winner-title">PLAYER 1 WINS!</div>
+    <div class="vs-scores" id="vs-final-scores"></div>
+    <div class="overlay-stats" id="complete-stats-2p"></div>
+    <div class="overlay-btns">
+      <button class="btn share" onclick="shareResult()">SHARE</button>
+      <button class="btn" onclick="restartGame()">PLAY AGAIN</button>
+      <button class="btn secondary" onclick="goToMenu()">CHANGE SIZE</button>
+    </div>
   </div>
 </div>
 
@@ -515,6 +619,13 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   var isLocked = false;
   var gameActive = false;
 
+  // 2P state
+  var twoPlayerMode = false;
+  var currentPlayer = 0; // 0 = P1, 1 = P2
+  var playerScores = [0, 0];
+  var PLAYER_COLORS = ['#00f0ff', '#ff2d7b'];
+  var PLAYER_NAMES = ['PLAYER 1', 'PLAYER 2'];
+
   // ========== DOM ==========
   var startScreen = document.getElementById('start-screen');
   var gameScreen = document.getElementById('game-screen');
@@ -528,6 +639,17 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   var bestNote = document.getElementById('best-note');
   var particleCanvas = document.getElementById('particles');
   var particleCtx = particleCanvas.getContext('2d');
+  var topBarSolo = document.getElementById('top-bar-solo');
+  var topBar2p = document.getElementById('top-bar-2p');
+  var p1ScoreEl = document.getElementById('p1-score');
+  var p2ScoreEl = document.getElementById('p2-score');
+  var turnLabelEl = document.getElementById('turn-label');
+  var turnOverlay = document.getElementById('turn-overlay');
+  var turnOverlayText = document.getElementById('turn-overlay-text');
+  var completeOverlay2p = document.getElementById('complete-overlay-2p');
+  var winnerTitle = document.getElementById('winner-title');
+  var vsFinalScores = document.getElementById('vs-final-scores');
+  var completeStats2p = document.getElementById('complete-stats-2p');
 
   // ========== AUDIO ==========
   var audioCtx = null;
@@ -661,16 +783,25 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   // ========== NEON.JS INIT ==========
   function initNeon() {
     var diff = DIFFICULTIES[currentDiff];
-    Neon.init({
-      game: 'pairs',
-      mode: 'low',
-      key: 'neonarcade_neonclassic_pairs_scores_' + diff.label,
-      formatScore: function(s) {
-        var m = Math.floor(s / 60);
-        var sec = Math.floor(s % 60);
-        return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
-      }
-    });
+    if (twoPlayerMode) {
+      Neon.init({
+        game: 'pairs',
+        mode: 'high',
+        key: 'neonarcade_neonclassic_pairs_scores_2p_' + diff.label,
+        formatScore: function(s) { return s + ' pairs'; }
+      });
+    } else {
+      Neon.init({
+        game: 'pairs',
+        mode: 'low',
+        key: 'neonarcade_neonclassic_pairs_scores_' + diff.label,
+        formatScore: function(s) {
+          var m = Math.floor(s / 60);
+          var sec = Math.floor(s % 60);
+          return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+      });
+    }
   }
 
   function formatTime(s) {
@@ -713,7 +844,8 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   }
 
   // ========== GAME START ==========
-  window.startGame = function() {
+  window.startGame = function(is2P) {
+    twoPlayerMode = !!is2P;
     var diff = DIFFICULTIES[currentDiff];
     totalPairs = diff.pairs;
     matchedPairs = 0;
@@ -724,12 +856,29 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     gameActive = false;
     cards = [];
 
+    // 2P reset
+    currentPlayer = 0;
+    playerScores = [0, 0];
+
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
     movesCounter.textContent = 'MOVES: 0';
     pairsCounter.textContent = '0 / ' + totalPairs;
     timerEl.textContent = '00:00';
     completeOverlay.classList.remove('active');
+    completeOverlay2p.classList.remove('active');
+    turnOverlay.classList.remove('active');
+
+    // Toggle top bars
+    if (twoPlayerMode) {
+      topBarSolo.style.display = 'none';
+      topBar2p.classList.add('active');
+      update2pUI();
+      initNeon();
+    } else {
+      topBarSolo.style.display = '';
+      topBar2p.classList.remove('active');
+    }
 
     // Build card data
     var symbolPool = shuffle(SYMBOLS.slice()).slice(0, totalPairs);
@@ -787,6 +936,42 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     return Math.min(maxW, maxH, 100);
   }
 
+  // ========== 2P UI ==========
+  function update2pUI() {
+    p1ScoreEl.textContent = 'P1: ' + playerScores[0];
+    p2ScoreEl.textContent = 'P2: ' + playerScores[1];
+    if (currentPlayer === 0) {
+      p1ScoreEl.classList.add('active-turn');
+      p2ScoreEl.classList.remove('active-turn');
+      turnLabelEl.textContent = "P1's TURN";
+      turnLabelEl.style.color = PLAYER_COLORS[0];
+    } else {
+      p1ScoreEl.classList.remove('active-turn');
+      p2ScoreEl.classList.add('active-turn');
+      turnLabelEl.textContent = "P2's TURN";
+      turnLabelEl.style.color = PLAYER_COLORS[1];
+    }
+  }
+
+  function showTurnTransition(callback) {
+    var pNum = currentPlayer + 1;
+    turnOverlayText.textContent = 'PLAYER ' + pNum + "'s TURN";
+    turnOverlayText.style.color = PLAYER_COLORS[currentPlayer];
+    turnOverlay.classList.add('active');
+    setTimeout(function() {
+      turnOverlay.classList.remove('active');
+      if (callback) callback();
+    }, 800);
+  }
+
+  function switchPlayer() {
+    currentPlayer = currentPlayer === 0 ? 1 : 0;
+    update2pUI();
+    showTurnTransition(function() {
+      isLocked = false;
+    });
+  }
+
   // ========== CARD FLIP ==========
   function flipCard(cardEl) {
     if (isLocked) return;
@@ -797,11 +982,13 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     if (card.isFlipped || card.isMatched) return;
     if (flippedCards.length >= 2) return;
 
-    // Start timer on first flip
+    // Start timer on first flip (solo mode only)
     if (!gameActive) {
       gameActive = true;
-      timerStart = Date.now();
-      timerInterval = setInterval(updateTimer, 200);
+      if (!twoPlayerMode) {
+        timerStart = Date.now();
+        timerInterval = setInterval(updateTimer, 200);
+      }
     }
 
     card.isFlipped = true;
@@ -811,7 +998,9 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
 
     if (flippedCards.length === 2) {
       moves++;
-      movesCounter.textContent = 'MOVES: ' + moves;
+      if (!twoPlayerMode) {
+        movesCounter.textContent = 'MOVES: ' + moves;
+      }
 
       var c1 = flippedCards[0];
       var c2 = flippedCards[1];
@@ -825,7 +1014,9 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
           c1.el.classList.add('matched');
           c2.el.classList.add('matched');
           matchedPairs++;
-          pairsCounter.textContent = matchedPairs + ' / ' + totalPairs;
+          if (!twoPlayerMode) {
+            pairsCounter.textContent = matchedPairs + ' / ' + totalPairs;
+          }
           playMatchSound();
 
           var r1 = c1.el.getBoundingClientRect();
@@ -833,12 +1024,22 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
           spawnParticles(r1.left + r1.width / 2, r1.top + r1.height / 2, c1.data.color, 10);
           spawnParticles(r2.left + r2.width / 2, r2.top + r2.height / 2, c2.data.color, 10);
 
+          if (twoPlayerMode) {
+            playerScores[currentPlayer]++;
+            update2pUI();
+          }
+
           flippedCards = [];
           isLocked = false;
 
           if (matchedPairs === totalPairs) {
-            gameComplete();
+            if (twoPlayerMode) {
+              gameComplete2p();
+            } else {
+              gameComplete();
+            }
           }
+          // In 2P mode, current player keeps their turn on match
         }, 300);
       } else {
         // Mismatch
@@ -856,7 +1057,13 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
             c2.el.classList.remove('flipped', 'wrong');
             document.body.classList.remove('shake');
             flippedCards = [];
-            isLocked = false;
+
+            if (twoPlayerMode) {
+              // Switch player — isLocked stays true until transition ends
+              switchPlayer();
+            } else {
+              isLocked = false;
+            }
           }, 500);
         }, 800);
       }
@@ -962,39 +1169,147 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     }, 600);
   }
 
+  // ========== 2P GAME COMPLETE ==========
+  function gameComplete2p() {
+    gameActive = false;
+    playCompleteSound();
+
+    var p1 = playerScores[0];
+    var p2 = playerScores[1];
+    var winnerIdx = -1;
+    if (p1 > p2) winnerIdx = 0;
+    else if (p2 > p1) winnerIdx = 1;
+
+    // Title
+    if (winnerIdx === -1) {
+      winnerTitle.textContent = "IT'S A DRAW!";
+      winnerTitle.style.color = '#ffd700';
+    } else {
+      winnerTitle.textContent = PLAYER_NAMES[winnerIdx] + ' WINS!';
+      winnerTitle.style.color = PLAYER_COLORS[winnerIdx];
+    }
+
+    // Score cards
+    while (vsFinalScores.firstChild) vsFinalScores.removeChild(vsFinalScores.firstChild);
+
+    for (var i = 0; i < 2; i++) {
+      var pDiv = document.createElement('div');
+      pDiv.className = 'vs-p' + (i === winnerIdx ? ' winner' : '');
+      var label = document.createElement('span');
+      label.className = 'vs-label';
+      label.textContent = 'P' + (i + 1);
+      label.style.color = PLAYER_COLORS[i];
+      var val = document.createElement('span');
+      val.className = 'vs-val';
+      val.textContent = playerScores[i];
+      val.style.color = PLAYER_COLORS[i];
+      pDiv.appendChild(label);
+      pDiv.appendChild(val);
+      vsFinalScores.appendChild(pDiv);
+    }
+
+    // Stats
+    while (completeStats2p.firstChild) completeStats2p.removeChild(completeStats2p.firstChild);
+
+    var movesDiv = document.createElement('div');
+    movesDiv.className = 'stat';
+    var movesVal = document.createElement('span');
+    movesVal.className = 'val';
+    movesVal.textContent = moves;
+    movesDiv.appendChild(movesVal);
+    movesDiv.appendChild(document.createTextNode('TOTAL MOVES'));
+    completeStats2p.appendChild(movesDiv);
+
+    var pairsDiv = document.createElement('div');
+    pairsDiv.className = 'stat';
+    var pairsVal = document.createElement('span');
+    pairsVal.className = 'val';
+    pairsVal.textContent = totalPairs;
+    pairsDiv.appendChild(pairsVal);
+    pairsDiv.appendChild(document.createTextNode('PAIRS'));
+    completeStats2p.appendChild(pairsDiv);
+
+    // Save winner's score via Neon.js if applicable
+    if (winnerIdx >= 0) {
+      var winnerScore = playerScores[winnerIdx];
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(winnerScore);
+      }).then(function(result) {
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      }).catch(function() {});
+    }
+
+    // Celebration particles
+    for (var j = 0; j < 5; j++) {
+      (function(delay) {
+        setTimeout(function() {
+          spawnParticles(
+            window.innerWidth * (0.2 + Math.random() * 0.6),
+            window.innerHeight * (0.3 + Math.random() * 0.4),
+            NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)],
+            15
+          );
+        }, delay);
+      })(j * 150);
+    }
+
+    setTimeout(function() {
+      completeOverlay2p.classList.add('active');
+    }, 600);
+  }
+
   // ========== SHARE ==========
   window.shareResult = function() {
     var diff = DIFFICULTIES[currentDiff];
-    var perfectMoves = totalPairs;
-    var extraMoves = moves - perfectMoves;
-    var stars;
-    if (extraMoves <= 2) stars = 3;
-    else if (extraMoves <= 6) stars = 2;
-    else stars = 1;
+    var text;
 
-    var starEmoji = '';
-    for (var i = 0; i < stars; i++) starEmoji += '\u2B50';
+    if (twoPlayerMode) {
+      var p1 = playerScores[0];
+      var p2 = playerScores[1];
+      var resultLine;
+      if (p1 > p2) resultLine = '\uD83C\uDFC6 P1 wins!';
+      else if (p2 > p1) resultLine = '\uD83C\uDFC6 P2 wins!';
+      else resultLine = '\uD83E\uDD1D Draw!';
 
-    // Build mini grid
-    var gridLines = [];
-    var colCount = diff.cols;
-    for (var r = 0; r < diff.rows; r++) {
-      var line = '';
-      for (var c = 0; c < colCount; c++) {
-        var cardIdx = r * colCount + c;
-        if (cardIdx < cards.length) {
-          var pairId = cards[cardIdx].data.id;
-          line += SHARE_BLOCKS[pairId % SHARE_BLOCKS.length];
+      text = '\uD83C\uDCCF NEON PAIRS VS (' + diff.label + ')\n' +
+        '\uD83D\uDFE6 P1: ' + p1 + ' | \uD83D\uDFE5 P2: ' + p2 + '\n' +
+        resultLine + '\n' +
+        'neonarcade.net/neonclassic/pairs.html';
+    } else {
+      var perfectMoves = totalPairs;
+      var extraMoves = moves - perfectMoves;
+      var stars;
+      if (extraMoves <= 2) stars = 3;
+      else if (extraMoves <= 6) stars = 2;
+      else stars = 1;
+
+      var starEmoji = '';
+      for (var i = 0; i < stars; i++) starEmoji += '\u2B50';
+
+      // Build mini grid
+      var gridLines = [];
+      var colCount = diff.cols;
+      for (var r = 0; r < diff.rows; r++) {
+        var line = '';
+        for (var c = 0; c < colCount; c++) {
+          var cardIdx = r * colCount + c;
+          if (cardIdx < cards.length) {
+            var pairId = cards[cardIdx].data.id;
+            line += SHARE_BLOCKS[pairId % SHARE_BLOCKS.length];
+          }
         }
+        gridLines.push(line);
       }
-      gridLines.push(line);
-    }
 
-    var text = '\uD83C\uDCCF NEON PAIRS (' + diff.label + ')\n' +
-      '\u23F1 ' + formatTime(elapsedSeconds) + ' | Moves: ' + moves + '\n' +
-      starEmoji + '\n' +
-      gridLines.join('\n') + '\n' +
-      'neonarcade.net/neonclassic/pairs.html';
+      text = '\uD83C\uDCCF NEON PAIRS (' + diff.label + ')\n' +
+        '\u23F1 ' + formatTime(elapsedSeconds) + ' | Moves: ' + moves + '\n' +
+        starEmoji + '\n' +
+        gridLines.join('\n') + '\n' +
+        'neonarcade.net/neonclassic/pairs.html';
+    }
 
     if (navigator.share) {
       navigator.share({ text: text }).catch(function() {
@@ -1024,7 +1339,9 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
   // ========== NAVIGATION ==========
   window.restartGame = function() {
     completeOverlay.classList.remove('active');
-    startGame();
+    completeOverlay2p.classList.remove('active');
+    turnOverlay.classList.remove('active');
+    startGame(twoPlayerMode);
   };
 
   window.goToMenu = function() {
@@ -1032,7 +1349,12 @@ body.shake { animation: shake 0.3s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     gameScreen.classList.remove('active');
     completeOverlay.classList.remove('active');
+    completeOverlay2p.classList.remove('active');
+    turnOverlay.classList.remove('active');
+    topBar2p.classList.remove('active');
+    topBarSolo.style.display = '';
     startScreen.classList.add('active');
+    twoPlayerMode = false;
     updateBestTimes();
     initNeon();
     Neon.render(document.getElementById('start-lb'));
