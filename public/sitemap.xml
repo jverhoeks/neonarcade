@@ -317,7 +317,12 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- NEON CLASSIC Games (7) -->
+  <!-- NEON CLASSIC Games (8) -->
+  <url>
+    <loc>https://neonarcade.net/neonclassic/tictactoe.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <url>
     <loc>https://neonarcade.net/neonclassic/2048.html</loc>
     <changefreq>monthly</changefreq>

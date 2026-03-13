@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tic Tac Toe — Free Online Strategy Game | NEON ARCADE</title>
+<meta name="description" content="Play Tic Tac Toe free online — the classic reimagined with stunning neon visuals. VS AI (3 difficulties) or pass-and-play with a friend. 3x3 and 4x4 grids. No download, no login.">
+<meta name="keywords" content="tic tac toe, free strategy game online, browser game, neon arcade, noughts and crosses">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonclassic/tictactoe.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonclassic/tictactoe.html">
+<meta property="og:title" content="Tic Tac Toe — Free Online Strategy Game | NEON ARCADE">
+<meta property="og:description" content="Play Tic Tac Toe free online — the classic reimagined with stunning neon visuals. VS AI or pass-and-play.">
+<meta property="og:image" content="https://neonarcade.net/neonclassic/screenshots/tictactoe.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonclassic/tictactoe.html">
+<meta name="twitter:title" content="Tic Tac Toe — Free Online Strategy Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Tic Tac Toe free online — the classic reimagined with stunning neon visuals. VS AI or pass-and-play.">
+<meta name="twitter:image" content="https://neonarcade.net/neonclassic/screenshots/tictactoe.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Tic Tac Toe",
+  "url": "https://neonarcade.net/neonclassic/tictactoe.html",
+  "description": "Play Tic Tac Toe free online — the classic reimagined with stunning neon visuals. VS AI (3 difficulties) or pass-and-play with a friend. 3x3 and 4x4 grids.",
+  "genre": "Strategy",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonclassic/screenshots/tictactoe.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CLASSIC", "item": "https://neonarcade.net/neonclassic/" },
+    { "@type": "ListItem", "position": 3, "name": "Tic Tac Toe", "item": "https://neonarcade.net/neonclassic/tictactoe.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(0,240,255,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255,45,123,0.04) 0%, transparent 50%),
+    var(--bg-deep);
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+
+body.shake { animation: shake 0.25s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+@keyframes shake {
+  10%,90% { transform: translate3d(-2px,0,0); }
+  20%,80% { transform: translate3d(3px,0,0); }
+  30%,50%,70% { transform: translate3d(-3px,0,0); }
+  40%,60% { transform: translate3d(3px,0,0); }
+}
+
+#particles {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 100;
+}
+
+/* SCREENS */
+.screen {
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; width: 100%;
+  padding: 16px; position: absolute; inset: 0;
+}
+.screen.active { display: flex; }
+
+/* START SCREEN */
+#start-screen {
+  gap: 6px; overflow-y: auto;
+  justify-content: flex-start; padding-top: 30px;
+}
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.6rem, 6vw, 2.8rem);
+  font-weight: 900; color: var(--neon-cyan);
+  text-shadow: 0 0 20px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.15);
+  letter-spacing: 6px; margin-bottom: 2px;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 0 0 20px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.15); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.8), 0 0 80px rgba(0,240,255,0.3); }
+}
+
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(0.8rem, 2.5vw, 1.05rem);
+  font-weight: 300; color: var(--text-mid);
+  letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* Option groups */
+.option-group {
+  width: 100%; max-width: 400px; margin-bottom: 10px;
+}
+.option-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 11px;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 6px;
+}
+.option-row {
+  display: flex; gap: 6px; justify-content: center;
+}
+.opt-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 11px; letter-spacing: 2px;
+  padding: 10px 16px; border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.03); color: var(--text-mid);
+  cursor: pointer; border-radius: 3px; text-transform: uppercase;
+  transition: all 0.2s; flex: 1; max-width: 140px;
+}
+.opt-btn:hover { background: rgba(0,240,255,0.08); border-color: var(--neon-cyan); }
+.opt-btn.selected { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,240,255,0.1); box-shadow: 0 0 12px rgba(0,240,255,0.15); }
+.opt-btn.selected-pink { border-color: var(--neon-pink); color: var(--neon-pink); background: rgba(255,45,123,0.1); box-shadow: 0 0 12px rgba(255,45,123,0.15); }
+.opt-btn.selected-gold { border-color: var(--neon-gold); color: var(--neon-gold); background: rgba(255,215,0,0.1); box-shadow: 0 0 12px rgba(255,215,0,0.15); }
+.opt-btn.selected-green { border-color: var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.1); box-shadow: 0 0 12px rgba(57,255,20,0.15); }
+
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+  margin: 10px 0;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+.play-btn:active { transform: scale(0.97); }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300; font-size: 11px;
+  letter-spacing: 2px; color: var(--text-dim);
+  text-transform: uppercase; margin-top: 2px;
+}
+
+/* GAME SCREEN */
+#game-screen {
+  flex-direction: column; padding: 0;
+  justify-content: space-between;
+}
+
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; width: 100%;
+  font-family: 'Orbitron', monospace; font-size: 13px;
+  background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05);
+  min-height: 44px; z-index: 10;
+}
+
+.score-x { color: var(--neon-cyan); min-width: 50px; text-align: left; }
+.round-info { color: var(--text-mid); font-size: 11px; letter-spacing: 2px; }
+.score-o { color: var(--neon-pink); min-width: 50px; text-align: right; }
+
+.turn-banner {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: clamp(12px, 3vw, 16px); letter-spacing: 3px;
+  text-transform: uppercase; padding: 6px 16px; text-align: center;
+  transition: all 0.3s;
+}
+.turn-banner.turn-x { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.5); }
+.turn-banner.turn-o { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.5); }
+.turn-banner.turn-win { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,20,0.5); }
+.turn-banner.turn-draw { color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+
+.canvas-wrapper {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  position: relative; width: 100%;
+}
+
+#game-canvas {
+  display: block;
+}
+
+.bottom-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 8px 16px; width: 100%;
+  background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05);
+  min-height: 48px; z-index: 10;
+}
+
+.bar-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 11px; letter-spacing: 2px;
+  padding: 10px 18px; border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04); color: var(--text-mid);
+  cursor: pointer; border-radius: 3px; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.bar-btn:hover { background: rgba(255,255,255,0.08); }
+
+/* OVERLAY */
+.overlay {
+  display: none; position: absolute; inset: 0;
+  background: rgba(10,10,18,0.92);
+  flex-direction: column; align-items: center; justify-content: center;
+  z-index: 50; gap: 10px; padding: 20px;
+  animation: fadeIn 0.4s ease-out;
+  overflow-y: auto;
+}
+.overlay.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.overlay-title {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(1.6rem, 6vw, 2.6rem); letter-spacing: 6px;
+}
+.overlay-title.win-x { color: var(--neon-cyan); text-shadow: 0 0 30px rgba(0,240,255,0.5), 0 0 80px rgba(0,240,255,0.2); }
+.overlay-title.win-o { color: var(--neon-pink); text-shadow: 0 0 30px rgba(255,45,123,0.5), 0 0 80px rgba(255,45,123,0.2); }
+.overlay-title.win-draw { color: var(--neon-gold); text-shadow: 0 0 30px rgba(255,215,0,0.5), 0 0 80px rgba(255,215,0,0.2); }
+.overlay-title.win-green { color: var(--neon-green); text-shadow: 0 0 30px rgba(57,255,20,0.5), 0 0 80px rgba(57,255,20,0.2); }
+
+.overlay-sub {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: 14px; letter-spacing: 2px; color: var(--text-mid);
+  text-transform: uppercase;
+}
+
+.overlay-stats {
+  display: flex; gap: 20px; margin: 6px 0 10px;
+  font-family: 'Rajdhani', sans-serif; font-size: 14px;
+  color: var(--text-mid);
+}
+.overlay-stats .stat { text-align: center; }
+.overlay-stats .val { color: var(--neon-cyan); font-weight: 700; font-size: 18px; display: block; font-family: 'Orbitron', monospace; }
+.overlay-stats .val-pink { color: var(--neon-pink); }
+.overlay-stats .val-gold { color: var(--neon-gold); }
+
+.overlay-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+
+.btn {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 12px; letter-spacing: 3px;
+  padding: 14px 28px; border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06); color: var(--neon-cyan);
+  cursor: pointer; border-radius: 3px; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+.btn:active { transform: scale(0.97); }
+.btn.secondary { border-color: var(--text-dim); color: var(--text-mid); background: rgba(255,255,255,0.03); }
+.btn.secondary:hover { background: rgba(255,255,255,0.08); box-shadow: none; }
+.btn.share { border-color: var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.06); }
+.btn.share:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+
+.leaderboard { width: 100%; max-width: 340px; margin: 6px 0; }
+
+.best-note {
+  font-size: 13px; color: var(--neon-green); letter-spacing: 2px;
+  margin-bottom: 2px; text-shadow: 0 0 8px rgba(57,255,20,0.3);
+  font-family: 'Rajdhani', sans-serif; font-weight: 500;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* Series score large display */
+.series-score {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(2rem, 8vw, 3.5rem); letter-spacing: 8px;
+  margin: 4px 0;
+}
+.series-score .sx { color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0,240,255,0.5); }
+.series-score .dash { color: var(--text-dim); margin: 0 4px; }
+.series-score .so { color: var(--neon-pink); text-shadow: 0 0 15px rgba(255,45,123,0.5); }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- START SCREEN -->
+<div id="start-screen" class="screen active">
+  <div class="title">TIC TAC TOE</div>
+  <div class="subtitle">The classic. Reimagined in neon.</div>
+
+  <div class="option-group">
+    <div class="option-label">Grid Size</div>
+    <div class="option-row" id="grid-options">
+      <button class="opt-btn selected" data-val="3" onclick="selectOption('grid',3)">3 x 3</button>
+      <button class="opt-btn" data-val="4" onclick="selectOption('grid',4)">4 x 4</button>
+    </div>
+  </div>
+
+  <div class="option-group">
+    <div class="option-label">Mode</div>
+    <div class="option-row" id="mode-options">
+      <button class="opt-btn selected-pink" data-val="ai" onclick="selectOption('mode','ai')">VS AI</button>
+      <button class="opt-btn" data-val="friend" onclick="selectOption('mode','friend')">VS FRIEND</button>
+    </div>
+  </div>
+
+  <div class="option-group" id="diff-group">
+    <div class="option-label">AI Difficulty</div>
+    <div class="option-row" id="diff-options">
+      <button class="opt-btn selected-green" data-val="easy" onclick="selectOption('diff','easy')">Easy</button>
+      <button class="opt-btn" data-val="medium" onclick="selectOption('diff','medium')">Medium</button>
+      <button class="opt-btn" data-val="hard" onclick="selectOption('diff','hard')">Hard</button>
+    </div>
+  </div>
+
+  <div class="option-group">
+    <div class="option-label">Series</div>
+    <div class="option-row" id="series-options">
+      <button class="opt-btn selected-gold" data-val="3" onclick="selectOption('series',3)">Best of 3</button>
+      <button class="opt-btn" data-val="5" onclick="selectOption('series',5)">Best of 5</button>
+      <button class="opt-btn" data-val="0" onclick="selectOption('series',0)">Endless</button>
+    </div>
+  </div>
+
+  <button class="play-btn" onclick="startSeries()">START</button>
+  <div class="controls-hint">Click cells or use numpad (3x3) &bull; ESC = menu</div>
+  <div class="leaderboard" id="start-lb"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div class="top-bar">
+    <div class="score-x" id="score-x">X: 0</div>
+    <div class="round-info" id="round-info">ROUND 1</div>
+    <div class="score-o" id="score-o">O: 0</div>
+  </div>
+  <div class="turn-banner turn-x" id="turn-banner">X'S TURN</div>
+  <div class="canvas-wrapper" id="canvas-wrapper">
+    <canvas id="game-canvas"></canvas>
+  </div>
+  <div class="bottom-bar">
+    <button class="bar-btn" id="undo-btn" onclick="undoMove()" style="display:none">UNDO</button>
+    <button class="bar-btn" onclick="newRound()">NEW ROUND</button>
+    <button class="bar-btn" onclick="goToMenu()">MENU</button>
+  </div>
+
+  <!-- ROUND OVER OVERLAY -->
+  <div class="overlay" id="round-overlay">
+    <div class="overlay-title" id="round-result-title">X WINS!</div>
+    <div class="series-score" id="round-series-score">
+      <span class="sx">0</span><span class="dash">-</span><span class="so">0</span>
+    </div>
+    <div class="overlay-sub" id="round-result-sub">Tap to continue</div>
+    <div class="overlay-btns">
+      <button class="btn" onclick="continueAfterRound()">CONTINUE</button>
+    </div>
+  </div>
+
+  <!-- SERIES OVER OVERLAY -->
+  <div class="overlay" id="series-overlay">
+    <div class="overlay-title" id="series-result-title">X WINS!</div>
+    <div class="overlay-sub" id="series-result-sub">SERIES COMPLETE</div>
+    <div class="series-score" id="series-final-score">
+      <span class="sx">0</span><span class="dash">-</span><span class="so">0</span>
+    </div>
+    <div class="overlay-stats" id="series-stats"></div>
+    <div class="best-note" id="best-note" style="display:none"></div>
+    <div class="overlay-btns">
+      <button class="btn share" onclick="shareResult()">SHARE</button>
+      <button class="btn" onclick="startSeries()">PLAY AGAIN</button>
+      <button class="btn secondary" onclick="goToMenu()">MENU</button>
+    </div>
+    <div class="leaderboard" id="series-lb"></div>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  // ========== CONFIG ==========
+  var COLOR_X = '#00f0ff';
+  var COLOR_O = '#ff2d7b';
+  var COLOR_GRID = '#2a2a44';
+  var COLOR_WIN = '#39ff14';
+  var COLOR_DRAW = '#ffd700';
+
+  // ========== STATE ==========
+  var gridSize = 3;
+  var winLen = 3;
+  var gameMode = 'ai';
+  var aiDiff = 'easy';
+  var seriesLen = 3;
+  var board = [];
+  var currentPlayer = 1; // 1=X, 2=O
+  var scoreX = 0;
+  var scoreO = 0;
+  var draws = 0;
+  var roundNum = 1;
+  var totalRounds = 0;
+  var gameOver = false;
+  var seriesOver = false;
+  var winLine = null;
+  var moveHistory = [];
+  var moveTimesX = [];
+  var moveTimesO = [];
+  var lastMoveTime = 0;
+  var aiThinking = false;
+  var winStreak = 0;
+  var maxWinStreak = 0;
+
+  // Animation state
+  var markAnimations = [];
+  var winLineProgress = 0;
+  var winLineStart = 0;
+  var drawPulseStart = 0;
+  var hoverCell = { r: -1, c: -1 };
+  var animFrameId = null;
+
+  // Canvas
+  var canvas = document.getElementById('game-canvas');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var canvasLogW = 0;
+  var canvasLogH = 0;
+  var cellSize = 0;
+  var gridOffset = { x: 0, y: 0 };
+  var lineWidth = 0;
+
+  // DOM
+  var startScreen = document.getElementById('start-screen');
+  var gameScreen = document.getElementById('game-screen');
+  var scoreXEl = document.getElementById('score-x');
+  var scoreOEl = document.getElementById('score-o');
+  var roundInfoEl = document.getElementById('round-info');
+  var turnBanner = document.getElementById('turn-banner');
+  var roundOverlay = document.getElementById('round-overlay');
+  var seriesOverlay = document.getElementById('series-overlay');
+  var undoBtn = document.getElementById('undo-btn');
+  var particleCanvas = document.getElementById('particles');
+  var particleCtx = particleCanvas.getContext('2d');
+
+  // ========== AUDIO ==========
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playPlaceX() {
+    try {
+      var a = getAudio();
+      var osc = a.createOscillator();
+      var gain = a.createGain();
+      osc.connect(gain); gain.connect(a.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, a.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1320, a.currentTime + 0.06);
+      gain.gain.setValueAtTime(0.14, a.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.12);
+      osc.start(a.currentTime);
+      osc.stop(a.currentTime + 0.12);
+    } catch(e) {}
+  }
+
+  function playPlaceO() {
+    try {
+      var a = getAudio();
+      var osc = a.createOscillator();
+      var gain = a.createGain();
+      osc.connect(gain); gain.connect(a.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, a.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(330, a.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.14, a.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.15);
+      osc.start(a.currentTime);
+      osc.stop(a.currentTime + 0.15);
+    } catch(e) {}
+  }
+
+  function playWinSound() {
+    try {
+      var a = getAudio();
+      var t = a.currentTime;
+      [523, 659, 784, 1047].forEach(function(freq, i) {
+        var osc = a.createOscillator();
+        var gain = a.createGain();
+        osc.connect(gain); gain.connect(a.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + i * 0.1);
+        gain.gain.setValueAtTime(0.15, t + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.3);
+        osc.start(t + i * 0.1);
+        osc.stop(t + i * 0.1 + 0.3);
+      });
+    } catch(e) {}
+  }
+
+  function playDrawSound() {
+    try {
+      var a = getAudio();
+      var t = a.currentTime;
+      var osc = a.createOscillator();
+      var gain = a.createGain();
+      osc.connect(gain); gain.connect(a.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, t);
+      osc.frequency.linearRampToValueAtTime(380, t + 0.3);
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.start(t);
+      osc.stop(t + 0.4);
+    } catch(e) {}
+  }
+
+  function playSeriesWinSound() {
+    try {
+      var a = getAudio();
+      var t = a.currentTime;
+      [523, 659, 784, 880, 1047, 1319].forEach(function(freq, i) {
+        var osc = a.createOscillator();
+        var gain = a.createGain();
+        osc.connect(gain); gain.connect(a.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + i * 0.1);
+        gain.gain.setValueAtTime(0.15, t + i * 0.1);
+        gain.gain.linearRampToValueAtTime(0.08, t + i * 0.1 + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.5);
+        osc.start(t + i * 0.1);
+        osc.stop(t + i * 0.1 + 0.5);
+      });
+    } catch(e) {}
+  }
+
+  // ========== PARTICLES ==========
+  var particles = [];
+
+  function resizeParticleCanvas() {
+    var d = window.devicePixelRatio || 1;
+    particleCanvas.width = window.innerWidth * d;
+    particleCanvas.height = window.innerHeight * d;
+    particleCanvas.style.width = window.innerWidth + 'px';
+    particleCanvas.style.height = window.innerHeight + 'px';
+    particleCtx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  resizeParticleCanvas();
+  window.addEventListener('resize', resizeParticleCanvas);
+
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < (count || 12); i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.02,
+        size: 2 + Math.random() * 3,
+        color: color
+      });
+    }
+  }
+
+  function tickParticles() {
+    particleCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      particleCtx.globalAlpha = p.life;
+      particleCtx.fillStyle = p.color;
+      particleCtx.shadowBlur = 8;
+      particleCtx.shadowColor = p.color;
+      particleCtx.beginPath();
+      particleCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      particleCtx.fill();
+    }
+    particleCtx.globalAlpha = 1;
+    particleCtx.shadowBlur = 0;
+    requestAnimationFrame(tickParticles);
+  }
+  tickParticles();
+
+  // ========== NEON.JS ==========
+  function initNeon() {
+    Neon.init({
+      game: 'tictactoe',
+      mode: 'high',
+      key: 'neonarcade_neonclassic_tictactoe_scores'
+    });
+  }
+
+  // ========== OPTION SELECTION ==========
+  window.selectOption = function(group, val) {
+    var containerId = group === 'grid' ? 'grid-options' :
+                      group === 'mode' ? 'mode-options' :
+                      group === 'diff' ? 'diff-options' : 'series-options';
+    var selClass = group === 'mode' ? 'selected-pink' :
+                   group === 'diff' ? 'selected-green' :
+                   group === 'series' ? 'selected-gold' : 'selected';
+    var container = document.getElementById(containerId);
+    var btns = container.querySelectorAll('.opt-btn');
+    btns.forEach(function(b) {
+      b.classList.remove('selected', 'selected-pink', 'selected-green', 'selected-gold');
+    });
+    btns.forEach(function(b) {
+      if (b.dataset.val === String(val)) b.classList.add(selClass);
+    });
+
+    if (group === 'grid') {
+      gridSize = val;
+      winLen = val;
+    } else if (group === 'mode') {
+      gameMode = val;
+      document.getElementById('diff-group').style.display = val === 'ai' ? '' : 'none';
+    } else if (group === 'diff') {
+      aiDiff = val;
+    } else if (group === 'series') {
+      seriesLen = val;
+    }
+  };
+
+  // ========== CANVAS SIZING ==========
+  function sizeCanvas() {
+    var wrapper = document.getElementById('canvas-wrapper');
+    var ww = wrapper.clientWidth - 20;
+    var wh = wrapper.clientHeight - 20;
+    var sz = Math.min(ww, wh, 500);
+    canvasLogW = sz;
+    canvasLogH = sz;
+    canvas.width = sz * dpr;
+    canvas.height = sz * dpr;
+    canvas.style.width = sz + 'px';
+    canvas.style.height = sz + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var padding = sz * 0.06;
+    var gridTotal = sz - padding * 2;
+    cellSize = gridTotal / gridSize;
+    gridOffset.x = padding;
+    gridOffset.y = padding;
+    lineWidth = Math.max(2, sz * 0.008);
+  }
+
+  // ========== BOARD LOGIC ==========
+  function createBoard() {
+    board = [];
+    for (var r = 0; r < gridSize; r++) {
+      board[r] = [];
+      for (var c = 0; c < gridSize; c++) {
+        board[r][c] = 0;
+      }
+    }
+  }
+
+  function checkWin(b, player) {
+    var n = gridSize;
+    var w = winLen;
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        var dirs = [[0,1],[1,0],[1,1],[1,-1]];
+        for (var d = 0; d < dirs.length; d++) {
+          var dr = dirs[d][0], dc = dirs[d][1];
+          var er = r + dr * (w - 1), ec = c + dc * (w - 1);
+          if (er < 0 || er >= n || ec < 0 || ec >= n) continue;
+          var count = 0;
+          var cells = [];
+          for (var k = 0; k < w; k++) {
+            var rr = r + dr * k, cc = c + dc * k;
+            if (b[rr][cc] === player) {
+              count++;
+              cells.push({ r: rr, c: cc });
+            }
+          }
+          if (count === w) return cells;
+        }
+      }
+    }
+    return null;
+  }
+
+  function isBoardFull(b) {
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        if (b[r][c] === 0) return false;
+      }
+    }
+    return true;
+  }
+
+  function getEmpty(b) {
+    var moves = [];
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        if (b[r][c] === 0) moves.push({ r: r, c: c });
+      }
+    }
+    return moves;
+  }
+
+  // ========== AI ==========
+  function aiMove() {
+    if (gameOver || aiThinking) return;
+    aiThinking = true;
+
+    setTimeout(function() {
+      var move;
+      if (aiDiff === 'easy') {
+        move = aiEasy();
+      } else if (aiDiff === 'medium') {
+        move = aiMedium();
+      } else {
+        move = aiHard();
+      }
+      if (move) {
+        placeMark(move.r, move.c);
+      }
+      aiThinking = false;
+    }, 300 + Math.random() * 200);
+  }
+
+  function aiEasy() {
+    var empty = getEmpty(board);
+    return empty.length > 0 ? empty[Math.floor(Math.random() * empty.length)] : null;
+  }
+
+  function aiMedium() {
+    var winMove = findWinningMove(board, 2);
+    if (winMove) return winMove;
+    var blockMove = findWinningMove(board, 1);
+    if (blockMove) return blockMove;
+    var mid = Math.floor(gridSize / 2);
+    if (board[mid][mid] === 0) return { r: mid, c: mid };
+    return aiEasy();
+  }
+
+  function findWinningMove(b, player) {
+    var empty = getEmpty(b);
+    for (var i = 0; i < empty.length; i++) {
+      var m = empty[i];
+      b[m.r][m.c] = player;
+      if (checkWin(b, player)) {
+        b[m.r][m.c] = 0;
+        return m;
+      }
+      b[m.r][m.c] = 0;
+    }
+    return null;
+  }
+
+  function aiHard() {
+    if (gridSize === 3) {
+      return minimax3x3();
+    } else {
+      return alphaBeta4x4();
+    }
+  }
+
+  function minimax3x3() {
+    var bestScore = -Infinity;
+    var bestMove = null;
+    var empty = getEmpty(board);
+    for (var i = 0; i < empty.length; i++) {
+      var m = empty[i];
+      board[m.r][m.c] = 2;
+      var score = minimaxScore(board, 0, false);
+      board[m.r][m.c] = 0;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = m;
+      }
+    }
+    return bestMove;
+  }
+
+  function minimaxScore(b, depth, isMax) {
+    var wO = checkWin(b, 2);
+    if (wO) return 10 - depth;
+    var wX = checkWin(b, 1);
+    if (wX) return depth - 10;
+    if (isBoardFull(b)) return 0;
+
+    var empty = getEmpty(b);
+    if (isMax) {
+      var best = -Infinity;
+      for (var i = 0; i < empty.length; i++) {
+        b[empty[i].r][empty[i].c] = 2;
+        best = Math.max(best, minimaxScore(b, depth + 1, false));
+        b[empty[i].r][empty[i].c] = 0;
+      }
+      return best;
+    } else {
+      var best2 = Infinity;
+      for (var j = 0; j < empty.length; j++) {
+        b[empty[j].r][empty[j].c] = 1;
+        best2 = Math.min(best2, minimaxScore(b, depth + 1, true));
+        b[empty[j].r][empty[j].c] = 0;
+      }
+      return best2;
+    }
+  }
+
+  function alphaBeta4x4() {
+    var bestScore = -Infinity;
+    var bestMove = null;
+    var empty = getEmpty(board);
+    var maxDepth = 5;
+    empty.sort(function(a, b) {
+      var midA = Math.abs(a.r - 1.5) + Math.abs(a.c - 1.5);
+      var midB = Math.abs(b.r - 1.5) + Math.abs(b.c - 1.5);
+      return midA - midB;
+    });
+    for (var i = 0; i < empty.length; i++) {
+      var m = empty[i];
+      board[m.r][m.c] = 2;
+      var score = abScore(board, maxDepth - 1, -Infinity, Infinity, false);
+      board[m.r][m.c] = 0;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = m;
+      }
+    }
+    return bestMove;
+  }
+
+  function abScore(b, depth, alpha, beta, isMax) {
+    var wO = checkWin(b, 2);
+    if (wO) return 100 - (5 - depth);
+    var wX = checkWin(b, 1);
+    if (wX) return (5 - depth) - 100;
+    if (isBoardFull(b) || depth <= 0) return evaluate4x4(b);
+
+    var empty = getEmpty(b);
+    if (isMax) {
+      var val = -Infinity;
+      for (var i = 0; i < empty.length; i++) {
+        b[empty[i].r][empty[i].c] = 2;
+        val = Math.max(val, abScore(b, depth - 1, alpha, beta, false));
+        b[empty[i].r][empty[i].c] = 0;
+        alpha = Math.max(alpha, val);
+        if (beta <= alpha) break;
+      }
+      return val;
+    } else {
+      var val2 = Infinity;
+      for (var j = 0; j < empty.length; j++) {
+        b[empty[j].r][empty[j].c] = 1;
+        val2 = Math.min(val2, abScore(b, depth - 1, alpha, beta, true));
+        b[empty[j].r][empty[j].c] = 0;
+        beta = Math.min(beta, val2);
+        if (beta <= alpha) break;
+      }
+      return val2;
+    }
+  }
+
+  function evaluate4x4(b) {
+    var score = 0;
+    var n = 4, w = 4;
+    var dirs = [[0,1],[1,0],[1,1],[1,-1]];
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        for (var d = 0; d < dirs.length; d++) {
+          var dr = dirs[d][0], dc = dirs[d][1];
+          var er = r + dr * (w - 1), ec = c + dc * (w - 1);
+          if (er < 0 || er >= n || ec < 0 || ec >= n) continue;
+          var xCount = 0, oCount = 0;
+          for (var k = 0; k < w; k++) {
+            var v = b[r + dr * k][c + dc * k];
+            if (v === 1) xCount++;
+            else if (v === 2) oCount++;
+          }
+          if (xCount > 0 && oCount === 0) score -= xCount * xCount;
+          if (oCount > 0 && xCount === 0) score += oCount * oCount;
+        }
+      }
+    }
+    return score;
+  }
+
+  // ========== PLACE MARK ==========
+  function placeMark(r, c) {
+    if (board[r][c] !== 0 || gameOver) return false;
+
+    var now = Date.now();
+    if (lastMoveTime > 0) {
+      var elapsed = (now - lastMoveTime) / 1000;
+      if (currentPlayer === 1) moveTimesX.push(elapsed);
+      else moveTimesO.push(elapsed);
+    }
+    lastMoveTime = now;
+
+    board[r][c] = currentPlayer;
+    moveHistory.push({ r: r, c: c, player: currentPlayer });
+
+    markAnimations.push({
+      r: r, c: c, player: currentPlayer,
+      progress: 0, startTime: performance.now()
+    });
+
+    if (currentPlayer === 1) playPlaceX();
+    else playPlaceO();
+
+    // Particles at cell center
+    var cx = gridOffset.x + c * cellSize + cellSize / 2;
+    var cy = gridOffset.y + r * cellSize + cellSize / 2;
+    var canvasRect = canvas.getBoundingClientRect();
+    spawnParticles(
+      canvasRect.left + cx * (canvasRect.width / canvasLogW),
+      canvasRect.top + cy * (canvasRect.height / canvasLogH),
+      currentPlayer === 1 ? COLOR_X : COLOR_O,
+      8
+    );
+
+    // Check win
+    var wCells = checkWin(board, currentPlayer);
+    if (wCells) {
+      winLine = wCells;
+      winLineProgress = 0;
+      winLineStart = performance.now();
+      gameOver = true;
+      if (currentPlayer === 1) {
+        scoreX++;
+        winStreak++;
+        if (winStreak > maxWinStreak) maxWinStreak = winStreak;
+      } else {
+        scoreO++;
+        winStreak = 0;
+      }
+      totalRounds++;
+      updateScoreDisplay();
+      playWinSound();
+
+      if (currentPlayer === 1) {
+        turnBanner.textContent = 'X WINS!';
+        turnBanner.className = 'turn-banner turn-win';
+      } else {
+        turnBanner.textContent = 'O WINS!';
+        turnBanner.className = 'turn-banner turn-o';
+      }
+
+      // Spawn win particles along the winning line cells
+      for (var wi = 0; wi < wCells.length; wi++) {
+        var wcx = gridOffset.x + wCells[wi].c * cellSize + cellSize / 2;
+        var wcy = gridOffset.y + wCells[wi].r * cellSize + cellSize / 2;
+        spawnParticles(
+          canvasRect.left + wcx * (canvasRect.width / canvasLogW),
+          canvasRect.top + wcy * (canvasRect.height / canvasLogH),
+          COLOR_WIN,
+          6
+        );
+      }
+
+      setTimeout(function() { showRoundOver(currentPlayer); }, 1200);
+      return true;
+    }
+
+    // Check draw
+    if (isBoardFull(board)) {
+      gameOver = true;
+      draws++;
+      totalRounds++;
+      drawPulseStart = performance.now();
+      playDrawSound();
+      document.body.classList.add('shake');
+      setTimeout(function() { document.body.classList.remove('shake'); }, 300);
+
+      turnBanner.textContent = "CAT'S GAME";
+      turnBanner.className = 'turn-banner turn-draw';
+
+      setTimeout(function() { showRoundOver(0); }, 1000);
+      return true;
+    }
+
+    // Switch player
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    updateTurnBanner();
+
+    if (gameMode === 'ai' && currentPlayer === 2 && !gameOver) {
+      aiMove();
+    }
+
+    return true;
+  }
+
+  // ========== UNDO ==========
+  window.undoMove = function() {
+    if (gameOver || moveHistory.length === 0) return;
+    if (gameMode === 'ai') return;
+
+    var last = moveHistory.pop();
+    board[last.r][last.c] = 0;
+    for (var i = markAnimations.length - 1; i >= 0; i--) {
+      if (markAnimations[i].r === last.r && markAnimations[i].c === last.c) {
+        markAnimations.splice(i, 1);
+        break;
+      }
+    }
+    currentPlayer = last.player;
+    updateTurnBanner();
+  };
+
+  // ========== DISPLAY ==========
+  function updateScoreDisplay() {
+    scoreXEl.textContent = 'X: ' + scoreX;
+    scoreOEl.textContent = 'O: ' + scoreO;
+    if (seriesLen > 0) {
+      roundInfoEl.textContent = 'ROUND ' + roundNum + ' / ' + seriesLen;
+    } else {
+      roundInfoEl.textContent = 'ROUND ' + roundNum;
+    }
+  }
+
+  function updateTurnBanner() {
+    if (currentPlayer === 1) {
+      turnBanner.textContent = gameMode === 'ai' ? 'YOUR TURN (X)' : "X'S TURN";
+      turnBanner.className = 'turn-banner turn-x';
+    } else {
+      turnBanner.textContent = gameMode === 'ai' ? 'AI THINKING...' : "O'S TURN";
+      turnBanner.className = 'turn-banner turn-o';
+    }
+  }
+
+  function updateSeriesScoreEl(el, xVal, oVal) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    var spanX = document.createElement('span');
+    spanX.className = 'sx';
+    spanX.textContent = xVal;
+    var spanDash = document.createElement('span');
+    spanDash.className = 'dash';
+    spanDash.textContent = '-';
+    var spanO = document.createElement('span');
+    spanO.className = 'so';
+    spanO.textContent = oVal;
+    el.appendChild(spanX);
+    el.appendChild(spanDash);
+    el.appendChild(spanO);
+  }
+
+  // ========== ROUND OVER ==========
+  function showRoundOver(winner) {
+    var titleEl = document.getElementById('round-result-title');
+    var subEl = document.getElementById('round-result-sub');
+    var scoreEl = document.getElementById('round-series-score');
+
+    if (winner === 1) {
+      titleEl.textContent = 'X WINS!';
+      titleEl.className = 'overlay-title win-x';
+    } else if (winner === 2) {
+      titleEl.textContent = 'O WINS!';
+      titleEl.className = 'overlay-title win-o';
+    } else {
+      titleEl.textContent = "CAT'S GAME";
+      titleEl.className = 'overlay-title win-draw';
+    }
+
+    updateSeriesScoreEl(scoreEl, scoreX, scoreO);
+
+    // Check if series is over
+    if (seriesLen > 0) {
+      var needed = Math.ceil(seriesLen / 2);
+      if (scoreX >= needed || scoreO >= needed) {
+        subEl.textContent = 'SERIES COMPLETE';
+        roundOverlay.classList.add('active');
+        setTimeout(function() {
+          roundOverlay.classList.remove('active');
+          showSeriesOver();
+        }, 1500);
+        return;
+      }
+    }
+
+    subEl.textContent = 'TAP TO CONTINUE';
+    roundOverlay.classList.add('active');
+  }
+
+  window.continueAfterRound = function() {
+    roundOverlay.classList.remove('active');
+    newRound();
+  };
+
+  roundOverlay.addEventListener('click', function(e) {
+    if (e.target === roundOverlay || e.target.id === 'round-result-sub') {
+      roundOverlay.classList.remove('active');
+      newRound();
+    }
+  });
+
+  // ========== SERIES OVER ==========
+  function showSeriesOver() {
+    seriesOver = true;
+    var titleEl = document.getElementById('series-result-title');
+    var subEl = document.getElementById('series-result-sub');
+    var scoreEl = document.getElementById('series-final-score');
+    var statsEl = document.getElementById('series-stats');
+    var bestEl = document.getElementById('best-note');
+
+    if (scoreX > scoreO) {
+      titleEl.textContent = gameMode === 'ai' ? 'YOU WIN!' : 'X WINS THE SERIES!';
+      titleEl.className = 'overlay-title win-x';
+    } else if (scoreO > scoreX) {
+      titleEl.textContent = gameMode === 'ai' ? 'AI WINS!' : 'O WINS THE SERIES!';
+      titleEl.className = 'overlay-title win-o';
+    } else {
+      titleEl.textContent = 'SERIES TIED!';
+      titleEl.className = 'overlay-title win-draw';
+    }
+
+    subEl.textContent = seriesLen > 0 ? 'BEST OF ' + seriesLen : 'SERIES COMPLETE';
+    updateSeriesScoreEl(scoreEl, scoreX, scoreO);
+
+    // Build stats with DOM methods
+    while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
+
+    var roundsDiv = document.createElement('div');
+    roundsDiv.className = 'stat';
+    var roundsVal = document.createElement('span');
+    roundsVal.className = 'val';
+    roundsVal.textContent = totalRounds;
+    roundsDiv.appendChild(roundsVal);
+    roundsDiv.appendChild(document.createTextNode('ROUNDS'));
+    statsEl.appendChild(roundsDiv);
+
+    var drawsDiv = document.createElement('div');
+    drawsDiv.className = 'stat';
+    var drawsVal = document.createElement('span');
+    drawsVal.className = 'val val-gold';
+    drawsVal.textContent = draws;
+    drawsDiv.appendChild(drawsVal);
+    drawsDiv.appendChild(document.createTextNode('DRAWS'));
+    statsEl.appendChild(drawsDiv);
+
+    var streakDiv = document.createElement('div');
+    streakDiv.className = 'stat';
+    var streakVal = document.createElement('span');
+    streakVal.className = 'val';
+    streakVal.textContent = maxWinStreak;
+    streakDiv.appendChild(streakVal);
+    streakDiv.appendChild(document.createTextNode('BEST STREAK'));
+    statsEl.appendChild(streakDiv);
+
+    playSeriesWinSound();
+
+    // Celebration particles
+    for (var j = 0; j < 5; j++) {
+      (function(delay) {
+        setTimeout(function() {
+          spawnParticles(
+            window.innerWidth * (0.2 + Math.random() * 0.6),
+            window.innerHeight * (0.2 + Math.random() * 0.5),
+            [COLOR_X, COLOR_O, COLOR_WIN, COLOR_DRAW][Math.floor(Math.random() * 4)],
+            15
+          );
+        }, delay);
+      })(j * 200);
+    }
+
+    // Save to neon.js if VS AI and won
+    if (gameMode === 'ai' && scoreX > scoreO) {
+      bestEl.style.display = 'none';
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(scoreX);
+      }).then(function(result) {
+        if (result && result.isNewBest) {
+          bestEl.textContent = 'NEW BEST!';
+          bestEl.style.display = 'block';
+        }
+        Neon.render(document.getElementById('series-lb'));
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      }).catch(function() {});
+    } else {
+      bestEl.style.display = 'none';
+    }
+
+    seriesOverlay.classList.add('active');
+  }
+
+  // ========== NEW ROUND ==========
+  window.newRound = function() {
+    roundOverlay.classList.remove('active');
+    roundNum++;
+    createBoard();
+    gameOver = false;
+    winLine = null;
+    winLineProgress = 0;
+    moveHistory = [];
+    markAnimations = [];
+    currentPlayer = (roundNum % 2 === 1) ? 1 : 2;
+    lastMoveTime = Date.now();
+    updateScoreDisplay();
+    updateTurnBanner();
+
+    if (gameMode === 'ai' && currentPlayer === 2) {
+      aiMove();
+    }
+  };
+
+  // ========== START SERIES ==========
+  window.startSeries = function() {
+    scoreX = 0;
+    scoreO = 0;
+    draws = 0;
+    roundNum = 1;
+    totalRounds = 0;
+    winStreak = 0;
+    maxWinStreak = 0;
+    moveTimesX = [];
+    moveTimesO = [];
+    seriesOver = false;
+
+    createBoard();
+    gameOver = false;
+    winLine = null;
+    winLineProgress = 0;
+    moveHistory = [];
+    markAnimations = [];
+    currentPlayer = 1;
+    lastMoveTime = Date.now();
+
+    undoBtn.style.display = gameMode === 'friend' ? '' : 'none';
+
+    startScreen.classList.remove('active');
+    gameScreen.classList.add('active');
+    seriesOverlay.classList.remove('active');
+    roundOverlay.classList.remove('active');
+
+    sizeCanvas();
+    updateScoreDisplay();
+    updateTurnBanner();
+
+    if (!animFrameId) {
+      animFrameId = requestAnimationFrame(renderLoop);
+    }
+  };
+
+  // ========== GO TO MENU ==========
+  window.goToMenu = function() {
+    gameOver = true;
+    gameScreen.classList.remove('active');
+    roundOverlay.classList.remove('active');
+    seriesOverlay.classList.remove('active');
+    startScreen.classList.add('active');
+    initNeon();
+    Neon.render(document.getElementById('start-lb'));
+  };
+
+  // ========== SHARE ==========
+  window.shareResult = function() {
+    var boardEmoji = '';
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        var v = board[r][c];
+        if (v === 1) boardEmoji += '\u274C';
+        else if (v === 2) boardEmoji += '\u2B55';
+        else boardEmoji += '\u2B1C';
+      }
+      boardEmoji += '\n';
+    }
+
+    var modeStr = gameMode === 'ai' ? 'VS AI (' + aiDiff.charAt(0).toUpperCase() + aiDiff.slice(1) + ')' : 'VS FRIEND';
+    var resultStr = scoreX > scoreO ? 'Won' : scoreO > scoreX ? 'Lost' : 'Tied';
+    var streakStr = maxWinStreak > 1 ? ' | \uD83D\uDD25 ' + maxWinStreak + ' win streak' : '';
+
+    var text = '\u274C\u2B55 TIC TAC TOE\n' +
+      gridSize + 'x' + gridSize + ' | ' + modeStr + '\n' +
+      resultStr + ' ' + scoreX + '-' + scoreO + streakStr + '\n' +
+      boardEmoji +
+      'neonarcade.net/neonclassic/tictactoe.html';
+
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        copyToClipboard(text);
+      });
+    } else {
+      copyToClipboard(text);
+    }
+  };
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      showCopiedToast();
+    }).catch(function() {
+      showCopiedToast();
+    });
+  }
+
+  function showCopiedToast() {
+    var btn = document.querySelector('.btn.share');
+    if (!btn) return;
+    var orig = btn.textContent;
+    btn.textContent = 'COPIED!';
+    setTimeout(function() { btn.textContent = orig; }, 1500);
+  }
+
+  // ========== INPUT ==========
+  canvas.addEventListener('click', function(e) {
+    handleCanvasInput(e.offsetX, e.offsetY);
+  });
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var touch = e.touches[0];
+    var x = (touch.clientX - rect.left) * (canvasLogW / rect.width);
+    var y = (touch.clientY - rect.top) * (canvasLogH / rect.height);
+    handleCanvasInput(x, y);
+  }, { passive: false });
+
+  canvas.addEventListener('mousemove', function(e) {
+    var cell = getCellFromPos(e.offsetX, e.offsetY);
+    hoverCell = cell || { r: -1, c: -1 };
+  });
+
+  canvas.addEventListener('mouseleave', function() {
+    hoverCell = { r: -1, c: -1 };
+  });
+
+  function getCellFromPos(x, y) {
+    var c = Math.floor((x - gridOffset.x) / cellSize);
+    var r = Math.floor((y - gridOffset.y) / cellSize);
+    if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+      return { r: r, c: c };
+    }
+    return null;
+  }
+
+  function handleCanvasInput(x, y) {
+    if (gameOver || aiThinking) return;
+    var cell = getCellFromPos(x, y);
+    if (cell) {
+      placeMark(cell.r, cell.c);
+    }
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (seriesOverlay.classList.contains('active') || roundOverlay.classList.contains('active')) {
+        goToMenu();
+      } else if (gameScreen.classList.contains('active')) {
+        goToMenu();
+      }
+      return;
+    }
+
+    if (!gameScreen.classList.contains('active') || gameOver || aiThinking) return;
+
+    if (gridSize === 3) {
+      var numMap = {
+        '7': [0,0], '8': [0,1], '9': [0,2],
+        '4': [1,0], '5': [1,1], '6': [1,2],
+        '1': [2,0], '2': [2,1], '3': [2,2]
+      };
+      var key = e.key;
+      if (numMap[key]) {
+        placeMark(numMap[key][0], numMap[key][1]);
+      }
+    }
+  });
+
+  // ========== RENDERING ==========
+  function renderLoop(timestamp) {
+    animFrameId = requestAnimationFrame(renderLoop);
+    if (!gameScreen.classList.contains('active')) return;
+    draw(timestamp);
+  }
+
+  function draw(timestamp) {
+    ctx.clearRect(0, 0, canvasLogW, canvasLogH);
+
+    drawGrid();
+    drawMarks(timestamp);
+    drawHover();
+    if (winLine) drawWinLine(timestamp);
+    if (gameOver && !winLine) drawDrawEffect(timestamp);
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = COLOR_GRID;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = 'rgba(0,240,255,0.15)';
+
+    for (var c = 1; c < gridSize; c++) {
+      var x = gridOffset.x + c * cellSize;
+      ctx.beginPath();
+      ctx.moveTo(x, gridOffset.y + cellSize * 0.05);
+      ctx.lineTo(x, gridOffset.y + gridSize * cellSize - cellSize * 0.05);
+      ctx.stroke();
+    }
+
+    for (var r = 1; r < gridSize; r++) {
+      var y = gridOffset.y + r * cellSize;
+      ctx.beginPath();
+      ctx.moveTo(gridOffset.x + cellSize * 0.05, y);
+      ctx.lineTo(gridOffset.x + gridSize * cellSize - cellSize * 0.05, y);
+      ctx.stroke();
+    }
+
+    ctx.shadowBlur = 0;
+  }
+
+  function drawMarks(timestamp) {
+    for (var i = 0; i < markAnimations.length; i++) {
+      var anim = markAnimations[i];
+      var elapsed = (timestamp - anim.startTime) / 300;
+      anim.progress = Math.min(elapsed, 1);
+    }
+
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        if (board[r][c] === 0) continue;
+        var anim2 = null;
+        for (var a = 0; a < markAnimations.length; a++) {
+          if (markAnimations[a].r === r && markAnimations[a].c === c) {
+            anim2 = markAnimations[a];
+            break;
+          }
+        }
+        var prog = anim2 ? easeOutCubic(anim2.progress) : 1;
+        var cx = gridOffset.x + c * cellSize + cellSize / 2;
+        var cy = gridOffset.y + r * cellSize + cellSize / 2;
+        var sz = cellSize * 0.3;
+
+        if (board[r][c] === 1) {
+          drawX(cx, cy, sz, prog, 1);
+        } else {
+          drawO(cx, cy, sz, prog, 1);
+        }
+      }
+    }
+  }
+
+  function drawX(cx, cy, sz, prog, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = COLOR_X;
+    ctx.lineWidth = Math.max(3, cellSize * 0.06);
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = 'rgba(0,240,255,0.6)';
+
+    var p1 = Math.min(prog * 2, 1);
+    if (p1 > 0) {
+      ctx.beginPath();
+      ctx.moveTo(cx - sz, cy - sz);
+      ctx.lineTo(cx - sz + sz * 2 * p1, cy - sz + sz * 2 * p1);
+      ctx.stroke();
+    }
+
+    var p2 = Math.max((prog - 0.5) * 2, 0);
+    if (p2 > 0) {
+      ctx.beginPath();
+      ctx.moveTo(cx + sz, cy - sz);
+      ctx.lineTo(cx + sz - sz * 2 * p2, cy - sz + sz * 2 * p2);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function drawO(cx, cy, sz, prog, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = COLOR_O;
+    ctx.lineWidth = Math.max(3, cellSize * 0.06);
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = 'rgba(255,45,123,0.6)';
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, sz, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * prog);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawHover() {
+    if (gameOver || aiThinking) return;
+    if (hoverCell.r < 0 || hoverCell.c < 0) return;
+    if (board[hoverCell.r][hoverCell.c] !== 0) return;
+
+    var cx = gridOffset.x + hoverCell.c * cellSize + cellSize / 2;
+    var cy = gridOffset.y + hoverCell.r * cellSize + cellSize / 2;
+    var sz = cellSize * 0.3;
+
+    if (currentPlayer === 1) {
+      drawX(cx, cy, sz, 1, 0.2);
+    } else {
+      drawO(cx, cy, sz, 1, 0.2);
+    }
+  }
+
+  function drawWinLine(timestamp) {
+    var elapsed = (timestamp - winLineStart) / 600;
+    winLineProgress = Math.min(elapsed, 1);
+    var prog = easeOutCubic(winLineProgress);
+
+    if (winLine.length < 2) return;
+
+    var first = winLine[0];
+    var last = winLine[winLine.length - 1];
+
+    var x1 = gridOffset.x + first.c * cellSize + cellSize / 2;
+    var y1 = gridOffset.y + first.r * cellSize + cellSize / 2;
+    var x2 = gridOffset.x + last.c * cellSize + cellSize / 2;
+    var y2 = gridOffset.y + last.r * cellSize + cellSize / 2;
+
+    var xEnd = x1 + (x2 - x1) * prog;
+    var yEnd = y1 + (y2 - y1) * prog;
+
+    // Outer glow line
+    ctx.strokeStyle = COLOR_WIN;
+    ctx.lineWidth = Math.max(4, cellSize * 0.08);
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = 'rgba(57,255,20,0.8)';
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(xEnd, yEnd);
+    ctx.stroke();
+
+    // Inner bright line
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = Math.max(2, cellSize * 0.03);
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = COLOR_WIN;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(xEnd, yEnd);
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    // Pulsing glow after complete
+    if (winLineProgress >= 1) {
+      var pulse = 0.3 + Math.sin(timestamp * 0.004) * 0.15;
+      ctx.strokeStyle = COLOR_WIN;
+      ctx.lineWidth = Math.max(8, cellSize * 0.15);
+      ctx.globalAlpha = pulse;
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = COLOR_WIN;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function drawDrawEffect(timestamp) {
+    var elapsed = (timestamp - drawPulseStart) / 1000;
+    var pulse = 0.3 + Math.sin(elapsed * 3) * 0.15;
+
+    ctx.globalAlpha = 0.3 + pulse;
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        if (board[r][c] === 0) continue;
+        var cx2 = gridOffset.x + c * cellSize + cellSize / 2;
+        var cy2 = gridOffset.y + r * cellSize + cellSize / 2;
+        ctx.fillStyle = COLOR_DRAW;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = COLOR_DRAW;
+        ctx.beginPath();
+        ctx.arc(cx2, cy2, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  // ========== RESIZE ==========
+  window.addEventListener('resize', function() {
+    dpr = window.devicePixelRatio || 1;
+    if (gameScreen.classList.contains('active')) {
+      sizeCanvas();
+    }
+  });
+
+  // ========== INIT ==========
+  initNeon();
+  setTimeout(function() {
+    Neon.render(document.getElementById('start-lb'));
+  }, 500);
+
+  animFrameId = requestAnimationFrame(renderLoop);
+
+})();
+</script>
+</body>
+</html>
