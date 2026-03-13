@@ -175,6 +175,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 10 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Multiplayer Without Servers — Challenge Links, Seeded Boards, and Same-Device 2P",
+  "description": "How we added three types of multiplayer to NEON ARCADE — VS AI, same-device 2P, and challenge links — without any server infrastructure for most of them.",
+  "url": "https://neonarcade.net/blog.html#multiplayer-without-servers",
+  "datePublished": "2026-03-13",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#multiplayer-without-servers"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -765,6 +781,10 @@
     <li><a href="#battleship-multiplayer">
       <span class="toc-num">09</span>
       <span class="toc-text">Battleship &mdash; Our First Online Multiplayer Game</span>
+    </a></li>
+    <li><a href="#multiplayer-without-servers">
+      <span class="toc-num">10</span>
+      <span class="toc-text">Multiplayer Without Servers &mdash; Challenge Links, Seeds &amp; Same-Device 2P</span>
     </a></li>
   </ol>
 </nav>
@@ -1503,6 +1523,142 @@ Neon.getName() ? Promise.resolve() : Neon.promptName();
   <div class="highlight-box">
     <span class="hl-label">The Takeaway</span>
     <p>You do not need WebSockets or a game server to build online multiplayer. A Cloudflare Worker, KV storage, and 800ms polling intervals give you a surprisingly smooth turn-based multiplayer experience &mdash; for $0/month. Sometimes the simplest architecture is the best one.</p>
+  </div>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 10 -->
+<!-- ================================================================ -->
+<article class="article" id="multiplayer-without-servers">
+  <p class="article-num">Article 10 &mdash; March 13, 2026</p>
+  <h2 class="article-title">Multiplayer Without Servers</h2>
+
+  <p>NEON ARCADE hit 62 games. Most of them are solo. You play, you score, you share. But games become something different when another person is involved. The tension of a head-to-head match, the satisfaction of beating a friend's time, the drama of a close finish &mdash; those are the moments that make people actually send a link.</p>
+
+  <p>So we asked: <strong>how many of our games can become multiplayer without adding servers, accounts, or matchmaking?</strong> The answer turned out to be 10 &mdash; and we built three different multiplayer patterns to make it work.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val green">10</div>
+      <div class="stat-label">Multiplayer Games</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Multiplayer Modes</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">$0</div>
+      <div class="stat-label">Server Cost for Challenge Links</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">0</div>
+      <div class="stat-label">Accounts Required</div>
+    </div>
+  </div>
+
+  <h3>The Three Modes</h3>
+
+  <p>Not all multiplayer is the same. A fighting game and a crossword puzzle need completely different approaches. We settled on three modes that cover most cases without overcomplicating things:</p>
+
+  <ul>
+    <li><strong>VS AI</strong> &mdash; A computer opponent good enough to make you think. Battleship, Mine Finder, and Tic Tac Toe all have AI opponents with proper strategy, not random moves.</li>
+    <li><strong>2P Local</strong> &mdash; Same device, pass and play. Two humans, one screen, taking turns. Pairs, Tic Tac Toe, Veto, and Mimic all support this. No network needed.</li>
+    <li><strong>Online (Challenge Links)</strong> &mdash; Send a URL. Your friend gets the exact same puzzle. Compare results. No room codes, no server relay, no waiting. Battleship is the only game using real-time room codes &mdash; everything else uses challenge links encoded in the URL.</li>
+  </ul>
+
+  <p>Every game on the site now has <strong>mode tags</strong> visible on its card &mdash; colored badges showing SOLO, VS AI, 2P LOCAL, or ONLINE. A new <a href="/multiplayer.html" style="color:var(--neon-green);text-decoration:underline;text-underline-offset:3px;">multiplayer landing page</a> groups all 10 games with filter tabs.</p>
+
+  <h3>Challenge Links: The Zero-Server Multiplayer</h3>
+
+  <p>Challenge links are the most interesting pattern because they require <strong>zero server infrastructure.</strong> The entire multiplayer state is encoded in the URL itself. When you complete a puzzle in Connections or Minesweeper, you get a "CHALLENGE FRIEND" button. It generates a link like:</p>
+
+  <div class="code-block" data-lang="url">
+<code>neonarcade.net/neonmind/connections.html<span class="str">#c=17</span>
+neonarcade.net/neonmind/minesweeper.html<span class="str">#c=839274516-3</span></code>
+  </div>
+
+  <p>The hash fragment encodes which puzzle to load. For Connections, it is a puzzle index. For Minesweeper, it is a <strong>seed + difficulty level.</strong> When your friend opens the link, JavaScript reads the hash, and they get the exact same challenge. No server involved &mdash; the URL is the entire protocol.</p>
+
+  <p>This means challenge links are:</p>
+
+  <ul>
+    <li><strong>Free</strong> &mdash; no API calls, no bandwidth, no KV storage</li>
+    <li><strong>Instant</strong> &mdash; no waiting for the other player</li>
+    <li><strong>Permanent</strong> &mdash; the link works forever, not just during a session</li>
+    <li><strong>Shareable anywhere</strong> &mdash; text messages, Discord, Slack, social media, email</li>
+  </ul>
+
+  <p>The tradeoff? Both players play independently. There is no live connection, no real-time view of the other player. You share a link, they play, they share back. It is asynchronous by nature. But for puzzles like Minesweeper and Connections, that is exactly the right model. You do not need to watch someone solve a Sudoku in real time. You just want to know if they were faster than you.</p>
+
+  <h3>Seeded PRNG: Making Randomness Reproducible</h3>
+
+  <p>Minesweeper posed a specific problem. Its boards are randomly generated &mdash; so how do you give two players the exact same random board? The answer is a <strong>seeded pseudo-random number generator.</strong></p>
+
+  <p>We used <code>mulberry32</code>, a fast 32-bit PRNG. Given the same seed, it produces the exact same sequence of "random" numbers every time. The board generation uses this instead of <code>Math.random()</code>:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="kw">function</span> <span class="fn">mulberry32</span>(a) {
+  <span class="kw">return function</span>() {
+    a |= <span class="num">0</span>;
+    a = a + <span class="num">0x6D2B79F5</span> | <span class="num">0</span>;
+    <span class="kw">var</span> t = Math.<span class="fn">imul</span>(a ^ a >>> <span class="num">15</span>, <span class="num">1</span> | a);
+    t = t + Math.<span class="fn">imul</span>(t ^ t >>> <span class="num">7</span>, <span class="num">61</span> | t) ^ t;
+    <span class="kw">return</span> ((t ^ t >>> <span class="num">14</span>) >>> <span class="num">0</span>) / <span class="num">4294967296</span>;
+  };
+}</code>
+  </div>
+
+  <p>When a player finishes a Minesweeper game, we save the seed. When they challenge a friend, the seed and board size go into the URL hash. The friend's browser seeds the PRNG with the same value, runs the same Fisher-Yates shuffle, and gets the same mine placement. Same board, different player, fair competition.</p>
+
+  <p>First-click safety is preserved too. If the first click lands on a mine, the mine swaps to a safe cell &mdash; and since the first-click position is part of the board state, both players get the same first-click behavior as long as they click the same cell first. In practice, challenge mode starts with a pre-revealed board, so this edge case is handled naturally.</p>
+
+  <h3>Same-Device 2P: The Couch Multiplayer</h3>
+
+  <p>Sometimes multiplayer means two people staring at the same screen. For Neon Pairs (the memory card game), we added a <strong>VS Friend</strong> mode that turns it into a competitive card-matching duel.</p>
+
+  <p>The rules are simple: players take turns flipping two cards. If they match, you score a point and go again. If they do not match, the cards flip back and it is the other player's turn. The person with the most matches wins.</p>
+
+  <p>The UI makes it obvious whose turn it is. Player 1 glows <strong style="color:#00f0ff;">cyan</strong>. Player 2 glows <strong style="color:#ff2d7b;">pink</strong>. A brief transition overlay announces each turn change. The top bar shows both scores updating live. It is minimal UI on top of the existing solo game &mdash; same cards, same animations, same sounds, just with turn tracking layered on.</p>
+
+  <p>Tic Tac Toe already had this mode from launch (3&times;3 or 4&times;4 grids, two humans on one screen). Veto and Mimic also support same-device play alongside their online challenge modes.</p>
+
+  <h3>The Tagging System</h3>
+
+  <p>With 62 games and 10 supporting multiplayer, players need a way to find the right ones. We added a tagging system: every game in the catalog now carries a <code>modes</code> array with values like <code>['1p', 'ai', 'local', 'online']</code>. Game cards render these as colored badges:</p>
+
+  <ul>
+    <li><strong style="color:#7a7a9a;">SOLO</strong> &mdash; grey, every game has this</li>
+    <li><strong style="color:#b44dff;">VS AI</strong> &mdash; purple, for games with computer opponents</li>
+    <li><strong style="color:#39ff14;">2P LOCAL</strong> &mdash; green, same-device pass-and-play</li>
+    <li><strong style="color:#00f0ff;">ONLINE</strong> &mdash; cyan, challenge links or room codes</li>
+  </ul>
+
+  <p>The badges only show when a game has more than one mode. Solo-only games (52 of them) get no tags &mdash; keeping the cards clean. The dedicated <a href="/multiplayer.html" style="color:var(--neon-green);text-decoration:underline;text-underline-offset:3px;">multiplayer hub</a> shows all 10 games with filter tabs for each mode.</p>
+
+  <h3>Why Not WebSockets?</h3>
+
+  <p>Battleship uses real-time room codes via the Cloudflare Worker relay (see <a href="#battleship-multiplayer" style="color:var(--neon-cyan);text-decoration:underline;text-underline-offset:3px;">Article 09</a>). That works because Battleship needs <strong>live turn-by-turn communication</strong> &mdash; you fire, they react, you see the result. It is genuinely synchronous.</p>
+
+  <p>But most puzzle games are not. Minesweeper does not need the other player present. Connections does not either. They are solo experiences that become competitive when you compare results. For these, challenge links are strictly better than real-time connections:</p>
+
+  <ul>
+    <li>No timing coordination (play whenever you want)</li>
+    <li>No server load (the link contains all state)</li>
+    <li>No connection drops or lobby timeouts</li>
+    <li>Works in group chats (send one link, everyone plays)</li>
+  </ul>
+
+  <p>The lesson: <strong>multiplayer does not always mean real-time.</strong> For most competitive puzzle experiences, "play the same thing and compare" is more fun, less friction, and infinitely cheaper to build.</p>
+
+  <h3>What's Next</h3>
+
+  <p>We are eyeing more games for multiplayer upgrades. Sudoku and KenKen could get challenge links (same puzzle, race the clock). TypeBlitz could support same-device speed duels. Reflex Chain could compare reaction times via shared seeds. The patterns are established &mdash; adding multiplayer to a new game now takes hours, not days.</p>
+
+  <p>The multiplayer hub also sets up future possibilities: tournament brackets, daily challenge leaderboards, and "play what your friends played" social features. All without adding a single WebSocket connection.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Takeaway</span>
+    <p>Most multiplayer does not need servers. A seeded PRNG and a URL hash give you reproducible shared experiences for free. Real-time connections are for real-time games &mdash; everything else can be a link. The best multiplayer architecture is the one where the URL is the entire protocol.</p>
   </div>
 </article>
 
