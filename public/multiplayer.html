@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiplayer Games — Free Online 2-Player Games | NEON ARCADE</title>
+<meta name="description" content="Play free multiplayer browser games — VS AI, same-device 2-player, or online challenges via link. No download, no login.">
+<meta name="keywords" content="multiplayer games, 2 player games, free online multiplayer, vs ai games, local multiplayer, browser games">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/multiplayer.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/multiplayer.html">
+<meta property="og:title" content="Multiplayer Games — Free Online 2-Player Games | NEON ARCADE">
+<meta property="og:description" content="Play free multiplayer browser games — VS AI, same-device 2-player, or online challenges via link. No download, no login.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/multiplayer.html">
+<meta name="twitter:title" content="Multiplayer Games — Free Online 2-Player Games | NEON ARCADE">
+<meta name="twitter:description" content="Play free multiplayer browser games — VS AI, same-device 2-player, or online challenges via link. No download, no login.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Multiplayer Games",
+  "url": "https://neonarcade.net/multiplayer.html",
+  "description": "Play free multiplayer browser games — VS AI, same-device 2-player, or online challenges via link. No download, no login.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "Multiplayer Games", "item": "https://neonarcade.net/multiplayer.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #7a7a9a;
+    --text-mid: #9999bb;
+    --text-bright: #cccce0;
+    --border: rgba(0,240,255,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* --- SCANLINES --- */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* --- ANIMATED BG --- */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- BACK LINK --- */
+  .back-link {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    margin: 24px 0 0 24px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 6px 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+
+  .back-link:hover {
+    color: var(--neon-cyan);
+    border-color: rgba(0,240,255,0.3);
+    background: rgba(0,240,255,0.06);
+  }
+
+  /* --- HEADER --- */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(32px, 7vw, 64px);
+    letter-spacing: 8px;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(57,255,20,0.6), 0 0 40px rgba(57,255,20,0.2), 0 0 80px rgba(57,255,20,0.1);
+    line-height: 1.1;
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(14px, 3vw, 20px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .header-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 2.5vw, 16px);
+    color: var(--text-mid);
+    max-width: 640px;
+    margin: 16px auto 0;
+    line-height: 1.6;
+    letter-spacing: 1px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+    margin: 30px auto 0;
+  }
+
+  /* --- FILTER TABS --- */
+  .filter-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    max-width: 600px;
+    margin: 30px auto 0;
+    padding: 0 20px;
+  }
+
+  .filter-tab {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .filter-tab.tab-all {
+    color: var(--neon-gold);
+    border: 1px solid rgba(255,215,0,0.2);
+  }
+  .filter-tab.tab-all:hover,
+  .filter-tab.tab-all.active {
+    background: rgba(255,215,0,0.1);
+    border-color: rgba(255,215,0,0.5);
+    box-shadow: 0 0 12px rgba(255,215,0,0.15);
+  }
+
+  .filter-tab.tab-ai {
+    color: var(--neon-purple);
+    border: 1px solid rgba(180,77,255,0.2);
+  }
+  .filter-tab.tab-ai:hover,
+  .filter-tab.tab-ai.active {
+    background: rgba(180,77,255,0.1);
+    border-color: rgba(180,77,255,0.5);
+    box-shadow: 0 0 12px rgba(180,77,255,0.15);
+  }
+
+  .filter-tab.tab-local {
+    color: var(--neon-green);
+    border: 1px solid rgba(57,255,20,0.2);
+  }
+  .filter-tab.tab-local:hover,
+  .filter-tab.tab-local.active {
+    background: rgba(57,255,20,0.1);
+    border-color: rgba(57,255,20,0.5);
+    box-shadow: 0 0 12px rgba(57,255,20,0.15);
+  }
+
+  .filter-tab.tab-online {
+    color: var(--neon-cyan);
+    border: 1px solid rgba(0,240,255,0.2);
+  }
+  .filter-tab.tab-online:hover,
+  .filter-tab.tab-online.active {
+    background: rgba(0,240,255,0.1);
+    border-color: rgba(0,240,255,0.5);
+    box-shadow: 0 0 12px rgba(0,240,255,0.15);
+  }
+
+  .filter-tab .tab-count {
+    font-size: 9px;
+    opacity: 0.6;
+    margin-left: 4px;
+  }
+
+  /* --- GAMES GRID --- */
+  .games-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 24px 0;
+  }
+
+  .games-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(0,240,255,0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0,240,255,0.08), 0 0 0 1px rgba(0,240,255,0.1);
+  }
+
+  .game-card.hidden {
+    display: none;
+  }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-screenshot img { transform: scale(1.03); }
+
+  .card-screenshot .placeholder {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+
+  .card-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    color: var(--text-bright);
+  }
+
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  /* --- MODE TAGS --- */
+  .mode-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .mode-tag {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .mode-tag.tag-ai { background: rgba(180,77,255,0.12); color: var(--neon-purple); border: 1px solid rgba(180,77,255,0.25); }
+  .mode-tag.tag-local { background: rgba(57,255,20,0.12); color: var(--neon-green); border: 1px solid rgba(57,255,20,0.25); }
+  .mode-tag.tag-online { background: rgba(0,240,255,0.12); color: var(--neon-cyan); border: 1px solid rgba(0,240,255,0.25); }
+
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--neon-cyan);
+    transition: all 0.2s;
+  }
+
+  .game-card:hover .card-play { letter-spacing: 4px; }
+
+  .play-arrow {
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+
+  .game-card:hover .play-arrow { transform: translateX(4px); }
+
+  /* --- EMPTY STATE --- */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    display: none;
+  }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    margin-top: 60px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #9999bb;
+    text-decoration: underline;
+    text-decoration-color: rgba(153,153,187,0.4);
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover { color: var(--neon-cyan); text-decoration-color: rgba(0,240,255,0.4); }
+
+  @media (max-width: 700px) {
+    .games-row { grid-template-columns: 1fr; gap: 16px; }
+    .games-section { padding: 20px 16px 0; }
+    header { padding: 30px 16px 16px; }
+    .back-link { margin: 16px 0 0 16px; }
+    .filter-bar { gap: 8px; }
+    .filter-tab { padding: 6px 14px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<a href="/" class="back-link">&larr; BACK TO ALL GAMES</a>
+
+<header>
+  <h1 class="logo">MULTIPLAYER</h1>
+  <p class="tagline">Challenge friends &mdash; same device, online, or versus AI</p>
+  <p class="header-desc">10 games with multiplayer modes. Play against smart AI opponents, pass-and-play on the same device, or send challenge links to friends online.</p>
+  <div class="header-line"></div>
+</header>
+
+<main>
+
+<div class="filter-bar" id="filter-bar">
+  <button class="filter-tab tab-all active" data-filter="all">ALL <span class="tab-count">10</span></button>
+  <button class="filter-tab tab-ai" data-filter="ai">VS AI <span class="tab-count">3</span></button>
+  <button class="filter-tab tab-local" data-filter="local">2P LOCAL <span class="tab-count">4</span></button>
+  <button class="filter-tab tab-online" data-filter="online">ONLINE <span class="tab-count">7</span></button>
+</div>
+
+<div class="games-section">
+  <div class="games-row" id="games-grid">
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>ALL GAMES RUN IN YOUR BROWSER &mdash; NO INSTALL &mdash; NO SIGNUP &mdash; JUST PLAY</p>
+  <p class="credit">Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+<script>
+(function() {
+  var GAMES = [
+    { slug: 'battleship', name: 'BATTLESHIP', desc: 'Classic naval warfare meets neon. Place your fleet, hunt the enemy grid shot by shot. Smart AI or online 2-player with room codes.', img: 'neonarcade/screenshots/battleship.png', path: 'neonarcade/', modes: ['ai','online'] },
+    { slug: 'mine-finder', name: 'MINE FINDER', desc: 'Reverse minesweeper. Place mines to fool the AI. Can you outsmart the algorithm?', img: 'neonarcade/screenshots/mine-finder.png', path: 'neonarcade/', modes: ['ai'] },
+    { slug: 'tictactoe', name: 'TIC TAC TOE', desc: '3x3 or 4x4, VS AI or VS Friend. Three AI difficulties, animated marks and glowing win lines.', img: 'neonclassic/screenshots/tictactoe.png', path: 'neonclassic/', modes: ['ai','local'] },
+    { slug: 'veto', name: 'VETO', desc: '2-player bracket challenge. Eliminate 16 items to find your winner. Soulmates or opposites?', img: 'neonarcade/screenshots/veto.png', path: 'neonarcade/', modes: ['local','online'] },
+    { slug: 'mimic', name: 'MIMIC', desc: 'Answer 10 questions, challenge a friend to predict your answers. How well do they know you?', img: 'neonarcade/screenshots/mimic.png', path: 'neonarcade/', modes: ['local','online'] },
+    { slug: 'pairs', name: 'NEON PAIRS', desc: 'Flip, match, remember. Memory card matching — solo or 2-player on the same device!', img: 'neonclassic/screenshots/pairs.png', path: 'neonclassic/', modes: ['local'] },
+    { slug: 'wordchain-duel', name: 'WORDCHAIN DUEL', desc: 'Async 1v1 word chain challenge. Send a link, your opponent plays the same chain.', img: 'neonarcade/screenshots/wordchain-duel.png', path: 'neonarcade/', modes: ['online'] },
+    { slug: 'breakout-architect', name: 'BREAKOUT ARCHITECT', desc: 'Design breakout levels and share challenge links. Can friends beat your creation?', img: 'neonarcade/screenshots/breakout-architect.png', path: 'neonarcade/', modes: ['online'] },
+    { slug: 'minesweeper', name: 'MINESWEEPER', desc: 'Classic mine-clearing with six sizes. Challenge friends with the same board seed!', img: 'neonmind/screenshots/minesweeper.png', path: 'neonmind/', modes: ['online'] },
+    { slug: 'connections', name: 'CONNECTIONS', desc: 'Find 4 groups of 4 words sharing a hidden connection. Challenge friends with the same puzzle!', img: 'neonmind/screenshots/connections.png', path: 'neonmind/', modes: ['online'] }
+  ];
+
+  var modeLabels = { 'ai': 'VS AI', 'local': '2P LOCAL', 'online': 'ONLINE' };
+  var activeFilter = 'all';
+  var grid = document.getElementById('games-grid');
+
+  function makeCard(game) {
+    var a = document.createElement('a');
+    a.href = '/' + game.path + game.slug + '.html';
+    a.className = 'game-card';
+    a.setAttribute('data-modes', game.modes.join(','));
+
+    var ssDiv = document.createElement('div');
+    ssDiv.className = 'card-screenshot';
+    var img = document.createElement('img');
+    img.src = '/' + game.img;
+    img.alt = game.name + ' - free online multiplayer browser game';
+    img.width = 1280;
+    img.height = 800;
+    img.loading = 'lazy';
+    img.onerror = function() { this.style.display = 'none'; };
+    ssDiv.appendChild(img);
+    a.appendChild(ssDiv);
+
+    var body = document.createElement('div');
+    body.className = 'card-body';
+
+    var title = document.createElement('h2');
+    title.className = 'card-title';
+    title.textContent = game.name;
+    body.appendChild(title);
+
+    var desc = document.createElement('p');
+    desc.className = 'card-desc';
+    desc.textContent = game.desc;
+    body.appendChild(desc);
+
+    var tags = document.createElement('div');
+    tags.className = 'mode-tags';
+    game.modes.forEach(function(m) {
+      var tag = document.createElement('span');
+      tag.className = 'mode-tag tag-' + m;
+      tag.textContent = modeLabels[m] || m;
+      tags.appendChild(tag);
+    });
+    body.appendChild(tags);
+
+    var play = document.createElement('div');
+    play.className = 'card-play';
+    play.textContent = 'PLAY NOW ';
+    var arrow = document.createElement('span');
+    arrow.className = 'play-arrow';
+    arrow.textContent = '\u2192';
+    play.appendChild(arrow);
+    body.appendChild(play);
+
+    a.appendChild(body);
+    return a;
+  }
+
+  // Build all cards once
+  GAMES.forEach(function(game) {
+    grid.appendChild(makeCard(game));
+  });
+
+  // Filter logic
+  function applyFilter(filter) {
+    activeFilter = filter;
+    var cards = grid.querySelectorAll('.game-card');
+    var visibleCount = 0;
+    cards.forEach(function(card) {
+      var modes = card.getAttribute('data-modes').split(',');
+      var show = filter === 'all' || modes.indexOf(filter) !== -1;
+      card.classList.toggle('hidden', !show);
+      if (show) visibleCount++;
+    });
+
+    // Update active tab
+    var tabs = document.querySelectorAll('.filter-tab');
+    tabs.forEach(function(tab) {
+      tab.classList.toggle('active', tab.getAttribute('data-filter') === filter);
+    });
+  }
+
+  // Tab click handlers
+  document.getElementById('filter-bar').addEventListener('click', function(e) {
+    var tab = e.target.closest('.filter-tab');
+    if (!tab) return;
+    var filter = tab.getAttribute('data-filter');
+    if (filter) applyFilter(filter);
+  });
+
+  // Initial state: show all
+  applyFilter('all');
+})();
+</script>
+</body>
+</html>

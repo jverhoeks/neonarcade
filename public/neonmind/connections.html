@@ -148,6 +148,12 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 .play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
 .play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
 
+/* Challenge mode */
+.play-btn.challenge-btn{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.challenge-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.challenge-badge{display:none;font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#0a0a12;background:#ffd700;padding:4px 14px;border-radius:3px;text-transform:uppercase;box-shadow:0 0 12px rgba(255,215,0,0.4),0 0 30px rgba(255,215,0,0.15);margin-bottom:2px}
+.challenge-badge.visible{display:inline-block}
+
 /* Screen shake */
 @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-2px,1px)}20%{transform:translate(2px,-1px)}30%{transform:translate(-1px,2px)}40%{transform:translate(1px,-1px)}50%{transform:translate(-2px,1px)}60%{transform:translate(2px,0)}70%{transform:translate(-1px,-2px)}80%{transform:translate(1px,1px)}90%{transform:translate(-1px,-1px)}}
 .shaking{animation:shake 0.3s ease-in-out}
@@ -210,6 +216,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 <!-- GAME SCREEN -->
 <div class="screen" id="gameScreen">
+  <div class="challenge-badge" id="challengeBadge">CHALLENGE MODE</div>
   <div class="game-top-bar">
     <button class="top-back" id="backBtn" title="Back to menu">&#8592;</button>
     <div class="top-puzzle" id="topPuzzle">PUZZLE #1</div>
@@ -239,7 +246,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
 <!-- COMPLETE SCREEN -->
 <div class="screen" id="completeScreen">
-  <div class="brand-tag">NEON MIND</div>
+  <div class="challenge-badge" id="completeBadge">CHALLENGE MODE</div>
+  <div class="brand-tag" id="completeBrand">NEON MIND</div>
   <h1 class="complete-title" id="completeTitle">SOLVED</h1>
 
   <div class="result-groups" id="resultGroups"></div>
@@ -252,6 +260,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
   <div class="btn-row">
     <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn challenge-btn" id="challengeBtn">CHALLENGE FRIEND</button>
     <button class="play-btn" id="playAgainBtn">PLAY AGAIN</button>
     <button class="play-btn menu-btn" id="menuBtn">MENU</button>
   </div>
@@ -524,6 +533,9 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   var statStreak = document.getElementById('statStreak');
   var statBest = document.getElementById('statBest');
   var toastEl = document.getElementById('toast');
+  var challengeBadge = document.getElementById('challengeBadge');
+  var completeBadge = document.getElementById('completeBadge');
+  var challengeBtn = document.getElementById('challengeBtn');
 
   // ===== AUDIO =====
   var audioCtx = null;
@@ -625,6 +637,20 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   var elapsed = 0;
   var gameActive = false;
   var previousGuesses = [];
+  var isChallengeMode = false;
+  var challengePuzzleIndex = -1;
+
+  // ===== CHALLENGE LINK DETECTION =====
+  function parseChallengeHash() {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('#c=') === 0) {
+      var val = parseInt(hash.substring(3), 10);
+      if (!isNaN(val) && val >= 0 && val < PUZZLES.length) {
+        return val;
+      }
+    }
+    return -1;
+  }
 
   // ===== PERSISTENCE =====
   var STATS_KEY = 'neonarcade_neonmind_connections_stats';
@@ -662,8 +688,15 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   });
 
   function updateStartScreen() {
-    puzzleIndex = getPuzzleIndex();
-    puzzleNumEl.textContent = 'PUZZLE #' + (puzzleIndex + 1);
+    challengePuzzleIndex = parseChallengeHash();
+    if (challengePuzzleIndex >= 0) {
+      isChallengeMode = true;
+      puzzleIndex = challengePuzzleIndex;
+    } else {
+      isChallengeMode = false;
+      puzzleIndex = getPuzzleIndex();
+    }
+    puzzleNumEl.textContent = isChallengeMode ? 'CHALLENGE PUZZLE #' + (puzzleIndex + 1) : 'PUZZLE #' + (puzzleIndex + 1);
     var stats = loadStats();
     statWins.textContent = stats.wins;
     statStreak.textContent = stats.streak;
@@ -934,9 +967,14 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
   // ===== START GAME =====
   function startGame() {
-    puzzleIndex = getPuzzleIndex();
+    if (isChallengeMode && challengePuzzleIndex >= 0) {
+      puzzleIndex = challengePuzzleIndex;
+    } else {
+      puzzleIndex = getPuzzleIndex();
+    }
     currentPuzzle = PUZZLES[puzzleIndex];
     topPuzzleEl.textContent = 'PUZZLE #' + (puzzleIndex + 1);
+    challengeBadge.classList.toggle('visible', isChallengeMode);
 
     remainingWords = [];
     currentPuzzle.groups.forEach(function(g) {
@@ -973,6 +1011,8 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       completeTitle.textContent = 'GAME OVER';
       completeTitle.className = 'complete-title lose';
     }
+
+    completeBadge.classList.toggle('visible', isChallengeMode);
 
     resultGroups.textContent = '';
     DIFF_ORDER.forEach(function(d) {
@@ -1054,7 +1094,11 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
 
     var totalTime = Math.floor(elapsed);
     text += mistakes + '/' + MAX_MISTAKES + ' mistakes | ' + fmtTime(totalTime) + '\n';
-    text += 'neonarcade.net/neonmind/connections.html';
+    if (isChallengeMode) {
+      text += buildChallengeUrl();
+    } else {
+      text += 'neonarcade.net/neonmind/connections.html';
+    }
     return text;
   }
 
@@ -1066,6 +1110,33 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
       });
     } else {
       navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); }).catch(function() { showToast('Could not copy'); });
+    }
+  }
+
+  // ===== CHALLENGE LINK =====
+  function buildChallengeUrl() {
+    return window.location.origin + window.location.pathname + '#c=' + puzzleIndex;
+  }
+
+  function buildChallengeShareText() {
+    var url = buildChallengeUrl();
+    var num = puzzleIndex + 1;
+    var totalTime = Math.floor(elapsed);
+    var text = '\u{1F3AE} CONNECTIONS CHALLENGE #' + num + '\n';
+    text += 'I solved it in ' + fmtTime(totalTime) + ' with ' + mistakes + '/' + MAX_MISTAKES + ' mistakes.\n';
+    text += 'Can you beat me?\n';
+    text += url;
+    return text;
+  }
+
+  function doChallenge() {
+    var text = buildChallengeShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() { showToast('Link copied!'); }).catch(function() { showToast('Could not copy'); });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() { showToast('Link copied!'); }).catch(function() { showToast('Could not copy'); });
     }
   }
 
@@ -1099,6 +1170,7 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
   });
 
   shareBtn.addEventListener('click', doShare);
+  challengeBtn.addEventListener('click', doChallenge);
   playAgainBtn.addEventListener('click', startGame);
   menuBtn.addEventListener('click', function() {
     showScreen(startScreen);
@@ -1119,8 +1191,20 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(
     }
   });
 
+  // ===== HASH CHANGE =====
+  window.addEventListener('hashchange', function() {
+    if (!gameActive) {
+      updateStartScreen();
+    }
+  });
+
   // ===== INIT =====
   updateStartScreen();
+
+  // Auto-start if opened via challenge link
+  if (isChallengeMode) {
+    startGame();
+  }
 
 })();
 </script>
