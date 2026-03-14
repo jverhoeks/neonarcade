@@ -1,8 +1,8 @@
 # NEON ARCADE
 
-> Play 62 free online browser games instantly — no download, no login required. Arcade, puzzle, skill and retro games with global leaderboards.
+> Play 67 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro and deep games with global leaderboards.
 
-NEON ARCADE is a collection of 62 free HTML5 browser games organized in four categories:
+NEON ARCADE is a collection of 67 free HTML5 browser games organized in five categories:
 
 ## Categories
 
@@ -10,6 +10,7 @@ NEON ARCADE is a collection of 62 free HTML5 browser games organized in four cat
 - [NEON MIND](https://neonarcade.net/neonmind/) — 15 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
 - [NEON GRIND](https://neonarcade.net/neongrind/) — 8 progressive skill challenges
 - [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 8 retro arcade classics reimagined
+- [NEON QUEST](https://neonarcade.net/neonquest/) — 5 deep games for longer sessions (roguelikes, tower defense, crafting)
 
 ## All Games
 
@@ -82,6 +83,13 @@ NEON ARCADE is a collection of 62 free HTML5 browser games organized in four cat
 - [Neon Pairs](https://neonarcade.net/neonclassic/pairs.html) — Memory card matching
 - [Neon Tetris](https://neonarcade.net/neonclassic/tetris.html) — Classic block stacking reimagined
 - [Tic Tac Toe](https://neonarcade.net/neonclassic/tictactoe.html) — 3x3 or 4x4, VS AI or VS Friend
+
+### NEON QUEST
+- [Fusion](https://neonarcade.net/neonquest/fusion.html) — Atomic merge physics — drop elements, fuse them up the periodic table
+- [Jackpot](https://neonarcade.net/neonquest/jackpot.html) — Slot machine roguelike deckbuilder with 15 floors of enemies
+- [Firewall](https://neonarcade.net/neonquest/firewall.html) — Tower defense on a circuit board with evolving maze paths
+- [Swarm](https://neonarcade.net/neonquest/swarm.html) — Drone survivor-like with split/merge swarm mechanics
+- [Synthesis](https://neonarcade.net/neonquest/synthesis.html) — Neon alchemy lab with 200+ discoverable items
 
 ## Features
 

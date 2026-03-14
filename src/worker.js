@@ -69,6 +69,13 @@ const KNOWN_GAMES = {
   'hitori':              { mode: 'low', maxScore: 86400 },
   'kenken':              { mode: 'low', maxScore: 86400 },
 
+  // NEON QUEST (longer-session deep games, mode: high)
+  'fusion':              { mode: 'high', maxScore: 10000000 },
+  'jackpot':             { mode: 'high', maxScore: 100000 },
+  'firewall':            { mode: 'high', maxScore: 100000 },
+  'swarm':               { mode: 'high', maxScore: 100000 },
+  'synthesis':           { mode: 'high', maxScore: 10000 },
+
   // NEON CLASSIC (retro games, mode: high)
   'invaders':            { mode: 'high', maxScore: 1000000 },
   'breakout':            { mode: 'high', maxScore: 1000000 },

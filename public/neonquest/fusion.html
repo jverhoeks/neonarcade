@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Fusion — Free Atomic Merge Physics Game | NEON ARCADE</title>
+<meta name="description" content="Play Fusion free online — drop atoms into a reactor and fuse them into heavier elements. Suika Game meets the periodic table with neon physics. No download, no login.">
+<meta name="keywords" content="fusion game, suika game, atom merge, periodic table game, free browser game, neon arcade, physics puzzle">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonquest/fusion.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonquest/fusion.html">
+<meta property="og:title" content="Fusion — Free Atomic Merge Physics Game | NEON ARCADE">
+<meta property="og:description" content="Play Fusion free online — drop atoms into a reactor and fuse them into heavier elements. Suika Game meets the periodic table with neon physics.">
+<meta property="og:image" content="https://neonarcade.net/neonquest/screenshots/fusion.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonquest/fusion.html">
+<meta name="twitter:title" content="Fusion — Free Atomic Merge Physics Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Fusion free online — drop atoms into a reactor and fuse them into heavier elements. Suika Game meets the periodic table with neon physics.">
+<meta name="twitter:image" content="https://neonarcade.net/neonquest/screenshots/fusion.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Fusion",
+  "url": "https://neonarcade.net/neonquest/fusion.html",
+  "description": "Play Fusion free online — drop atoms into a reactor and fuse them into heavier elements. Suika Game meets the periodic table with neon physics.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonquest/screenshots/fusion.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON QUEST", "item": "https://neonarcade.net/neonquest/" },
+    { "@type": "ListItem", "position": 3, "name": "Fusion", "item": "https://neonarcade.net/neonquest/fusion.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+canvas {
+  position: fixed; top: 0; left: 0;
+  display: block;
+  width: 100%; height: 100%;
+}
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+  z-index: 100;
+}
+#ui {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.screen {
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 20px;
+  width: 100%; height: 100%;
+  background: rgba(10,10,18,0.92);
+}
+.screen.active { display: flex; pointer-events: auto; }
+h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(42px, 9vw, 80px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.3), 0 0 80px rgba(0,240,255,0.15);
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.3), 0 0 80px rgba(0,240,255,0.15); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.8), 0 0 60px rgba(0,240,255,0.4), 0 0 100px rgba(0,240,255,0.25); }
+}
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 3vw, 22px);
+  font-weight: 300;
+  color: #00f0ff;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+.tagline {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(12px, 2.2vw, 16px);
+  color: #9999bb;
+  letter-spacing: 2px;
+  max-width: 400px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin: 6px;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.play-btn.pink { border-color: #ff2d7b; color: #ff2d7b; background: rgba(255,45,123,0.06); }
+.play-btn.pink:hover { background: rgba(255,45,123,0.15); box-shadow: 0 0 20px rgba(255,45,123,0.2); }
+.play-btn.green { border-color: #39ff14; color: #39ff14; background: rgba(57,255,20,0.06); }
+.play-btn.green:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(11px, 2vw, 14px);
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+.stat-row {
+  display: flex;
+  gap: 30px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stat-box {
+  text-align: center;
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(22px, 4vw, 36px);
+  font-weight: 700;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+}
+.stat-value.gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+.stat-value.pink { color: #ff2d7b; text-shadow: 0 0 10px rgba(255,45,123,0.4); }
+.stat-value.green { color: #39ff14; text-shadow: 0 0 10px rgba(57,255,20,0.4); }
+.new-best {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  margin: 8px 0;
+  animation: newBestPulse 1s ease-in-out infinite;
+}
+@keyframes newBestPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+#leaderboard-container { margin-top: 16px; width: 100%; max-width: 400px; }
+#startLB { margin-top: 16px; width: 100%; max-width: 400px; }
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+  gap: 4px;
+  max-width: 400px;
+  margin: 12px auto;
+}
+.collection-cell {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: #7a7a9a;
+  transition: all 0.3s;
+}
+.collection-cell.unlocked {
+  border-color: rgba(0,240,255,0.4);
+  color: #fff;
+}
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  10% { transform: translate(-3px, 2px); }
+  20% { transform: translate(3px, -2px); }
+  30% { transform: translate(-2px, -3px); }
+  40% { transform: translate(2px, 3px); }
+  50% { transform: translate(-3px, -1px); }
+  60% { transform: translate(3px, 1px); }
+  70% { transform: translate(-1px, 3px); }
+  80% { transform: translate(1px, -3px); }
+  90% { transform: translate(-2px, 2px); }
+}
+.shaking { animation: shake 0.25s ease-in-out; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="startScreen" class="screen active">
+    <h1>FUSION</h1>
+    <div class="subtitle">Atomic Merge Physics</div>
+    <div class="tagline">Drop atoms into the reactor. When two identical atoms touch, they fuse into the next element. Reach Gold before the reactor overflows!</div>
+    <button class="play-btn" id="startBtn">START REACTOR</button>
+    <div class="controls-hint">CLICK / TAP to drop &bull; MOUSE / DRAG to aim &bull; ESC to quit</div>
+    <div id="startLB"></div>
+  </div>
+  <div id="gameOverScreen" class="screen">
+    <h1 style="font-size:clamp(32px,7vw,56px)">MELTDOWN</h1>
+    <div class="subtitle" id="goSubtitle">REACTOR OVERFLOW</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="goScore">0</div></div>
+      <div class="stat-box"><div class="stat-label">Heaviest</div><div class="stat-value gold" id="goHeaviest">H</div></div>
+      <div class="stat-box"><div class="stat-label">Fusions</div><div class="stat-value green" id="goFusions">0</div></div>
+      <div class="stat-box"><div class="stat-label">Best Chain</div><div class="stat-value pink" id="goChain">0</div></div>
+    </div>
+    <div id="goNewBest" class="new-best" style="display:none">NEW HIGH SCORE!</div>
+    <div class="btn-row">
+      <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+      <button class="play-btn green" id="shareBtn">SHARE</button>
+    </div>
+    <div id="leaderboard-container"></div>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ======== POLYFILL: roundRect ========
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      if (typeof r === 'number') r = [r, r, r, r];
+      var tl = r[0] || 0, tr = r[1] || r[0] || 0, br = r[2] || r[0] || 0, bl = r[3] || r[1] || r[0] || 0;
+      this.moveTo(x + tl, y);
+      this.lineTo(x + w - tr, y);
+      this.quadraticCurveTo(x + w, y, x + w, y + tr);
+      this.lineTo(x + w, y + h - br);
+      this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+      this.lineTo(x + bl, y + h);
+      this.quadraticCurveTo(x, y + h, x, y + h - bl);
+      this.lineTo(x, y + tl);
+      this.quadraticCurveTo(x, y, x + tl, y);
+      this.closePath();
+      return this;
+    };
+  }
+
+  // ======== ELEMENT CONFIG ========
+  const ELEMENTS = [
+    { sym: 'H',  z: 1,  name: 'Hydrogen',  color: '#00f0ff' },
+    { sym: 'He', z: 2,  name: 'Helium',    color: '#b44dff' },
+    { sym: 'Li', z: 3,  name: 'Lithium',   color: '#ff2d7b' },
+    { sym: 'Be', z: 4,  name: 'Beryllium', color: '#39ff14' },
+    { sym: 'B',  z: 5,  name: 'Boron',     color: '#ff8c00' },
+    { sym: 'C',  z: 6,  name: 'Carbon',    color: '#9999bb' },
+    { sym: 'N',  z: 7,  name: 'Nitrogen',  color: '#00f0ff' },
+    { sym: 'O',  z: 8,  name: 'Oxygen',    color: '#ff2d7b' },
+    { sym: 'F',  z: 9,  name: 'Fluorine',  color: '#ffd700' },
+    { sym: 'Ne', z: 10, name: 'Neon',      color: '#ff8c00' },
+    { sym: 'Na', z: 11, name: 'Sodium',    color: '#b44dff' },
+    { sym: 'Mg', z: 12, name: 'Magnesium', color: '#39ff14' },
+    { sym: 'Al', z: 13, name: 'Aluminum',  color: '#9999bb' },
+    { sym: 'Si', z: 14, name: 'Silicon',   color: '#00f0ff' },
+    { sym: 'P',  z: 15, name: 'Phosphorus',color: '#ffd700' },
+    { sym: 'S',  z: 16, name: 'Sulfur',    color: '#ff8c00' },
+    { sym: 'Cl', z: 17, name: 'Chlorine',  color: '#39ff14' },
+    { sym: 'Ar', z: 18, name: 'Argon',     color: '#b44dff' },
+    { sym: 'K',  z: 19, name: 'Potassium', color: '#ff2d7b' },
+    { sym: 'Ca', z: 20, name: 'Calcium',   color: '#9999bb' },
+    { sym: 'Fe', z: 26, name: 'Iron',      color: '#ff8c00' },
+    { sym: 'Cu', z: 29, name: 'Copper',    color: '#ff2d7b' },
+    { sym: 'Ag', z: 47, name: 'Silver',    color: '#e0e0e0' },
+    { sym: 'Au', z: 79, name: 'Gold',      color: '#ffd700' },
+    { sym: 'U',  z: 92, name: 'Uranium',   color: '#39ff14' },
+  ];
+
+  // Radius scale: logarithmic from ~10 to ~50
+  const MIN_R = 11;
+  const MAX_R = 48;
+  const LOG_MIN = Math.log(1);
+  const LOG_MAX = Math.log(92);
+  function radiusForIndex(i) {
+    var z = ELEMENTS[i].z;
+    var t = (Math.log(z) - LOG_MIN) / (LOG_MAX - LOG_MIN);
+    return MIN_R + t * (MAX_R - MIN_R);
+  }
+
+  // Points per fusion
+  function fusionPoints(idx) {
+    return Math.round(10 * Math.pow(1.5, idx));
+  }
+
+  // Unstable threshold: elements above Silver (index 22+) decay
+  const UNSTABLE_THRESHOLD = 22;
+  const DECAY_TIME = 5000;
+
+  // Max droppable element index (starts at H, can unlock up to C)
+  const MAX_DROP_BASE = 4; // H through B
+  const COLLECTION_KEY = 'neonarcade_neonquest_fusion_collection';
+  const UNLOCK_KEY = 'neonarcade_neonquest_fusion_unlocks';
+  const BEST_KEY = 'neonarcade_neonquest_fusion_best';
+
+  // ======== PHYSICS CONFIG ========
+  const GRAVITY = 0.35;
+  const DAMPING = 0.985;
+  const FRICTION = 0.92;
+  const BOUNCE = 0.45;
+  const OVERLAP_PUSH = 0.4;
+  const SUBSTEPS = 4;
+
+  // ======== REACTOR CONFIG ========
+  const REACTOR_PAD = 0.08; // fraction of canvas width for side padding
+  const REACTOR_TOP_FRAC = 0.12; // fraction of canvas height
+  const REACTOR_BOTTOM_PAD = 0.04;
+  const DANGER_LINE_FRAC = 0.18; // from top of reactor
+  const OVERFLOW_TIME = 2000; // ms above danger line
+
+  // ======== DOM REFS ========
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const startScreen = document.getElementById('startScreen');
+  const gameOverScreen = document.getElementById('gameOverScreen');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const shareBtn = document.getElementById('shareBtn');
+
+  // ======== SIZING ========
+  var W, H, dpr;
+  var reactorLeft, reactorRight, reactorTop, reactorBottom, dangerY;
+  var reactorW;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    reactorLeft = Math.floor(W * REACTOR_PAD);
+    reactorRight = Math.floor(W * (1 - REACTOR_PAD));
+    reactorTop = Math.floor(H * REACTOR_TOP_FRAC);
+    reactorBottom = Math.floor(H * (1 - REACTOR_BOTTOM_PAD));
+    reactorW = reactorRight - reactorLeft;
+    dangerY = reactorTop + Math.floor((reactorBottom - reactorTop) * DANGER_LINE_FRAC);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ======== AUDIO ========
+  var audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playDrop() {
+    ensureAudio();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(600, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    o.start(); o.stop(audioCtx.currentTime + 0.15);
+  }
+
+  function playFusion(chain) {
+    ensureAudio();
+    var baseFreq = 300 + chain * 80;
+    // Two oscillators for richer sound
+    for (var i = 0; i < 2; i++) {
+      var o = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = i === 0 ? 'sine' : 'triangle';
+      o.frequency.setValueAtTime(baseFreq * (i === 0 ? 1 : 1.5), audioCtx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(baseFreq * 2, audioCtx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+      o.start(); o.stop(audioCtx.currentTime + 0.35);
+    }
+  }
+
+  function playGameOver() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    [400, 300, 200, 100].forEach(function(f, i) {
+      var o = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f, t + i * 0.12);
+      g.gain.setValueAtTime(0.1, t + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.2);
+      o.start(t + i * 0.12);
+      o.stop(t + i * 0.12 + 0.2);
+    });
+  }
+
+  function playSuccess() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    [500, 700, 900, 1200].forEach(function(f, i) {
+      var o = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(f, t + i * 0.08);
+      g.gain.setValueAtTime(0.12, t + i * 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.2);
+      o.start(t + i * 0.08);
+      o.stop(t + i * 0.08 + 0.2);
+    });
+  }
+
+  // ======== PARTICLES ========
+  var particles = [];
+  function spawnParticles(x, y, color, count, speed) {
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var spd = (Math.random() * 0.6 + 0.4) * (speed || 3);
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.025,
+        r: 2 + Math.random() * 3,
+        color: color,
+      });
+    }
+  }
+
+  function updateParticles() {
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.life -= p.decay;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function drawParticles() {
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      ctx.globalAlpha = p.life * 0.8;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ======== FLOATING TEXT ========
+  var floatingTexts = [];
+  function spawnFloatingText(x, y, text, color) {
+    floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1, decay: 0.015 });
+  }
+
+  function updateFloatingTexts() {
+    for (var i = floatingTexts.length - 1; i >= 0; i--) {
+      var ft = floatingTexts[i];
+      ft.y -= 1.2;
+      ft.life -= ft.decay;
+      if (ft.life <= 0) floatingTexts.splice(i, 1);
+    }
+  }
+
+  function drawFloatingTexts() {
+    for (var i = 0; i < floatingTexts.length; i++) {
+      var ft = floatingTexts[i];
+      ctx.globalAlpha = ft.life;
+      ctx.fillStyle = ft.color;
+      ctx.font = '700 ' + Math.floor(16 + (1 - ft.life) * 8) + 'px Orbitron, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = ft.color;
+      ctx.shadowBlur = 10;
+      ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ======== SCREEN SHAKE ========
+  var shakeAmount = 0;
+  var shakeDuration = 0;
+  var shakeTime = 0;
+  function triggerShake(amount, duration) {
+    shakeAmount = amount;
+    shakeDuration = duration;
+    shakeTime = 0;
+  }
+
+  // ======== GAME STATE ========
+  var STATE_MENU = 0, STATE_PLAYING = 1, STATE_GAMEOVER = 2;
+  var state = STATE_MENU;
+  var atoms = [];
+  var score = 0;
+  var fusionCount = 0;
+  var bestChain = 0;
+  var currentChain = 0;
+  var chainTimer = 0;
+  var heaviestIdx = 0;
+  var dropX = 0;
+  var currentAtomIdx = 0;
+  var nextQueue = [];
+  var canDrop = true;
+  var dropCooldown = 0;
+  var overflowTimer = 0;
+  var dangerFlash = 0;
+  var gameTime = 0;
+  var maxDropIdx = MAX_DROP_BASE;
+  var isDragging = false;
+
+  // Collection / unlocks
+  var collection = loadCollection();
+  var unlocks = loadUnlocks();
+  var bestRecord = loadBest();
+
+  function loadCollection() {
+    try { return JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]'); } catch(e) { return []; }
+  }
+  function saveCollection() {
+    localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+  }
+  function loadUnlocks() {
+    try { return JSON.parse(localStorage.getItem(UNLOCK_KEY) || '{}'); } catch(e) { return {}; }
+  }
+  function saveUnlocks() {
+    localStorage.setItem(UNLOCK_KEY, JSON.stringify(unlocks));
+  }
+  function loadBest() {
+    try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}'); } catch(e) { return {}; }
+  }
+  function saveBest() {
+    localStorage.setItem(BEST_KEY, JSON.stringify(bestRecord));
+  }
+
+  function getMaxDropForUnlocks() {
+    // Reach Carbon (idx 5) -> can start with He (idx 1)
+    // Reach Iron (idx 20) -> can start with C (idx 5)
+    var maxIdx = MAX_DROP_BASE;
+    if (unlocks.reachedCarbon) maxIdx = Math.max(maxIdx, 5);
+    if (unlocks.reachedIron) maxIdx = Math.max(maxIdx, 7);
+    return maxIdx;
+  }
+
+  function randomDropIdx() {
+    // Weighted random: lower elements more likely
+    var max = Math.min(getMaxDropForUnlocks(), ELEMENTS.length - 1);
+    max = Math.min(max, 5); // Never drop heavier than C
+    var weights = [];
+    var total = 0;
+    for (var i = 0; i <= max; i++) {
+      var w = Math.pow(0.6, i); // exponentially less likely for heavier
+      weights.push(w);
+      total += w;
+    }
+    var r = Math.random() * total;
+    var cum = 0;
+    for (var i = 0; i <= max; i++) {
+      cum += weights[i];
+      if (r <= cum) return i;
+    }
+    return 0;
+  }
+
+  function initGame() {
+    atoms = [];
+    particles = [];
+    floatingTexts = [];
+    score = 0;
+    fusionCount = 0;
+    bestChain = 0;
+    currentChain = 0;
+    chainTimer = 0;
+    heaviestIdx = 0;
+    overflowTimer = 0;
+    dangerFlash = 0;
+    gameTime = 0;
+    canDrop = true;
+    dropCooldown = 0;
+    maxDropIdx = getMaxDropForUnlocks();
+    isDragging = false;
+    dropX = (reactorLeft + reactorRight) / 2;
+    currentAtomIdx = randomDropIdx();
+    nextQueue = [randomDropIdx(), randomDropIdx()];
+    state = STATE_PLAYING;
+    startScreen.classList.remove('active');
+    gameOverScreen.classList.remove('active');
+  }
+
+  // ======== ATOM CREATION ========
+  function createAtom(x, y, elemIdx) {
+    var r = radiusForIndex(elemIdx);
+    return {
+      x: x, y: y,
+      px: x, py: y, // previous position for Verlet
+      r: r,
+      elemIdx: elemIdx,
+      settled: false,
+      fusionFlash: 0,
+      decayTimer: (elemIdx >= UNSTABLE_THRESHOLD) ? DECAY_TIME : -1,
+      created: performance.now(),
+    };
+  }
+
+  // ======== PHYSICS ========
+  function physicsTick(dt) {
+    var dtSec = dt / 1000;
+    var subDt = dtSec / SUBSTEPS;
+
+    for (var step = 0; step < SUBSTEPS; step++) {
+      // Verlet integration
+      for (var i = 0; i < atoms.length; i++) {
+        var a = atoms[i];
+        var vx = (a.x - a.px) * DAMPING;
+        var vy = (a.y - a.py) * DAMPING;
+        a.px = a.x;
+        a.py = a.y;
+        a.x += vx;
+        a.y += vy + GRAVITY * subDt * 60;
+      }
+
+      // Resolve collisions between atoms
+      for (var i = 0; i < atoms.length; i++) {
+        for (var j = i + 1; j < atoms.length; j++) {
+          var a = atoms[i];
+          var b = atoms[j];
+          var dx = b.x - a.x;
+          var dy = b.y - a.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          var minDist = a.r + b.r;
+          if (dist < minDist && dist > 0.01) {
+            var overlap = (minDist - dist) * OVERLAP_PUSH;
+            var nx = dx / dist;
+            var ny = dy / dist;
+            // Mass-proportional push
+            var totalR = a.r + b.r;
+            var ra = b.r / totalR;
+            var rb = a.r / totalR;
+            a.x -= nx * overlap * ra;
+            a.y -= ny * overlap * ra;
+            b.x += nx * overlap * rb;
+            b.y += ny * overlap * rb;
+
+            // Friction on tangential velocity
+            var avx = a.x - a.px;
+            var avy = a.y - a.py;
+            var bvx = b.x - b.px;
+            var bvy = b.y - b.py;
+            var relVx = avx - bvx;
+            var relVy = avy - bvy;
+            var tangX = -ny;
+            var tangY = nx;
+            var tangVel = relVx * tangX + relVy * tangY;
+            a.px += tangX * tangVel * (1 - FRICTION) * 0.5;
+            a.py += tangY * tangVel * (1 - FRICTION) * 0.5;
+            b.px -= tangX * tangVel * (1 - FRICTION) * 0.5;
+            b.py -= tangY * tangVel * (1 - FRICTION) * 0.5;
+          }
+        }
+      }
+
+      // Wall constraints
+      for (var i = 0; i < atoms.length; i++) {
+        var a = atoms[i];
+        // Left wall
+        if (a.x - a.r < reactorLeft) {
+          var vx = a.x - a.px;
+          a.x = reactorLeft + a.r;
+          a.px = a.x + vx * BOUNCE;
+        }
+        // Right wall
+        if (a.x + a.r > reactorRight) {
+          var vx = a.x - a.px;
+          a.x = reactorRight - a.r;
+          a.px = a.x + vx * BOUNCE;
+        }
+        // Floor
+        if (a.y + a.r > reactorBottom) {
+          var vy = a.y - a.py;
+          a.y = reactorBottom - a.r;
+          a.py = a.y + vy * BOUNCE;
+          // Floor friction
+          a.px += (a.x - a.px) * (1 - FRICTION) * 0.3;
+        }
+        // Ceiling - soft push back
+        if (a.y - a.r < reactorTop) {
+          a.y = reactorTop + a.r;
+          a.py = a.y;
+        }
+      }
+    }
+  }
+
+  // ======== FUSION DETECTION ========
+  function checkFusions() {
+    var fused = true;
+    var chainCount = 0;
+
+    while (fused) {
+      fused = false;
+      for (var i = 0; i < atoms.length; i++) {
+        for (var j = i + 1; j < atoms.length; j++) {
+          var a = atoms[i];
+          var b = atoms[j];
+          if (a.elemIdx !== b.elemIdx) continue;
+          if (a.elemIdx >= ELEMENTS.length - 1) continue; // Already Uranium
+          var dx = b.x - a.x;
+          var dy = b.y - a.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          var touchDist = a.r + b.r + 2; // small tolerance
+          if (dist < touchDist) {
+            // FUSE!
+            var newIdx = a.elemIdx + 1;
+            var mx = (a.x + b.x) / 2;
+            var my = (a.y + b.y) / 2;
+
+            // Remove both
+            atoms.splice(j, 1);
+            atoms.splice(i, 1);
+
+            // Create new atom
+            var newAtom = createAtom(mx, my, newIdx);
+            // Give it some of the old velocity
+            var avx = (a.x - a.px + b.x - b.px) / 2;
+            var avy = (a.y - a.py + b.y - b.py) / 2;
+            newAtom.px = newAtom.x - avx * 0.5;
+            newAtom.py = newAtom.y - avy * 0.5;
+            newAtom.fusionFlash = 1;
+            atoms.push(newAtom);
+
+            // Score
+            chainCount++;
+            currentChain = chainCount;
+            var mult = Math.min(chainCount, 8);
+            var pts = fusionPoints(newIdx) * mult;
+            score += pts;
+            fusionCount++;
+            if (chainCount > bestChain) bestChain = chainCount;
+            if (newIdx > heaviestIdx) heaviestIdx = newIdx;
+
+            // Record collection
+            if (collection.indexOf(newIdx) === -1) {
+              collection.push(newIdx);
+              saveCollection();
+            }
+            // Also record the original if not there
+            if (collection.indexOf(a.elemIdx) === -1) {
+              collection.push(a.elemIdx);
+              saveCollection();
+            }
+
+            // Check unlocks
+            if (newIdx >= 5 && !unlocks.reachedCarbon) { // Carbon
+              unlocks.reachedCarbon = true;
+              saveUnlocks();
+            }
+            if (newIdx >= 20 && !unlocks.reachedIron) { // Iron
+              unlocks.reachedIron = true;
+              saveUnlocks();
+            }
+
+            // Effects
+            var elem = ELEMENTS[newIdx];
+            spawnParticles(mx, my, elem.color, 12 + newIdx * 2, 3 + newIdx * 0.3);
+            playFusion(chainCount);
+            triggerShake(2 + Math.min(newIdx * 0.5, 6), 200 + Math.min(newIdx * 20, 300));
+            var label = '+' + pts;
+            if (mult > 1) label += ' x' + mult;
+            spawnFloatingText(mx, my - 20, label, elem.color);
+            if (chainCount >= 2) {
+              spawnFloatingText(mx, my - 45, chainCount + 'x CHAIN!', '#ffd700');
+            }
+
+            fused = true;
+            break;
+          }
+        }
+        if (fused) break;
+      }
+    }
+
+    if (chainCount > 0) {
+      chainTimer = 500; // Reset chain window
+    }
+  }
+
+  // ======== DECAY ========
+  function updateDecay(dt) {
+    for (var i = atoms.length - 1; i >= 0; i--) {
+      var a = atoms[i];
+      if (a.decayTimer > 0) {
+        a.decayTimer -= dt;
+        // Shrink radius
+        var frac = Math.max(0, a.decayTimer / DECAY_TIME);
+        a.r = radiusForIndex(a.elemIdx) * frac;
+        if (a.decayTimer <= 0 || a.r < 3) {
+          spawnParticles(a.x, a.y, ELEMENTS[a.elemIdx].color, 8, 2);
+          atoms.splice(i, 1);
+        }
+      }
+    }
+  }
+
+  // ======== OVERFLOW CHECK ========
+  function checkOverflow(dt) {
+    var anyAbove = false;
+    for (var i = 0; i < atoms.length; i++) {
+      var a = atoms[i];
+      // Only check atoms that have been in play for at least 1 second
+      if (performance.now() - a.created < 1000) continue;
+      if (a.y - a.r < dangerY) {
+        anyAbove = true;
+        break;
+      }
+    }
+    if (anyAbove) {
+      overflowTimer += dt;
+      dangerFlash += dt * 0.005;
+    } else {
+      overflowTimer = Math.max(0, overflowTimer - dt * 2);
+      dangerFlash *= 0.95;
+    }
+    if (overflowTimer >= OVERFLOW_TIME) {
+      endGame();
+    }
+  }
+
+  // ======== DROP ========
+  function dropAtom() {
+    if (!canDrop || state !== STATE_PLAYING) return;
+    ensureAudio();
+    var x = Math.max(reactorLeft + radiusForIndex(currentAtomIdx) + 2, Math.min(reactorRight - radiusForIndex(currentAtomIdx) - 2, dropX));
+    var y = reactorTop + radiusForIndex(currentAtomIdx) + 4;
+    var atom = createAtom(x, y, currentAtomIdx);
+    atom.py = atom.y - 0.5; // slight downward velocity
+    atoms.push(atom);
+
+    // Record dropped element
+    if (collection.indexOf(currentAtomIdx) === -1) {
+      collection.push(currentAtomIdx);
+      saveCollection();
+    }
+
+    playDrop();
+
+    // Advance queue
+    currentAtomIdx = nextQueue.shift();
+    nextQueue.push(randomDropIdx());
+
+    canDrop = false;
+    dropCooldown = 350; // ms before next drop
+  }
+
+  // ======== END GAME ========
+  function endGame() {
+    state = STATE_GAMEOVER;
+    playGameOver();
+    triggerShake(8, 500);
+
+    // Update best records
+    var isNewBest = false;
+    if (!bestRecord.score || score > bestRecord.score) {
+      bestRecord.score = score;
+      isNewBest = true;
+    }
+    if (!bestRecord.heaviest || heaviestIdx > bestRecord.heaviest) {
+      bestRecord.heaviest = heaviestIdx;
+    }
+    if (!bestRecord.chain || bestChain > bestRecord.chain) {
+      bestRecord.chain = bestChain;
+    }
+    saveBest();
+
+    // Update UI
+    document.getElementById('goScore').textContent = score.toLocaleString();
+    document.getElementById('goHeaviest').textContent = ELEMENTS[heaviestIdx].sym + ' (' + ELEMENTS[heaviestIdx].name + ')';
+    document.getElementById('goFusions').textContent = fusionCount;
+    document.getElementById('goChain').textContent = bestChain + 'x';
+    document.getElementById('goNewBest').style.display = isNewBest ? 'block' : 'none';
+
+    gameOverScreen.classList.add('active');
+
+    // Neon.js integration
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      Neon.render(document.getElementById('leaderboard-container'));
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+  }
+
+  // ======== SHARING ========
+  function getShareText() {
+    var elem = ELEMENTS[heaviestIdx];
+    // Build element progress bar
+    var progressEmojis = ['#ffffff','#00f0ff','#b44dff','#ff2d7b','#39ff14','#ff8c00','#9999bb','#00f0ff','#ff2d7b','#ffd700'];
+    var blocks = '';
+    var maxBlocks = 10;
+    var filled = Math.min(maxBlocks, Math.ceil(heaviestIdx / (ELEMENTS.length - 1) * maxBlocks));
+    for (var i = 0; i < maxBlocks; i++) {
+      if (i < filled) {
+        if (i < 2) blocks += '\u2b1c'; // white
+        else if (i < 4) blocks += '\ud83d\udfe6'; // blue
+        else if (i < 6) blocks += '\ud83d\udfe9'; // green
+        else if (i < 8) blocks += '\ud83d\udfe8'; // yellow
+        else blocks += '\ud83d\udfe7'; // orange
+      } else {
+        blocks += '\u2b1b'; // black
+      }
+    }
+
+    var text = '\u269b\ufe0f FUSION\n';
+    text += 'Heaviest: ' + elem.sym + ' (' + elem.name + ') | ' + fusionCount + ' fusions\n';
+    text += blocks + '\n';
+    if (bestChain >= 2) text += 'Chain: ' + bestChain + 'x combo!\n';
+    text += 'neonarcade.net/neonquest/fusion.html';
+    return text;
+  }
+
+  shareBtn.addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text).then(function() {
+          shareBtn.textContent = 'COPIED!';
+          setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+        });
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(function() {
+        shareBtn.textContent = 'COPIED!';
+        setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+      });
+    }
+  });
+
+  // ======== DRAWING ========
+  function drawBackground() {
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle radial glows
+    var grd = ctx.createRadialGradient(W * 0.3, H * 0.2, 0, W * 0.3, H * 0.2, W * 0.6);
+    grd.addColorStop(0, 'rgba(0,240,255,0.03)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    var grd2 = ctx.createRadialGradient(W * 0.7, H * 0.8, 0, W * 0.7, H * 0.8, W * 0.5);
+    grd2.addColorStop(0, 'rgba(255,45,123,0.02)');
+    grd2.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawReactor() {
+    var rw = reactorRight - reactorLeft;
+    var rh = reactorBottom - reactorTop;
+    var cornerR = 12;
+
+    // Reactor glow
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 20;
+    ctx.strokeStyle = 'rgba(0,240,255,0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(reactorLeft, reactorTop, rw, rh, cornerR);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Inner fill
+    ctx.fillStyle = 'rgba(0,240,255,0.02)';
+    ctx.beginPath();
+    ctx.roundRect(reactorLeft, reactorTop, rw, rh, cornerR);
+    ctx.fill();
+
+    // Danger line
+    var dangerAlpha = 0.3 + Math.sin(dangerFlash * 2) * 0.2;
+    if (overflowTimer > 0) {
+      dangerAlpha = 0.5 + Math.sin(performance.now() * 0.01) * 0.3;
+    }
+    ctx.strokeStyle = 'rgba(255,45,123,' + dangerAlpha + ')';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(reactorLeft + 8, dangerY);
+    ctx.lineTo(reactorRight - 8, dangerY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Danger label
+    if (overflowTimer > 0) {
+      ctx.fillStyle = 'rgba(255,45,123,' + (0.5 + Math.sin(performance.now() * 0.008) * 0.4) + ')';
+      ctx.font = '700 10px Orbitron, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('DANGER', (reactorLeft + reactorRight) / 2, dangerY - 6);
+      // Overflow progress bar
+      var barW = 80;
+      var barH = 3;
+      var barX = (reactorLeft + reactorRight) / 2 - barW / 2;
+      var barY = dangerY + 4;
+      ctx.fillStyle = 'rgba(255,45,123,0.2)';
+      ctx.fillRect(barX, barY, barW, barH);
+      ctx.fillStyle = '#ff2d7b';
+      ctx.fillRect(barX, barY, barW * Math.min(1, overflowTimer / OVERFLOW_TIME), barH);
+    }
+  }
+
+  function drawAtom(a) {
+    var elem = ELEMENTS[a.elemIdx];
+    var r = a.r;
+    if (r < 2) return;
+
+    // Flash effect on new fusion
+    var flash = a.fusionFlash || 0;
+    if (flash > 0) {
+      ctx.globalAlpha = flash * 0.6;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, r * (1 + flash * 0.5), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    // Atom body
+    var grad = ctx.createRadialGradient(a.x - r * 0.3, a.y - r * 0.3, 0, a.x, a.y, r);
+    grad.addColorStop(0, elem.color);
+    grad.addColorStop(0.7, elem.color);
+    grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Glow
+    ctx.shadowColor = elem.color;
+    ctx.shadowBlur = 8 + flash * 20;
+    ctx.strokeStyle = elem.color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Decay indicator (pulsing border for unstable)
+    if (a.decayTimer > 0 && a.decayTimer < DECAY_TIME) {
+      var decayFrac = a.decayTimer / DECAY_TIME;
+      ctx.strokeStyle = 'rgba(255,45,123,' + (1 - decayFrac) * 0.8 + ')';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, r + 2, 0, Math.PI * 2 * decayFrac);
+      ctx.stroke();
+    }
+
+    // Element symbol
+    ctx.fillStyle = '#fff';
+    var fontSize = Math.max(8, Math.floor(r * 0.75));
+    ctx.font = '700 ' + fontSize + 'px Orbitron, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(elem.sym, a.x, a.y);
+    ctx.shadowBlur = 0;
+
+    // Atomic number (for larger atoms)
+    if (r > 18) {
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '500 ' + Math.max(7, Math.floor(r * 0.35)) + 'px Rajdhani, sans-serif';
+      ctx.fillText(elem.z, a.x, a.y + r * 0.5);
+    }
+  }
+
+  function drawDropPreview() {
+    if (state !== STATE_PLAYING || !canDrop) return;
+
+    var elem = ELEMENTS[currentAtomIdx];
+    var r = radiusForIndex(currentAtomIdx);
+    var px = Math.max(reactorLeft + r + 2, Math.min(reactorRight - r - 2, dropX));
+    var py = reactorTop - r - 15;
+
+    // Drop line
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(px, py + r);
+    ctx.lineTo(px, reactorBottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Preview atom
+    ctx.globalAlpha = 0.8;
+    var grad = ctx.createRadialGradient(px - r * 0.3, py - r * 0.3, 0, px, py, r);
+    grad.addColorStop(0, elem.color);
+    grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowColor = elem.color;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = elem.color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#fff';
+    var fontSize = Math.max(8, Math.floor(r * 0.75));
+    ctx.font = '700 ' + fontSize + 'px Orbitron, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(elem.sym, px, py);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawQueue() {
+    if (state !== STATE_PLAYING) return;
+
+    // Next label
+    var qx = reactorRight + 20;
+    if (qx + 50 > W) qx = reactorLeft - 55;
+    var qy = reactorTop + 30;
+
+    ctx.fillStyle = '#7a7a9a';
+    ctx.font = '300 10px Rajdhani, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('N E X T', qx + 18, qy - 10);
+
+    for (var i = 0; i < nextQueue.length; i++) {
+      var elem = ELEMENTS[nextQueue[i]];
+      var r = radiusForIndex(nextQueue[i]) * 0.6;
+      var y = qy + i * (r * 2 + 16) + r;
+      var x = qx + 18;
+
+      ctx.globalAlpha = i === 0 ? 0.9 : 0.5;
+      ctx.fillStyle = elem.color;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = elem.color;
+      ctx.lineWidth = 1;
+      ctx.shadowColor = elem.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 ' + Math.max(7, Math.floor(r * 0.8)) + 'px Orbitron, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(elem.sym, x, y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawHUD() {
+    if (state !== STATE_PLAYING) return;
+
+    // Score
+    ctx.fillStyle = '#00f0ff';
+    var scoreFontSize = Math.min(22, Math.max(14, W * 0.03));
+    ctx.font = '700 ' + Math.round(scoreFontSize) + 'px Orbitron, monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,240,255,0.4)';
+    ctx.shadowBlur = 8;
+    ctx.fillText(score.toLocaleString(), reactorLeft, 10);
+    ctx.shadowBlur = 0;
+
+    // Heaviest element
+    if (heaviestIdx > 0) {
+      var helem = ELEMENTS[heaviestIdx];
+      ctx.fillStyle = helem.color;
+      ctx.font = '500 12px Rajdhani, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('HEAVIEST: ' + helem.sym + ' (' + helem.z + ')', reactorRight, 10);
+    }
+
+    // Chain indicator
+    if (currentChain >= 2) {
+      ctx.fillStyle = '#ffd700';
+      ctx.font = '700 18px Orbitron, monospace';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(255,215,0,0.5)';
+      ctx.shadowBlur = 10;
+      ctx.fillText(currentChain + 'x CHAIN', (reactorLeft + reactorRight) / 2, reactorTop - 8);
+      ctx.shadowBlur = 0;
+    }
+
+    // Fusion count
+    ctx.fillStyle = '#7a7a9a';
+    ctx.font = '300 11px Rajdhani, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('FUSIONS: ' + fusionCount, reactorLeft, 34);
+  }
+
+  // ======== IDLE ANIMATION (menu background) ========
+  var idleAtoms = [];
+  function initIdleAtoms() {
+    idleAtoms = [];
+    for (var i = 0; i < 12; i++) {
+      var idx = Math.floor(Math.random() * 8);
+      idleAtoms.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        r: radiusForIndex(idx) * (0.4 + Math.random() * 0.4),
+        elemIdx: idx,
+        alpha: 0.15 + Math.random() * 0.15,
+      });
+    }
+  }
+  initIdleAtoms();
+
+  function drawIdleAtoms() {
+    for (var i = 0; i < idleAtoms.length; i++) {
+      var a = idleAtoms[i];
+      a.x += a.vx;
+      a.y += a.vy;
+      if (a.x < -50) a.x = W + 50;
+      if (a.x > W + 50) a.x = -50;
+      if (a.y < -50) a.y = H + 50;
+      if (a.y > H + 50) a.y = -50;
+
+      var elem = ELEMENTS[a.elemIdx];
+      ctx.globalAlpha = a.alpha;
+      ctx.fillStyle = elem.color;
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowColor = elem.color;
+      ctx.shadowBlur = 12;
+      ctx.strokeStyle = elem.color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 ' + Math.max(7, Math.floor(a.r * 0.7)) + 'px Orbitron, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(elem.sym, a.x, a.y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ======== MAIN LOOP ========
+  var lastTime = 0;
+  function loop(t) {
+    requestAnimationFrame(loop);
+    var dt = Math.min(t - lastTime, 50);
+    lastTime = t;
+
+    // Shake offset
+    var sx = 0, sy = 0;
+    if (shakeDuration > 0) {
+      shakeTime += dt;
+      if (shakeTime < shakeDuration) {
+        var prog = 1 - shakeTime / shakeDuration;
+        sx = (Math.random() - 0.5) * shakeAmount * prog * 2;
+        sy = (Math.random() - 0.5) * shakeAmount * prog * 2;
+      } else {
+        shakeDuration = 0;
+      }
+    }
+    ctx.save();
+    ctx.translate(sx, sy);
+
+    drawBackground();
+
+    if (state === STATE_MENU) {
+      drawIdleAtoms();
+    } else if (state === STATE_PLAYING || state === STATE_GAMEOVER) {
+      // Physics
+      if (state === STATE_PLAYING) {
+        gameTime += dt;
+        physicsTick(dt);
+        checkFusions();
+        updateDecay(dt);
+        checkOverflow(dt);
+
+        // Chain timer
+        if (chainTimer > 0) {
+          chainTimer -= dt;
+          if (chainTimer <= 0) {
+            currentChain = 0;
+          }
+        }
+
+        // Drop cooldown
+        if (!canDrop) {
+          dropCooldown -= dt;
+          if (dropCooldown <= 0) canDrop = true;
+        }
+
+        // Fusion flash decay
+        for (var i = 0; i < atoms.length; i++) {
+          if (atoms[i].fusionFlash > 0) {
+            atoms[i].fusionFlash -= dt * 0.004;
+            if (atoms[i].fusionFlash < 0) atoms[i].fusionFlash = 0;
+          }
+        }
+      }
+
+      drawReactor();
+      for (var i = 0; i < atoms.length; i++) {
+        drawAtom(atoms[i]);
+      }
+      drawDropPreview();
+      drawQueue();
+      drawHUD();
+    }
+
+    updateParticles();
+    drawParticles();
+    updateFloatingTexts();
+    drawFloatingTexts();
+
+    ctx.restore();
+  }
+
+  // ======== INPUT ========
+  function getInputX(e) {
+    if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+    return e.clientX;
+  }
+
+  canvas.addEventListener('mousemove', function(e) {
+    if (state === STATE_PLAYING) {
+      dropX = e.clientX;
+    }
+  });
+
+  canvas.addEventListener('mousedown', function(e) {
+    if (state === STATE_PLAYING) {
+      dropX = e.clientX;
+      dropAtom();
+    }
+  });
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (state === STATE_PLAYING) {
+      isDragging = true;
+      dropX = getInputX(e);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (state === STATE_PLAYING && isDragging) {
+      dropX = getInputX(e);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    if (state === STATE_PLAYING && isDragging) {
+      isDragging = false;
+      dropAtom();
+    }
+  }, { passive: false });
+
+  document.addEventListener('keydown', function(e) {
+    if (state === STATE_PLAYING) {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        dropX = Math.max(reactorLeft + 15, dropX - 20);
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        dropX = Math.min(reactorRight - 15, dropX + 20);
+      } else if (e.key === ' ' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        dropAtom();
+      } else if (e.key === 'Escape') {
+        // Quit to start screen
+        state = STATE_MENU;
+        gameOverScreen.classList.remove('active');
+        startScreen.classList.add('active');
+        atoms = [];
+        particles = [];
+        floatingTexts = [];
+        initIdleAtoms();
+        Neon.render(document.getElementById('startLB'));
+      }
+    }
+  });
+
+  // ======== BUTTONS ========
+  startBtn.addEventListener('click', function() {
+    ensureAudio();
+    initGame();
+  });
+
+  restartBtn.addEventListener('click', function() {
+    ensureAudio();
+    initGame();
+  });
+
+  // ======== INIT ========
+  Neon.init({
+    game: 'fusion',
+    mode: 'high',
+    key: 'neonarcade_neonquest_fusion_scores',
+  });
+  Neon.render(document.getElementById('startLB'));
+
+  // Record H in collection
+  if (collection.indexOf(0) === -1) {
+    collection.push(0);
+    saveCollection();
+  }
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
