@@ -1308,6 +1308,7 @@ body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height
 
   // ========== DAILY BONUS ==========
   function checkDailyBonus() {
+    if (chips >= 100) return;
     var lastBonus = localStorage.getItem('neoncasino_last_bonus');
     var today = new Date().toDateString();
     if (lastBonus !== today) {

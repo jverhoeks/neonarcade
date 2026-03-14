@@ -260,12 +260,12 @@ body{background-image:radial-gradient(ellipse at 30% 10%,rgba(0,240,255,0.06)0%,
   function loadBankroll() { try { var data = JSON.parse(localStorage.getItem('neoncasino_bankroll')); if (data && data.hash === hashBankroll(data.chips)) return data.chips; } catch (e) {} return null; }
 
   function checkDailyBonus() {
-    var last = localStorage.getItem('neoncasino_daily_bonus');
+    var last = localStorage.getItem('neoncasino_last_bonus');
     var today = new Date().toDateString();
     if (last !== today && bankroll < 100) {
       bankroll += 500;
       saveBankroll(bankroll);
-      localStorage.setItem('neoncasino_daily_bonus', today);
+      localStorage.setItem('neoncasino_last_bonus', today);
       return true;
     }
     return false;

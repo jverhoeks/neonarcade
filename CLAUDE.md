@@ -6,7 +6,7 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 ## Architecture
 - Each game = 1 HTML file (HTML + CSS + JS, all inline)
 - Shared client library: `public/neon.js` — unified API, scores, name input, global leaderboard UI
-- 4 categories: `public/neonarcade/` (action), `public/neonmind/` (puzzles), `public/neongrind/` (skill/speed), `public/neonclassic/` (retro)
+- 5 categories: `public/neonarcade/` (action), `public/neonmind/` (puzzles), `public/neongrind/` (skill/speed), `public/neonclassic/` (retro), `public/neoncasino/` (casino)
 - Hub pages: `public/index.html` (main), plus category index pages
 - Screenshots: `public/{category}/screenshots/{game-name}.png` — 1280x800 viewport captures (each category has its own screenshots subdir)
 - Backend: Cloudflare Worker (`src/worker.js`) with KV storage at `neonarcade.net`
@@ -16,7 +16,7 @@ Collection of viral single-file HTML5 browser games under the "NEON ARCADE" bran
 ## File Structure
 ```
 public/                   # Deployed to Cloudflare Pages (wrangler assets directory)
-  index.html              # Main hub page linking to 4 categories
+  index.html              # Main hub page linking to 5 categories
   neon.js                 # Shared client library (API + scores + name + leaderboard + feedback UI)
   blog.html               # Behind-the-scenes blog
   updates.html            # Changelog
@@ -33,6 +33,9 @@ public/                   # Deployed to Cloudflare Pages (wrangler assets direct
   neonclassic/            # Retro games reimagined
     index.html            # NEON CLASSIC hub
     tetris.html, invaders.html, breakout.html, ...
+  neoncasino/             # Casino card & table games
+    index.html            # NEON CASINO hub
+    blackjack.html, poker.html, roulette.html, slots.html, video-poker.html
   admin/                  # Admin dashboards
     stats.html, topscores.html
   {category}/screenshots/ # PNG screenshots per category (e.g. neonarcade/screenshots/)
@@ -277,6 +280,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
    - `public/neonmind/` — classic brain puzzles (sudoku, minesweeper, etc.)
    - `public/neongrind/` — skill/speed challenges
    - `public/neonclassic/` — retro games reimagined
+   - `public/neoncasino/` — casino card & table games (shared bankroll system)
 2. Follow the visual style guide above exactly (colors, typography, effects, contrast)
    - **CRITICAL**: Use ONLY the standard palette colors. NEVER use #000/#000000 for backgrounds (use #0a0a12). NEVER use non-standard accent colors like #ffff00, #00e5ff, #ff6622 etc.
    - **REQUIRED effects**: scanline overlay (body::after), screen shake (@keyframes shake), particle effects, neon glow (text-shadow)
@@ -329,7 +333,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a12; font-family: '
 14. **Update `public/sitemap.xml`** — add `<url>` entry for the new game
 15. **Update `public/llms.txt`** — add the game to the appropriate category listing
 16. Available accent colors for cards: `cyan`, `pink`, `green`, `gold`, `purple`, `orange`, `white`
-17. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple)
+17. Available badges: `badge-new` (green), `badge-hot` (pink), `badge-classic` (gold), `badge-mind` (purple), `badge-casino` (gold)
 
 ## Ideas Backlog
 See `VIRAL_GAME_IDEAS.md` for 25+ ranked game concepts organized in tiers:
