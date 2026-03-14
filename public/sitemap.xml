@@ -322,6 +322,38 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- NEON CASINO Hub + Games (5) -->
+  <url>
+    <loc>https://neonarcade.net/neoncasino/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neoncasino/blackjack.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neoncasino/poker.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neoncasino/roulette.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neoncasino/slots.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neoncasino/video-poker.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- NEON CLASSIC Games (8) -->
   <url>
     <loc>https://neonarcade.net/neonclassic/tictactoe.html</loc>
