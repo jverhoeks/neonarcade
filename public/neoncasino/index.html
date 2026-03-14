@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON CASINO — Free Online Casino Games | NEON ARCADE</title>
+<meta name="description" content="Play free online casino games — Blackjack, Poker, Roulette, Slots, and Video Poker. No download, no login, no real money.">
+<meta name="keywords" content="free casino games, online blackjack, free poker, browser roulette, neon slots, video poker, neon arcade, no download casino">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neoncasino/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neoncasino/">
+<meta property="og:title" content="NEON CASINO — Free Online Casino Games | NEON ARCADE">
+<meta property="og:description" content="Play free online casino games — Blackjack, Poker, Roulette, Slots, and Video Poker. No download, no login, no real money.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neoncasino/">
+<meta name="twitter:title" content="NEON CASINO — Free Online Casino Games | NEON ARCADE">
+<meta name="twitter:description" content="Play free online casino games — Blackjack, Poker, Roulette, Slots, and Video Poker. No download, no login, no real money.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "NEON CASINO",
+  "url": "https://neonarcade.net/neoncasino/",
+  "description": "Play free online casino games — Blackjack, Poker, Roulette, Slots, and Video Poker. No download, no login, no real money.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What casino games are available?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We have Blackjack, Poker (Texas Hold'em), European Roulette, Slots (5 reels, 20 paylines), and Video Poker (Jacks or Better) — all free to play in your browser with no real money involved."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is real money involved?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No! All games use a virtual chip bankroll stored in your browser. No real money, no deposits, no gambling — just fun."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to download anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No downloads required! Every game runs directly in your browser on any device — desktop, tablet, or phone."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CASINO", "item": "https://neonarcade.net/neoncasino/" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #0e0e1a;
+    --bg-card-hover: #141428;
+    --neon-cyan: #00f0ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff2d7b;
+    --neon-purple: #b44dff;
+    --neon-orange: #ff8c00;
+    --text-dim: #7a7a9a;
+    --text-mid: #9999bb;
+    --text-bright: #cccce0;
+    --border: rgba(255,215,0,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-deep);
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,215,0,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(0,240,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 28px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--neon-cyan); }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(32px, 7vw, 56px);
+    letter-spacing: 6px;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2), 0 0 80px rgba(255,215,0,0.1);
+    line-height: 1.1;
+  }
+
+  .logo span {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  }
+
+  .tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 2.5vw, 18px);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 10px;
+  }
+
+  .header-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-gold), transparent);
+    margin: 24px auto 0;
+  }
+
+  /* --- BANKROLL BAR --- */
+  .bankroll-bar {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .bankroll-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--neon-gold);
+    text-shadow: 0 0 8px rgba(255,215,0,0.3);
+  }
+
+  .bankroll-icon {
+    font-size: 20px;
+  }
+
+  .bankroll-amount {
+    font-size: 20px;
+  }
+
+  .daily-bonus {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .daily-bonus.available {
+    color: var(--neon-green);
+    background: rgba(57,255,20,0.08);
+    border: 1px solid rgba(57,255,20,0.2);
+  }
+
+  .daily-bonus.claimed {
+    color: var(--text-dim);
+    background: rgba(122,122,154,0.08);
+    border: 1px solid rgba(122,122,154,0.15);
+  }
+
+  .reset-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 5px 12px;
+    border: 1px solid rgba(255,45,123,0.2);
+    background: rgba(255,45,123,0.06);
+    color: var(--neon-pink);
+    cursor: pointer;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover {
+    background: rgba(255,45,123,0.15);
+    border-color: rgba(255,45,123,0.4);
+  }
+
+  /* --- SORT BAR --- */
+  .sort-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .sort-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .sort-btn {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .sort-btn:hover { border-color: rgba(255,215,0,0.2); color: var(--text-mid); }
+  .sort-btn.active { border-color: rgba(255,215,0,0.4); color: var(--neon-gold); background: rgba(255,215,0,0.06); }
+
+  /* --- GAME GRID --- */
+  .games-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 24px 60px;
+  }
+
+  .game-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-4px);
+  }
+
+  .game-card[data-accent="cyan"]:hover { border-color: rgba(0,240,255,0.3); box-shadow: 0 8px 32px rgba(0,240,255,0.08); }
+  .game-card[data-accent="pink"]:hover { border-color: rgba(255,45,123,0.3); box-shadow: 0 8px 32px rgba(255,45,123,0.08); }
+  .game-card[data-accent="green"]:hover { border-color: rgba(57,255,20,0.3); box-shadow: 0 8px 32px rgba(57,255,20,0.08); }
+  .game-card[data-accent="gold"]:hover { border-color: rgba(255,215,0,0.3); box-shadow: 0 8px 32px rgba(255,215,0,0.08); }
+  .game-card[data-accent="purple"]:hover { border-color: rgba(180,77,255,0.3); box-shadow: 0 8px 32px rgba(180,77,255,0.08); }
+  .game-card[data-accent="orange"]:hover { border-color: rgba(255,140,0,0.3); box-shadow: 0 8px 32px rgba(255,140,0,0.08); }
+  .game-card[data-accent="white"]:hover { border-color: rgba(224,224,240,0.3); box-shadow: 0 8px 32px rgba(224,224,240,0.06); }
+
+  .game-card[data-accent="cyan"] .card-title { color: var(--neon-cyan); }
+  .game-card[data-accent="pink"] .card-title { color: var(--neon-pink); }
+  .game-card[data-accent="green"] .card-title { color: var(--neon-green); }
+  .game-card[data-accent="gold"] .card-title { color: var(--neon-gold); }
+  .game-card[data-accent="purple"] .card-title { color: var(--neon-purple); }
+  .game-card[data-accent="orange"] .card-title { color: var(--neon-orange); }
+  .game-card[data-accent="white"] .card-title { color: #e0e0f0; }
+
+  .card-screenshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #08080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-screenshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-screenshot img { transform: scale(1.03); }
+
+  .card-screenshot .placeholder {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-new { background: rgba(57,255,20,0.12); color: var(--neon-green); border: 1px solid rgba(57,255,20,0.25); }
+  .badge-hot { background: rgba(255,45,123,0.12); color: var(--neon-pink); border: 1px solid rgba(255,45,123,0.25); }
+  .badge-classic { background: rgba(255,215,0,0.12); color: var(--neon-gold); border: 1px solid rgba(255,215,0,0.25); }
+  .badge-casino { background: var(--neon-gold); color: var(--bg-deep); border: 1px solid rgba(255,215,0,0.6); }
+
+  .card-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-number {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    color: var(--text-bright);
+  }
+
+  .card-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .card-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--neon-gold);
+    transition: all 0.2s;
+  }
+
+  .game-card:hover .card-play { letter-spacing: 4px; }
+
+  .play-arrow {
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+
+  .game-card:hover .play-arrow { transform: translateX(4px); }
+
+  /* --- CARD STATS ROW --- */
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .card-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-stat .stat-icon { font-size: 13px; opacity: 0.7; }
+  .card-stat .stat-val { color: var(--text-mid); font-weight: 500; }
+
+  /* --- FOOTER --- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  .credit {
+    margin-top: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #5a5a7a;
+  }
+
+  .credit a {
+    color: #9999bb;
+    text-decoration: underline;
+    text-decoration-color: rgba(153,153,187,0.4);
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .credit a:hover { color: var(--neon-gold); text-decoration-color: rgba(255,215,0,0.4); }
+
+  @media (max-width: 700px) {
+    .games-grid {
+      grid-template-columns: 1fr;
+      padding: 12px 16px 60px;
+      gap: 16px;
+    }
+    header { padding: 40px 16px 28px; }
+    .bankroll-bar { padding: 12px 16px; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <a href="../index.html" class="back-link">&larr; NEON ARCADE HUB</a>
+  <h1 class="logo">NEON<span>CASINO</span></h1>
+  <p class="tagline">Classic games. Neon stakes.</p>
+  <div class="header-line"></div>
+</header>
+
+<div class="bankroll-bar" id="bankroll-bar">
+  <div class="bankroll-display">
+    <span class="bankroll-icon">&#x1F4B0;</span>
+    <span>CHIPS:</span>
+    <span class="bankroll-amount" id="bankroll-amount">---</span>
+  </div>
+  <span class="daily-bonus" id="daily-bonus"></span>
+  <button class="reset-btn" id="reset-btn">RESET BANKROLL</button>
+</div>
+
+<div class="sort-bar">
+  <span class="sort-label">Sort by:</span>
+  <button class="sort-btn active" data-sort="default">Default</button>
+  <button class="sort-btn" data-sort="popular">Most Played</button>
+  <button class="sort-btn" data-sort="liked">Most Liked</button>
+  <button class="sort-btn" data-sort="name">A-Z</button>
+</div>
+
+<main class="games-grid" id="games-grid">
+
+  <!-- 1. BLACKJACK -->
+  <a href="blackjack.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img fetchpriority="high" width="1280" height="800" src="screenshots/blackjack.png" alt="Blackjack — free online neon blackjack game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F0CF;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 01</span>
+      <h2 class="card-title">BLACKJACK</h2>
+      <p class="card-desc">Classic 21 vs the AI dealer. Hit, stand, double down, or split. Fast rounds, persistent bankroll.</p>
+      <div class="card-tags">
+        <span class="tag">Cards</span>
+        <span class="tag">Solo</span>
+        <span class="tag">Strategy</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 2. POKER -->
+  <a href="poker.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img fetchpriority="high" width="1280" height="800" src="screenshots/poker.png" alt="Poker — free online neon Texas Hold'em game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x2660;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 02</span>
+      <h2 class="card-title">POKER</h2>
+      <p class="card-desc">Texas Hold'em at a 6-seat neon table. Play solo against AI opponents or invite friends with room codes.</p>
+      <div class="card-tags">
+        <span class="tag">Cards</span>
+        <span class="tag">Multiplayer</span>
+        <span class="tag">Strategy</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 3. ROULETTE -->
+  <a href="roulette.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img fetchpriority="high" width="1280" height="800" src="screenshots/roulette.png" alt="Roulette — free online neon European roulette game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F3B0;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 03</span>
+      <h2 class="card-title">ROULETTE</h2>
+      <p class="card-desc">European roulette with animated wheel. Place inside and outside bets, spin and watch the ball land.</p>
+      <div class="card-tags">
+        <span class="tag">Wheel</span>
+        <span class="tag">Betting</span>
+        <span class="tag">Chance</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 4. SLOTS -->
+  <a href="slots.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img loading="lazy" width="1280" height="800" src="screenshots/slots.png" alt="Slots — free online neon slot machine game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x1F3B0;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 04</span>
+      <h2 class="card-title">SLOTS</h2>
+      <p class="card-desc">5 reels, 20 paylines, wild diamonds, and free spin bonus rounds. Pull the neon lever.</p>
+      <div class="card-tags">
+        <span class="tag">Reels</span>
+        <span class="tag">Bonus</span>
+        <span class="tag">Free Spins</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+  <!-- 5. VIDEO POKER -->
+  <a href="video-poker.html" class="game-card" data-accent="gold">
+    <div class="card-screenshot">
+      <img loading="lazy" width="1280" height="800" src="screenshots/video-poker.png" alt="Video Poker — free online neon Jacks or Better game" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder').style.display='block'">
+      <div class="placeholder" style="display:none">&#x2665;</div>
+      <span class="card-badge badge-new">NEW</span>
+    </div>
+    <div class="card-body">
+      <span class="card-number">GAME 05</span>
+      <h2 class="card-title">VIDEO POKER</h2>
+      <p class="card-desc">Jacks or Better with hold and draw. Double or nothing after every win.</p>
+      <div class="card-tags">
+        <span class="tag">Cards</span>
+        <span class="tag">Solo</span>
+        <span class="tag">Hold/Draw</span>
+      </div>
+      <div class="card-play">PLAY NOW <span class="play-arrow">&rarr;</span></div>
+    </div>
+  </a>
+
+</main>
+
+<footer>
+  <p>CASINO GAMES &mdash; NEON STYLE &mdash; ZERO REAL MONEY</p>
+  <p class="credit">Made by <a href="http://jacob.verhoeks.org/about" target="_blank" rel="noopener">Jacob Verhoeks</a> + Mr Claude</p>
+</footer>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  // --- Bankroll display ---
+  var DEFAULT_CHIPS = 1000;
+  var amountEl = document.getElementById('bankroll-amount');
+  var bonusEl = document.getElementById('daily-bonus');
+  var resetBtn = document.getElementById('reset-btn');
+
+  function getBankroll() {
+    try {
+      var raw = localStorage.getItem('neoncasino_bankroll');
+      if (raw) {
+        var data = JSON.parse(raw);
+        return data.chips || DEFAULT_CHIPS;
+      }
+    } catch (e) {}
+    return DEFAULT_CHIPS;
+  }
+
+  function getDailyBonusStatus() {
+    try {
+      var raw = localStorage.getItem('neoncasino_bankroll');
+      if (raw) {
+        var data = JSON.parse(raw);
+        if (data.lastBonus) {
+          var last = new Date(data.lastBonus);
+          var now = new Date();
+          return last.toDateString() === now.toDateString() ? 'claimed' : 'available';
+        }
+      }
+    } catch (e) {}
+    return 'available';
+  }
+
+  function updateBankrollDisplay() {
+    var chips = getBankroll();
+    amountEl.textContent = chips.toLocaleString();
+    var status = getDailyBonusStatus();
+    if (status === 'claimed') {
+      bonusEl.className = 'daily-bonus claimed';
+      bonusEl.textContent = 'DAILY BONUS CLAIMED';
+    } else {
+      bonusEl.className = 'daily-bonus available';
+      bonusEl.textContent = 'DAILY BONUS READY';
+    }
+  }
+
+  resetBtn.addEventListener('click', function() {
+    if (confirm('Reset your bankroll to ' + DEFAULT_CHIPS.toLocaleString() + ' chips?')) {
+      localStorage.setItem('neoncasino_bankroll', JSON.stringify({ chips: DEFAULT_CHIPS }));
+      updateBankrollDisplay();
+    }
+  });
+
+  updateBankrollDisplay();
+
+  // --- Sort + stats ---
+  var cards = document.querySelectorAll('.game-card');
+  var grid = document.getElementById('games-grid');
+  var defaultOrder = Array.from(cards);
+
+  NeonAPI.allStats().then(function(data) {
+    if (!data || !data.games) return;
+    var stats = data.games;
+
+    cards.forEach(function(card) {
+      var href = card.getAttribute('href') || '';
+      var slug = href.replace('.html', '').replace(/^.*\//, '');
+      var g = stats[slug] || {};
+      var plays = g.plays || 0;
+      var likes = g.likes || 0;
+      card.dataset.plays = plays;
+      card.dataset.likes = likes;
+
+      if (plays > 0) {
+        var statsRow = document.createElement('div');
+        statsRow.className = 'card-stats';
+        var playStat = document.createElement('div');
+        playStat.className = 'card-stat';
+        var playIcon = document.createElement('span');
+        playIcon.className = 'stat-icon';
+        playIcon.textContent = '\u25B6';
+        var playVal = document.createElement('span');
+        playVal.className = 'stat-val';
+        playVal.textContent = formatNum(plays) + ' plays';
+        playStat.appendChild(playIcon);
+        playStat.appendChild(playVal);
+        statsRow.appendChild(playStat);
+
+        if (likes > 0) {
+          var likeStat = document.createElement('div');
+          likeStat.className = 'card-stat';
+          var likeIcon = document.createElement('span');
+          likeIcon.className = 'stat-icon';
+          likeIcon.textContent = '\u2764';
+          var likeVal = document.createElement('span');
+          likeVal.className = 'stat-val';
+          likeVal.textContent = formatNum(likes);
+          likeStat.appendChild(likeIcon);
+          likeStat.appendChild(likeVal);
+          statsRow.appendChild(likeStat);
+        }
+
+        var body = card.querySelector('.card-body');
+        var playBtn = body.querySelector('.card-play');
+        body.insertBefore(statsRow, playBtn);
+      }
+    });
+  });
+
+  function formatNum(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return String(n);
+  }
+
+  // Sort buttons
+  document.querySelectorAll('.sort-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.sort-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var sort = btn.dataset.sort;
+      var arr = Array.from(cards);
+
+      if (sort === 'popular') {
+        arr.sort(function(a, b) { return (parseInt(b.dataset.plays) || 0) - (parseInt(a.dataset.plays) || 0); });
+      } else if (sort === 'liked') {
+        arr.sort(function(a, b) { return (parseInt(b.dataset.likes) || 0) - (parseInt(a.dataset.likes) || 0); });
+      } else if (sort === 'name') {
+        arr.sort(function(a, b) {
+          var an = (a.querySelector('.card-title') || {}).textContent || '';
+          var bn = (b.querySelector('.card-title') || {}).textContent || '';
+          return an.localeCompare(bn);
+        });
+      } else {
+        arr = defaultOrder.slice();
+      }
+
+      arr.forEach(function(card) { grid.appendChild(card); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 # NEON ARCADE
 
-> Play 67 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro and deep games with global leaderboards.
+> Play 72 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro, deep quest and casino games with global leaderboards.
 
-NEON ARCADE is a collection of 67 free HTML5 browser games organized in five categories:
+NEON ARCADE is a collection of 72 free HTML5 browser games organized in six categories:
 
 ## Categories
 
@@ -11,6 +11,7 @@ NEON ARCADE is a collection of 67 free HTML5 browser games organized in five cat
 - [NEON GRIND](https://neonarcade.net/neongrind/) — 8 progressive skill challenges
 - [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 8 retro arcade classics reimagined
 - [NEON QUEST](https://neonarcade.net/neonquest/) — 5 deep games for longer sessions (roguelikes, tower defense, crafting)
+- [NEON CASINO](https://neonarcade.net/neoncasino/) — 5 casino card and table games with virtual chips
 
 ## All Games
 
@@ -90,6 +91,14 @@ NEON ARCADE is a collection of 67 free HTML5 browser games organized in five cat
 - [Firewall](https://neonarcade.net/neonquest/firewall.html) — Tower defense on a circuit board with evolving maze paths
 - [Swarm](https://neonarcade.net/neonquest/swarm.html) — Drone survivor-like with split/merge swarm mechanics
 - [Synthesis](https://neonarcade.net/neonquest/synthesis.html) — Neon alchemy lab with 200+ discoverable items
+
+### NEON CASINO
+Casino card and table games with persistent chip bankroll. Gold neon aesthetic.
+- [Blackjack](https://neonarcade.net/neoncasino/blackjack.html) — Solo vs AI dealer, classic 21
+- [Poker](https://neonarcade.net/neoncasino/poker.html) — Texas Hold'em, 6-seat table, AI opponents + multiplayer room codes
+- [Roulette](https://neonarcade.net/neoncasino/roulette.html) — European roulette, full bet types
+- [Slots](https://neonarcade.net/neoncasino/slots.html) — 5x3 reels, 20 paylines, wilds, free spins bonus
+- [Video Poker](https://neonarcade.net/neoncasino/video-poker.html) — Jacks or Better with double-or-nothing
 
 ## Features
 
