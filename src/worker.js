@@ -473,6 +473,171 @@ export default {
         return json({ ok: true });
       }
 
+      // ─── Multi-Player Room Endpoints (up to 6 players) ─────────────
+
+      // POST /api/mroom/create — create a new multi-player room (up to 6 seats)
+      if (request.method === 'POST' && segments[0] === 'mroom' && segments[1] === 'create') {
+        let body;
+        try { body = await request.json(); } catch { body = {}; }
+
+        const name = sanitizeName(body.name || '');
+
+        let code = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const candidate = generateRoomCode();
+          const existing = await env.GAME_DATA.get(`mroom:${candidate}`);
+          if (!existing) {
+            code = candidate;
+            break;
+          }
+        }
+        if (!code) return json({ error: 'failed to generate room code, try again' }, 503);
+
+        const token = generateToken();
+        const room = {
+          seats: { 0: { token, name: name || 'P1' } },
+          messages: [],
+          created: Date.now(),
+          state: 'waiting',
+          maxSeats: 6,
+        };
+        await env.GAME_DATA.put(`mroom:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ code, token, seat: 0 });
+      }
+
+      // POST /api/mroom/join — join an existing multi-player room
+      if (request.method === 'POST' && segments[0] === 'mroom' && segments[1] === 'join') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const code = sanitizeRoomCode(body.code);
+        if (!code) return json({ error: 'invalid room code' }, 400);
+
+        const name = sanitizeName(body.name || '');
+
+        const room = safeParseObject(await env.GAME_DATA.get(`mroom:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+        if (room.state === 'closed') return json({ error: 'room closed' }, 400);
+
+        // Find next available seat
+        const maxSeats = room.maxSeats || 6;
+        let seatIndex = -1;
+        for (let i = 0; i < maxSeats; i++) {
+          if (!room.seats[String(i)]) {
+            seatIndex = i;
+            break;
+          }
+        }
+        if (seatIndex === -1) return json({ error: 'room full' }, 400);
+
+        const token = generateToken();
+        room.seats[String(seatIndex)] = { token, name: name || ('P' + (seatIndex + 1)) };
+
+        // If all seats filled, mark as full (but game can start with fewer)
+        const occupiedSeats = Object.keys(room.seats).length;
+        if (occupiedSeats >= maxSeats) {
+          room.state = 'full';
+        }
+
+        await env.GAME_DATA.put(`mroom:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ code, token, seat: seatIndex });
+      }
+
+      // POST /api/mroom/send — send a message to the multi-player room
+      if (request.method === 'POST' && segments[0] === 'mroom' && segments[1] === 'send') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const code = sanitizeRoomCode(body.code);
+        if (!code) return json({ error: 'invalid room code' }, 400);
+        if (!body.token) return json({ error: 'token required' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`mroom:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+
+        // Verify token and determine sender seat
+        let fromSeat = -1;
+        for (const [seat, data] of Object.entries(room.seats)) {
+          if (data.token === body.token) {
+            fromSeat = parseInt(seat, 10);
+            break;
+          }
+        }
+        if (fromSeat === -1) return json({ error: 'invalid token' }, 403);
+
+        // Append message, keep only last 100
+        room.messages.push({ from: fromSeat, msg: body.msg, ts: Date.now() });
+        if (room.messages.length > 100) {
+          room.messages = room.messages.slice(-100);
+        }
+
+        // Update state if included in message
+        if (body.state) {
+          room.state = String(body.state).slice(0, 20);
+        }
+
+        await env.GAME_DATA.put(`mroom:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ ok: true });
+      }
+
+      // GET /api/mroom/poll?code=ABCD&token=...&after=TIMESTAMP — poll for new messages
+      if (request.method === 'GET' && segments[0] === 'mroom' && segments[1] === 'poll') {
+        const code = sanitizeRoomCode(url.searchParams.get('code'));
+        if (!code) return json({ error: 'invalid room code' }, 400);
+        const token = url.searchParams.get('token');
+        if (!token) return json({ error: 'token required' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`mroom:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+
+        // Verify token and determine player seat
+        let mySeat = -1;
+        for (const [seat, data] of Object.entries(room.seats)) {
+          if (data.token === token) {
+            mySeat = parseInt(seat, 10);
+            break;
+          }
+        }
+        if (mySeat === -1) return json({ error: 'invalid token' }, 403);
+
+        const after = parseInt(url.searchParams.get('after') || '0', 10);
+
+        // Return messages from OTHER players after the given timestamp
+        const messages = room.messages.filter(m => m.from !== mySeat && m.ts > after);
+
+        // Build seats info (without tokens for security)
+        const seats = {};
+        for (const [seat, data] of Object.entries(room.seats)) {
+          seats[seat] = { name: data.name };
+        }
+
+        return json({ messages, state: room.state, seats, mySeat });
+      }
+
+      // POST /api/mroom/close — close a multi-player room
+      if (request.method === 'POST' && segments[0] === 'mroom' && segments[1] === 'close') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const code = sanitizeRoomCode(body.code);
+        if (!code) return json({ error: 'invalid room code' }, 400);
+        if (!body.token) return json({ error: 'token required' }, 400);
+
+        const room = safeParseObject(await env.GAME_DATA.get(`mroom:${code}`));
+        if (!room) return json({ error: 'room not found' }, 404);
+
+        // Verify token belongs to any seated player
+        let valid = false;
+        for (const data of Object.values(room.seats)) {
+          if (data.token === body.token) { valid = true; break; }
+        }
+        if (!valid) return json({ error: 'invalid token' }, 403);
+
+        room.state = 'closed';
+        await env.GAME_DATA.put(`mroom:${code}`, JSON.stringify(room), { expirationTtl: 600 });
+        return json({ ok: true });
+      }
+
       return json({ error: 'not found' }, 404);
 
     } catch (err) {
