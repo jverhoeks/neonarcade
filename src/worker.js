@@ -86,6 +86,13 @@ const KNOWN_GAMES = {
   'frogger':             { mode: 'high', maxScore: 1000000 },
   'battleship':          { mode: 'low', maxScore: 200 },
   'tictactoe':           { mode: 'high', maxScore: 10000 },
+
+  // NEON CASINO (mode: high — bankroll-based)
+  'blackjack':           { mode: 'high', maxScore: 1000000 },
+  'poker':               { mode: 'high', maxScore: 1000000 },
+  'roulette':            { mode: 'high', maxScore: 1000000 },
+  'slots':               { mode: 'high', maxScore: 1000000 },
+  'video-poker':         { mode: 'high', maxScore: 1000000 },
 };
 
 function isAllowedOrigin(request) {
