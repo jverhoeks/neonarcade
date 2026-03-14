@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEON ARCADE — Free Online Browser Games | Play Instantly</title>
-<meta name="description" content="Play 62 free online browser games instantly — no download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.">
+<meta name="description" content="Play 67 free online browser games instantly — no download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.">
 <meta name="keywords" content="free online games, browser games, no download games, instant play games, arcade games, puzzle games, neon games, HTML5 games">
 <meta name="author" content="NEON ARCADE">
 <meta name="robots" content="index, follow">
@@ -22,7 +22,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://neonarcade.net/">
 <meta property="og:title" content="NEON ARCADE — Free Online Browser Games | Play Instantly">
-<meta property="og:description" content="Play 62 free online browser games instantly — no download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.">
+<meta property="og:description" content="Play 67 free online browser games instantly — no download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.">
 <meta property="og:image" content="https://neonarcade.net/og-image.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="800">
@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://neonarcade.net/">
 <meta name="twitter:title" content="NEON ARCADE — Free Online Browser Games | Play Instantly">
-<meta name="twitter:description" content="Play 62 free online browser games instantly — no download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.">
+<meta name="twitter:description" content="Play 67 free online browser games instantly — no download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.">
 <meta name="twitter:image" content="https://neonarcade.net/og-image.png">
 
 <!-- Structured Data -->
@@ -43,7 +43,7 @@
   "@type": "WebSite",
   "name": "NEON ARCADE",
   "url": "https://neonarcade.net",
-  "description": "Play 62 free online browser games instantly. No download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.",
+  "description": "Play 67 free online browser games instantly. No download, no login required. Snake, Sudoku, Minesweeper, Tetris and more arcade, puzzle and skill games with global leaderboards.",
   "publisher": {
     "@type": "Organization",
     "name": "NEON ARCADE",
@@ -62,7 +62,7 @@
       "name": "What games can I play for free?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "All 62 games on NEON ARCADE are completely free to play — no download, no login, no ads. Just open your browser and start playing instantly."
+        "text": "All 67 games on NEON ARCADE are completely free to play — no download, no login, no ads. Just open your browser and start playing instantly."
       }
     },
     {
@@ -221,6 +221,7 @@
   .category-title.arcade { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.4); }
   .category-title.grind { color: var(--neon-purple); text-shadow: 0 0 10px rgba(180,77,255,0.4); }
   .category-title.mind { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,20,0.4); }
+  .category-title.quest { color: var(--neon-orange); text-shadow: 0 0 10px rgba(255,140,0,0.4); }
 
   .category-sub {
     font-family: 'Rajdhani', sans-serif;
@@ -250,6 +251,8 @@
   .category-link.grind:hover { background: rgba(180,77,255,0.06); border-color: rgba(180,77,255,0.4); }
   .category-link.mind { color: var(--neon-green); border-color: rgba(57,255,20,0.2); }
   .category-link.mind:hover { background: rgba(57,255,20,0.06); border-color: rgba(57,255,20,0.4); }
+  .category-link.quest { color: var(--neon-orange); border-color: rgba(255,140,0,0.2); }
+  .category-link.quest:hover { background: rgba(255,140,0,0.06); border-color: rgba(255,140,0,0.4); }
 
   /* --- GAME GRID (3 cards per row) --- */
   .games-row {
@@ -517,7 +520,7 @@
 <header>
   <h1 class="logo">NEON<span>ARCADE</span></h1>
   <p class="tagline">Free online browser games — play instantly</p>
-  <p class="header-desc">62 free games in four collections: quick arcade action, retro classics reborn, classic brain puzzles, and progressive skill challenges. No download, no login — just open and play in your browser.</p>
+  <p class="header-desc">67 free games in five collections: quick arcade action, retro classics reborn, classic brain puzzles, progressive skill challenges, and deep quest games. No download, no login — just open and play in your browser.</p>
   <div class="header-line"></div>
 </header>
 
@@ -564,6 +567,22 @@
     <a href="/neonclassic/" class="category-link" style="color:var(--neon-gold);border-color:rgba(255,215,0,0.2);">ALL 8 GAMES &rarr;</a>
   </div>
   <div class="games-row" id="classic-games">
+    <div class="loading">Loading top games...</div>
+  </div>
+</div>
+
+<div class="section-line"></div>
+
+<!-- NEON QUEST — Deep Games -->
+<div class="category">
+  <div class="category-header">
+    <div>
+      <h2 class="category-title quest">NEON QUEST</h2>
+      <p class="category-sub">Free deep games — longer sessions, 5-60 minutes</p>
+    </div>
+    <a href="/neonquest/" class="category-link quest">ALL 5 GAMES &rarr;</a>
+  </div>
+  <div class="games-row" id="quest-games">
     <div class="loading">Loading top games...</div>
   </div>
 </div>
@@ -704,6 +723,13 @@
       { slug: 'hitori', name: 'HITORI', desc: 'Shade cells to eliminate duplicates. Shaded can\'t touch. Unshaded must connect.', img: 'neonmind/screenshots/hitori.png', path: 'neonmind/', modes: ['1p'] },
       { slug: 'kenken', name: 'KENKEN', desc: 'Math meets logic. Latin square with arithmetic cages. +, -, ×, ÷.', img: 'neonmind/screenshots/kenken.png', path: 'neonmind/', modes: ['1p'] },
     ],
+    quest: [
+      { slug: 'fusion', name: 'FUSION', desc: 'Drop atoms into a reactor. Identical atoms fuse into heavier elements. Physics-based chain reactions. How far up the periodic table can you go?', img: 'neonquest/screenshots/fusion.png', path: 'neonquest/', modes: ['1p'] },
+      { slug: 'jackpot', name: 'JACKPOT', desc: 'Roguelike slot machine deckbuilder. Spin reels, match symbols to deal damage. Buy new symbols, bend probability, defeat bosses across 15 floors.', img: 'neonquest/screenshots/jackpot.png', path: 'neonquest/', modes: ['1p'] },
+      { slug: 'firewall', name: 'FIREWALL', desc: 'Tower defense on a circuit board. Place security programs, evolve the board every 5 waves. Overclock towers at the risk of burnout.', img: 'neonquest/screenshots/firewall.png', path: 'neonquest/', modes: ['1p'] },
+      { slug: 'swarm', name: 'SWARM', desc: 'Control a drone swarm in a survivor-like. Split into groups or merge for power. Survive 15 minutes of escalating chaos.', img: 'neonquest/screenshots/swarm.png', path: 'neonquest/', modes: ['1p'] },
+      { slug: 'synthesis', name: 'SYNTHESIS', desc: 'Neon alchemy lab. Start with 4 elements, discover 200+ substances. Unlock equipment, explore 5 themed branches. Save and resume anytime.', img: 'neonquest/screenshots/synthesis.png', path: 'neonquest/', modes: ['1p'] },
+    ],
   };
 
   function makeCard(game, basePath) {
@@ -787,6 +813,7 @@
     arcade: shuffle(CATALOG.arcade).slice(0, 3),
     classic: shuffle(CATALOG.classic).slice(0, 3),
     grind: shuffle(CATALOG.grind).slice(0, 3),
+    quest: shuffle(CATALOG.quest).slice(0, 3),
     mind: shuffle(CATALOG.mind).slice(0, 3)
   };
 
@@ -802,13 +829,14 @@
   renderCategory('arcade-games', picked.arcade, 'neonarcade/');
   renderCategory('classic-games', picked.classic, 'neonclassic/');
   renderCategory('grind-games', picked.grind, 'neongrind/');
+  renderCategory('quest-games', picked.quest, 'neonquest/');
   renderCategory('mind-games', picked.mind, 'neonmind/');
 
   // Fetch stats and add play counts to shown games (no re-sort)
   NeonAPI.allStats().then(function(data) {
     if (!data || !data.games) return;
     var stats = data.games;
-    ['arcade', 'classic', 'grind', 'mind'].forEach(function(cat) {
+    ['arcade', 'classic', 'grind', 'quest', 'mind'].forEach(function(cat) {
       picked[cat].forEach(function(g) {
         g.plays = (stats[g.slug] || {}).plays || 0;
       });
@@ -816,6 +844,7 @@
     renderCategory('arcade-games', picked.arcade, 'neonarcade/');
     renderCategory('classic-games', picked.classic, 'neonclassic/');
     renderCategory('grind-games', picked.grind, 'neongrind/');
+    renderCategory('quest-games', picked.quest, 'neonquest/');
     renderCategory('mind-games', picked.mind, 'neonmind/');
   });
 })();

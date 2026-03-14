@@ -191,6 +191,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 11 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "NEON QUEST — Why We Built Games You Can't Finish in 60 Seconds",
+  "description": "How we designed 5 deep games for the new NEON QUEST category: physics puzzles, roguelike deckbuilders, tower defense, survivor-likes, and crafting — all in single HTML files.",
+  "url": "https://neonarcade.net/blog.html#neon-quest",
+  "datePublished": "2026-03-13",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#neon-quest"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -785,6 +801,10 @@
     <li><a href="#multiplayer-without-servers">
       <span class="toc-num">10</span>
       <span class="toc-text">Multiplayer Without Servers &mdash; Challenge Links, Seeds &amp; Same-Device 2P</span>
+    </a></li>
+    <li><a href="#neon-quest">
+      <span class="toc-num">11</span>
+      <span class="toc-text">NEON QUEST &mdash; Why We Built Games You Can&rsquo;t Finish in 60 Seconds</span>
     </a></li>
   </ol>
 </nav>
@@ -1659,6 +1679,82 @@ neonarcade.net/neonmind/minesweeper.html<span class="str">#c=839274516-3</span><
   <div class="highlight-box">
     <span class="hl-label">The Takeaway</span>
     <p>Most multiplayer does not need servers. A seeded PRNG and a URL hash give you reproducible shared experiences for free. Real-time connections are for real-time games &mdash; everything else can be a link. The best multiplayer architecture is the one where the URL is the entire protocol.</p>
+  </div>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 11 -->
+<!-- ================================================================ -->
+<article class="article" id="neon-quest">
+  <p class="article-num">Article 11 &mdash; March 13, 2026</p>
+  <h2 class="article-title">NEON QUEST &mdash; Why We Built Games You Can&rsquo;t Finish in 60 Seconds</h2>
+
+  <p>NEON ARCADE started as a collection of 30-second viral hits. Open a link, play, share your score, move on. That formula works &mdash; 62 games later, it clearly works. But something was missing.</p>
+
+  <p>Players kept asking: <strong>&ldquo;Do you have anything I can play on my commute?&rdquo;</strong></p>
+
+  <p>A 30-second game does not fill a 45-minute train ride. It fills the first 30 seconds. So we built NEON QUEST &mdash; a fifth category with 5 games designed for 5-60 minute sessions. Games you come back to. Games with progression, save states, and the kind of depth that keeps you thinking about strategy when you are not playing.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val" style="color:#ff8c00;">5</div>
+      <div class="stat-label">New Deep Games</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">67</div>
+      <div class="stat-label">Total Games</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">5</div>
+      <div class="stat-label">Categories</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">60m</div>
+      <div class="stat-label">Max Session Length</div>
+    </div>
+  </div>
+
+  <h3>The Design Tension</h3>
+
+  <p>Every rule in CLAUDE.md says &ldquo;sessions under 60 seconds.&rdquo; NEON QUEST throws that out. But the deeper principles still apply: learnable in 30 seconds (tutorial pacing, not upfront rules), a shareable moment in the first session, and the &ldquo;one more try&rdquo; hook that makes you restart instead of close the tab.</p>
+
+  <p>The key adaptation was <strong>save/resume.</strong> You cannot ask someone on a train to finish a 25-minute tower defense run in one sitting. Games with sessions over 15 minutes auto-save between natural break points. Close the tab, come back tomorrow, pick up where you left off. It is the same localStorage we already use for scores &mdash; just saving more state.</p>
+
+  <h3>The Five Games</h3>
+
+  <p><strong style="color:#ff8c00;">FUSION</strong> &mdash; Suika Game meets the periodic table. Drop atoms into a reactor. When two identical atoms touch, they fuse into the next element. Physics-based chain reactions are the hook &mdash; watching a cascade of fusions ripple through a packed reactor is the screenshot moment. The hardest engineering problem here was stable circle-circle collision resolution. We used Verlet integration with iterative constraint solving. No physics library &mdash; just inline JavaScript computing forces 60 times per second.</p>
+
+  <p><strong style="color:#ff8c00;">JACKPOT</strong> &mdash; A roguelike deckbuilder where your deck is a slot machine. Spin 3 reels, match symbols to deal damage, buy new symbols between fights, bend probability with weights and relics. 15 floors, 5 bosses, each with a mechanic that breaks your strategy. The Ransomware boss encrypts one of your reels. The Zero-Day boss is immune to your most common symbol. Every run is 10-15 minutes and ends with &ldquo;if I had just bought that Lightning symbol on floor 4&hellip;&rdquo;</p>
+
+  <p><strong style="color:#ff8c00;">FIREWALL</strong> &mdash; Tower defense on a circuit board. Place security programs on nodes, watch enemies stream along glowing circuit traces. The twist: every 5 waves, the board evolves. You choose from 3 circuit expansions that add new paths and new tower slots, reshaping the battlefield. Overclocking lets any tower fire at 2x speed &mdash; but 3 overclocks without cooling and it burns out permanently. Save/resume between waves.</p>
+
+  <p><strong style="color:#ff8c00;">SWARM</strong> &mdash; Vampire Survivors, but you control a swarm of drones instead of one character. The core mechanic is split/merge. Right-click to leave a splinter group guarding a position. Left-click to recall everything. More drones together means stronger attacks (cohesion bonus), but splitting covers more ground. 15-minute survival runs with bosses at 5, 10, and 15 minutes. Performance was the engineering challenge &mdash; 50 drones, 200 enemies, and hundreds of projectiles at 60fps required spatial hashing and object pooling.</p>
+
+  <p><strong style="color:#ff8c00;">SYNTHESIS</strong> &mdash; Infinite Craft in a neon lab. Start with 4 base elements. Drag two items onto the workbench to discover new substances. 200+ items across 3 tiers, organized in 5 themed branches (Chemistry, Electronics, Energy, Biology, Space). Discovering specific items unlocks new equipment: a Furnace enables heat combinations, a Centrifuge splits items back into components for reverse-engineering hints. Full save/resume &mdash; this is the game you play for weeks, discovering a few new items each session.</p>
+
+  <h3>Still Single-File HTML</h3>
+
+  <p>Every NEON QUEST game is a single <code>.html</code> file. No build step, no framework, no external dependencies beyond Google Fonts and neon.js. SYNTHESIS is the largest at around 200KB &mdash; the recipe database is a JSON object embedded directly in the source. SWARM is the most technically demanding, running a full entity-component system with spatial hashing inside an inline <code>&lt;script&gt;</code> tag.</p>
+
+  <p>This is either impressive discipline or questionable judgment. We choose to interpret it as both.</p>
+
+  <h3>The Category System</h3>
+
+  <p>NEON QUEST is the fifth category, joining NEON ARCADE (action), NEON MIND (puzzles), NEON GRIND (skill), and NEON CLASSIC (retro). Each has its own hub page, accent color, and design philosophy. NEON QUEST uses <strong style="color:#ff8c00;">orange</strong> &mdash; warm, distinct, and fitting for the &ldquo;deeper/longer&rdquo; vibe. The main hub page now shows all five categories with 3 random games each.</p>
+
+  <h3>What We Learned</h3>
+
+  <p>Building games with 15-minute sessions is fundamentally different from building 30-second viral hits. Three things surprised us:</p>
+
+  <ul>
+    <li><strong>Balancing is everything.</strong> JACKPOT needed dozens of tuning passes. If swords are too strong, nobody buys other symbols. If bosses are too hard on floor 6, nobody sees floor 7. In a 30-second game, balance barely matters. In a 15-minute roguelike, it is the game.</li>
+    <li><strong>Save state is harder than gameplay.</strong> Serializing a FIREWALL board with 12 towers, 3 upgrade levels each, active cooldowns, and mid-wave enemy positions into localStorage is more complex than the pathfinding algorithm.</li>
+    <li><strong>The &ldquo;one more try&rdquo; hook works differently.</strong> In NEON SNAKE, you die and restart in 1 second. In JACKPOT, you die and spend 5 seconds thinking about what you would do differently. That reflection time is what creates the &ldquo;I could do better&rdquo; feeling that drives retention.</li>
+  </ul>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Takeaway</span>
+    <p>Viral games and deep games need different design instincts, but the same core principle: the player should always know what they would do differently next time. In a 30-second game, that is &ldquo;tap faster.&rdquo; In a 15-minute roguelike, that is &ldquo;buy the Lightning symbol instead of the Shield next run.&rdquo; Both drive the same behavior &mdash; hitting play again.</p>
   </div>
 </article>
 
