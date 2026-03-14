@@ -191,6 +191,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 11 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Building a Casino With Fake Money and Real Architecture",
+  "description": "How we built 5 casino games with a shared bankroll system, FNV-1a hash integrity, 6-player poker rooms, and canvas-rendered roulette wheels — all in single HTML files.",
+  "url": "https://neonarcade.net/blog.html#neon-casino",
+  "datePublished": "2026-03-14",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#neon-casino"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1659,6 +1675,109 @@ neonarcade.net/neonmind/minesweeper.html<span class="str">#c=839274516-3</span><
   <div class="highlight-box">
     <span class="hl-label">The Takeaway</span>
     <p>Most multiplayer does not need servers. A seeded PRNG and a URL hash give you reproducible shared experiences for free. Real-time connections are for real-time games &mdash; everything else can be a link. The best multiplayer architecture is the one where the URL is the entire protocol.</p>
+  </div>
+</article>
+
+<article class="article" id="neon-casino">
+  <p class="article-num">Article 11 &mdash; March 14, 2026</p>
+  <h2 class="article-title">Building a Casino With Fake Money and Real Architecture</h2>
+
+  <p>NEON ARCADE is 67 games now. Most are quick hits &mdash; 30 seconds, one mechanic, done. But we kept hearing the same request: <strong>"Make something I can sit with."</strong> Games where you settle in, build something up, come back later. Casino games are perfect for that. They have natural session breaks (between hands, between spins), persistent progression (your bankroll), and a dopamine loop that is older than video games themselves.</p>
+
+  <p>So we built <a href="/neoncasino/" style="color:var(--neon-gold);text-decoration:underline;text-underline-offset:3px;">NEON CASINO</a> &mdash; five games, one shared bankroll, and the first new category since launch.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val gold">5</div>
+      <div class="stat-label">Casino Games</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">1</div>
+      <div class="stat-label">Shared Bankroll</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">6</div>
+      <div class="stat-label">Poker Seats</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">$0</div>
+      <div class="stat-label">Real Money</div>
+    </div>
+  </div>
+
+  <h3>The Shared Bankroll Problem</h3>
+
+  <p>Every other game on the site is self-contained. Your Tetris score has nothing to do with your Sudoku time. Casino games are different. You want to win chips at Blackjack, blow them at Roulette, and grind them back on Slots &mdash; all from the same wallet. Five HTML files needed to share state.</p>
+
+  <p>The solution is localStorage. All five games read and write to the same key: <code>neoncasino_bankroll</code>. The value is a JSON object with two fields: the chip count and a hash. Open Blackjack, win 500 chips, close it, open Slots &mdash; your 1,500 chips are right there.</p>
+
+  <p>But localStorage is client-side. Anyone with a browser console can type <code>localStorage.setItem</code> and give themselves a million chips. Since the bankroll feeds into the global leaderboard, we needed some integrity checking.</p>
+
+  <h3>FNV-1a: Hashing for Honesty</h3>
+
+  <p>We chose FNV-1a &mdash; a fast, non-cryptographic hash. The bankroll is stored as:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code>{ <span class="str">"chips"</span>: <span class="num">1500</span>, <span class="str">"hash"</span>: <span class="str">"a7f3k2"</span> }</code>
+  </div>
+
+  <p>The hash is computed from the chip count plus a salt. When any game loads, it reads the bankroll, recomputes the hash, and checks if they match. If someone edits the chip count without knowing the salt, the hash won't verify and the bankroll resets to 1,000.</p>
+
+  <p>Is this bulletproof? No. The salt is in the source code &mdash; a determined player can find it. But it stops casual tampering, which is all we need for a free game with no real money. The goal is not cryptographic security. It is keeping the leaderboard honest enough that high scores feel earned.</p>
+
+  <h3>Five Games, Five Challenges</h3>
+
+  <p><strong>Blackjack</strong> was first. Standard rules: 6-deck shoe, hit/stand/double/split, dealer stands on soft 17, blackjack pays 3:2. The interesting part is the card rendering &mdash; DOM elements styled to look like neon playing cards, with cyan for hearts and diamonds, pink for spades and clubs. CSS 3D transforms handle the flip animation when the dealer reveals.</p>
+
+  <p><strong>Roulette</strong> needed a wheel. A real, spinning, ball-bouncing wheel. This meant canvas rendering with HiDPI support. The wheel has 37 pockets (European single-zero), each drawn as an arc segment in alternating red and black with green for zero. The ball follows a decelerating arc with bounce physics when it lands. Sound effects tick faster as the ball slows down. The betting table supports all standard bet types &mdash; straight, split, street, corner, line, dozen, column, and even-money positions.</p>
+
+  <p><strong>Slots</strong> is the most visually complex. Five reels, three rows, twenty paylines. Seven neon vector symbols drawn on canvas &mdash; no emoji, no images. Each reel spins independently with staggered stops (left to right, 0.3 seconds apart) and a spring-back bounce on landing. Diamond wilds, lightning scatters, and a free spins bonus round with retriggering. The payline visualization traces glowing lines across the grid when you win.</p>
+
+  <p><strong>Video Poker</strong> (Jacks or Better) is the cleanest design. Five cards, hold what you want, draw the rest. A visible paytable updates to highlight your current hand. The double-or-nothing feature after each win is the hook &mdash; do you take your 40-chip win or risk it for 80?</p>
+
+  <p><strong>Poker</strong> is the ambitious one. A 6-seat Texas Hold'em table with AI opponents. Three AI personalities &mdash; tight, loose, and aggressive &mdash; each evaluating hand strength, pot odds, and bluff frequency with realistic thinking delays. The table is an oval with CSS-positioned seats, a community card area, and a pot display. And it is the only casino game with multiplayer: create a room, share the code, play with up to 5 friends.</p>
+
+  <h3>Scaling the Room System</h3>
+
+  <p>NEON ARCADE already had a 2-player room system for Battleship (see <a href="#battleship-multiplayer" style="color:var(--neon-cyan);text-decoration:underline;text-underline-offset:3px;">Article 09</a>). But Poker needs 6 seats. The existing endpoints assumed exactly two players &mdash; creator and joiner, with a simple token pair.</p>
+
+  <p>We built a new set of endpoints under <code>/api/mroom/*</code> (multi-player room). The room data structure uses numbered seats:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code>{
+  <span class="str">"seats"</span>: {
+    <span class="str">"0"</span>: { <span class="str">"token"</span>: <span class="str">"abc..."</span>, <span class="str">"name"</span>: <span class="str">"ACE"</span> },
+    <span class="str">"1"</span>: { <span class="str">"token"</span>: <span class="str">"def..."</span>, <span class="str">"name"</span>: <span class="str">"PIX"</span> }
+  },
+  <span class="str">"messages"</span>: [],
+  <span class="str">"state"</span>: <span class="str">"waiting"</span>,
+  <span class="str">"maxSeats"</span>: <span class="num">6</span>
+}</code>
+  </div>
+
+  <p>Players join by taking the next available seat. The poll endpoint returns messages from other players filtered by timestamp, plus seat info (names only, never tokens). The room lives in Cloudflare KV with a 10-minute TTL &mdash; if everyone leaves, it cleans itself up.</p>
+
+  <p>In solo mode, the table renders all 6 seats. You sit at seat 0. Three AI opponents take seats 1, 3, and 4. Seats 2 and 5 show empty "JOIN" placeholders &mdash; a visual hint that multiplayer exists without cluttering the table.</p>
+
+  <h3>The Daily Bonus Safety Net</h3>
+
+  <p>Casino games have a problem that arcade games do not: you can go to zero. In Tetris, losing means starting over with the same nothing you started with. In Blackjack, losing means your bankroll is empty and you literally cannot play anymore.</p>
+
+  <p>The daily bonus handles this. If your bankroll drops below 100 chips, you get a one-time +500 bonus once per day. It is enough to play a few more hands without feeling punished. The threshold is low enough that it only triggers when you genuinely need it &mdash; not when you are doing fine at 890 chips. (We caught that bug in testing. The original code showed the bonus modal regardless of bankroll. Oops.)</p>
+
+  <p>There is also a nuclear option: a RESET BANKROLL button with a confirmation dialog that wipes everything back to 1,000 chips. Fresh start, no questions asked. Sometimes you just want a clean slate.</p>
+
+  <h3>Building Five Games in Parallel</h3>
+
+  <p>The implementation used five parallel AI agents, one per game. Each agent got the same design spec, bankroll system code, and visual style guide. They built independently, committed separately, and we merged the results.</p>
+
+  <p>This worked because casino games are surprisingly independent. They share a bankroll and a visual language, but the game logic is completely isolated. Blackjack's shoe shuffling has nothing to do with Roulette's ball physics. The only integration point was the shared localStorage key &mdash; and since that was defined upfront in the spec, there were no merge conflicts.</p>
+
+  <p>Total build time for all five games: under 15 minutes of wall clock, running in parallel. Integration (hub page, main index, sitemap, worker registration) took one more agent pass.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Takeaway</span>
+    <p>Casino games are a different beast from quick arcade hits. They need shared state, session persistence, and enough integrity checking to keep leaderboards fair. But the same single-HTML-file architecture scales to handle it. FNV-1a hashes in localStorage, a 6-seat room system on Cloudflare KV, and canvas-rendered wheels and reels &mdash; all running without a framework, without a build step, without a database. Open the file, play some cards.</p>
   </div>
 </article>
 
