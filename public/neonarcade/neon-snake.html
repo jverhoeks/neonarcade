@@ -445,7 +445,10 @@
       <div id="final-score">0</div>
       <div id="new-best"></div>
       <div class="score-table"></div>
-      <button class="play-btn" id="retry-btn">PLAY AGAIN</button>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="play-btn" id="share-btn">SHARE</button>
+        <button class="play-btn" id="retry-btn">PLAY AGAIN</button>
+      </div>
       <p class="controls-hint">PRESS SPACE OR TAP</p>
     </div>
   </div>
@@ -967,6 +970,22 @@
   // buttons
   document.getElementById('start-btn').addEventListener('click', startGame);
   document.getElementById('retry-btn').addEventListener('click', restartGame);
+  document.getElementById('share-btn').addEventListener('click', function() {
+    var len = snake ? snake.length : 0;
+    var text = '\u{1F40D} NEON SNAKE\n'
+      + 'Score: ' + score + ' | Length: ' + len + '\n'
+      + (score >= 500 ? '\u{1F525}\u{1F525}\u{1F525}' : score >= 200 ? '\u{1F525}\u{1F525}' : '\u{1F525}') + '\n'
+      + 'neonarcade.net/neonarcade/neon-snake.html';
+    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+      navigator.share({ text: text }).catch(function() {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('share-btn');
+        btn.textContent = 'COPIED!';
+        setTimeout(function() { btn.textContent = 'SHARE'; }, 1500);
+      }).catch(function() {});
+    }
+  });
 
   function startGame() {
     startOverlay.classList.remove('visible');

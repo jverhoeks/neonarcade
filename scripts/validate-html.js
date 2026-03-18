@@ -12,7 +12,7 @@ const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 
 // ========== Configuration ==========
-const GAME_DIRS = ['neonarcade', 'neonmind', 'neongrind', 'neonclassic'];
+const GAME_DIRS = ['neonarcade', 'neonmind', 'neongrind', 'neonclassic', 'neoncasino', 'neonquest'];
 
 // Required patterns for game files (not hub/admin pages)
 const REQUIRED_PATTERNS = [

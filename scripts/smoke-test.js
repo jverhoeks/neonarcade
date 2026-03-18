@@ -13,7 +13,7 @@ const { execFileSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 const PORT = 8787;
-const GAME_DIRS = ['neonarcade', 'neonmind', 'neongrind', 'neonclassic'];
+const GAME_DIRS = ['neonarcade', 'neonmind', 'neongrind', 'neonclassic', 'neoncasino', 'neonquest'];
 const TIMEOUT = 8000; // ms to wait per page
 
 // MIME types for static serving

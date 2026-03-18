@@ -1326,7 +1326,7 @@ async function runFlashSequence() {
 
   for (let i = 0; i < 10; i++) {
     // Black gap
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = '#0a0a12';
     ctx.fillRect(0, 0, W, H);
     document.getElementById('flash-counter').textContent = `${i + 1}/10`;
     await sleep(500);
@@ -1338,7 +1338,7 @@ async function runFlashSequence() {
   }
 
   // Final black
-  ctx.fillStyle = '#000000';
+  ctx.fillStyle = '#0a0a12';
   ctx.fillRect(0, 0, W, H);
   showFlashCounter(false);
 
