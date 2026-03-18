@@ -83,6 +83,7 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 | 28 | TypeBlitz | Speed typing WPM challenge |
 | 29 | Veto | 2-player bracket elimination challenge |
 | 30 | Mimic | Social prediction game with challenge links |
+| 31 | Battleship | Online 2-player naval combat with room codes |
 
 ### New Ideas -- Ranked
 
@@ -169,6 +170,14 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 **Why viral:** Watching the frog chain navigate traffic is hypnotic. "Time-paradox planning" is a unique cognitive challenge. The moment your past self gets hit by a car you dodged is devastating.
 **Sharing:** Survival time + max clone count + replay
 **Build difficulty:** 4/5
+
+#### 13. ECHO ⭐ NEW (March 2026)
+**Type:** Cognitive flip / reverse sequence memory
+**Mechanic:** Watch a sequence of colored neon flashes (3–10 items). Then your screen "echoes" — you must replay the same sequence in REVERSE order, tapping along as it plays back. Nails 3 in reverse? Easy. 8 in reverse? You'll be humbled. Each successful echo adds another flash. Miss the order and the echo shatters.
+**Why viral:** Reversing sequences is notoriously, universally hard — everyone knows they can't say the alphabet backwards at speed. "I got to 9 in reverse!" is a concrete, shareable achievement. Tests a specific cognitive skill people are genuinely curious about. Fast play loop (30–60s).
+**Sharing:** `ECHO | Reversed: 9 | Record: 11 | Top 5% | 🔄`
+**Build difficulty:** 2/5
+**Priority:** HIGH — fills a distinct cognitive niche; different from Sequencer (forward memory) and Chimp (grid memory)
 
 ---
 
@@ -293,6 +302,22 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 **Sharing:** `NUMBERLINK #29 | 7x7 | 5 pairs | 1:40`
 **Build difficulty:** 3/5
 
+#### 15. CULPRIT ⭐ NEW (March 2026)
+**Type:** Daily deduction grid (Murdle-inspired)
+**Mechanic:** A crime has been committed. Solve it using a 3×3 logic grid: suspect, location, weapon. Each row/column of clues eliminates options through pure deduction. No guessing needed — every puzzle has exactly one logical solution. New theme daily (noir crime, sci-fi heist, fantasy mystery). Share your solve time + emoji grid.
+**Why viral:** Murdle went viral and spawned a bestselling book series. The "whodunit" framing is universally appealing. Zero prior knowledge needed — pure logic. Emoji grid (✅❌) sharing creates spoiler-free FOMO. Daily cadence builds streaks.
+**Sharing:** `CULPRIT #44 | Solved in 3:12 | No hints | 🟩🟥🟥 / 🟥🟩🟥 / 🟥🟥🟩`
+**Build difficulty:** 3/5
+**Priority:** HIGH — Murdle proved this format. No equivalent in NEON MIND.
+
+#### 16. FACTION ⭐ NEW (March 2026)
+**Type:** Daily intersection trivia grid (Immaculate Grid-inspired)
+**Mechanic:** A 3×3 grid where rows and columns are categories (e.g., "French" × "Scientist" = Marie Curie). Name one person/thing that satisfies both constraints for each of 9 cells. Scored by how rare your answers are — common answers score low, obscure correct answers score high. New grid daily.
+**Why viral:** Immaculate Grid (sports) was acquired for millions. Format works for ANY domain: history, science, film, music, literature, sports. Rarity scoring makes every correct answer feel like a flex. "Nobody else named that person" drives sharing.
+**Sharing:** `FACTION #17 | History Grid | Score: 847 | Rarity: Rare | 🔥`
+**Build difficulty:** 3/5
+**Priority:** HIGH — proven format, completely absent from browser gaming outside sports.
+
 ---
 
 ## NEON GRIND Ideas (Skill/Speed)
@@ -395,6 +420,93 @@ From Nikoli's catalog: Slitherlink, Masyu, Hitori, Shikaku, Fillomino, Akari (Li
 **Sharing:** `MATHRACE | Level 34 | Algebra | 97% accuracy | Challenge: [link]`
 **Build difficulty:** 2/5
 
+#### 13. TEMPO ⭐ NEW (March 2026)
+**Type:** Music layer identification / audio working memory
+**Mechanic:** A short music loop plays (built from Web Audio API synthesis: drums, bass, lead, pad). One layer silently drops out for 2 seconds — identify which layer is missing. 20 rounds per session. Timer gets shorter, layers get more similar in timbre. Modes: easy (4 layers, distinct), hard (6 layers, similar textures), speed (1 second to decide).
+**Why viral:** "Layers of a song" is a viral TikTok format — creators reveal stems of hit songs to massive engagement. Gamifying that experience is irresistible. Musicians flex, non-musicians are humbled. "I can hear the bass disappear" is a specific, trainable skill. Pairs with RHYTHMTAP for an audio skill progression.
+**Sharing:** `TEMPO | 17/20 | Bass expert | Avg: 1.9s | Top 8%`
+**Build difficulty:** 3/5
+**Priority:** HIGH — audio skill games are a gap in NEON GRIND; music layer content is proven viral on social media
+
+---
+
+## NEON CASINO Ideas (Casino / Card / Table)
+
+### Already Built (5 games)
+| # | Game | Type |
+|---|------|------|
+| 1 | Blackjack | Classic 21 card game |
+| 2 | Poker | 6-seat Texas Hold'em vs AI or multiplayer |
+| 3 | Roulette | European roulette with all bet types |
+| 4 | Slots | 5-reel slot machine with bonus rounds |
+| 5 | Video Poker | Jacks or Better draw poker |
+
+### New Ideas -- Ranked
+
+#### 1. KENO ⭐ NEW (March 2026)
+**Type:** Lottery / number selection casino game
+**Mechanic:** Classic Keno with neon flair. Pick 1–10 numbers from a 1–80 grid. 20 numbers are drawn. Payout table scales with how many of your picks match (5/10 = small win, 8/10 = big win, 10/10 = jackpot). Rounds take 30 seconds. Daily "hot numbers" (highlighted picks with 1.5x payout) rotate each day. Progressive jackpot counter for 10/10 hits. Uses shared neoncasino bankroll.
+**Why viral:** Zero skill floor — pick numbers and watch the draw. Near-misses create powerful "almost!" moments. Jackpot format generates "what if I'd picked 67" sharing. Extremely fast rounds encourage compulsive replay. Keno is missing from every browser casino collection.
+**Sharing:** `KENO | 7/10 matched | +250 chips | Balance: 3,200 🎰`
+**Build difficulty:** 2/5
+**Priority:** HIGH — Keno is a classic casino game with no equivalent in NEON CASINO; pure chance = zero barrier to entry
+
+#### 2. BACCARAT
+**Type:** Card comparison casino game
+**Mechanic:** Bet on Player, Banker, or Tie. Two hands dealt — closest to 9 wins. Aces = 1, face cards = 0. No decisions after betting. Tracks streak bonuses: 3 Banker wins in a row = 1.1x multiplier on next Banker bet. Road display (last 20 results) for pattern watchers. Includes Punto Banco variant rules.
+**Why viral:** Baccarat is the #1 casino game globally by revenue. Low skill floor = highly accessible. Streak tracking creates "I knew Banker was due!" moments. Completes the classic table game set.
+**Sharing:** `BACCARAT | 8-game Banker streak | +450 chips | Balance: 5,100`
+**Build difficulty:** 2/5
+
+#### 3. CRAPS
+**Type:** Dice casino game
+**Mechanic:** Shoot dice on a simplified Craps layout. Pass Line, Don't Pass, Come, Place bets on 6/8. Two dice animate with physics, settle to random values. Visual odds display for each bet type. Tutorial mode explains each bet inline. Streamlined: skip prop bets, keep the 6 most popular bet types.
+**Why viral:** Craps is notoriously intimidating — a simplified browser version that teaches while playing fills a real gap. "Oh THAT'S how Craps works" shareable moment. Dice roll animation is satisfying. Film/TV references make it aspirational.
+**Sharing:** `CRAPS | 12-roll hot streak | Pass Line crushed | +620 chips`
+**Build difficulty:** 3/5
+
+---
+
+## NEON WORLD Ideas (Geography / History / Culture) ⭐ NEW CATEGORY (March 2026)
+
+**Category concept:** NEON WORLD games are about real-world knowledge — geography, history, art, culture. Different from NEON MIND (pure logic) and NEON GRIND (cognitive speed). NEON WORLD rewards curiosity about the world, produces "I never knew that!" moments, and generates debates across cultural backgrounds. Every game has a daily puzzle format for global comparison.
+
+**Accent color:** Gold (#ffd700) — evokes maps, history, global discovery
+**Hub icon:** 🌍
+
+### New Ideas -- Ranked
+
+#### 1. DECADE ⭐ NEW (March 2026)
+**Type:** Year estimation / historical image dating
+**Mechanic:** A photograph, headline, or cultural artifact appears. Guess the year it's from (slider from 1900–2025). Scoring: exact year = 1000pts, off by 1 = 950pts, off by 5 = 750pts, off by 10 = 500pts, off by 20 = 200pts. 5 items per daily set. Hints: click to reveal one visual detail at a cost of 100pts. Category rotates: photography, fashion, technology, music, sports.
+**Why viral:** "Guess the year" content is already huge on Reddit and TikTok. Dating photos requires synthesizing multiple visual cues (fashion, technology, vehicle design, color grading). Social debates: "That's clearly 1987, look at the hair!" The 5-item daily format creates shareable scorecards.
+**Sharing:** `DECADE #28 | 4,350/5,000 | Category: Fashion | "1974 not 1976!" 📸`
+**Build difficulty:** 2/5
+**Priority:** HIGH — proven viral format, zero equivalent in browser gaming
+
+#### 2. LAYER ⭐ NEW (March 2026)
+**Type:** Progressive map reveal / geography guessing
+**Mechanic:** A location is revealed layer by layer: first just the outline shape, then rivers and coastline, then major cities (as dots), then roads, finally the full detailed map with labels. Guess the country/city/region at each layer — earlier guesses score more (Layer 1 = 1000pts, Layer 5 = 200pts). Daily location. Zoom in/out on mobile with pinch.
+**Why viral:** Progressive reveal creates mounting tension — "I KNOW this shape, don't show me the cities yet!" Geography is a universal flex. Daily format enables "I got it on Layer 2!" bragging. Shape-only guessing is surprisingly hard for similar-shaped countries (Belgium vs Netherlands, North vs South Korea).
+**Sharing:** `LAYER #41 | Guessed: Layer 2 | 900 pts | 🗺️ France`
+**Build difficulty:** 2/5
+**Priority:** HIGH — map games (Worldle, GeoGuessr Daily) are proven viral; our progressive-reveal twist is distinct
+
+#### 3. STYLE ⭐ NEW (March 2026)
+**Type:** Art/design movement identification
+**Mechanic:** An artwork, building, poster, or design appears. Identify the movement or era from 4 choices: e.g., "Art Nouveau vs Art Deco vs Bauhaus vs De Stijl." Starts with distinct examples (Monet vs Mondrian), evolves to subtle period-within-movement distinctions. Daily themed sets: Architecture Week, Graphic Design Era, Painting Movement, Fashion Decade. 10 items per session.
+**Why viral:** Art identification tests cultural knowledge in a way most people haven't experienced as a game. Designers and art history enthusiasts are passionate sharers. "I confused Brutalism and Metabolism" is a humble-brag. "I got 10/10 on Architecture Week" is a genuine flex. Museums and schools share it organically.
+**Sharing:** `STYLE #15 | Architecture Week | 8/10 | Stumped by: Metabolism 🏗️`
+**Build difficulty:** 2/5
+**Priority:** HIGH — no cultural/art knowledge game exists in the browser gaming space; strong educator sharing potential
+
+#### 4. ATLAS
+**Type:** World knowledge trivia / exploration
+**Mechanic:** A world map with 10 mystery markers. Each marker hides a question about that location: capital city, national dish, famous landmark, official language, currency, etc. Answer all 10 for a full score. Daily set. Difficulty tiers: continents → countries → cities → regions. Wrong answers reveal the correct answer + one fun fact.
+**Why viral:** Geography + trivia hybrid. The "fun fact on wrong answer" mechanic teaches while playing — players share "I learned there are 3 countries that drive on the left in South America!" Mapped format is visually engaging. Covers every corner of the world over time.
+**Sharing:** `ATLAS #33 | 8/10 | Missed: Capital of Kyrgyzstan 🌍`
+**Build difficulty:** 2/5
+
 ---
 
 ## Cross-Category Ideas
@@ -469,44 +581,50 @@ These blend elements from multiple categories and could live in any section.
 
 ## Recommended Build Priority
 
-### NEON GRIND (most underserved -- only 3 games)
-Build order by impact-per-hour-of-development:
-1. **CLICKSPEED** -- 1/5 difficulty, universal appeal, CPS tests are already viral
-2. **COLORNAME** -- 1/5 difficulty, Stroop effect is universally maddening
-3. **NUMBERSENSE** -- 1/5 difficulty, unique test, "how many dots?" is addictive
-4. **GRIDMATCH** -- 1/5 difficulty, spot-the-difference on steroids
-5. **SEQUENCER** -- 1/5 difficulty, Simon Says is universally known
-6. **FLAGDASH** -- 2/5 difficulty, geography flex + regional competition
-7. **AIMTRAINER** -- 2/5 difficulty, massive FPS gamer audience
-8. **TYPEBLITZ** -- 2/5 difficulty, WPM is the new IQ flex
+### NEON WORLD (new category — highest ROI for variety)
+Entirely new category, highest differentiation value:
+1. **DECADE** -- 2/5 difficulty, "guess the year" is already viral content
+2. **LAYER** -- 2/5 difficulty, progressive map reveal is distinct and satisfying
+3. **STYLE** -- 2/5 difficulty, art knowledge game has strong educator sharing
+4. **ATLAS** -- 2/5 difficulty, geography trivia with fun facts on wrong answers
 
-### NEON MIND (strong foundation -- needs variety)
+### NEON CASINO (expand to 8 games)
+1. **KENO** -- 2/5 difficulty, classic game missing from every browser casino
+2. **BACCARAT** -- 2/5 difficulty, #1 casino game globally, zero barrier to entry
+3. **CRAPS** -- 3/5 difficulty, fills the "I never understood Craps" teaching gap
+
+### NEON GRIND (well-stocked but gaps remain)
+Build order for remaining ideas:
+1. **TEMPO** -- 3/5 difficulty, music layer recognition fills audio game gap
+2. **NBACK** -- 2/5 difficulty, "IQ training" framing drives curiosity sharing
+3. **FLAGDASH** -- 2/5 difficulty, geography flex + regional competition
+4. **WORDFLOOD** -- 2/5 difficulty, vocabulary as competitive sport
+5. **RHYTHMTAP** -- 2/5 difficulty, millisecond timing is a niche but passionate flex
+
+### NEON MIND (strong foundation -- new high-priority ideas)
 Build order:
-1. **TANGO** -- 2/5 difficulty, LinkedIn proved mainstream viability
-2. **LIGHTUP** -- 2/5 difficulty, visual satisfaction of illumination
-3. **TENTS** -- 2/5 difficulty, charming theme, beginner-friendly
-4. **SKYSCRAPERS** -- 2/5 difficulty, 3D reasoning in 2D
-5. **HITORI** -- 2/5 difficulty, unique elimination mechanic
-6. **KENKEN** -- 2/5 difficulty, educational crossover appeal
-7. **SLITHERLINK** -- 3/5 difficulty, elegant loop puzzle
-8. **STAR BATTLE** -- 3/5 difficulty, competition prestige
+1. **CULPRIT** -- 3/5 difficulty, Murdle format proven, daily whodunit deduction
+2. **FACTION** -- 3/5 difficulty, Immaculate Grid format, rarity scoring
+3. **SLITHERLINK** -- 3/5 difficulty, elegant loop puzzle
+4. **MASYU** -- 3/5 difficulty, beautiful loop with cascading logic
+5. **FILLOMINO** -- 3/5 difficulty, territory-building spatial reasoning
+6. **STAR BATTLE** -- 3/5 difficulty, competition prestige
+7. **FUTOSHIKI** -- 2/5 difficulty, simple twist on Sudoku
+8. **NUMBERLINK** -- 3/5 difficulty, tactile path-drawing on touchscreens
 
 ### NEON ARCADE (largest library -- focus on gaps)
 Build order:
-1. **CHIMP** -- 1/5 difficulty, TikTok viral ready, "beat the chimp" hook
-2. **POUR** -- 2/5 difficulty, satisfying physics, beautiful failures
-3. **BLOOMFIELD** -- 2/5 difficulty, generative art sharing
-4. **VETO** -- 2/5 difficulty, social bracket debates
-5. **FREEFALL** -- 3/5 difficulty, ragdoll comedy content
-6. **ECHOFIELD** -- 3/5 difficulty, stunning sonar visuals
-7. **ORBIT** -- 3/5 difficulty, mesmerizing orbital mechanics
-8. **CONDUCTOR** -- 3/5 difficulty, creates actual shareable music
+1. **ECHO** -- 2/5 difficulty, reverse sequence memory fills distinct cognitive niche
+2. **FREEFALL** -- 3/5 difficulty, ragdoll comedy content
+3. **ECHOFIELD** -- 3/5 difficulty, stunning sonar visuals
+4. **ORBIT** -- 3/5 difficulty, mesmerizing orbital mechanics
+5. **CONDUCTOR** -- 3/5 difficulty, creates actual shareable music
+6. **MIRRORLOCK** -- 3/5 difficulty, brain-breaking mirrored controls
 
 ### Cross-Category (high-impact picks)
 1. **CONNECTIONS** -- 2/5 difficulty, proven format, 10M daily NYT players validate it
 2. **BENCHMARK** -- 3/5 difficulty, comprehensive brain score card
-3. **MIMIC** -- 2/5 difficulty, most powerful social hook possible
-4. **DAILY LADDER** -- 2/5 difficulty, LinkedIn Crossclimb proved it works
+3. **DAILY LADDER** -- 2/5 difficulty, LinkedIn Crossclimb proved it works
 
 ---
 
