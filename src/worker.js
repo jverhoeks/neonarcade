@@ -68,6 +68,12 @@ const KNOWN_GAMES = {
   'connections':         { mode: 'low', maxScore: 86400 },
   'hitori':              { mode: 'low', maxScore: 86400 },
   'kenken':              { mode: 'low', maxScore: 86400 },
+  'culprit':             { mode: 'low', maxScore: 86400 },
+  'faction':             { mode: 'high', maxScore: 9000 },
+
+  // NEON WORLD (mode: high — score-based)
+  'decade':              { mode: 'high', maxScore: 5000 },
+  'style':               { mode: 'high', maxScore: 1500 },
 
   // NEON QUEST (longer-session deep games, mode: high)
   'fusion':              { mode: 'high', maxScore: 10000000 },

@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Style — Free Online Art Movement Quiz | NEON ARCADE</title>
+<meta name="description" content="Play Style free online — identify art and architecture movements from visual clues and descriptions. Test your cultural literacy. No download, no login.">
+<meta name="keywords" content="art movement quiz, architecture styles game, art history game, free quiz game online, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonworld/style.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonworld/style.html">
+<meta property="og:title" content="Style — Free Online Art Movement Quiz | NEON ARCADE">
+<meta property="og:description" content="Play Style free online — identify art and architecture movements from visual clues and descriptions. Test your cultural literacy. No download, no login.">
+<meta property="og:image" content="https://neonarcade.net/neonworld/screenshots/style.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonworld/style.html">
+<meta name="twitter:title" content="Style — Free Online Art Movement Quiz | NEON ARCADE">
+<meta name="twitter:description" content="Play Style free online — identify art and architecture movements from visual clues and descriptions. Test your cultural literacy. No download, no login.">
+<meta name="twitter:image" content="https://neonarcade.net/neonworld/screenshots/style.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Style",
+  "url": "https://neonarcade.net/neonworld/style.html",
+  "description": "Play Style free online — identify art and architecture movements from visual clues and descriptions. Test your cultural literacy. No download, no login.",
+  "genre": "Quiz",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonworld/screenshots/style.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON WORLD", "item": "https://neonarcade.net/neonworld/" },
+    { "@type": "ListItem", "position": 3, "name": "Style", "item": "https://neonarcade.net/neonworld/style.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif; color: #fff;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+  overflow: hidden;
+}
+body {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255,215,0,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(180,77,255,0.05) 0%, transparent 50%),
+    var(--bg-deep);
+  display: flex; align-items: center; justify-content: center;
+}
+body::after {
+  content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+
+.screen { display: none; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; max-width: 620px; padding: 20px; text-align: center;
+  position: absolute; max-height: 100vh; overflow-y: auto; }
+.screen.active { display: flex; }
+
+/* ── START SCREEN ── */
+#startScreen .game-icon { font-size: 56px; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+#startScreen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(38px,9vw,60px);
+  letter-spacing: 8px; color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
+  margin-bottom: 6px;
+}
+#startScreen .subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 16px;
+  letter-spacing: 4px; color: var(--text-mid); text-transform: uppercase; margin-bottom: 20px;
+}
+#startScreen .desc {
+  font-size: 15px; color: var(--text-mid); line-height: 1.6; margin-bottom: 24px; max-width: 400px;
+}
+.daily-badge {
+  font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px;
+  color: var(--neon-gold); border: 1px solid rgba(255,215,0,0.3);
+  padding: 4px 14px; border-radius: 2px; margin-bottom: 18px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.3); display: inline-block;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-gold); background: rgba(255,215,0,0.06);
+  color: var(--neon-gold); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(255,215,0,0.15); box-shadow: 0 0 20px rgba(255,215,0,0.25); transform: scale(1.04); }
+.controls-hint { margin-top: 16px; font-size: 13px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; font-weight: 300; }
+.best-score { margin-top: 12px; font-family: 'Orbitron', monospace; font-size: 13px; color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.3); letter-spacing: 2px; }
+#startLB { margin-top: 16px; width: 100%; max-width: 340px; }
+
+/* ── GAME SCREEN ── */
+#gameScreen { max-width: 640px; }
+.round-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; margin-bottom: 10px;
+}
+.round-label {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 3px; color: var(--neon-gold);
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+}
+.score-live {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 2px; color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+.cat-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+}
+.speed-bar-wrap { width: 100%; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+.speed-bar { height: 100%; background: var(--neon-gold); border-radius: 2px; transition: width 0.1s linear; box-shadow: 0 0 8px rgba(255,215,0,0.5); }
+.speed-bar.warn { background: var(--neon-orange); box-shadow: 0 0 8px rgba(255,140,0,0.5); }
+.speed-bar.danger { background: var(--neon-pink); box-shadow: 0 0 8px rgba(255,45,123,0.5); }
+
+/* Style preview card */
+.preview-card {
+  width: 100%; background: var(--bg-surface);
+  border: 1px solid rgba(255,215,0,0.15); border-radius: 6px;
+  padding: 16px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 18px;
+}
+.style-preview {
+  width: 200px; height: 160px; flex-shrink: 0;
+  border-radius: 4px; overflow: hidden; position: relative;
+  background: #0e0e1a;
+}
+.preview-info { flex: 1; text-align: left; }
+.preview-category {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
+  letter-spacing: 3px; color: var(--neon-gold); text-transform: uppercase; margin-bottom: 6px;
+}
+.preview-description {
+  font-size: 14px; color: #ccc; line-height: 1.55; margin-bottom: 10px;
+}
+.preview-chars {
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.char-tag {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
+  letter-spacing: 1px; color: var(--text-dim); background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 2px; padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+/* Answer grid */
+.answer-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; width: 100%; margin-bottom: 10px;
+}
+.answer-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 16px 12px; text-align: center;
+  border: 1px solid rgba(255,215,0,0.25); background: rgba(255,215,0,0.04);
+  color: #ddd; cursor: pointer; border-radius: 4px;
+  text-transform: uppercase; transition: all 0.18s; line-height: 1.3;
+}
+.answer-btn:hover:not([disabled]) { border-color: var(--neon-gold); background: rgba(255,215,0,0.12); color: #fff; box-shadow: 0 0 12px rgba(255,215,0,0.15); }
+.answer-btn.correct { border-color: var(--neon-green); background: rgba(57,255,20,0.12); color: var(--neon-green); box-shadow: 0 0 16px rgba(57,255,20,0.2); }
+.answer-btn.wrong { border-color: var(--neon-pink); background: rgba(255,45,123,0.1); color: var(--neon-pink); opacity: 0.6; }
+.answer-btn.reveal { border-color: var(--neon-green); background: rgba(57,255,20,0.08); color: var(--neon-green); }
+.answer-btn[disabled] { cursor: default; }
+
+.feedback-bar {
+  min-height: 28px; font-family: 'Orbitron', monospace; font-size: 13px;
+  letter-spacing: 2px; text-align: center; margin-bottom: 4px;
+}
+.feedback-bar.correct-msg { color: var(--neon-green); text-shadow: 0 0 8px rgba(57,255,20,0.4); }
+.feedback-bar.wrong-msg { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,45,123,0.4); }
+.bonus-flash {
+  min-height: 20px; font-family: 'Rajdhani', sans-serif; font-size: 14px;
+  letter-spacing: 2px; color: var(--neon-gold); text-align: center;
+  text-shadow: 0 0 8px rgba(255,215,0,0.4);
+}
+.next-btn-wrap { margin-top: 10px; }
+.next-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 3px; padding: 12px 32px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.next-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 16px rgba(0,240,255,0.2); }
+#nextBtn { display: none; }
+
+/* ── RESULTS SCREEN ── */
+#resultsScreen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(28px,7vw,46px);
+  letter-spacing: 6px; color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
+  margin-bottom: 10px;
+}
+.results-subtitle { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 14px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 16px; }
+.total-score {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 42px;
+  color: var(--neon-gold); letter-spacing: 4px;
+  text-shadow: 0 0 12px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.2);
+  margin-bottom: 4px;
+}
+.score-label { font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 14px; }
+.result-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; font-size: 22px; }
+.results-grid { width: 100%; max-width: 380px; margin-bottom: 14px; }
+.result-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.result-round { font-family: 'Orbitron', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; }
+.result-style { font-family: 'Rajdhani', sans-serif; font-size: 13px; color: var(--text-mid); letter-spacing: 1px; flex: 1; padding: 0 10px; text-align: left; }
+.result-pts { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 1px; }
+.result-pts.ok { color: var(--neon-green); }
+.result-pts.bad { color: var(--neon-pink); }
+.new-best { font-family: 'Orbitron', monospace; font-size: 13px; color: var(--neon-gold); letter-spacing: 3px; margin-bottom: 14px; text-shadow: 0 0 8px rgba(255,215,0,0.4); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: 3px; padding: 14px 32px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 16px rgba(57,255,20,0.2); }
+.copied-msg { font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--neon-green); letter-spacing: 2px; margin-top: 10px; min-height: 20px; text-shadow: 0 0 8px rgba(57,255,20,0.3); }
+#styleScoreTable { margin-top: 14px; width: 100%; max-width: 340px; }
+
+/* ── ANIMATIONS ── */
+@keyframes shake {
+  0%,100%{ transform: translate(0,0); }
+  10%{ transform: translate(-3px,1px); }
+  20%{ transform: translate(3px,-2px); }
+  30%{ transform: translate(-2px,3px); }
+  40%{ transform: translate(2px,-1px); }
+  50%{ transform: translate(-3px,2px); }
+  60%{ transform: translate(3px,1px); }
+  70%{ transform: translate(-1px,-3px); }
+  80%{ transform: translate(2px,2px); }
+  90%{ transform: translate(-2px,-1px); }
+}
+.shake { animation: shake 0.25s ease; }
+
+.particle { position: fixed; width: 5px; height: 5px; border-radius: 50%; pointer-events: none; z-index: 9998; }
+
+/* ── CSS STYLE PREVIEWS ── */
+
+/* Impressionism: soft blurred layered divs, warm palette */
+.preview-impressionism {
+  background: linear-gradient(135deg, #d4a96a 0%, #8fb0d0 50%, #c9d4a0 100%);
+}
+.preview-impressionism::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 40px 30px at 30% 40%, rgba(248,217,160,0.8) 0%, transparent 70%),
+    radial-gradient(ellipse 50px 35px at 65% 30%, rgba(143,176,208,0.7) 0%, transparent 70%),
+    radial-gradient(ellipse 35px 25px at 50% 70%, rgba(180,210,140,0.7) 0%, transparent 70%),
+    radial-gradient(ellipse 30px 20px at 20% 65%, rgba(220,160,100,0.6) 0%, transparent 70%);
+  filter: blur(6px);
+}
+.preview-impressionism::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 3px, transparent 3px, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 7px);
+}
+
+/* Art Deco: radiating gold lines, geometric */
+.preview-artdeco {
+  background: #1a1408;
+  overflow: hidden;
+}
+.preview-artdeco::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 200px; height: 200px;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    #ffd700 0deg 4deg, transparent 4deg 12deg,
+    #ffd700 12deg 16deg, transparent 16deg 24deg,
+    #ffd700 24deg 28deg, transparent 28deg 36deg,
+    #ffd700 36deg 40deg, transparent 40deg 48deg,
+    #ffd700 48deg 52deg, transparent 52deg 60deg,
+    #ffd700 60deg 64deg, transparent 64deg 72deg,
+    #ffd700 72deg 76deg, transparent 76deg 84deg,
+    #ffd700 84deg 88deg, transparent 88deg 96deg,
+    #ffd700 96deg 100deg, transparent 100deg 108deg,
+    #ffd700 108deg 112deg, transparent 112deg 120deg,
+    #ffd700 120deg 124deg, transparent 124deg 132deg,
+    #ffd700 132deg 136deg, transparent 136deg 144deg,
+    #ffd700 144deg 148deg, transparent 148deg 156deg,
+    #ffd700 156deg 160deg, transparent 160deg 168deg,
+    #ffd700 168deg 172deg, transparent 172deg 180deg,
+    #ffd700 180deg 184deg, transparent 184deg 192deg,
+    #ffd700 192deg 196deg, transparent 196deg 204deg,
+    #ffd700 204deg 208deg, transparent 208deg 216deg,
+    #ffd700 216deg 220deg, transparent 220deg 228deg,
+    #ffd700 228deg 232deg, transparent 232deg 240deg,
+    #ffd700 240deg 244deg, transparent 244deg 252deg,
+    #ffd700 252deg 256deg, transparent 256deg 264deg,
+    #ffd700 264deg 268deg, transparent 268deg 276deg,
+    #ffd700 276deg 280deg, transparent 280deg 288deg,
+    #ffd700 288deg 292deg, transparent 292deg 300deg,
+    #ffd700 300deg 304deg, transparent 304deg 312deg,
+    #ffd700 312deg 316deg, transparent 316deg 324deg,
+    #ffd700 324deg 328deg, transparent 328deg 336deg,
+    #ffd700 336deg 340deg, transparent 340deg 348deg,
+    #ffd700 348deg 352deg, transparent 352deg 360deg
+  );
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+.preview-artdeco::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 40px; height: 40px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #ffd700 30%, #b8860b 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255,215,0,0.6);
+  z-index: 2;
+}
+
+/* Bauhaus: bold primary blocks */
+.preview-bauhaus {
+  background: #f5f5f5;
+  display: grid;
+  grid-template-columns: 60px 80px 60px;
+  grid-template-rows: 60px 40px 60px;
+}
+.preview-bauhaus::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    /* red block top-left */ linear-gradient(to right, #cc0000 0px, #cc0000 60px, transparent 60px),
+    /* blue block center-right */ linear-gradient(to bottom, transparent 60px, #1a44cc 60px, #1a44cc 100px, transparent 100px);
+}
+.preview-bauhaus::after {
+  content: '';
+  position: absolute;
+  left: 60px; top: 0; width: 80px; height: 60px;
+  background: #f5c800;
+  box-shadow: 0 100px 0 0 #f5c800;
+}
+
+/* Cubism: angular faceted clip-paths */
+.preview-cubism {
+  background: #b8a070;
+  position: relative;
+}
+.preview-cubism::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 10px; width: 90px; height: 80px;
+  background: #6688aa;
+  clip-path: polygon(0% 20%, 30% 0%, 100% 10%, 80% 100%, 10% 90%);
+  transform: rotate(8deg);
+}
+.preview-cubism::after {
+  content: '';
+  position: absolute;
+  bottom: 15px; right: 10px; width: 100px; height: 90px;
+  background: #cc8844;
+  clip-path: polygon(20% 0%, 100% 15%, 85% 100%, 0% 80%, 10% 30%);
+  transform: rotate(-12deg);
+}
+
+/* Minimalism: single centered circle on near-white */
+.preview-minimalism {
+  background: #e8e8e0;
+}
+.preview-minimalism::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 60px; height: 60px;
+  transform: translate(-50%, -50%);
+  background: #555560;
+  border-radius: 50%;
+}
+.preview-minimalism::after { content: none; }
+
+/* Pop Art: bold halftone dots, flat bright */
+.preview-popart {
+  background: #ffec00;
+  background-image:
+    radial-gradient(circle, #cc0077 6px, transparent 6px),
+    radial-gradient(circle, #cc0077 6px, transparent 6px);
+  background-size: 22px 22px;
+  background-position: 0 0, 11px 11px;
+  border: 4px solid #000;
+}
+.preview-popart::before {
+  content: '';
+  position: absolute;
+  top: 20px; left: 30px; width: 140px; height: 60px;
+  background: #00aacc;
+  border: 3px solid #000;
+  border-radius: 4px;
+}
+.preview-popart::after {
+  content: '';
+  position: absolute;
+  bottom: 20px; right: 20px; width: 70px; height: 70px;
+  background: #ff4400;
+  border: 3px solid #000;
+  border-radius: 50%;
+}
+
+/* Surrealism: melting shapes, dreamlike */
+.preview-surrealism {
+  background: linear-gradient(180deg, #1a1a6e 0%, #6e3a1a 100%);
+}
+.preview-surrealism::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 40px; width: 120px; height: 60px;
+  background: #d4a044;
+  border-radius: 50% 50% 80% 80% / 40% 40% 80% 80%;
+  transform: rotate(-5deg);
+  box-shadow: 0 40px 0 -10px rgba(212,160,68,0.5);
+}
+.preview-surrealism::after {
+  content: '';
+  position: absolute;
+  bottom: 15px; left: 20px; width: 50px; height: 100px;
+  background: #4488cc;
+  border-radius: 50%;
+  transform: skewX(20deg) scaleY(0.6);
+}
+
+/* Expressionism: jagged dark shapes */
+.preview-expressionism {
+  background: #1a0a0a;
+}
+.preview-expressionism::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #8b1a1a;
+  clip-path: polygon(0% 0%, 45% 0%, 30% 60%, 60% 30%, 40% 100%, 0% 100%);
+}
+.preview-expressionism::after {
+  content: '';
+  position: absolute;
+  top: 10px; right: 10px; width: 80px; height: 120px;
+  background: #2244aa;
+  clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%);
+  transform: rotate(15deg);
+}
+
+/* Abstract Expressionism: gestural sweeps */
+.preview-abstractexp {
+  background: #1a1010;
+}
+.preview-abstractexp::before {
+  content: '';
+  position: absolute;
+  top: 20px; left: -10px; width: 160px; height: 50px;
+  background: #dd4422;
+  transform: rotate(-8deg);
+  border-radius: 3px;
+  box-shadow: 0 0 12px rgba(221,68,34,0.4);
+}
+.preview-abstractexp::after {
+  content: '';
+  position: absolute;
+  bottom: 15px; right: -10px; width: 140px; height: 40px;
+  background: #2255cc;
+  transform: rotate(12deg);
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(34,85,204,0.4);
+}
+
+/* Op Art: concentric high-contrast rings */
+.preview-opart {
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.preview-opart::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 160px; height: 160px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle,
+      #000 0px, #000 10px,
+      #fff 10px, #fff 20px,
+      #000 20px, #000 30px,
+      #fff 30px, #fff 40px,
+      #000 40px, #000 50px,
+      #fff 50px, #fff 60px,
+      #000 60px, #000 70px,
+      #fff 70px, #fff 80px
+    );
+}
+.preview-opart::after { content: none; }
+
+/* Constructivism: diagonal red/black poster */
+.preview-constructivism {
+  background: #e8e0d0;
+}
+.preview-constructivism::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: #cc1111;
+  clip-path: polygon(0% 0%, 60% 0%, 40% 100%, 0% 100%);
+}
+.preview-constructivism::after {
+  content: '';
+  position: absolute;
+  top: 20px; right: 10px; width: 80px; height: 6px;
+  background: #111;
+  box-shadow: 0 14px 0 #111, 0 28px 0 #111, 0 42px 0 #111, 0 56px 0 #111, 0 70px 0 #111;
+  transform: rotate(-10deg);
+}
+
+/* Art Nouveau: flowing organic curves */
+.preview-artnouv {
+  background: linear-gradient(135deg, #1a2a1a 0%, #2a1a30 100%);
+}
+.preview-artnouv::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%; width: 80px; height: 140px;
+  transform: translateX(-50%);
+  background: transparent;
+  border: 3px solid #88cc66;
+  border-radius: 50% 50% 30% 30%;
+  box-shadow: 0 0 10px rgba(136,204,102,0.3);
+}
+.preview-artnouv::after {
+  content: '';
+  position: absolute;
+  bottom: 10px; left: 20px; width: 160px; height: 50px;
+  background: transparent;
+  border: 2px solid #cc88aa;
+  border-radius: 0 80% 80% 0;
+  box-shadow: 0 0 8px rgba(204,136,170,0.3);
+}
+
+/* De Stijl: primary grid */
+.preview-destijl {
+  background: #f5f5f5;
+}
+.preview-destijl::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    /* vertical black lines */
+    linear-gradient(to right, transparent 59px, #111 59px, #111 63px, transparent 63px, transparent 119px, #111 119px, #111 123px, transparent 123px),
+    /* horizontal black lines */
+    linear-gradient(to bottom, transparent 59px, #111 59px, #111 63px, transparent 63px, transparent 99px, #111 99px, #111 103px, transparent 103px);
+}
+.preview-destijl::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 59px; height: 59px;
+  background: #cc1111;
+  box-shadow: 64px 104px 0 0 #1a44cc, 124px 0 0 0 #f5c800;
+}
+
+/* Futurism: speed lines */
+.preview-futurism {
+  background: #0a0a1a;
+}
+.preview-futurism::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(78deg, transparent 45%, rgba(255,80,20,0.7) 45%, rgba(255,80,20,0.7) 46%, transparent 46%),
+    linear-gradient(72deg, transparent 40%, rgba(255,140,0,0.5) 40%, rgba(255,140,0,0.5) 41%, transparent 41%),
+    linear-gradient(65deg, transparent 35%, rgba(255,200,0,0.4) 35%, rgba(255,200,0,0.4) 36%, transparent 36%),
+    linear-gradient(80deg, transparent 55%, rgba(200,50,10,0.6) 55%, rgba(200,50,10,0.6) 56%, transparent 56%),
+    linear-gradient(60deg, transparent 25%, rgba(255,100,30,0.3) 25%, rgba(255,100,30,0.3) 26.5%, transparent 26.5%);
+}
+.preview-futurism::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 20%; width: 100px; height: 40px;
+  transform: translateY(-50%) skewX(-20deg);
+  background: rgba(255,80,20,0.15);
+  box-shadow: 20px 0 40px rgba(255,80,20,0.3);
+}
+
+/* Dadaism: chaotic mixed elements */
+.preview-dadaism {
+  background: #f0e8d0;
+}
+.preview-dadaism::before {
+  content: '';
+  position: absolute;
+  top: 15px; left: 10px; width: 70px; height: 50px;
+  background: #dd2222;
+  transform: rotate(23deg);
+}
+.preview-dadaism::after {
+  content: '';
+  position: absolute;
+  bottom: 20px; right: 15px; width: 90px; height: 30px;
+  background: #2244cc;
+  transform: rotate(-17deg);
+  box-shadow: -30px -25px 0 -5px #22aa44, 20px -40px 0 -10px #ffcc00;
+}
+
+/* Brutalism: massive gray blocks */
+.preview-brutalism {
+  background: #444448;
+}
+.preview-brutalism::before {
+  content: '';
+  position: absolute;
+  top: 20px; left: 20px; width: 80px; height: 120px;
+  background: #666668;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.4), inset 4px 4px 0 rgba(255,255,255,0.08);
+}
+.preview-brutalism::after {
+  content: '';
+  position: absolute;
+  top: 40px; right: 15px; width: 70px; height: 100px;
+  background: #555558;
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.4), inset 4px 4px 0 rgba(255,255,255,0.06);
+}
+
+/* Art Deco Architecture: stepped tower */
+.preview-artdecoarch {
+  background: #0a0a14;
+}
+.preview-artdecoarch::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 120px;
+  background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+  box-shadow:
+    -20px 20px 0 0 #ffd700, 20px 20px 0 0 #ffd700,
+    -35px 40px 0 0 #ffd700, 35px 40px 0 0 #ffd700,
+    -50px 60px 0 0 #ffd700, 50px 60px 0 0 #ffd700,
+    0 0 20px rgba(255,215,0,0.4);
+}
+.preview-artdecoarch::after { content: none; }
+
+/* Modernism architecture: glass grid */
+.preview-modernism {
+  background: #1a2a3a;
+}
+.preview-modernism::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 20px; width: 160px; height: 140px;
+  background:
+    repeating-linear-gradient(to right, rgba(120,180,220,0.3) 0px, rgba(120,180,220,0.3) 28px, rgba(255,255,255,0.08) 28px, rgba(255,255,255,0.08) 30px),
+    repeating-linear-gradient(to bottom, rgba(120,180,220,0.3) 0px, rgba(120,180,220,0.3) 28px, rgba(255,255,255,0.08) 28px, rgba(255,255,255,0.08) 30px);
+  border: 1px solid rgba(120,180,220,0.3);
+}
+.preview-modernism::after { content: none; }
+
+/* Gothic: pointed arch, vertical emphasis */
+.preview-gothic {
+  background: #0e0e18;
+}
+.preview-gothic::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 140px;
+  background: transparent;
+  border-left: 3px solid #8899cc;
+  border-right: 3px solid #8899cc;
+  border-bottom: 3px solid #8899cc;
+  border-top: none;
+}
+.preview-gothic::after {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 60px;
+  background: transparent;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-bottom: 60px solid #8899cc;
+  filter: drop-shadow(0 0 6px rgba(136,153,204,0.5));
+}
+
+/* Baroque: ornate curves, gold/red */
+.preview-baroque {
+  background: radial-gradient(ellipse at center, #2a1a08 0%, #0a0a08 100%);
+}
+.preview-baroque::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 140px; height: 100px;
+  border: 3px solid #b8860b;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 0 12px rgba(184,134,11,0.4), inset 0 0 20px rgba(184,134,11,0.1);
+}
+.preview-baroque::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 80px; height: 60px;
+  border: 2px solid #cc2200;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(204,34,0,0.3);
+}
+
+/* Deconstructivism: fragmentary angles */
+.preview-decon {
+  background: #12120a;
+}
+.preview-decon::before {
+  content: '';
+  position: absolute;
+  top: 20px; left: 10px; width: 120px; height: 80px;
+  background: #446688;
+  clip-path: polygon(0% 10%, 80% 0%, 100% 60%, 60% 100%, 10% 80%);
+  transform: rotate(-15deg);
+}
+.preview-decon::after {
+  content: '';
+  position: absolute;
+  bottom: 10px; right: 5px; width: 100px; height: 70px;
+  background: #884422;
+  clip-path: polygon(20% 0%, 100% 20%, 80% 100%, 0% 70%);
+  transform: rotate(20deg);
+}
+
+/* Metabolism: hexagonal modular grid */
+.preview-metabolism {
+  background: #0a1218;
+}
+.preview-metabolism::before {
+  content: '';
+  position: absolute; inset: 10px;
+  background:
+    radial-gradient(circle 20px at 33% 33%, rgba(80,140,180,0.6) 0%, rgba(80,140,180,0.6) 18px, transparent 18px),
+    radial-gradient(circle 20px at 67% 33%, rgba(80,140,180,0.5) 0%, rgba(80,140,180,0.5) 18px, transparent 18px),
+    radial-gradient(circle 20px at 33% 67%, rgba(80,140,180,0.5) 0%, rgba(80,140,180,0.5) 18px, transparent 18px),
+    radial-gradient(circle 20px at 67% 67%, rgba(80,140,180,0.6) 0%, rgba(80,140,180,0.6) 18px, transparent 18px),
+    radial-gradient(circle 20px at 50% 50%, rgba(100,180,220,0.7) 0%, rgba(100,180,220,0.7) 18px, transparent 18px);
+  border: 1px solid rgba(80,140,180,0.3);
+}
+.preview-metabolism::after { content: none; }
+
+/* Post-Impressionism: structured brushstrokes, bold outlines */
+.preview-postimpr {
+  background: linear-gradient(135deg, #2a1a0a 0%, #0a1a2a 100%);
+}
+.preview-postimpr::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 35px 25px at 35% 40%, #cc8822 0%, transparent 100%),
+    radial-gradient(ellipse 40px 30px at 65% 35%, #2266aa 0%, transparent 100%),
+    radial-gradient(ellipse 30px 20px at 50% 70%, #229944 0%, transparent 100%);
+}
+.preview-postimpr::after {
+  content: '';
+  position: absolute; inset: 15px;
+  border: 2px solid rgba(255,200,100,0.3);
+  border-radius: 2px;
+}
+
+/* Fauvism: wild unnatural colors, bold */
+.preview-fauvism {
+  background: #ff6600;
+}
+.preview-fauvism::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 10px; width: 90px; height: 80px;
+  background: #00cc88;
+  clip-path: polygon(0% 0%, 100% 10%, 90% 100%, 0% 90%);
+}
+.preview-fauvism::after {
+  content: '';
+  position: absolute;
+  bottom: 10px; right: 10px; width: 80px; height: 70px;
+  background: #cc00cc;
+  clip-path: polygon(10% 0%, 100% 0%, 100% 90%, 0% 100%);
+}
+
+/* Pointillism: dot pattern */
+.preview-pointillism {
+  background: #f5f0e8;
+  background-image:
+    radial-gradient(circle 3px at 15% 25%, #cc4422 0%, transparent 100%),
+    radial-gradient(circle 3px at 35% 15%, #2244cc 0%, transparent 100%),
+    radial-gradient(circle 3px at 55% 30%, #22aa44 0%, transparent 100%),
+    radial-gradient(circle 3px at 75% 20%, #cc8822 0%, transparent 100%),
+    radial-gradient(circle 3px at 25% 50%, #aa2288 0%, transparent 100%),
+    radial-gradient(circle 3px at 50% 55%, #228899 0%, transparent 100%),
+    radial-gradient(circle 3px at 80% 45%, #cc3311 0%, transparent 100%),
+    radial-gradient(circle 3px at 10% 70%, #2266cc 0%, transparent 100%),
+    radial-gradient(circle 3px at 40% 75%, #22aa22 0%, transparent 100%),
+    radial-gradient(circle 3px at 65% 70%, #cc7700 0%, transparent 100%),
+    radial-gradient(circle 3px at 90% 65%, #882299 0%, transparent 100%),
+    radial-gradient(circle 3px at 20% 88%, #cc2244 0%, transparent 100%),
+    radial-gradient(circle 3px at 55% 85%, #2244aa 0%, transparent 100%),
+    radial-gradient(circle 3px at 85% 85%, #33aa55 0%, transparent 100%);
+}
+.preview-pointillism::before { content: none; }
+.preview-pointillism::after { content: none; }
+
+/* Renaissance: balanced symmetry, golden ratio composition */
+.preview-renaissance {
+  background: linear-gradient(180deg, #c8b090 0%, #8a6840 100%);
+}
+.preview-renaissance::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  width: 60px; height: 80px;
+  background: #d4a870;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 0 0 3px #8a6840;
+}
+.preview-renaissance::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 10px; right: 10px; height: 60px;
+  background: linear-gradient(to top, #6a4820, transparent);
+}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(255,215,0,0.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:640px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(255,215,0,0.08);border-radius:3px;background:rgba(255,215,0,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#ffd700;border-color:rgba(255,215,0,0.25);background:rgba(255,215,0,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+
+@media (max-width: 560px) {
+  .preview-card { flex-direction: column; align-items: center; }
+  .style-preview { width: 100%; height: 120px; }
+  .preview-info { text-align: center; }
+  .preview-chars { justify-content: center; }
+  .answer-grid { grid-template-columns: 1fr 1fr; }
+  .answer-btn { font-size: 10px; padding: 12px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="game-icon">🎨</div>
+  <h1>STYLE</h1>
+  <div class="subtitle">Art Movement Identification</div>
+  <div class="daily-badge" id="dailyBadge">EDITION #1</div>
+  <p class="desc">A visual + text clue appears. Identify the art or architecture movement from 4 choices. 10 rounds. Speed bonuses. How cultured are you?</p>
+  <button class="play-btn" id="startBtn">BEGIN</button>
+  <div class="controls-hint">Tap an answer • ESC returns to menu</div>
+  <div class="best-score" id="bestScoreDisplay"></div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="round-bar">
+    <div class="round-label" id="roundLabel">ROUND 1 / 10</div>
+    <div class="cat-label" id="catLabel">PAINTING</div>
+    <div class="score-live" id="scoreLive">0 PTS</div>
+  </div>
+  <div class="speed-bar-wrap"><div class="speed-bar" id="speedBar"></div></div>
+
+  <div class="preview-card">
+    <div class="style-preview" id="stylePreview"></div>
+    <div class="preview-info">
+      <div class="preview-category" id="previewCategory">PAINTING</div>
+      <div class="preview-description" id="previewDesc"></div>
+      <div class="preview-chars" id="previewChars"></div>
+    </div>
+  </div>
+
+  <div class="answer-grid" id="answerGrid"></div>
+  <div class="feedback-bar" id="feedbackBar"></div>
+  <div class="bonus-flash" id="bonusFlash"></div>
+  <div class="next-btn-wrap">
+    <button class="next-btn" id="nextBtn">NEXT →</button>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="resultsScreen" class="screen">
+  <h1>RESULTS</h1>
+  <div class="results-subtitle">ART HISTORY QUIZ COMPLETE</div>
+  <div class="result-dots" id="resultDots"></div>
+  <div class="total-score" id="totalScore">0</div>
+  <div class="score-label">TOTAL SCORE</div>
+  <div class="new-best" id="newBestMsg" style="display:none">✦ NEW PERSONAL BEST ✦</div>
+  <div class="best-score" id="resultsBest"></div>
+  <div class="results-grid" id="resultsGrid"></div>
+  <div id="styleScoreTable"></div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+  </div>
+  <div class="copied-msg" id="copiedMsg"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  Neon.init({
+    game: 'style',
+    mode: 'high',
+    key: 'neonarcade_neonworld_style_scores',
+    formatScore: function(s) { return s + ' pts'; }
+  });
+
+  // ── QUESTION BANK ──
+  var ALL_QUESTIONS = [
+    // PAINTING MOVEMENTS
+    {
+      style: 'Impressionism',
+      description: 'Characterized by small, visible brushstrokes and an emphasis on capturing light and mood rather than precise details. Often painted outdoors to capture changing light conditions.',
+      characteristics: ['Visible brushstrokes', 'Outdoor scenes', 'Soft edges', 'Light over form'],
+      wrongOptions: ['Post-Impressionism', 'Fauvism', 'Pointillism'],
+      cssClass: 'preview-impressionism',
+      category: 'Painting'
+    },
+    {
+      style: 'Post-Impressionism',
+      description: 'Extended Impressionism but rejected its limitations. Artists used vivid colors and bold, expressive brushwork with strong geometric structures and symbolic content.',
+      characteristics: ['Vivid color', 'Symbolic content', 'Structural form', 'Emotional depth'],
+      wrongOptions: ['Impressionism', 'Fauvism', 'Expressionism'],
+      cssClass: 'preview-postimpr',
+      category: 'Painting'
+    },
+    {
+      style: 'Art Deco',
+      description: 'Geometric elegance meets luxury. Radiating sunburst motifs, stepped forms, bold outlines, and metallic gold and black. Celebrates modernity through decorative precision.',
+      characteristics: ['Sunburst patterns', 'Gold accents', 'Geometric symmetry', 'Luxury feel'],
+      wrongOptions: ['Art Nouveau', 'Bauhaus', 'Constructivism'],
+      cssClass: 'preview-artdeco',
+      category: 'Design'
+    },
+    {
+      style: 'Bauhaus',
+      description: 'German school that unified fine art with functional design. Pure primary colors — red, blue, yellow — in bold geometric compositions. Form strictly follows function.',
+      characteristics: ['Primary colors only', 'Geometric forms', 'Functional design', 'Grid structures'],
+      wrongOptions: ['De Stijl', 'Constructivism', 'Minimalism'],
+      cssClass: 'preview-bauhaus',
+      category: 'Design'
+    },
+    {
+      style: 'Cubism',
+      description: 'Objects are fragmented and reassembled in abstracted form, depicting subjects from multiple viewpoints simultaneously. Angular, faceted surfaces in muted earth tones.',
+      characteristics: ['Multiple viewpoints', 'Angular facets', 'Fragmented forms', 'Earth tones'],
+      wrongOptions: ['Futurism', 'Expressionism', 'Dadaism'],
+      cssClass: 'preview-cubism',
+      category: 'Painting'
+    },
+    {
+      style: 'Minimalism',
+      description: 'Maximum simplicity. A single elemental form — circle, square, line — given the entire space. No ornamentation, no narrative. The work is exactly what it is and nothing more.',
+      characteristics: ['Single form', 'Vast empty space', 'Monochrome palette', 'No ornamentation'],
+      wrongOptions: ['Abstract Expressionism', 'Bauhaus', 'De Stijl'],
+      cssClass: 'preview-minimalism',
+      category: 'Painting'
+    },
+    {
+      style: 'Pop Art',
+      description: 'Appropriated from consumer culture, advertising, and mass media. Bold black outlines, flat saturated colors, halftone dots borrowed from commercial printing.',
+      characteristics: ['Halftone dots', 'Bold outlines', 'Consumer imagery', 'Flat bright color'],
+      wrongOptions: ['Dadaism', 'Fauvism', 'Op Art'],
+      cssClass: 'preview-popart',
+      category: 'Painting'
+    },
+    {
+      style: 'Surrealism',
+      description: 'Dreamlike imagery that defies rational logic. Unexpected combinations of recognizable objects, distorted scale, and melting forms that evoke the subconscious mind.',
+      characteristics: ['Dreamlike logic', 'Distorted scale', 'Melting forms', 'Subconscious imagery'],
+      wrongOptions: ['Expressionism', 'Dadaism', 'Symbolism'],
+      cssClass: 'preview-surrealism',
+      category: 'Painting'
+    },
+    {
+      style: 'Expressionism',
+      description: 'Distorted, emotionally charged imagery in dark, intense colors. Reality is warped to reflect the artist\'s subjective emotional state rather than the external world.',
+      characteristics: ['Emotional distortion', 'Intense darkness', 'Jagged forms', 'Psychological depth'],
+      wrongOptions: ['Surrealism', 'Abstract Expressionism', 'Cubism'],
+      cssClass: 'preview-expressionism',
+      category: 'Painting'
+    },
+    {
+      style: 'Abstract Expressionism',
+      description: 'Large canvases with gestural, spontaneous marks. The act of painting itself is expressive. Non-representational — no recognizable objects, only energy and emotion.',
+      characteristics: ['Gestural marks', 'Large scale', 'Non-representational', 'Spontaneous energy'],
+      wrongOptions: ['Expressionism', 'Minimalism', 'Surrealism'],
+      cssClass: 'preview-abstractexp',
+      category: 'Painting'
+    },
+    {
+      style: 'Op Art',
+      description: 'Optical illusions created through precise geometric patterns. High-contrast shapes appear to vibrate, move, or curve. Viewer perception becomes part of the artwork.',
+      characteristics: ['Optical illusions', 'High contrast', 'Geometric precision', 'Apparent motion'],
+      wrongOptions: ['Minimalism', 'Constructivism', 'De Stijl'],
+      cssClass: 'preview-opart',
+      category: 'Painting'
+    },
+    {
+      style: 'Constructivism',
+      description: 'Soviet-born movement using art as political tool. Diagonal compositions in a strict red, black, and white palette. Bold diagonals suggest dynamic forward motion.',
+      characteristics: ['Diagonal composition', 'Red/black/white', 'Political purpose', 'Dynamic energy'],
+      wrongOptions: ['Bauhaus', 'De Stijl', 'Futurism'],
+      cssClass: 'preview-constructivism',
+      category: 'Design'
+    },
+    {
+      style: 'Art Nouveau',
+      description: 'Organic, flowing lines inspired by natural forms — plants, flowers, insects, flowing hair. Sinuous curves dominate. Ornamental and highly decorative with nature-drawn colors.',
+      characteristics: ['Flowing organic curves', 'Natural motifs', 'Sinuous lines', 'Decorative detail'],
+      wrongOptions: ['Art Deco', 'Baroque', 'Romanticism'],
+      cssClass: 'preview-artnouv',
+      category: 'Design'
+    },
+    {
+      style: 'De Stijl',
+      description: 'Dutch movement using only straight horizontal and vertical lines, and a palette restricted to primary colors plus black and white. Pure abstraction through absolute constraints.',
+      characteristics: ['Horizontal/vertical only', 'Primary colors + B&W', 'Strict geometry', 'Absolute order'],
+      wrongOptions: ['Bauhaus', 'Minimalism', 'Constructivism'],
+      cssClass: 'preview-destijl',
+      category: 'Painting'
+    },
+    {
+      style: 'Futurism',
+      description: 'Italian movement celebrating speed, machines, and modern life. Dynamic diagonal lines suggest violent motion. Colors of flame and energy — orange, red, yellow.',
+      characteristics: ['Speed and motion', 'Dynamic diagonals', 'Machine worship', 'Explosive energy'],
+      wrongOptions: ['Constructivism', 'Expressionism', 'Cubism'],
+      cssClass: 'preview-futurism',
+      category: 'Painting'
+    },
+    {
+      style: 'Dadaism',
+      description: 'Anti-art born from disillusionment after World War I. Deliberately irrational, chaotic, and absurd. Challenges every assumption of what art should be or look like.',
+      characteristics: ['Deliberate chaos', 'Anti-rational', 'Absurdist logic', 'Shock value'],
+      wrongOptions: ['Surrealism', 'Cubism', 'Expressionism'],
+      cssClass: 'preview-dadaism',
+      category: 'Painting'
+    },
+    {
+      style: 'Fauvism',
+      description: 'Wild, unnaturalistic color used purely for emotional expression. Bright, clashing, pure pigment applied directly from the tube. Named "fauves" — wild beasts — by shocked critics.',
+      characteristics: ['Unnatural color', 'Pure bright pigment', 'Emotional color', 'Bold simplicity'],
+      wrongOptions: ['Expressionism', 'Pop Art', 'Post-Impressionism'],
+      cssClass: 'preview-fauvism',
+      category: 'Painting'
+    },
+    {
+      style: 'Pointillism',
+      description: 'Painting composed entirely of tiny, distinct dots of pure color placed side by side. When viewed at a distance, the dots optically blend into continuous tones and forms.',
+      characteristics: ['Tiny color dots', 'Optical color mixing', 'Scientific method', 'Systematic application'],
+      wrongOptions: ['Impressionism', 'Op Art', 'Post-Impressionism'],
+      cssClass: 'preview-pointillism',
+      category: 'Painting'
+    },
+    // ARCHITECTURE MOVEMENTS
+    {
+      style: 'Brutalism',
+      description: 'Raw, exposed concrete left unfinished. Massive geometric blocks with minimal surface ornamentation. Buildings that announce their weight and material honestly.',
+      characteristics: ['Exposed concrete', 'Massive geometry', 'No ornamentation', 'Raw honesty'],
+      wrongOptions: ['Modernism', 'Deconstructivism', 'Metabolism'],
+      cssClass: 'preview-brutalism',
+      category: 'Architecture'
+    },
+    {
+      style: 'Gothic Architecture',
+      description: 'Soaring pointed arches reaching heavenward, ribbed vaults, flying buttresses. Stone carved into lace. Vertical emphasis to draw eyes — and souls — upward toward the divine.',
+      characteristics: ['Pointed arches', 'Vertical emphasis', 'Stone tracery', 'Flying buttresses'],
+      wrongOptions: ['Romanesque', 'Byzantine', 'Baroque Architecture'],
+      cssClass: 'preview-gothic',
+      category: 'Architecture'
+    },
+    {
+      style: 'Baroque Architecture',
+      description: 'Theatrical drama in stone. Ornate decoration overwhelms every surface. Curves counter-curves. Rich materials — gold, marble — create overwhelming sensory impact.',
+      characteristics: ['Extreme ornamentation', 'Dramatic curves', 'Counter-curves', 'Gold and marble'],
+      wrongOptions: ['Rococo', 'Renaissance Architecture', 'Gothic Architecture'],
+      cssClass: 'preview-baroque',
+      category: 'Architecture'
+    },
+    {
+      style: 'Modernism',
+      description: 'Flat roofs, unadorned surfaces, walls of glass and steel. Ornament is crime. The curtain wall — floor-to-ceiling glass grid — becomes the defining visual motif.',
+      characteristics: ['Glass curtain walls', 'No ornamentation', 'Steel structure', 'Flat roofs'],
+      wrongOptions: ['Brutalism', 'Art Deco Architecture', 'Metabolism'],
+      cssClass: 'preview-modernism',
+      category: 'Architecture'
+    },
+    {
+      style: 'Art Deco Architecture',
+      description: 'Skyscrapers as stepped ziggurats in gleaming metal. Setback massing creates a stacked silhouette. Gold, chrome, and aluminum finishes catch the city light.',
+      characteristics: ['Stepped massing', 'Metallic finishes', 'Ornate detail', 'Vertical emphasis'],
+      wrongOptions: ['Art Deco', 'Gothic Architecture', 'Modernism'],
+      cssClass: 'preview-artdecoarch',
+      category: 'Architecture'
+    },
+    {
+      style: 'Deconstructivism',
+      description: 'Architecture that intentionally appears unstable and fragmented. Twisted, colliding geometric volumes challenge all assumptions about gravity and structural logic.',
+      characteristics: ['Fragmented geometry', 'Apparent instability', 'Colliding volumes', 'Non-linear form'],
+      wrongOptions: ['Brutalism', 'Modernism', 'Metabolism'],
+      cssClass: 'preview-decon',
+      category: 'Architecture'
+    },
+    {
+      style: 'Metabolism',
+      description: 'Japanese 1960s movement. Buildings as living organisms with replaceable modular units — capsules, pods — that can be attached, detached, and swapped like living cells.',
+      characteristics: ['Modular capsules', 'Interchangeable units', 'Organic metaphor', 'Futuristic industrial'],
+      wrongOptions: ['Brutalism', 'Modernism', 'Deconstructivism'],
+      cssClass: 'preview-metabolism',
+      category: 'Architecture'
+    },
+    {
+      style: 'Renaissance Architecture',
+      description: 'Revival of ancient Greek and Roman harmony. Symmetric facades, classical columns, arched windows, and dome-capped structures. Rational beauty through mathematical proportion.',
+      characteristics: ['Classical columns', 'Symmetry', 'Mathematical proportion', 'Domes and arches'],
+      wrongOptions: ['Baroque Architecture', 'Gothic Architecture', 'Modernism'],
+      cssClass: 'preview-renaissance',
+      category: 'Architecture'
+    }
+  ];
+
+  // ── SEEDED RNG ──
+  function seededRng(seed) {
+    var s = seed;
+    return function() {
+      s = (s * 1103515245 + 12345) & 0x7fffffff;
+      return s / 0x7fffffff;
+    };
+  }
+
+  function getDayNumber() {
+    var epoch = new Date(2026, 0, 1);
+    var now = new Date(); now.setHours(0,0,0,0);
+    return Math.floor((now - epoch) / 86400000) + 1;
+  }
+
+  function shuffle(arr, rng) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  // ── AUDIO ──
+  var audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  function playSelect() {
+    ensureAudio();
+    var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(660, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.07, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.12);
+  }
+  function playCorrect() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    [523, 659, 784, 1047].forEach(function(f, i) {
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(f, t + i*0.07);
+      g.gain.setValueAtTime(0.07, t + i*0.07);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i*0.07 + 0.25);
+      o.connect(g); g.connect(audioCtx.destination); o.start(t + i*0.07); o.stop(t + i*0.07 + 0.25);
+    });
+  }
+  function playWrong() {
+    ensureAudio();
+    var t = audioCtx.currentTime;
+    var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(200, t);
+    o.frequency.linearRampToValueAtTime(90, t + 0.28);
+    g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + 0.3);
+  }
+
+  // ── PARTICLES ──
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.cssText = 'left:' + x + 'px;top:' + y + 'px;background:' + color + ';box-shadow:0 0 6px ' + color;
+      document.body.appendChild(p);
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 50 + Math.random() * 120;
+      var dx = Math.cos(angle) * speed, dy = Math.sin(angle) * speed;
+      var start = performance.now();
+      (function(el, dx, dy) {
+        function tick(now) {
+          var e = (now - start) / 1000;
+          if (e > 0.8) { el.remove(); return; }
+          el.style.left = (x + dx*e) + 'px';
+          el.style.top = (y + dy*e + 80*e*e) + 'px';
+          el.style.opacity = String(1 - e/0.8);
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      })(p, dx, dy);
+    }
+  }
+
+  // ── STATE ──
+  var dayNum = getDayNumber();
+  var rng = seededRng(dayNum * 6271);
+  var sessionQuestions = [];
+  var currentRound = 0;
+  var score = 0;
+  var roundResults = []; // { correct: bool, pts: number, style: string }
+  var roundAnswered = false;
+  var speedTimerStart = 0;
+  var speedTimerRaf = null;
+  var ROUNDS = 10;
+  var MAX_TIME = 15; // seconds per question for speed bar
+
+  // ── DOM ──
+  var startScreen = document.getElementById('startScreen');
+  var gameScreen = document.getElementById('gameScreen');
+  var resultsScreen = document.getElementById('resultsScreen');
+  var dailyBadge = document.getElementById('dailyBadge');
+  var bestScoreDisplay = document.getElementById('bestScoreDisplay');
+  var startBtn = document.getElementById('startBtn');
+  var roundLabel = document.getElementById('roundLabel');
+  var catLabel = document.getElementById('catLabel');
+  var scoreLive = document.getElementById('scoreLive');
+  var speedBar = document.getElementById('speedBar');
+  var stylePreview = document.getElementById('stylePreview');
+  var previewCategory = document.getElementById('previewCategory');
+  var previewDesc = document.getElementById('previewDesc');
+  var previewChars = document.getElementById('previewChars');
+  var answerGrid = document.getElementById('answerGrid');
+  var feedbackBar = document.getElementById('feedbackBar');
+  var bonusFlash = document.getElementById('bonusFlash');
+  var nextBtn = document.getElementById('nextBtn');
+  var resultDots = document.getElementById('resultDots');
+  var totalScoreEl = document.getElementById('totalScore');
+  var newBestMsg = document.getElementById('newBestMsg');
+  var resultsBest = document.getElementById('resultsBest');
+  var resultsGrid = document.getElementById('resultsGrid');
+  var shareBtn = document.getElementById('shareBtn');
+  var replayBtn = document.getElementById('replayBtn');
+  var copiedMsg = document.getElementById('copiedMsg');
+
+  function showScreen(el) {
+    [startScreen, gameScreen, resultsScreen].forEach(function(s) { s.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  function init() {
+    dayNum = getDayNumber();
+    dailyBadge.textContent = 'EDITION #' + dayNum;
+    var best = Neon.getHighScore();
+    if (best > 0) { bestScoreDisplay.textContent = 'BEST: ' + best + ' PTS'; }
+    else { bestScoreDisplay.textContent = ''; }
+    Neon.render(document.getElementById('startLB'));
+    showScreen(startScreen);
+  }
+
+  function buildSessionQuestions() {
+    rng = seededRng(dayNum * 6271);
+    sessionQuestions = shuffle(ALL_QUESTIONS, rng).slice(0, ROUNDS);
+  }
+
+  function startGame() {
+    ensureAudio();
+    buildSessionQuestions();
+    currentRound = 0;
+    score = 0;
+    roundResults = [];
+    showRound();
+  }
+
+  function showRound() {
+    showScreen(gameScreen);
+    roundAnswered = false;
+    feedbackBar.textContent = '';
+    feedbackBar.className = 'feedback-bar';
+    bonusFlash.textContent = '';
+    nextBtn.style.display = 'none';
+
+    var q = sessionQuestions[currentRound];
+    roundLabel.textContent = 'ROUND ' + (currentRound+1) + ' / ' + ROUNDS;
+    catLabel.textContent = q.category.toUpperCase();
+    scoreLive.textContent = score + ' PTS';
+
+    // Preview
+    stylePreview.className = 'style-preview ' + q.cssClass;
+    previewCategory.textContent = q.category.toUpperCase();
+    previewDesc.textContent = q.description;
+
+    // Characteristics tags
+    while (previewChars.firstChild) previewChars.removeChild(previewChars.firstChild);
+    q.characteristics.forEach(function(c) {
+      var tag = document.createElement('span');
+      tag.className = 'char-tag';
+      tag.textContent = c;
+      previewChars.appendChild(tag);
+    });
+
+    // Build shuffled answers
+    var options = [q.style].concat(q.wrongOptions.slice(0, 3));
+    // shuffle with a deterministic seed based on round+day
+    var localRng = seededRng(dayNum * 6271 + currentRound * 1337);
+    options = shuffle(options, localRng);
+
+    while (answerGrid.firstChild) answerGrid.removeChild(answerGrid.firstChild);
+    options.forEach(function(opt) {
+      var btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', function() { selectAnswer(opt, btn, q.style); });
+      answerGrid.appendChild(btn);
+    });
+
+    // Speed bar
+    speedTimerStart = performance.now();
+    speedBar.style.width = '100%';
+    speedBar.className = 'speed-bar';
+    if (speedTimerRaf) cancelAnimationFrame(speedTimerRaf);
+    function tickSpeedBar() {
+      if (roundAnswered) return;
+      var elapsed = (performance.now() - speedTimerStart) / 1000;
+      var pct = Math.max(0, 1 - elapsed / MAX_TIME);
+      speedBar.style.width = (pct * 100) + '%';
+      speedBar.className = 'speed-bar' + (pct < 0.25 ? ' danger' : pct < 0.5 ? ' warn' : '');
+      if (pct > 0) speedTimerRaf = requestAnimationFrame(tickSpeedBar);
+    }
+    speedTimerRaf = requestAnimationFrame(tickSpeedBar);
+  }
+
+  function selectAnswer(chosen, btn, correctStyle) {
+    if (roundAnswered) return;
+    roundAnswered = true;
+    if (speedTimerRaf) cancelAnimationFrame(speedTimerRaf);
+    ensureAudio();
+
+    var elapsed = (performance.now() - speedTimerStart) / 1000;
+    var isCorrect = (chosen === correctStyle);
+
+    // Disable all btns, reveal correct
+    var allBtns = answerGrid.querySelectorAll('.answer-btn');
+    allBtns.forEach(function(b) {
+      b.disabled = true;
+      if (b.textContent === correctStyle) {
+        b.classList.add(isCorrect ? 'correct' : 'reveal');
+      } else if (b === btn && !isCorrect) {
+        b.classList.add('wrong');
+      } else {
+        b.style.opacity = '0.35';
+      }
+    });
+
+    var pts = 0;
+    if (isCorrect) {
+      var speedBonus = Math.max(0, Math.round(50 * (1 - elapsed / MAX_TIME)));
+      pts = 100 + speedBonus;
+      score += pts;
+      playCorrect();
+      feedbackBar.textContent = 'CORRECT!';
+      feedbackBar.className = 'feedback-bar correct-msg';
+      if (speedBonus > 0) bonusFlash.textContent = '+' + pts + ' pts (speed bonus +' + speedBonus + ')';
+      else bonusFlash.textContent = '+100 pts';
+      var rect = btn.getBoundingClientRect();
+      spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2, '#39ff14', 14);
+    } else {
+      playWrong();
+      feedbackBar.textContent = 'WRONG — It\'s ' + correctStyle;
+      feedbackBar.className = 'feedback-bar wrong-msg';
+      bonusFlash.textContent = '+0 pts';
+      document.body.classList.add('shake');
+      setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+      var rect2 = btn.getBoundingClientRect();
+      spawnParticles(rect2.left + rect2.width/2, rect2.top + rect2.height/2, '#ff2d7b', 8);
+    }
+    playSelect();
+
+    roundResults.push({ correct: isCorrect, pts: pts, style: sessionQuestions[currentRound].style });
+    scoreLive.textContent = score + ' PTS';
+    nextBtn.style.display = '';
+  }
+
+  function nextRound() {
+    currentRound++;
+    if (currentRound >= ROUNDS) {
+      showResults();
+    } else {
+      showRound();
+    }
+  }
+
+  function showResults() {
+    showScreen(resultsScreen);
+
+    // dots row
+    while (resultDots.firstChild) resultDots.removeChild(resultDots.firstChild);
+    roundResults.forEach(function(r) {
+      var d = document.createElement('span');
+      d.textContent = r.correct ? '✅' : '❌';
+      resultDots.appendChild(d);
+    });
+
+    totalScoreEl.textContent = score;
+
+    // grid rows
+    while (resultsGrid.firstChild) resultsGrid.removeChild(resultsGrid.firstChild);
+    roundResults.forEach(function(r, i) {
+      var row = document.createElement('div');
+      row.className = 'result-row';
+      var rn = document.createElement('div'); rn.className = 'result-round'; rn.textContent = 'Q' + (i+1);
+      var rs = document.createElement('div'); rs.className = 'result-style'; rs.textContent = r.style;
+      var rp = document.createElement('div'); rp.className = 'result-pts ' + (r.correct ? 'ok' : 'bad');
+      rp.textContent = r.correct ? '+' + r.pts : '✗';
+      row.appendChild(rn); row.appendChild(rs); row.appendChild(rp);
+      resultsGrid.appendChild(row);
+    });
+
+    copiedMsg.textContent = '';
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      if (result.isNewBest) newBestMsg.style.display = '';
+      else newBestMsg.style.display = 'none';
+      var best = Neon.getHighScore();
+      resultsBest.textContent = best ? 'BEST: ' + best + ' PTS' : '';
+      Neon.render(document.getElementById('styleScoreTable'));
+      if (result.globalRank >= 1 && result.globalRank <= 5) Neon.showGlobalSplash(result.globalRank);
+    });
+  }
+
+  function buildShareText() {
+    var correctCount = roundResults.filter(function(r) { return r.correct; }).length;
+    var dots = roundResults.map(function(r) { return r.correct ? '✅' : '❌'; }).join('');
+    return '🎨 STYLE — Art Movement Quiz\nScore: ' + score + ' / 1,500\n' + dots + '\n' + correctCount + '/10 correct\nneonarcade.net/neonworld/style.html';
+  }
+
+  function doShare() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() { copyText(text); });
+    } else {
+      copyText(text);
+    }
+  }
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      copiedMsg.textContent = 'COPIED TO CLIPBOARD';
+      setTimeout(function() { copiedMsg.textContent = ''; }, 2500);
+    }).catch(function() { copiedMsg.textContent = 'COPY FAILED'; });
+  }
+
+  // ── EVENTS ──
+  startBtn.addEventListener('click', startGame);
+  nextBtn.addEventListener('click', nextRound);
+  shareBtn.addEventListener('click', doShare);
+  replayBtn.addEventListener('click', function() { init(); });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active')) {
+      if (speedTimerRaf) cancelAnimationFrame(speedTimerRaf);
+      init();
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && nextBtn.style.display !== 'none' && gameScreen.classList.contains('active')) {
+      e.preventDefault();
+      nextRound();
+    }
+    // Number keys 1-4 for quick selection
+    if (['1','2','3','4'].includes(e.key) && gameScreen.classList.contains('active') && !roundAnswered) {
+      var idx = parseInt(e.key) - 1;
+      var btns = answerGrid.querySelectorAll('.answer-btn');
+      if (btns[idx]) btns[idx].click();
+    }
+  });
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
+  init();
+})();
+
+setTimeout(function() {
+  var mg = document.getElementById('neonMoreGames');
+  if (mg) mg.style.display = 'block';
+}, 4000);
+</script>
+
+<!-- More Games Navigation -->
+<div id="neonMoreGames" class="na-more-games" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+      <a href="/neonmind/connections.html" class="na-more-link">🔗 Connections</a>
+      <a href="/neonarcade/signal.html" class="na-more-link">📡 Signal</a>
+      <a href="/neonmind/sudoku.html" class="na-more-link">🔢 Sudoku</a>
+      <a href="/neonarcade/territory.html" class="na-more-link">🗺️ Territory</a>
+      <a href="/neonworld/" class="na-more-link na-more-hub">← All NEON WORLD</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

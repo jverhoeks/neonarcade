@@ -1,17 +1,18 @@
 # NEON ARCADE
 
-> Play 72 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro, deep quest and casino games with global leaderboards.
+> Play 76 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro, deep quest, casino, and world knowledge games with global leaderboards.
 
-NEON ARCADE is a collection of 72 free HTML5 browser games organized in six categories:
+NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven categories:
 
 ## Categories
 
 - [NEON ARCADE](https://neonarcade.net/neonarcade/) — 31 quick viral action games (30-60 seconds)
-- [NEON MIND](https://neonarcade.net/neonmind/) — 15 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
+- [NEON MIND](https://neonarcade.net/neonmind/) — 17 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
 - [NEON GRIND](https://neonarcade.net/neongrind/) — 8 progressive skill challenges
 - [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 8 retro arcade classics reimagined
 - [NEON QUEST](https://neonarcade.net/neonquest/) — 5 deep games for longer sessions (roguelikes, tower defense, crafting)
 - [NEON CASINO](https://neonarcade.net/neoncasino/) — 5 casino card and table games with virtual chips
+- [NEON WORLD](https://neonarcade.net/neonworld/) — 2 world knowledge games (history, art, geography)
 
 ## All Games
 
@@ -64,6 +65,8 @@ NEON ARCADE is a collection of 72 free HTML5 browser games organized in six cate
 - [Connections](https://neonarcade.net/neonmind/connections.html) — Find 4 groups of 4 words by hidden connection
 - [Hitori](https://neonarcade.net/neonmind/hitori.html) — Shade cells to eliminate duplicates
 - [KenKen](https://neonarcade.net/neonmind/kenken.html) — Math logic with arithmetic cages
+- [Culprit](https://neonarcade.net/neonmind/culprit.html) — Daily Murdle-style deduction mystery grid
+- [Faction](https://neonarcade.net/neonmind/faction.html) — Immaculate Grid intersection trivia with rarity scoring
 
 ### NEON GRIND
 - [Click Speed](https://neonarcade.net/neongrind/clickspeed.html) — How fast can you click?
@@ -91,6 +94,11 @@ NEON ARCADE is a collection of 72 free HTML5 browser games organized in six cate
 - [Firewall](https://neonarcade.net/neonquest/firewall.html) — Tower defense on a circuit board with evolving maze paths
 - [Swarm](https://neonarcade.net/neonquest/swarm.html) — Drone survivor-like with split/merge swarm mechanics
 - [Synthesis](https://neonarcade.net/neonquest/synthesis.html) — Neon alchemy lab with 200+ discoverable items
+
+### NEON WORLD
+World knowledge games — history, art, geography. Gold neon aesthetic.
+- [Decade](https://neonarcade.net/neonworld/decade.html) — Guess the year of 5 daily historical events (slider, score by accuracy)
+- [Style](https://neonarcade.net/neonworld/style.html) — Identify art and architecture movements from CSS-generated visual clues
 
 ### NEON CASINO
 Casino card and table games with persistent chip bankroll. Gold neon aesthetic.

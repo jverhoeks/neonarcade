@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Decade — Free Online Daily History Year Game | NEON ARCADE</title>
+<meta name="description" content="Play Decade free online — guess the year of 5 daily historical events. How well do you know history? Score by accuracy. No download, no login.">
+<meta name="keywords" content="decade game, history year guessing game, free history game online, browser game, neon arcade, daily history challenge">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonworld/decade.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonworld/decade.html">
+<meta property="og:title" content="Decade — Free Online Daily History Year Game | NEON ARCADE">
+<meta property="og:description" content="Play Decade free online — guess the year of 5 daily historical events. How well do you know history? Score by accuracy. No download, no login.">
+<meta property="og:image" content="https://neonarcade.net/neonworld/screenshots/decade.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonworld/decade.html">
+<meta name="twitter:title" content="Decade — Free Online Daily History Year Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Decade free online — guess the year of 5 daily historical events. How well do you know history? Score by accuracy.">
+<meta name="twitter:image" content="https://neonarcade.net/neonworld/screenshots/decade.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Decade","url":"https://neonarcade.net/neonworld/decade.html","description":"Play Decade free online — guess the year of 5 daily historical events. How well do you know history? Score by accuracy. No download, no login.","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/neonworld/screenshots/decade.png","inLanguage":"en","isFamilyFriendly":true}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON WORLD","item":"https://neonarcade.net/neonworld/"},{"@type":"ListItem","position":3,"name":"Decade","item":"https://neonarcade.net/neonworld/decade.html"}]}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;-webkit-user-select:none;user-select:none;overflow-x:hidden}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(255,215,0,0.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.05) 0%,transparent 50%)}
+
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-4px)}30%{transform:translateX(4px)}45%{transform:translateX(-3px)}60%{transform:translateX(3px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(0.85);opacity:0}70%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes particleFade{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(0)}}
+
+.screen{display:none;position:fixed;z-index:10;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.screen.active{display:flex}
+
+/* ── TYPOGRAPHY ── */
+.brand-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:4px;color:#b44dff;text-transform:uppercase;text-shadow:0 0 8px rgba(180,77,255,0.4);margin-bottom:4px}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(38px,9vw,64px);letter-spacing:6px;color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,0.6),0 0 48px rgba(255,215,0,0.2);text-align:center;line-height:1}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(13px,3vw,17px);letter-spacing:3px;color:#9999bb;text-transform:uppercase;text-align:center;max-width:440px;line-height:1.5;margin-top:6px}
+.puzzle-num{font-family:'Orbitron',monospace;font-weight:400;font-size:13px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.35);margin:8px 0}
+
+/* ── BUTTONS ── */
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 44px;border:1px solid #ffd700;background:rgba(255,215,0,0.07);color:#ffd700;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;touch-action:manipulation}
+.play-btn:hover,.play-btn:focus{background:rgba(255,215,0,0.16);box-shadow:0 0 24px rgba(255,215,0,0.25);transform:scale(1.04);outline:none}
+.play-btn:active{transform:scale(0.97)}
+.btn-cyan{border-color:#00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff}
+.btn-cyan:hover,.btn-cyan:focus{background:rgba(0,240,255,0.15);box-shadow:0 0 24px rgba(0,240,255,0.22)}
+
+/* ── START SCREEN ── */
+#startScreen{justify-content:center;gap:8px;min-height:100vh}
+.start-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4),transparent);margin:6px 0}
+.start-desc{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(14px,3.2vw,17px);color:#9999bb;text-align:center;max-width:400px;line-height:1.6;margin:4px 0}
+.how-to{background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.18);border-radius:6px;padding:14px 18px;max-width:400px;width:100%;margin:4px 0}
+.how-to-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#ffd700;text-transform:uppercase;margin-bottom:8px}
+.how-to-row{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1.5px;color:#9999bb;line-height:1.8;text-transform:uppercase}
+.how-to-row strong{color:#ffd700;font-weight:700}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-align:center}
+#startLB{width:100%;max-width:320px;margin-top:4px}
+
+/* ── ALREADY PLAYED BANNER ── */
+.already-played{background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:6px;padding:14px 18px;max-width:400px;width:100%;text-align:center;margin:6px 0}
+.already-played-title{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#ffd700;text-transform:uppercase;margin-bottom:6px}
+.already-played-score{font-family:'Orbitron',monospace;font-weight:900;font-size:28px;color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,0.4)}
+.already-played-sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-top:4px}
+
+/* ── GAME SCREEN ── */
+#gameScreen{gap:0;padding:16px;min-height:100vh;justify-content:flex-start}
+.game-header{display:flex;width:100%;max-width:560px;justify-content:space-between;align-items:center;padding:0 0 12px;border-bottom:1px solid rgba(255,215,0,0.12);margin-bottom:16px}
+.game-title-bar{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:3px;color:#ffd700;text-transform:uppercase;text-shadow:0 0 8px rgba(255,215,0,0.3)}
+.game-num-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.esc-btn{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:20px;color:#7a7a9a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s;touch-action:manipulation}
+.esc-btn:hover{color:#ff2d7b}
+
+/* ── PROGRESS DOTS ── */
+.progress-dots{display:flex;gap:10px;align-items:center;justify-content:center;margin:0 0 20px;width:100%;max-width:560px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,215,0,0.3);background:transparent;transition:all 0.4s;position:relative;flex-shrink:0}
+.dot.active{border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,0.5);background:rgba(255,215,0,0.15)}
+.dot.done-green{border-color:#39ff14;background:rgba(57,255,20,0.25);box-shadow:0 0 8px rgba(57,255,20,0.4)}
+.dot.done-gold{border-color:#ffd700;background:rgba(255,215,0,0.3);box-shadow:0 0 8px rgba(255,215,0,0.4)}
+.dot.done-orange{border-color:#ff8c00;background:rgba(255,140,0,0.25);box-shadow:0 0 8px rgba(255,140,0,0.35)}
+.dot.done-red{border-color:#ff2d7b;background:rgba(255,45,123,0.2);box-shadow:0 0 8px rgba(255,45,123,0.3)}
+
+/* ── ITEM CARD ── */
+.item-card{background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:20px 22px;max-width:560px;width:100%;margin-bottom:20px;animation:fadeIn 0.4s ease-out}
+.category-badge{display:inline-block;font-family:'Orbitron',monospace;font-weight:700;font-size:9px;letter-spacing:3px;color:#ffd700;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.3);border-radius:2px;padding:3px 8px;text-transform:uppercase;margin-bottom:12px}
+.clue-text{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(15px,3.5vw,19px);color:#e0e0f0;line-height:1.65;letter-spacing:0.3px}
+
+/* ── SLIDER ── */
+.slider-area{max-width:560px;width:100%;margin-bottom:20px;animation:fadeIn 0.4s ease-out 0.1s both}
+.year-display{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(40px,10vw,68px);color:#ffd700;text-shadow:0 0 16px rgba(255,215,0,0.6),0 0 60px rgba(255,215,0,0.2);text-align:center;margin-bottom:14px;letter-spacing:4px;line-height:1}
+.slider-labels{display:flex;justify-content:space-between;font-family:'Orbitron',monospace;font-weight:400;font-size:11px;letter-spacing:1px;color:#7a7a9a;margin-bottom:6px}
+.slider-track{position:relative;width:100%;height:44px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.slider-bg{position:absolute;left:0;right:0;height:4px;background:rgba(255,215,0,0.12);border-radius:2px}
+.slider-fill{position:absolute;left:0;height:4px;background:linear-gradient(90deg,rgba(255,215,0,0.4),#ffd700);border-radius:2px}
+.slider-thumb{position:absolute;width:28px;height:28px;border-radius:50%;background:#ffd700;box-shadow:0 0 16px rgba(255,215,0,0.7),0 0 4px rgba(255,215,0,0.9);cursor:grab;transition:transform 0.1s,box-shadow 0.1s;transform:translateX(-50%);top:50%;margin-top:-14px;z-index:2}
+.slider-thumb.dragging{cursor:grabbing;transform:translateX(-50%) scale(1.2);box-shadow:0 0 24px rgba(255,215,0,0.9),0 0 6px rgba(255,215,0,1)}
+.decade-ticks{display:flex;justify-content:space-between;margin-top:4px;padding:0 2px}
+.decade-tick{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:1px;color:rgba(255,215,0,0.3);text-transform:uppercase}
+
+/* ── SUBMIT / ANSWER ── */
+.submit-row{display:flex;justify-content:center;margin-bottom:16px}
+.answer-reveal{max-width:560px;width:100%;background:rgba(0,0,0,0.3);border-radius:8px;padding:18px 22px;margin-bottom:16px;animation:popIn 0.4s ease-out;border:1px solid rgba(255,255,255,0.07)}
+.answer-year-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.answer-col{text-align:center;flex:1;min-width:80px}
+.answer-col-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;margin-bottom:4px}
+.answer-col-val{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,6vw,36px);letter-spacing:2px}
+.answer-col-val.your-year{color:#9999bb}
+.answer-col-val.correct-year{color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,0.5)}
+.answer-col-val.pts-excellent{color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,0.5)}
+.answer-col-val.pts-good{color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,0.5)}
+.answer-col-val.pts-ok{color:#ff8c00;text-shadow:0 0 12px rgba(255,140,0,0.5)}
+.answer-col-val.pts-poor{color:#ff2d7b;text-shadow:0 0 12px rgba(255,45,123,0.5)}
+.answer-diff-line{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;text-align:center;margin-bottom:10px}
+.answer-context{font-family:'Rajdhani',sans-serif;font-weight:400;font-size:clamp(13px,3vw,15px);color:#9999bb;line-height:1.6;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px}
+.next-row{display:flex;justify-content:center}
+
+/* ── RESULTS ── */
+#resultsScreen{justify-content:flex-start;gap:0;padding:20px 16px;min-height:100vh}
+.results-header{text-align:center;margin-bottom:20px;width:100%;animation:fadeIn 0.5s ease-out}
+.results-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(26px,7vw,44px);letter-spacing:5px;color:#ffd700;text-shadow:0 0 14px rgba(255,215,0,0.6),0 0 50px rgba(255,215,0,0.2);margin-bottom:6px}
+.results-day{font-family:'Orbitron',monospace;font-weight:400;font-size:12px;letter-spacing:3px;color:#b44dff;text-shadow:0 0 8px rgba(180,77,255,0.4);margin-bottom:10px}
+.rating-badge{display:inline-block;font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(18px,5vw,28px);letter-spacing:4px;text-transform:uppercase;padding:8px 22px;border-radius:4px;margin:8px 0}
+.rating-historian{color:#ffd700;border:2px solid #ffd700;background:rgba(255,215,0,0.1);text-shadow:0 0 12px rgba(255,215,0,0.5);box-shadow:0 0 20px rgba(255,215,0,0.15)}
+.rating-scholar{color:#00f0ff;border:2px solid #00f0ff;background:rgba(0,240,255,0.08);text-shadow:0 0 12px rgba(0,240,255,0.5);box-shadow:0 0 20px rgba(0,240,255,0.12)}
+.rating-student{color:#ff8c00;border:2px solid #ff8c00;background:rgba(255,140,0,0.08);text-shadow:0 0 12px rgba(255,140,0,0.4);box-shadow:0 0 16px rgba(255,140,0,0.1)}
+.rating-novice{color:#ff2d7b;border:2px solid #ff2d7b;background:rgba(255,45,123,0.08);text-shadow:0 0 12px rgba(255,45,123,0.4);box-shadow:0 0 16px rgba(255,45,123,0.1)}
+.total-score{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,52px);letter-spacing:3px;color:#ffd700;text-shadow:0 0 16px rgba(255,215,0,0.6);margin:4px 0}
+.total-of{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+/* ── BREAKDOWN ── */
+.breakdown{max-width:560px;width:100%;margin:14px 0}
+.breakdown-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-bottom:8px}
+.breakdown-hdr{display:grid;grid-template-columns:1fr 80px 80px 80px;gap:8px;padding:6px 14px}
+.breakdown-row{display:grid;grid-template-columns:1fr 80px 80px 80px;gap:8px;align-items:center;padding:10px 14px;border-radius:4px;margin-bottom:5px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)}
+.bd-clue{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(11px,2.5vw,14px);color:#9999bb;line-height:1.3}
+.bd-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(12px,2.5vw,14px);text-align:center}
+.bd-hdr{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-align:center}
+.bd-pts-excellent{color:#39ff14}
+.bd-pts-good{color:#ffd700}
+.bd-pts-ok{color:#ff8c00}
+.bd-pts-poor{color:#ff2d7b}
+.bd-guess{color:#9999bb}
+.bd-answer{color:#ffd700}
+
+/* ── SHARE ── */
+.share-area{max-width:560px;width:100%;margin:14px 0}
+.share-preview{font-family:'Orbitron',monospace;font-size:13px;letter-spacing:1px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,215,0,0.2);border-radius:6px;padding:14px 16px;color:#ffd700;white-space:pre;overflow-x:auto;margin-bottom:10px;line-height:1.7}
+.share-btns{display:flex;gap:10px;flex-wrap:wrap}
+.share-feedback{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#39ff14;text-transform:uppercase;margin-top:6px;opacity:0;transition:opacity 0.3s}
+.share-feedback.show{opacity:1}
+
+.results-lb{max-width:560px;width:100%;margin:14px 0}
+
+/* ── PARTICLE ── */
+.particle-layer{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200;overflow:hidden}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;animation:particleFade 0.8s ease-out forwards}
+
+/* ── NAV ── */
+.nav-back{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-decoration:none;border-bottom:1px solid transparent;transition:color 0.2s,border-color 0.2s;display:inline-block;margin-top:14px}
+.nav-back:hover{color:#ffd700;border-bottom-color:rgba(255,215,0,0.4)}
+
+@media(max-width:480px){
+  .breakdown-row,.breakdown-hdr{grid-template-columns:1fr 60px 60px 60px;gap:4px;padding:8px 10px}
+  .share-btns{flex-direction:column}
+  .share-btns .play-btn{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="particle-layer" id="particleLayer"></div>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="brand-tag">NEON WORLD</div>
+  <div class="main-title">DECADE</div>
+  <div class="subtitle">Daily history year challenge</div>
+  <div class="puzzle-num" id="startPuzzleNum">PUZZLE #1</div>
+  <div class="start-divider"></div>
+  <div class="start-desc">5 historical events. Drag the slider to your best guess of the year. Score based on how close you are.</div>
+  <div class="how-to">
+    <div class="how-to-title">Scoring</div>
+    <div class="how-to-row">Exact year &rarr; <strong>1,000 pts</strong></div>
+    <div class="how-to-row">Off by &le;2 &rarr; <strong>900 pts</strong></div>
+    <div class="how-to-row">Off by &le;5 &rarr; <strong>750 pts</strong></div>
+    <div class="how-to-row">Off by &le;10 &rarr; <strong>500 pts</strong></div>
+    <div class="how-to-row">Off by &le;20 &rarr; <strong>200 pts</strong></div>
+    <div class="how-to-row">Off by 30+ &rarr; <strong>50 pts</strong></div>
+  </div>
+  <div id="alreadyPlayedBanner" style="display:none" class="already-played">
+    <div class="already-played-title">Today's puzzle complete</div>
+    <div class="already-played-score" id="apScore">0</div>
+    <div class="already-played-sub" id="apRating">—</div>
+  </div>
+  <div style="height:6px"></div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint" style="margin-top:8px">DRAG SLIDER &nbsp;|&nbsp; KEYBOARD &larr; &rarr; &nbsp;|&nbsp; ENTER TO SUBMIT</div>
+  <div id="startLB"></div>
+  <a href="/neonworld/" class="nav-back">&larr; NEON WORLD</a>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="game-header" style="align-self:center">
+    <div>
+      <div class="game-title-bar">DECADE</div>
+      <div class="game-num-label" id="gameNumLabel">PUZZLE #1</div>
+    </div>
+    <button class="esc-btn" id="escBtn" aria-label="Exit to menu">&#x2715;</button>
+  </div>
+  <div class="progress-dots" id="progressDots"></div>
+  <div id="itemCard" class="item-card">
+    <div class="category-badge" id="itemCategory">HISTORY</div>
+    <div class="clue-text" id="itemClue">Loading...</div>
+  </div>
+  <div class="slider-area" id="sliderArea">
+    <div class="year-display" id="yearDisplay">1970</div>
+    <div class="slider-labels"><span>1920</span><span>2020</span></div>
+    <div class="slider-track" id="sliderTrack">
+      <div class="slider-bg"></div>
+      <div class="slider-fill" id="sliderFill"></div>
+      <div class="slider-thumb" id="sliderThumb"></div>
+    </div>
+    <div class="decade-ticks">
+      <span class="decade-tick">1920</span>
+      <span class="decade-tick">1940</span>
+      <span class="decade-tick">1960</span>
+      <span class="decade-tick">1980</span>
+      <span class="decade-tick">2000</span>
+      <span class="decade-tick">2020</span>
+    </div>
+  </div>
+  <div class="submit-row" id="submitRow">
+    <button class="play-btn" id="submitBtn">SUBMIT GUESS</button>
+  </div>
+  <div id="answerReveal" class="answer-reveal" style="display:none"></div>
+  <div class="next-row" id="nextRow" style="display:none">
+    <button class="play-btn" id="nextBtn">NEXT &rarr;</button>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div class="screen" id="resultsScreen">
+  <div class="results-header">
+    <div class="results-day" id="resultsDayLabel">PUZZLE #1</div>
+    <div class="results-title">DECADE</div>
+    <div class="total-score" id="totalScore">0</div>
+    <div class="total-of">/ 5,000 PTS</div>
+    <div class="rating-badge" id="ratingBadge">HISTORIAN</div>
+  </div>
+  <div class="breakdown" id="breakdownArea">
+    <div class="breakdown-title">Round breakdown</div>
+    <div class="breakdown-hdr">
+      <div></div>
+      <div class="bd-hdr">YOUR YEAR</div>
+      <div class="bd-hdr">CORRECT</div>
+      <div class="bd-hdr">POINTS</div>
+    </div>
+    <div id="breakdownRows"></div>
+  </div>
+  <div class="share-area" id="shareArea">
+    <div class="share-preview" id="sharePreview"></div>
+    <div class="share-btns">
+      <button class="play-btn" id="shareBtn">SHARE RESULT</button>
+      <button class="play-btn btn-cyan" id="playAgainBtn">PLAY AGAIN</button>
+    </div>
+    <div class="share-feedback" id="shareFeedback">COPIED TO CLIPBOARD!</div>
+  </div>
+  <div class="results-lb" id="resultsLB"></div>
+  <a href="/neonworld/" class="nav-back">&larr; NEON WORLD</a>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ═══════════════════════════════════════
+// ITEMS DATA — 84 historical events
+// ═══════════════════════════════════════
+var ITEMS = [
+  // 1920s
+  { year: 1920, clue: "The 19th Amendment to the U.S. Constitution is ratified, granting American women the right to vote after decades of activism by the suffrage movement.", category: 'Society', context: "Ratified on August 18, 1920, it was the culmination of a 72-year campaign. Senator Harry Burn cast the deciding vote after his mother wrote him a note urging him to vote yes." },
+  { year: 1922, clue: "Howard Carter and Lord Carnarvon discover the intact tomb of the young Egyptian pharaoh Tutankhamun in the Valley of the Kings, stunning the world with its golden treasures.", category: 'History', context: "The tomb contained over 5,000 artifacts including a famous gold death mask, largely untouched for 3,300 years. The discovery sparked a global fascination with ancient Egypt." },
+  { year: 1927, clue: "Charles Lindbergh completes the first solo nonstop transatlantic flight in his single-engine monoplane 'Spirit of St. Louis', flying from New York to Paris in 33.5 hours.", category: 'Technology', context: "The 5,800 km flight made Lindbergh a global celebrity overnight. He won the $25,000 Orteig Prize and was greeted by 150,000 people at Le Bourget airport in Paris." },
+  { year: 1928, clue: "Alexander Fleming discovers that mold from the Penicillium genus kills bacteria in his laboratory, leading to the development of the first antibiotic and revolutionizing medicine.", category: 'Science', context: "Fleming noticed bacteria-free circles around mold on a petri dish he had left on his bench. Penicillin became widely available in the 1940s and has since saved hundreds of millions of lives." },
+  { year: 1929, clue: "The New York Stock Exchange crashes on 'Black Tuesday', wiping out billions of dollars of value and triggering the start of the Great Depression that would grip the world for a decade.", category: 'History', context: "The Dow Jones fell 25% in just two days. Unemployment in the U.S. eventually reached 25%. The depression spread globally through trade links and banking failures." },
+  { year: 1926, clue: "Scottish inventor John Logie Baird gives the first public demonstration of a working mechanical television system, transmitting grainy moving images before members of the Royal Institution in London.", category: 'Technology', context: "Baird's early TV used a spinning Nipkow disc to scan images. He had previously experimented using items including bicycle lamps and knitting needles as components." },
+  { year: 1924, clue: "The first Winter Olympics are held in Chamonix, France, featuring 16 nations and events including speed skating, ski jumping, and bobsled on Alpine snow and ice.", category: 'Culture', context: "The Games were originally called 'International Winter Sports Week' and were retroactively designated the 1st Winter Olympics by the IOC in 1926." },
+  // 1930s
+  { year: 1933, clue: "Adolf Hitler is appointed Chancellor of Germany by President Hindenburg, marking the beginning of the Nazi era and setting Europe on a path toward catastrophic world war.", category: 'History', context: "Within weeks Hitler used the Reichstag fire as a pretext to issue emergency decrees suspending civil liberties and eliminating political opposition through the Enabling Act." },
+  { year: 1937, clue: "The German passenger airship Hindenburg bursts into flames while attempting to dock in New Jersey, killing 36 people and ending the era of commercial passenger airships in a single disaster.", category: 'History', context: "The disaster was captured on film and broadcast on radio. The likely cause was static electricity igniting the hydrogen gas used for lift. The event ended public confidence in hydrogen airships." },
+  { year: 1936, clue: "Jesse Owens, an African-American sprinter and long jumper, wins four gold medals at the Berlin Olympics held in Nazi Germany — a powerful athletic rebuke of racial ideology.", category: 'Society', context: "Owens won the 100m, 200m, long jump, and 4x100m relay in front of Hitler. His record of four golds at a single Games stood for 48 years." },
+  { year: 1939, clue: "The Wizard of Oz and Gone with the Wind both premiere in the same spectacular year, marking what many consider Hollywood's greatest single filmmaking season in its golden era.", category: 'Culture', context: "Gone with the Wind won 10 Academy Awards and remains one of the highest-grossing films of all time when adjusted for inflation. The Wizard of Oz has never been out of public consciousness." },
+  { year: 1932, clue: "Amelia Earhart becomes the first woman to fly solo and nonstop across the Atlantic Ocean, landing in Northern Ireland after nearly 15 hours of flight from Newfoundland, Canada.", category: 'Society', context: "Earhart dealt with mechanical failure, icy conditions, and flames from a cracked exhaust manifold during the flight but pressed on. She became a global icon for women's independence." },
+  { year: 1935, clue: "British scientist Robert Watson-Watt secretly demonstrates radar technology to the government, detecting a Royal Air Force bomber using reflected radio waves — a discovery that would later help win World War II.", category: 'Science', context: "The British radar network Chain Home proved decisive in the Battle of Britain, providing early warning of incoming German aircraft. Watson-Watt's invention gave defenders the crucial edge." },
+  { year: 1938, clue: "Orson Welles broadcasts a radio dramatization of H.G. Wells' 'War of the Worlds', reportedly causing widespread panic among listeners who believed a real Martian invasion was underway.", category: 'Culture', context: "The broadcast interrupted a musical program with simulated news bulletins reporting alien landings. Though the panic may have been exaggerated, the event became a landmark in media history." },
+  // 1940s
+  { year: 1941, clue: "Japan launches a surprise attack on the U.S. naval base at Pearl Harbor, Hawaii, killing over 2,400 Americans and bringing the United States into World War II the following day.", category: 'History', context: "President Roosevelt called December 7, 1941 'a date which will live in infamy.' All eight battleships in the harbor were damaged or sunk, though U.S. aircraft carriers were fortunately at sea." },
+  { year: 1945, clue: "The United States drops atomic bombs on the Japanese cities of Hiroshima and Nagasaki — the only wartime use of nuclear weapons in history — killing an estimated 110,000-210,000 people and ending World War II.", category: 'History', context: "The Hiroshima bomb was dropped August 6; Nagasaki on August 9. Japan announced its surrender on August 15. The bombings remain one of the most debated decisions in military history." },
+  { year: 1947, clue: "U.S. Air Force test pilot Chuck Yeager becomes the first person officially confirmed to break the sound barrier, flying the experimental Bell X-1 aircraft at Mach 1.06 over the Mojave Desert.", category: 'Technology', context: "The achievement was kept secret for over a year. Yeager named the aircraft 'Glamorous Glennis' after his wife. He had broken two ribs in a horse-riding accident two days before the flight." },
+  { year: 1948, clue: "David Ben-Gurion proclaims the establishment of the State of Israel as an independent nation, hours before the British Mandate for Palestine officially expires at midnight.", category: 'History', context: "The U.S. recognized Israel eleven minutes after the proclamation. Five neighboring Arab states declared war the next morning, beginning the 1948 Arab-Israeli War." },
+  { year: 1944, clue: "On D-Day, Allied forces under General Eisenhower launch the largest seaborne invasion in history, landing over 150,000 troops on the beaches of Normandy, France, to begin the liberation of Western Europe.", category: 'History', context: "Operation Overlord on June 6 involved 5,000 ships, 13,000 aircraft, and Allied forces from over a dozen nations. The successful landings marked a decisive turning point in the war against Nazi Germany." },
+  { year: 1949, clue: "Mao Zedong proclaims the founding of the People's Republic of China from Beijing's Tiananmen Gate, ending the Chinese Civil War and establishing communist rule over the world's most populous nation.", category: 'History', context: "The defeated Nationalist government retreated to the island of Taiwan. China's communist victory reshaped the global balance of the Cold War and transformed the most populous country on Earth." },
+  // 1950s
+  { year: 1953, clue: "James Watson and Francis Crick publish the double-helix structure of DNA in the journal Nature, unlocking the fundamental secret of how genetic information is stored, copied, and inherited.", category: 'Science', context: "The discovery relied critically on X-ray crystallography data produced by Rosalind Franklin. Watson, Crick, and Maurice Wilkins received the Nobel Prize in 1962; Franklin had died of cancer in 1958." },
+  { year: 1955, clue: "Rosa Parks refuses to give up her bus seat to a white passenger in Montgomery, Alabama, sparking a 381-day bus boycott that elevates a young minister named Martin Luther King Jr. to national prominence.", category: 'Society', context: "The boycott ended when the Supreme Court ruled bus segregation unconstitutional in November 1956. Parks has been called 'the first lady of civil rights' and 'the mother of the freedom movement.'" },
+  { year: 1957, clue: "The Soviet Union launches Sputnik 1, the world's first artificial satellite, sending it into Earth orbit and triggering the Space Race between the superpowers of the Cold War.", category: 'Space', context: "Sputnik orbited Earth every 98 minutes, emitting a radio beep audible to amateur receivers worldwide. Its launch shocked the United States and led directly to the creation of NASA." },
+  { year: 1953, clue: "New Zealander Edmund Hillary and Nepali Sherpa Tenzing Norgay become the first climbers confirmed to have reached the summit of Mount Everest, the highest point on Earth at 8,849 metres.", category: 'History', context: "The news arrived in London on the morning of Queen Elizabeth II's coronation, giving the nation a double celebration. Hillary said of the summit: 'We knocked the bastard off.'" },
+  { year: 1958, clue: "The first successful implantable cardiac pacemaker is used in a human patient in Sweden, beginning a new era of life-saving electronic implantable medical devices that would eventually help millions.", category: 'Science', context: "Dr. Ake Senning implanted the device in patient Arne Larsson, who went on to outlive both his surgeon and the device's inventor Rune Elmqvist, dying in 2001 at age 86." },
+  { year: 1959, clue: "Fidel Castro's guerrilla forces overthrow the U.S.-backed Cuban dictator Fulgencio Batista on New Year's Day, establishing a communist government just 90 miles from the coast of Florida.", category: 'History', context: "Castro's revolution became a major Cold War flashpoint, contributing to the failed Bay of Pigs invasion in 1961 and the near-nuclear Cuban Missile Crisis of 1962." },
+  // 1960s
+  { year: 1961, clue: "Soviet cosmonaut Yuri Gagarin becomes the first human being to travel into space, completing one orbit of Earth in 108 minutes aboard the Vostok 1 spacecraft launched from Kazakhstan.", category: 'Space', context: "Gagarin was 27 years old. His famous words upon re-entry were reported as 'I see Earth — it is so beautiful.' He became the most celebrated hero in the Soviet Union and a global icon." },
+  { year: 1963, clue: "U.S. President John F. Kennedy is assassinated while riding in a motorcade through Dealey Plaza in Dallas, Texas, shocking the world and abruptly ending the brief, optimistic era of his presidency.", category: 'History', context: "Lee Harvey Oswald was arrested but shot two days later by Jack Ruby. The Warren Commission concluded Oswald acted alone, though conspiracy theories have never been fully put to rest." },
+  { year: 1969, clue: "Astronauts Neil Armstrong and Buzz Aldrin walk on the Moon during the Apollo 11 mission, fulfilling President Kennedy's pledge and achieving one of humanity's greatest exploratory feats.", category: 'Space', context: "Armstrong's words 'one small step for man, one giant leap for mankind' were heard live by an estimated 600 million people worldwide. The crew returned safely on July 24, 1969." },
+  { year: 1962, clue: "The Cuban Missile Crisis brings the United States and Soviet Union to the brink of nuclear war for 13 terrifying days, the closest moment in the Cold War to open nuclear conflict.", category: 'History', context: "Soviet missiles in Cuba were detected by U-2 spy planes. Kennedy imposed a naval blockade. Khrushchev ultimately agreed to remove the missiles in exchange for a U.S. pledge not to invade Cuba." },
+  { year: 1964, clue: "The Beatles arrive in the United States and appear on The Ed Sullivan Show before 73 million viewers, launching a cultural phenomenon — 'Beatlemania' — that transforms popular music forever.", category: 'Culture', context: "In April 1964, the Beatles simultaneously held the top five spots on the Billboard Hot 100 singles chart — a record never equaled. John, Paul, George, and Ringo were 23-24 years old." },
+  { year: 1969, clue: "Woodstock Music Festival draws over 400,000 people to a farm in Bethel, New York for three days of peace, love, and legendary performances from Hendrix, Joplin, The Who, and many others.", category: 'Culture', context: "Originally planned for 50,000 attendees, Woodstock became a defining cultural moment of the 1960s counterculture despite rain, mud, overcrowding, and food shortages across the four-day event." },
+  { year: 1967, clue: "The world's first human heart transplant is performed by cardiac surgeon Christiaan Barnard in Cape Town, South Africa — the patient, Louis Washkansky, lives for 18 days.", category: 'Science', context: "The operation lasted nine hours. Though Washkansky died of pneumonia, the surgery proved heart transplants were technically feasible. Barnard's second transplant patient lived for 593 days." },
+  { year: 1968, clue: "The assassination of Dr. Martin Luther King Jr. at a Memphis motel on April 4 triggers riots in over 100 American cities and devastates the leadership of the civil rights movement.", category: 'Society', context: "James Earl Ray was convicted of the murder in 1969. President Lyndon Johnson signed the Fair Housing Act just days after King's death, as a tribute and response to the nation's grief and anger." },
+  // 1970s
+  { year: 1971, clue: "Intel introduces the world's first commercially available microprocessor, the 4004, cramming 2,300 transistors onto a chip roughly the size of a fingernail and processing 60,000 operations per second.", category: 'Technology', context: "The 4004 was designed for a Japanese calculator company. It ran at 740 kHz — roughly a billionth of the performance of a modern smartphone chip — but it launched the microcomputer revolution." },
+  { year: 1972, clue: "Atari's Pong arcade game becomes the first massively successful commercial video game, while the Magnavox Odyssey home console launches — together, they birth a new entertainment industry.", category: 'Technology', context: "Pong's famously simple instructions were: 'Avoid missing ball for high score.' Within a year clones flooded the market. The home video game industry would eventually become larger than Hollywood." },
+  { year: 1974, clue: "The Watergate scandal forces U.S. President Richard Nixon to resign from office — the only time in American history a sitting president has voluntarily left the presidency before term's end.", category: 'History', context: "Nixon resigned on August 9, 1974, after transcripts showed he had directed the FBI to limit the investigation into the 1972 break-in at Democratic Party headquarters at the Watergate complex." },
+  { year: 1976, clue: "Apple Computer Company is co-founded by Steve Jobs, Steve Wozniak, and Ronald Wayne, releasing the Apple I as a circuit-board kit computer — the first step of a company that would change everything.", category: 'Technology', context: "The Apple I sold for $666.66. Ronald Wayne sold his 10% stake back to Jobs and Wozniak for $800 just 12 days later — missing out on a stake eventually worth hundreds of billions of dollars." },
+  { year: 1977, clue: "Star Wars opens in theaters, shatters box office records, and launches one of the most successful entertainment franchises in history while single-handedly revitalizing the science fiction genre.", category: 'Culture', context: "George Lucas was told by studio executives that the film would be a flop. It grossed $775 million in its original release and changed Hollywood's approach to blockbuster filmmaking forever." },
+  { year: 1979, clue: "A partial meltdown occurs at the Three Mile Island nuclear power plant near Harrisburg, Pennsylvania — the worst nuclear accident in U.S. history — shaking public confidence in nuclear energy.", category: 'Science', context: "A combination of equipment failure and operator error caused a partial core meltdown. No immediate deaths occurred, but the accident effectively ended new nuclear plant construction in the United States." },
+  { year: 1975, clue: "The fall of Saigon marks the end of the Vietnam War as North Vietnamese forces capture the South Vietnamese capital, forcing a chaotic U.S. evacuation after 20 years of American involvement.", category: 'History', context: "Iconic photographs of helicopters lifting people from rooftops became symbols of American defeat. Over 58,000 U.S. service members died during the conflict. South Vietnam fell on April 30, 1975." },
+  { year: 1978, clue: "Louise Brown, the world's first 'test tube baby', is born in Oldham, England following the first successful in vitro fertilization procedure, opening a new frontier in reproductive medicine.", category: 'Science', context: "Louise was conceived using eggs and sperm fertilized outside the womb by physiologist Robert Edwards and gynecologist Patrick Steptoe. Edwards later received the Nobel Prize for Medicine in 2010." },
+  // 1980s
+  { year: 1980, clue: "Mount St. Helens in Washington State erupts in the deadliest and most economically destructive volcanic event in modern U.S. history, killing 57 people and flattening 600 square kilometres of forest.", category: 'Natural', context: "The eruption blew the entire north face off the mountain, reducing its summit height by 400 metres. The ash cloud rose 24 km high and drifted across 11 states. The eruption lasted nine hours." },
+  { year: 1981, clue: "IBM releases the IBM Personal Computer running Microsoft's MS-DOS operating system, setting the standard for modern personal computing and triggering an industry that would reshape business and society.", category: 'Technology', context: "IBM's decision to use off-the-shelf components and license Microsoft's OS — rather than build proprietary systems — allowed clone manufacturers to dominate, making Microsoft and Intel fabulously wealthy." },
+  { year: 1983, clue: "ARPANET officially switches to the TCP/IP protocol on January 1 — an event known as 'Flag Day' — establishing the technical foundation on which the modern global internet is built.", category: 'Technology', context: "TCP/IP was designed by Vint Cerf and Bob Kahn in the 1970s. The January 1, 1983 switch is often cited as the true 'birth of the internet,' connecting previously separate computer networks into one system." },
+  { year: 1986, clue: "The Chernobyl nuclear power plant in Soviet Ukraine explodes in the worst nuclear accident in human history, releasing radioactive contamination across large parts of Europe.", category: 'Natural', context: "The explosion was caused by a combination of reactor design flaws and operator error during a safety test. Over 350,000 people were eventually evacuated. The disaster accelerated the Soviet Union's collapse." },
+  { year: 1989, clue: "The Berlin Wall falls after 28 years of division as crowds of East and West Germans celebrate through the night, tearing down the most potent symbol of the Cold War with hammers and bare hands.", category: 'History', context: "The announcement of open borders was accidental — a spokesperson misread the wrong note live on TV. Crowds flooded the checkpoints. Germany reunified formally on October 3, 1990." },
+  { year: 1984, clue: "Apple launches the Macintosh personal computer during the Super Bowl with a landmark television commercial, introducing the graphical user interface and mouse to mainstream consumers for the first time.", category: 'Technology', context: "The '1984' commercial directed by Ridley Scott aired only once nationally but became one of the most celebrated advertisements ever made. The Macintosh introduced GUI computing to the general public." },
+  { year: 1985, clue: "Mikhail Gorbachev becomes leader of the Soviet Union and begins introducing the radical reforms of glasnost (openness) and perestroika (restructuring) that would ultimately lead to the USSR's dissolution.", category: 'History', context: "Gorbachev intended to modernize communism, not destroy it. He withdrew Soviet forces from Afghanistan and negotiated major arms reduction treaties with the West, earning the Nobel Peace Prize in 1990." },
+  { year: 1987, clue: "Black Monday strikes global stock markets as the Dow Jones Industrial Average drops 22.6% in a single trading day — the largest single-day percentage crash in stock market history.", category: 'History', context: "Unlike 1929, Black Monday did not trigger a deep recession. Markets had largely recovered within two years, partly due to rapid intervention by the Federal Reserve to provide liquidity." },
+  // 1990s
+  { year: 1990, clue: "The Hubble Space Telescope is launched into low Earth orbit aboard the Space Shuttle Discovery, eventually producing some of the most detailed and awe-inspiring images of the universe ever captured.", category: 'Space', context: "A flaw in Hubble's primary mirror was discovered shortly after launch. A dramatic 1993 spacewalk repair mission corrected the optics, transforming Hubble into the iconic observatory it remains today." },
+  { year: 1991, clue: "The Soviet Union officially dissolves on Christmas Day, ending the Cold War that had defined global politics for 45 years and breaking up into 15 independent states including Russia and Ukraine.", category: 'History', context: "Mikhail Gorbachev resigned as president on December 25, 1991, and the Soviet flag was lowered over the Kremlin for the last time. The USSR had existed since 1922." },
+  { year: 1993, clue: "Tim Berners-Lee releases the World Wide Web software into the public domain, making the web available to everyone at no cost and launching the digital information age that transformed human society.", category: 'Technology', context: "Berners-Lee invented the web in 1989 at CERN to help physicists share research. His decision not to patent it was one of the most consequential acts of generosity in technological history." },
+  { year: 1994, clue: "The Channel Tunnel opens between England and France, connecting Britain to continental Europe via rail for the first time since the last Ice Age after 200 years of engineering ambition and debate.", category: 'Technology', context: "The tunnel is 50 km long with 38 km under the sea. It took 15,000 workers seven years to build at a cost of more than double the original estimate. French and British workers met in the middle in 1990." },
+  { year: 1996, clue: "Scientists at the Roslin Institute in Scotland successfully clone a sheep named Dolly from a single adult mammary cell — the first mammal ever cloned from an adult non-reproductive cell.", category: 'Science', context: "Dolly's existence was kept secret for seven months after her birth in July 1996. She lived to age six and was euthanized due to progressive lung disease. She sparked profound global debate about cloning ethics." },
+  { year: 1997, clue: "IBM's Deep Blue supercomputer defeats reigning world chess champion Garry Kasparov in a six-game match — the first time a computer defeats a reigning world champion under standard tournament conditions.", category: 'Technology', context: "Kasparov had defeated an earlier Deep Blue version in 1996. He accused IBM of cheating in the 1997 rematch and demanded a full printout of the machine's decision logs, which IBM declined to provide." },
+  { year: 1998, clue: "Google is founded by Stanford PhD students Larry Page and Sergey Brin, who develop a revolutionary search algorithm based on counting links between web pages — PageRank — that quickly dominates the internet.", category: 'Technology', context: "The name is a misspelling of 'googol', the number 10 to the 100th power. Google's first offices were in a garage in Menlo Park, California, rented from Susan Wojcicki, who later became YouTube's CEO." },
+  { year: 1999, clue: "Two students carry out a mass shooting at Columbine High School in Colorado, killing 13 people — at the time the deadliest school shooting in U.S. history — and igniting a lasting national debate over gun violence.", category: 'Society', context: "The attack prompted major changes to school security procedures across the country and became a reference point for all subsequent debates about gun control, mental health, and youth violence in America." },
+  { year: 1995, clue: "The Oklahoma City bombing kills 168 people, including 19 children, when a truck bomb demolishes the Alfred P. Murrah Federal Building — the deadliest domestic terrorist attack in U.S. history at that time.", category: 'History', context: "Timothy McVeigh, a U.S. Army veteran angered by government actions at Waco and Ruby Ridge, was convicted and executed in 2001. The bombing prompted major changes to federal building security." },
+  { year: 1992, clue: "The Los Angeles riots erupt over six days following the acquittal of police officers caught on video beating Rodney King, leaving 63 people dead and causing over $1 billion in property damage.", category: 'Society', context: "The riots were suppressed only with the National Guard and Army. The event sparked national conversation about police brutality, racial inequality, and the criminal justice system in the United States." },
+  // 2000s
+  { year: 2000, clue: "The Y2K millennium bug fails to cause the feared widespread computer crashes as the new year arrives, after governments and corporations worldwide spent an estimated $300 billion on remediation efforts.", category: 'Technology', context: "Fears of planes falling from skies and nuclear plants failing proved overblown. Whether the massive spending prevented disaster or the threat was exaggerated remains debated among technology historians." },
+  { year: 2001, clue: "Terrorists hijack four commercial airplanes and crash them into the World Trade Center towers, the Pentagon, and a Pennsylvania field on September 11, killing nearly 3,000 people in the deadliest terrorist attack in history.", category: 'History', context: "The attacks were planned by al-Qaeda. They led directly to the U.S. invasion of Afghanistan, the War on Terror, and sweeping changes to security and civil liberties across the world." },
+  { year: 2002, clue: "The euro currency becomes physical reality as notes and coins enter circulation in 12 European countries simultaneously, completing the first phase of monetary union and replacing beloved national currencies.", category: 'History', context: "On January 1, 2002, approximately 14.5 billion euro banknotes and 52 billion coins entered circulation. Germany's Deutsche Mark, France's Franc, Italy's Lira, and nine others were retired." },
+  { year: 2003, clue: "The Space Shuttle Columbia breaks apart during re-entry over Texas and Louisiana, killing all seven crew members aboard — the second Space Shuttle disaster after Challenger in 1986.", category: 'Space', context: "Damage caused by foam striking the left wing during launch allowed superheated gases to penetrate the wing structure on re-entry. NASA did not know the wing was fatally compromised until it was too late." },
+  { year: 2004, clue: "A magnitude 9.1 earthquake off the coast of Sumatra generates a devastating tsunami that strikes 14 countries around the Indian Ocean, killing over 230,000 people in one of history's deadliest natural disasters.", category: 'Natural', context: "The tsunami waves reached up to 40 metres high in some areas. Coastal communities in Indonesia, Sri Lanka, India, and Thailand were hardest hit. The disaster led to a global tsunami early-warning system." },
+  { year: 2005, clue: "Hurricane Katrina devastates New Orleans and the Gulf Coast, killing over 1,800 people and flooding 80% of New Orleans in the costliest natural disaster in U.S. history at the time of impact.", category: 'Natural', context: "Federal levees failed during the storm surge, causing most of the flooding. Over 100,000 people were stranded in the city. The slow government response exposed deep racial and economic inequalities." },
+  { year: 2006, clue: "Twitter is launched as a micro-blogging platform limited to 140 characters, beginning a social media revolution that changes how news spreads, politicians communicate, and public discourse flows.", category: 'Technology', context: "Co-founder Jack Dorsey sent the first tweet: 'just setting up my twttr.' The platform grew to hundreds of millions of users and has hosted announcements of wars, elections, and scientific discoveries." },
+  { year: 2007, clue: "Apple launches the first iPhone, combining a mobile phone, music player, and internet device in one revolutionary touchscreen device, fundamentally transforming the smartphone industry and human daily life.", category: 'Technology', context: "Steve Jobs called it 'the most revolutionary product Apple had ever made.' Competitors initially dismissed it as too expensive. Within years iPhone had reshaped mobile computing, photography, and navigation." },
+  { year: 2008, clue: "Barack Obama is elected as the 44th President of the United States — the first African-American to hold the office — defeating Senator John McCain and drawing emotional celebrations across the nation and world.", category: 'Society', context: "Obama won with 365 electoral votes and over 69 million popular votes, the most ever at that time. His election was seen worldwide as a historic milestone in American racial history." },
+  { year: 2009, clue: "Bitcoin is launched by the pseudonymous Satoshi Nakamoto with the publication of a white paper and the first mining of coins, introducing the world to decentralized cryptocurrency and blockchain technology.", category: 'Technology', context: "The first Bitcoin transaction was 10 BTC sent between Nakamoto and programmer Hal Finney in January 2009. Nakamoto's true identity has never been confirmed. One early pizza purchase cost 10,000 BTC." },
+  // 2010s
+  { year: 2010, clue: "A catastrophic magnitude 7.0 earthquake devastates Haiti, killing over 160,000 people, injuring 300,000, and leaving 1.5 million homeless in one of the worst disasters ever to strike the Western Hemisphere.", category: 'Natural', context: "Haiti's capital Port-au-Prince was largely destroyed. The impoverished country received massive international aid but recovery has been slow. The earthquake struck on January 12, 2010." },
+  { year: 2011, clue: "A magnitude 9.0 earthquake and subsequent tsunami strike Japan's northeast coast, killing over 18,000 people and triggering a nuclear meltdown at the Fukushima Daiichi power plant.", category: 'Natural', context: "Tsunami waves reached up to 40 metres in height. The nuclear disaster caused mass evacuations and reignited the global debate over nuclear power safety. It was Japan's worst disaster since World War II." },
+  { year: 2012, clue: "Scientists at CERN announce the discovery of a particle consistent with the long-theorized Higgs boson — the so-called 'God particle' — completing the Standard Model of particle physics.", category: 'Science', context: "The Higgs field gives other particles their mass. The discovery confirmed a 50-year-old prediction by theorist Peter Higgs, who received the Nobel Prize in Physics in 2013 along with Francois Englert." },
+  { year: 2013, clue: "NSA contractor Edward Snowden leaks classified documents revealing sweeping global surveillance programs operated by U.S. and allied intelligence agencies, triggering worldwide debate about privacy and government power.", category: 'Society', context: "Snowden fled first to Hong Kong, then to Russia, where he remains. His revelations prompted major reforms to surveillance law in multiple countries and reignited debate about encryption and civil liberties." },
+  { year: 2014, clue: "Russia annexes Ukraine's Crimean Peninsula following a controversial referendum — the first annexation of European territory by force since World War II — drawing international condemnation and sanctions.", category: 'History', context: "The annexation followed the Maidan revolution in Kyiv that ousted Ukraine's pro-Russian president Viktor Yanukovych. Western nations imposed economic sanctions on Russia in response." },
+  { year: 2015, clue: "The Paris Agreement on climate change is adopted by 196 countries at COP21, committing signatories to limit global warming to well below 2 degrees Celsius above pre-industrial levels.", category: 'Science', context: "It was the first legally binding global commitment on climate change. The U.S. under President Obama joined; President Trump withdrew in 2017; President Biden rejoined on his first day in office in 2021." },
+  { year: 2016, clue: "The United Kingdom votes 52% to 48% to leave the European Union in a historic and divisive referendum, triggering four years of political upheaval and negotiations in a process known as Brexit.", category: 'History', context: "Turnout was 72%. Prime Minister David Cameron, who called the referendum, resigned the following morning. The UK formally left the EU on January 31, 2020 after multiple parliamentary crises." },
+  { year: 2017, clue: "SpaceX successfully lands and reuses orbital-class rocket boosters for the first time, proving the concept of reusable rockets and dramatically lowering the cost of access to space.", category: 'Space', context: "The first successful drone ship landing occurred in April 2016; by 2017 booster reuse was routine. The innovation made SpaceX the world's dominant commercial launch provider and revolutionized the industry." },
+  { year: 2018, clue: "CRISPR-Cas9 gene editing enters widespread scientific use, described as 'molecular scissors' that can precisely cut and edit any DNA sequence — raising hopes for curing genetic diseases and ethical alarm alike.", category: 'Science', context: "Jennifer Doudna and Emmanuelle Charpentier won the 2020 Nobel Prize in Chemistry for developing CRISPR. A Chinese scientist controversially used it to create gene-edited babies, causing global outrage." },
+  { year: 2019, clue: "The first-ever image of a black hole is captured by the Event Horizon Telescope — a global array of radio telescopes — revealing the supermassive black hole at the centre of galaxy M87.", category: 'Space', context: "The black hole is 6.5 billion times the mass of our Sun and 55 million light-years away. The image required combining data from telescopes on four continents and took years of computation to produce." },
+  // extra items to reach 84
+  { year: 1961, clue: "Construction begins overnight on the Berlin Wall, dividing the city and sealing 96 crossing points. By morning East Berliners wake to find their city permanently divided by barbed wire and concrete.", category: 'History', context: "The wall was built to stop the flood of East Germans fleeing to the West — 3.5 million had left since 1945. Over the 28 years it stood, around 140 people were killed attempting to escape across it." },
+  { year: 1954, clue: "The U.S. Supreme Court rules unanimously in Brown v. Board of Education that racial segregation in public schools is unconstitutional, overturning the 1896 'separate but equal' doctrine of Plessy v. Ferguson.", category: 'Society', context: "Chief Justice Earl Warren delivered the unanimous 9-0 ruling. Though implementation was slow and resisted, the decision provided the legal foundation for the entire civil rights movement." },
+  { year: 1974, clue: "The Arecibo Message — a binary-encoded signal containing information about humanity, our solar system, and Earth's location — is broadcast from the Arecibo telescope toward a star cluster 25,000 light-years away.", category: 'Space', context: "Composed by astronomer Frank Drake with input from Carl Sagan, the message was encoded in prime-number dimensions. It won't reach its destination for 25,000 years. No reply is expected for 50,000." },
+  { year: 1988, clue: "Pixar Animation Studios is acquired by Steve Jobs from George Lucas's Lucasfilm company for $5 million, with Jobs providing additional funding to keep it afloat as it develops groundbreaking computer animation technology.", category: 'Technology', context: "Jobs invested $50 million in Pixar over the following years. Pixar's Toy Story (1995) became the first fully computer-animated feature film. When Disney acquired Pixar in 2006, Jobs received $7.4 billion." }
+];
+
+// ═══════════════════════════════════════
+// DAILY SEED & SELECTION
+// ═══════════════════════════════════════
+var EPOCH = new Date('2026-01-01').getTime();
+var TODAY_DAY = Math.floor((Date.now() - EPOCH) / 86400000);
+var PUZZLE_NUM = Math.max(1, TODAY_DAY + 1);
+var ITEMS_PER_ROUND = 5;
+var MIN_YEAR = 1920;
+var MAX_YEAR = 2020;
+var SK_PLAYED = 'decade_played_day';
+var SK_SCORE = 'decade_score_day';
+var SK_RESULTS = 'decade_results_day';
+
+function getDailyItems() {
+  var start = ((TODAY_DAY % ITEMS.length) + ITEMS.length) % ITEMS.length;
+  var result = [];
+  for (var i = 0; i < ITEMS_PER_ROUND; i++) {
+    result.push(ITEMS[(start + i) % ITEMS.length]);
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════
+// SCORING HELPERS
+// ═══════════════════════════════════════
+function calcScore(guess, correct) {
+  var diff = Math.abs(guess - correct);
+  if (diff === 0)  return 1000;
+  if (diff <= 1)   return 950;
+  if (diff <= 2)   return 900;
+  if (diff <= 5)   return 750;
+  if (diff <= 10)  return 500;
+  if (diff <= 20)  return 200;
+  return 50;
+}
+function scoreClass(pts) {
+  if (pts >= 900) return 'excellent';
+  if (pts >= 600) return 'good';
+  if (pts >= 300) return 'ok';
+  return 'poor';
+}
+function scoreEmoji(pts) {
+  if (pts >= 900) return '\uD83D\uDFE9';
+  if (pts >= 600) return '\uD83D\uDFE8';
+  if (pts >= 300) return '\uD83D\uDFE7';
+  return '\uD83D\uDFE5';
+}
+function dotClass(pts) {
+  if (pts >= 900) return 'done-green';
+  if (pts >= 600) return 'done-gold';
+  if (pts >= 300) return 'done-orange';
+  return 'done-red';
+}
+function getRating(total) {
+  if (total >= 4500) return 'HISTORIAN';
+  if (total >= 3500) return 'SCHOLAR';
+  if (total >= 2500) return 'STUDENT';
+  return 'NOVICE';
+}
+function getRatingCls(r) {
+  return { HISTORIAN: 'rating-historian', SCHOLAR: 'rating-scholar', STUDENT: 'rating-student', NOVICE: 'rating-novice' }[r] || 'rating-novice';
+}
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+var dailyItems = [];
+var currentIndex = 0;
+var guesses = [];
+var totalScore = 0;
+var currentYear = 1970;
+var submitted = false;
+var sliderDragging = false;
+var shareText = '';
+
+// ═══════════════════════════════════════
+// NEON.JS INIT
+// ═══════════════════════════════════════
+Neon.init({
+  game: 'decade',
+  mode: 'high',
+  key: 'neonarcade_neonworld_decade_scores',
+  formatScore: function(s) { return Number(s).toLocaleString() + ' pts'; }
+});
+
+// ═══════════════════════════════════════
+// DOM REFS
+// ═══════════════════════════════════════
+var elStartPuzzleNum = document.getElementById('startPuzzleNum');
+var elStartBtn = document.getElementById('startBtn');
+var elAlreadyBanner = document.getElementById('alreadyPlayedBanner');
+var elApScore = document.getElementById('apScore');
+var elApRating = document.getElementById('apRating');
+var elStartLB = document.getElementById('startLB');
+var elGameNumLabel = document.getElementById('gameNumLabel');
+var elProgressDots = document.getElementById('progressDots');
+var elItemCard = document.getElementById('itemCard');
+var elItemCategory = document.getElementById('itemCategory');
+var elItemClue = document.getElementById('itemClue');
+var elSliderArea = document.getElementById('sliderArea');
+var elYearDisplay = document.getElementById('yearDisplay');
+var elSliderFill = document.getElementById('sliderFill');
+var elSliderThumb = document.getElementById('sliderThumb');
+var elSliderTrack = document.getElementById('sliderTrack');
+var elSubmitRow = document.getElementById('submitRow');
+var elSubmitBtn = document.getElementById('submitBtn');
+var elAnswerReveal = document.getElementById('answerReveal');
+var elNextRow = document.getElementById('nextRow');
+var elNextBtn = document.getElementById('nextBtn');
+var elResultsDayLabel = document.getElementById('resultsDayLabel');
+var elTotalScore = document.getElementById('totalScore');
+var elRatingBadge = document.getElementById('ratingBadge');
+var elBreakdownRows = document.getElementById('breakdownRows');
+var elSharePreview = document.getElementById('sharePreview');
+var elShareBtn = document.getElementById('shareBtn');
+var elPlayAgainBtn = document.getElementById('playAgainBtn');
+var elShareFeedback = document.getElementById('shareFeedback');
+var elResultsLB = document.getElementById('resultsLB');
+var elEscBtn = document.getElementById('escBtn');
+
+// ═══════════════════════════════════════
+// SCREEN HELPERS
+// ═══════════════════════════════════════
+function showScreen(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════
+// START SCREEN
+// ═══════════════════════════════════════
+function setupStartScreen() {
+  elStartPuzzleNum.textContent = 'PUZZLE #' + PUZZLE_NUM;
+  Neon.render(elStartLB);
+
+  var playedDay = parseInt(localStorage.getItem(SK_PLAYED) || '-9999', 10);
+  if (playedDay === TODAY_DAY) {
+    var savedScore = parseInt(localStorage.getItem(SK_SCORE) || '0', 10);
+    elAlreadyBanner.style.display = 'block';
+    elApScore.textContent = savedScore.toLocaleString() + ' pts';
+    elApRating.textContent = getRating(savedScore);
+    elStartBtn.textContent = 'SEE RESULTS';
+    elStartBtn.onclick = function() { showResults(true); };
+  } else {
+    elAlreadyBanner.style.display = 'none';
+    elStartBtn.textContent = 'START';
+    elStartBtn.onclick = startGame;
+  }
+}
+
+function showStart() {
+  setupStartScreen();
+  showScreen('startScreen');
+}
+
+// ═══════════════════════════════════════
+// GAME START
+// ═══════════════════════════════════════
+function startGame() {
+  var playedDay = parseInt(localStorage.getItem(SK_PLAYED) || '-9999', 10);
+  if (playedDay === TODAY_DAY) { showResults(true); return; }
+
+  dailyItems = getDailyItems();
+  currentIndex = 0;
+  guesses = [];
+  totalScore = 0;
+
+  elGameNumLabel.textContent = 'PUZZLE #' + PUZZLE_NUM;
+  buildProgressDots();
+  showScreen('gameScreen');
+  loadItem(0);
+}
+
+function buildProgressDots() {
+  while (elProgressDots.firstChild) elProgressDots.removeChild(elProgressDots.firstChild);
+  for (var i = 0; i < ITEMS_PER_ROUND; i++) {
+    var dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.id = 'dot_' + i;
+    elProgressDots.appendChild(dot);
+  }
+}
+
+// ═══════════════════════════════════════
+// ITEM LOADING
+// ═══════════════════════════════════════
+function loadItem(idx) {
+  submitted = false;
+  var item = dailyItems[idx];
+  elItemCategory.textContent = item.category.toUpperCase();
+  elItemClue.textContent = item.clue;
+
+  // Reset card animation
+  elItemCard.style.animation = 'none';
+  void elItemCard.offsetHeight;
+  elItemCard.style.animation = '';
+
+  currentYear = 1970;
+  updateSlider();
+
+  // Reset UI state
+  while (elAnswerReveal.firstChild) elAnswerReveal.removeChild(elAnswerReveal.firstChild);
+  elAnswerReveal.style.display = 'none';
+  elNextRow.style.display = 'none';
+  elSubmitRow.style.display = 'flex';
+  elSubmitBtn.disabled = false;
+  elSliderArea.style.pointerEvents = 'auto';
+  elSliderArea.style.opacity = '1';
+}
+
+// ═══════════════════════════════════════
+// SLIDER
+// ═══════════════════════════════════════
+function yearFromRatio(r) {
+  r = Math.max(0, Math.min(1, r));
+  return Math.round(MIN_YEAR + r * (MAX_YEAR - MIN_YEAR));
+}
+function ratioFromYear(y) {
+  return (y - MIN_YEAR) / (MAX_YEAR - MIN_YEAR);
+}
+function updateSlider() {
+  var ratio = ratioFromYear(currentYear);
+  var pct = (ratio * 100).toFixed(2) + '%';
+  elSliderFill.style.width = pct;
+  elSliderThumb.style.left = pct;
+  elYearDisplay.textContent = currentYear;
+}
+function ratioFromPointer(e) {
+  var rect = elSliderTrack.getBoundingClientRect();
+  var cx = e.touches ? e.touches[0].clientX : e.clientX;
+  return (cx - rect.left) / rect.width;
+}
+
+elSliderTrack.addEventListener('mousedown', function(e) {
+  if (submitted) return;
+  sliderDragging = true;
+  elSliderThumb.classList.add('dragging');
+  currentYear = yearFromRatio(ratioFromPointer(e));
+  updateSlider();
+  e.preventDefault();
+});
+document.addEventListener('mousemove', function(e) {
+  if (!sliderDragging) return;
+  currentYear = yearFromRatio(ratioFromPointer(e));
+  updateSlider();
+});
+document.addEventListener('mouseup', function() {
+  if (sliderDragging) { sliderDragging = false; elSliderThumb.classList.remove('dragging'); }
+});
+elSliderTrack.addEventListener('touchstart', function(e) {
+  if (submitted) return;
+  sliderDragging = true;
+  elSliderThumb.classList.add('dragging');
+  currentYear = yearFromRatio(ratioFromPointer(e));
+  updateSlider();
+  e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchmove', function(e) {
+  if (!sliderDragging) return;
+  currentYear = yearFromRatio(ratioFromPointer(e));
+  updateSlider();
+  e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchend', function() {
+  sliderDragging = false;
+  elSliderThumb.classList.remove('dragging');
+});
+
+document.addEventListener('keydown', function(e) {
+  if (!document.getElementById('gameScreen').classList.contains('active')) return;
+  if (e.key === 'Escape') { showStart(); return; }
+  if (submitted) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); elNextBtn.click(); }
+    return;
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    currentYear = Math.max(MIN_YEAR, currentYear - (e.shiftKey ? 10 : 1));
+    updateSlider(); e.preventDefault();
+  } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    currentYear = Math.min(MAX_YEAR, currentYear + (e.shiftKey ? 10 : 1));
+    updateSlider(); e.preventDefault();
+  } else if (e.key === 'Enter') {
+    submitGuess();
+  }
+});
+
+// ═══════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════
+function submitGuess() {
+  if (submitted) return;
+  submitted = true;
+
+  var item = dailyItems[currentIndex];
+  var pts = calcScore(currentYear, item.year);
+  var diff = Math.abs(currentYear - item.year);
+  var cls = scoreClass(pts);
+
+  guesses.push({ guess: currentYear, correct: item.year, pts: pts });
+  totalScore += pts;
+
+  var dot = document.getElementById('dot_' + currentIndex);
+  if (dot) dot.className = 'dot ' + dotClass(pts);
+
+  elSliderArea.style.pointerEvents = 'none';
+  elSliderArea.style.opacity = '0.55';
+  elSubmitRow.style.display = 'none';
+
+  // Build answer reveal using DOM methods
+  buildAnswerReveal(currentYear, item.year, pts, diff, cls, item.context);
+
+  elAnswerReveal.style.display = 'block';
+
+  // Particles / feedback
+  if (pts >= 900) spawnParticles('#39ff14', 20);
+  else if (pts >= 600) spawnParticles('#ffd700', 14);
+  else if (pts >= 300) spawnParticles('#ff8c00', 8);
+  else { spawnParticles('#ff2d7b', 8); shakePage(); }
+
+  var isLast = (currentIndex === ITEMS_PER_ROUND - 1);
+  elNextBtn.textContent = isLast ? 'SEE RESULTS' : 'NEXT \u2192';
+  elNextBtn.onclick = isLast ? finishGame : nextItem;
+  elNextRow.style.display = 'flex';
+
+  setTimeout(function() {
+    elAnswerReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 120);
+}
+
+function buildAnswerReveal(guess, correct, pts, diff, cls, context) {
+  while (elAnswerReveal.firstChild) elAnswerReveal.removeChild(elAnswerReveal.firstChild);
+
+  // Year row
+  var yearRow = document.createElement('div');
+  yearRow.className = 'answer-year-row';
+
+  function makeCol(label, valText, valCls) {
+    var col = document.createElement('div');
+    col.className = 'answer-col';
+    var lbl = document.createElement('div');
+    lbl.className = 'answer-col-label';
+    lbl.textContent = label;
+    var val = document.createElement('div');
+    val.className = 'answer-col-val ' + valCls;
+    val.textContent = valText;
+    col.appendChild(lbl);
+    col.appendChild(val);
+    return col;
+  }
+
+  yearRow.appendChild(makeCol('YOUR GUESS', String(guess), 'your-year'));
+  yearRow.appendChild(makeCol('CORRECT YEAR', String(correct), 'correct-year'));
+  yearRow.appendChild(makeCol('POINTS', pts.toLocaleString(), 'pts-' + cls));
+  elAnswerReveal.appendChild(yearRow);
+
+  // Diff line
+  var diffLine = document.createElement('div');
+  diffLine.className = 'answer-diff-line';
+  var diffColor = diff === 0 ? '#39ff14' : (diff <= 5 ? '#ffd700' : (diff <= 15 ? '#ff8c00' : '#ff2d7b'));
+  diffLine.style.color = diffColor;
+  diffLine.textContent = diff === 0 ? 'Exact match!' : ('Off by ' + diff + ' year' + (diff !== 1 ? 's' : ''));
+  elAnswerReveal.appendChild(diffLine);
+
+  // Context
+  var ctxEl = document.createElement('div');
+  ctxEl.className = 'answer-context';
+  ctxEl.textContent = context;
+  elAnswerReveal.appendChild(ctxEl);
+}
+
+// ═══════════════════════════════════════
+// NEXT ITEM / FINISH
+// ═══════════════════════════════════════
+function nextItem() {
+  currentIndex++;
+  if (currentIndex >= ITEMS_PER_ROUND) { finishGame(); return; }
+  var activeDot = document.getElementById('dot_' + currentIndex);
+  if (activeDot && !activeDot.className.includes('done-')) activeDot.className = 'dot active';
+  loadItem(currentIndex);
+}
+
+function finishGame() {
+  localStorage.setItem(SK_PLAYED, TODAY_DAY);
+  localStorage.setItem(SK_SCORE, totalScore);
+  localStorage.setItem(SK_RESULTS, JSON.stringify(guesses));
+
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function() {
+    return Neon.save(totalScore);
+  }).then(function(result) {
+    Neon.render(elResultsLB);
+    if (result.globalRank >= 1 && result.globalRank <= 5) Neon.showGlobalSplash(result.globalRank);
+  }).catch(function() {
+    Neon.render(elResultsLB);
+  });
+
+  showResults(false);
+}
+
+// ═══════════════════════════════════════
+// RESULTS SCREEN
+// ═══════════════════════════════════════
+function showResults(fromSaved) {
+  if (fromSaved) {
+    var savedGuesses = JSON.parse(localStorage.getItem(SK_RESULTS) || '[]');
+    guesses = savedGuesses;
+    totalScore = parseInt(localStorage.getItem(SK_SCORE) || '0', 10);
+    dailyItems = getDailyItems();
+    Neon.render(elResultsLB);
+  }
+
+  var rating = getRating(totalScore);
+  elResultsDayLabel.textContent = 'PUZZLE #' + PUZZLE_NUM;
+  elTotalScore.textContent = totalScore.toLocaleString();
+  elRatingBadge.textContent = rating;
+  elRatingBadge.className = 'rating-badge ' + getRatingCls(rating);
+
+  // Breakdown
+  while (elBreakdownRows.firstChild) elBreakdownRows.removeChild(elBreakdownRows.firstChild);
+  for (var i = 0; i < guesses.length; i++) {
+    var g = guesses[i];
+    var item = dailyItems[i];
+    if (!item) continue;
+    var cls = scoreClass(g.pts);
+    var shortClue = item.clue.length > 60 ? item.clue.substring(0, 57) + '...' : item.clue;
+    var row = document.createElement('div');
+    row.className = 'breakdown-row';
+    row.style.animation = 'slideUp 0.4s ease-out ' + (i * 0.08) + 's both';
+
+    var clueCell = document.createElement('div');
+    clueCell.className = 'bd-clue';
+    clueCell.textContent = shortClue;
+
+    var guessCell = document.createElement('div');
+    guessCell.className = 'bd-val bd-guess';
+    guessCell.textContent = String(g.guess || '—');
+
+    var correctCell = document.createElement('div');
+    correctCell.className = 'bd-val bd-answer';
+    correctCell.textContent = String(g.correct || '—');
+
+    var ptsCell = document.createElement('div');
+    ptsCell.className = 'bd-val bd-pts-' + cls;
+    ptsCell.textContent = (g.pts || 0).toLocaleString();
+
+    row.appendChild(clueCell);
+    row.appendChild(guessCell);
+    row.appendChild(correctCell);
+    row.appendChild(ptsCell);
+    elBreakdownRows.appendChild(row);
+  }
+
+  // Share text
+  var emojiRow = guesses.map(function(g) { return scoreEmoji(g.pts); }).join('');
+  shareText =
+    '\uD83D\uDCC5 DECADE #' + PUZZLE_NUM + '\n' +
+    'Score: ' + totalScore.toLocaleString() + ' / 5,000 \u2014 ' + rating + '\n' +
+    emojiRow + '\n' +
+    'neonarcade.net/neonworld/decade.html';
+  elSharePreview.textContent = shareText;
+
+  showScreen('resultsScreen');
+}
+
+// ═══════════════════════════════════════
+// SHARE
+// ═══════════════════════════════════════
+function doShare() {
+  var onDone = function() {
+    elShareFeedback.classList.add('show');
+    setTimeout(function() { elShareFeedback.classList.remove('show'); }, 2500);
+  };
+  if (navigator.share) {
+    navigator.share({ text: shareText }).catch(function() { copyToClipboard(shareText, onDone); });
+  } else {
+    copyToClipboard(shareText, onDone);
+  }
+}
+function copyToClipboard(text, cb) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(cb).catch(function() { legacyCopy(text); cb(); });
+  } else { legacyCopy(text); cb(); }
+}
+function legacyCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+// ═══════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════
+var particleLayer = document.getElementById('particleLayer');
+function spawnParticles(color, count) {
+  for (var i = 0; i < count; i++) {
+    (function() {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var x = 20 + Math.random() * 60;
+      var y = 30 + Math.random() * 40;
+      var px = (Math.random() - 0.5) * 120;
+      var py = -60 - Math.random() * 80;
+      p.style.left = x + '%';
+      p.style.top = y + '%';
+      p.style.background = color;
+      p.style.boxShadow = '0 0 6px ' + color;
+      p.style.setProperty('--px', px + 'px');
+      p.style.setProperty('--py', py + 'px');
+      p.style.animationDuration = (0.6 + Math.random() * 0.5) + 's';
+      p.style.animationDelay = (Math.random() * 0.2) + 's';
+      particleLayer.appendChild(p);
+      setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 1200);
+    })();
+  }
+}
+function shakePage() {
+  var gs = document.getElementById('gameScreen');
+  gs.style.animation = 'shake 0.25s ease-out';
+  setTimeout(function() { gs.style.animation = ''; }, 280);
+}
+
+// ═══════════════════════════════════════
+// BUTTON WIRING
+// ═══════════════════════════════════════
+elStartBtn.addEventListener('click', startGame);
+elEscBtn.addEventListener('click', showStart);
+elSubmitBtn.addEventListener('click', submitGuess);
+elShareBtn.addEventListener('click', doShare);
+elPlayAgainBtn.addEventListener('click', showStart);
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+setupStartScreen();
+
+})();
+</script>
+</body>
+</html>

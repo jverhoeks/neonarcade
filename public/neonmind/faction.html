@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Faction — Free Online Daily Trivia Grid | NEON ARCADE</title>
+<meta name="description" content="Play Faction free online — daily intersection trivia grid. Name one thing that fits both categories. Rarity scoring rewards obscure answers. No download, no login.">
+<meta name="keywords" content="faction trivia grid, daily trivia game, intersection puzzle, free puzzle game online, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonmind/faction.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/faction.html">
+<meta property="og:title" content="Faction — Free Online Daily Trivia Grid | NEON ARCADE">
+<meta property="og:description" content="Play Faction free online — daily intersection trivia grid. Name one thing that fits both categories. Rarity scoring rewards obscure answers.">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/faction.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/faction.html">
+<meta name="twitter:title" content="Faction — Free Online Daily Trivia Grid | NEON ARCADE">
+<meta name="twitter:description" content="Daily intersection trivia grid. Name one thing that fits both categories. Rarity scoring rewards obscure answers.">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/faction.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Faction",
+  "url": "https://neonarcade.net/neonmind/faction.html",
+  "description": "Play Faction free online — daily intersection trivia grid. Name one thing that fits both categories. Rarity scoring rewards obscure answers.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonmind/screenshots/faction.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON MIND", "item": "https://neonarcade.net/neonmind/" },
+    { "@type": "ListItem", "position": 3, "name": "Faction", "item": "https://neonarcade.net/neonmind/faction.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  min-height: 100%;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow-x: hidden;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  15% { transform: translateX(-4px); }
+  30% { transform: translateX(4px); }
+  45% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+}
+@keyframes popIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes particleFly {
+  0% { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+}
+
+/* ===== SCREENS ===== */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; align-items: center; }
+
+/* ===== START SCREEN ===== */
+#startScreen {
+  justify-content: center;
+  padding: 40px 20px 80px;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0,240,255,0.07) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(180,77,255,0.07) 0%, transparent 60%);
+}
+.brand-tag {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #7a7a9a;
+  margin-bottom: 12px;
+}
+.start-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(42px, 8vw, 72px);
+  letter-spacing: 6px;
+  color: #00f0ff;
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.start-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #9999bb;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.daily-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #ffd700;
+  border: 1px solid rgba(255,215,0,0.4);
+  background: rgba(255,215,0,0.08);
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 28px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+.how-to {
+  max-width: 480px;
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(0,240,255,0.15);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+.how-to-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #00f0ff;
+  margin-bottom: 12px;
+}
+.how-to-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.how-to-list li {
+  font-size: 14px;
+  color: #9999bb;
+  padding-left: 18px;
+  position: relative;
+}
+.how-to-list li::before {
+  content: '\203A';
+  position: absolute;
+  left: 0;
+  color: #00f0ff;
+}
+.rarity-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.rarity-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #9999bb;
+}
+.rarity-stars { font-size: 12px; }
+.rarity-pts {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: #7a7a9a;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 48px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  margin-bottom: 20px;
+}
+.play-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+.play-btn:active { transform: scale(0.98); }
+.controls-hint {
+  font-size: 12px;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.leaderboard { width: 100%; max-width: 480px; }
+
+/* ===== GAME SCREEN ===== */
+#gameScreen {
+  padding: 16px 12px 40px;
+  background: radial-gradient(ellipse at 20% 10%, rgba(0,240,255,0.05) 0%, transparent 50%),
+              radial-gradient(ellipse at 85% 90%, rgba(255,45,123,0.05) 0%, transparent 50%);
+}
+.game-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 14px;
+}
+.top-back {
+  font-size: 18px;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #9999bb;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.top-back:hover { border-color: #00f0ff; color: #00f0ff; }
+.top-puzzle {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #00f0ff;
+  flex: 1;
+}
+.top-score-display {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+  letter-spacing: 1px;
+}
+
+/* ===== GRID ===== */
+.grid-wrapper {
+  width: 100%;
+  max-width: 640px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.faction-grid {
+  display: grid;
+  grid-template-columns: 110px repeat(3, 1fr);
+  grid-template-rows: auto repeat(3, 1fr);
+  gap: 6px;
+  min-width: 380px;
+  width: 100%;
+}
+.grid-corner { /* top-left empty */ }
+.col-label {
+  background: rgba(0,240,255,0.08);
+  border: 1px solid rgba(0,240,255,0.25);
+  border-radius: 6px;
+  padding: 10px 8px;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(9px, 1.5vw, 11px);
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #00f0ff;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+}
+.row-label {
+  background: rgba(180,77,255,0.08);
+  border: 1px solid rgba(180,77,255,0.25);
+  border-radius: 6px;
+  padding: 10px 8px;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(9px, 1.5vw, 11px);
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #b44dff;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+}
+.grid-cell {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  min-height: 90px;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.grid-cell:focus-within {
+  border-color: rgba(0,240,255,0.5);
+  background: rgba(0,240,255,0.04);
+}
+.grid-cell.state-valid {
+  border-color: rgba(57,255,20,0.6);
+  background: rgba(57,255,20,0.06);
+  animation: popIn 0.3s ease;
+}
+.grid-cell.state-invalid {
+  border-color: rgba(255,45,123,0.6);
+  background: rgba(255,45,123,0.06);
+  animation: shake 0.3s ease;
+}
+.cell-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
+  caret-color: #00f0ff;
+}
+.cell-input::placeholder { color: rgba(255,255,255,0.2); font-size: 13px; }
+.cell-input:disabled { opacity: 0.8; cursor: default; }
+.cell-stars {
+  text-align: center;
+  font-size: 14px;
+  min-height: 16px;
+  letter-spacing: 1px;
+}
+.cell-pts {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  text-align: center;
+  min-height: 14px;
+}
+.cell-hint {
+  font-size: 11px;
+  color: #9999bb;
+  text-align: center;
+  font-style: italic;
+  min-height: 14px;
+  line-height: 1.2;
+}
+
+/* Submit bar */
+.submit-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 640px;
+}
+.submit-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 13px 44px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.08);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.submit-btn:hover:not(:disabled) {
+  background: rgba(0,240,255,0.18);
+  box-shadow: 0 0 20px rgba(0,240,255,0.25);
+  transform: scale(1.03);
+}
+.submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.fill-progress {
+  font-size: 12px;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ===== COMPLETE SCREEN ===== */
+#completeScreen {
+  padding: 30px 16px 80px;
+  background: radial-gradient(ellipse at 50% 20%, rgba(57,255,20,0.06) 0%, transparent 60%);
+  align-items: center;
+}
+.complete-brand {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #7a7a9a;
+  margin-bottom: 10px;
+}
+.complete-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(30px, 6vw, 52px);
+  letter-spacing: 5px;
+  color: #39ff14;
+  text-shadow: 0 0 20px rgba(57,255,20,0.5), 0 0 60px rgba(57,255,20,0.15);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.complete-day {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.score-total {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 50px rgba(255,215,0,0.2);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.score-max {
+  font-size: 13px;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+/* Result grid recap */
+.result-grid {
+  display: grid;
+  grid-template-columns: 90px repeat(3, 1fr);
+  grid-template-rows: auto repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+.res-corner {}
+.res-col-lbl {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #00f0ff;
+  text-align: center;
+  padding: 6px 4px;
+  background: rgba(0,240,255,0.06);
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.res-row-lbl {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #b44dff;
+  text-align: center;
+  padding: 6px 4px;
+  background: rgba(180,77,255,0.06);
+  border-radius: 4px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.res-cell {
+  border-radius: 6px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 64px;
+  justify-content: center;
+}
+.res-cell.valid {
+  background: rgba(57,255,20,0.08);
+  border: 1px solid rgba(57,255,20,0.35);
+}
+.res-cell.invalid {
+  background: rgba(255,45,123,0.08);
+  border: 1px solid rgba(255,45,123,0.25);
+}
+.res-answer {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+  word-break: break-word;
+}
+.res-stars { font-size: 11px; }
+.res-pts {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: #ffd700;
+}
+.res-invalid-lbl {
+  font-size: 10px;
+  color: #ff2d7b;
+  font-style: italic;
+}
+.res-hint-lbl {
+  font-size: 10px;
+  color: #9999bb;
+  font-style: italic;
+}
+.complete-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.complete-stat { text-align: center; }
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+}
+.stat-lbl {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.share-btn {
+  border-color: #39ff14 !important;
+  color: #39ff14 !important;
+  background: rgba(57,255,20,0.06) !important;
+}
+.share-btn:hover {
+  background: rgba(57,255,20,0.15) !important;
+  box-shadow: 0 0 20px rgba(57,255,20,0.2) !important;
+}
+.menu-btn {
+  border-color: #7a7a9a !important;
+  color: #9999bb !important;
+  background: transparent !important;
+}
+.menu-btn:hover {
+  border-color: #9999bb !important;
+  background: rgba(255,255,255,0.05) !important;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(0,240,255,0.15);
+  border: 1px solid rgba(0,240,255,0.4);
+  color: #00f0ff;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: all 0.25s;
+  pointer-events: none;
+  z-index: 10000;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* More games bar */
+.na-more-games {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10,10,18,0.95);
+  border-top: 1px solid rgba(0,240,255,0.15);
+  z-index: 200;
+  padding: 8px 0;
+}
+.na-more-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.na-more-inner::-webkit-scrollbar { display: none; }
+.na-more-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.na-more-link {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #9999bb;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.na-more-link:hover { color: #00f0ff; }
+.na-more-hub { color: #00f0ff !important; font-weight: 700; }
+
+/* Particles */
+.particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5000;
+  animation: particleFly 0.8s ease-out forwards;
+}
+
+@media (max-width: 480px) {
+  .faction-grid {
+    grid-template-columns: 80px repeat(3, 1fr);
+    min-width: 320px;
+    gap: 4px;
+  }
+  .col-label, .row-label {
+    font-size: 9px;
+    padding: 8px 4px;
+    min-height: 44px;
+    letter-spacing: 0.5px;
+  }
+  .grid-cell {
+    min-height: 80px;
+    padding: 8px 6px 6px;
+  }
+  .cell-input { font-size: 13px; }
+  .complete-title { font-size: 28px; }
+  .score-total { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="brand-tag">NEON MIND</div>
+  <h1 class="start-title">FACTION</h1>
+  <p class="start-subtitle">Daily Intersection Grid</p>
+  <div class="daily-badge" id="dailyBadge">PUZZLE #1</div>
+
+  <div class="how-to">
+    <div class="how-to-title">HOW TO PLAY</div>
+    <ul class="how-to-list">
+      <li>Fill each cell with something that fits BOTH its row AND column</li>
+      <li>Obscure answers score higher — common picks score less</li>
+      <li>One attempt per cell — choose wisely</li>
+      <li>New puzzle every day at midnight</li>
+    </ul>
+  </div>
+
+  <div class="rarity-legend">
+    <div class="rarity-item"><span class="rarity-stars">&#11088;</span><span>Common</span><span class="rarity-pts">100</span></div>
+    <div class="rarity-item"><span class="rarity-stars">&#11088;&#11088;</span><span>Uncommon</span><span class="rarity-pts">250</span></div>
+    <div class="rarity-item"><span class="rarity-stars">&#11088;&#11088;&#11088;</span><span>Rare</span><span class="rarity-pts">500</span></div>
+    <div class="rarity-item"><span class="rarity-stars">&#11088;&#11088;&#11088;&#11088;</span><span>Legendary</span><span class="rarity-pts">1000</span></div>
+  </div>
+
+  <button class="play-btn" id="startBtn">PLAY TODAY</button>
+  <div class="controls-hint">Type &bull; Tab to next &bull; Enter to advance &bull; ESC to quit</div>
+  <div class="leaderboard" id="startLB"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="game-top-bar">
+    <button class="top-back" id="backBtn" title="Back to menu">&#8592;</button>
+    <div class="top-puzzle" id="topPuzzle">FACTION #1</div>
+    <div class="top-score-display" id="topScore">0 pts</div>
+  </div>
+
+  <div class="grid-wrapper">
+    <div class="faction-grid" id="factionGrid"></div>
+  </div>
+
+  <div class="submit-bar">
+    <div class="fill-progress" id="fillProgress">0 / 9 filled</div>
+    <button class="submit-btn" id="submitBtn" disabled>SUBMIT ANSWERS</button>
+  </div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div class="screen" id="completeScreen">
+  <div class="complete-brand">NEON MIND</div>
+  <h2 class="complete-title" id="completeTitle">COMPLETE</h2>
+  <div class="complete-day" id="completeDay">FACTION #1</div>
+  <div class="score-total" id="scoreTotal">0</div>
+  <div class="score-max">/ 9,000 pts</div>
+  <div class="result-grid" id="resultGrid"></div>
+  <div class="complete-stats">
+    <div class="complete-stat"><div class="stat-val" id="statValid">0</div><div class="stat-lbl">Correct</div></div>
+    <div class="complete-stat"><div class="stat-val" id="statRare">0</div><div class="stat-lbl">Rare+</div></div>
+    <div class="complete-stat"><div class="stat-val" id="statBest" style="color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.4)">--</div><div class="stat-lbl">Best</div></div>
+  </div>
+  <div class="btn-row">
+    <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn menu-btn" id="menuBtn">MENU</button>
+  </div>
+  <div class="leaderboard" id="completeLB"></div>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<div class="na-more-games">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE NEON MIND</div>
+    <a href="/neonmind/" class="na-more-link na-more-hub">All Puzzles</a>
+    <a href="connections.html" class="na-more-link">Connections</a>
+    <a href="sudoku.html" class="na-more-link">Sudoku</a>
+    <a href="queens.html" class="na-more-link">Queens</a>
+    <a href="hitori.html" class="na-more-link">Hitori</a>
+    <a href="kenken.html" class="na-more-link">KenKen</a>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ===== PUZZLE DATA =====
+  // Rarity: 1=Common(100pts), 2=Uncommon(250pts), 3=Rare(500pts), 4=Legendary(1000pts)
+  // Each cell: { a: [valid answers], r: { answer: rarityNum } }
+  var PUZZLES = [
+    // 0: French/German/British x Scientist/Artist/Author
+    {
+      rows: ['French', 'German', 'British'],
+      cols: ['Scientist', 'Artist', 'Author'],
+      cells: [
+        { a: ['marie curie','curie','pasteur','louis pasteur','lavoisier','pierre curie','ampere','laplace','fresnel'],
+          r: {'marie curie':1,'curie':1,'pasteur':2,'louis pasteur':2,'lavoisier':3,'pierre curie':3,'ampere':3,'laplace':4,'fresnel':4} },
+        { a: ['monet','renoir','degas','cezanne','gauguin','seurat','matisse','courbet','delacroix'],
+          r: {'monet':1,'renoir':1,'degas':2,'cezanne':2,'gauguin':3,'seurat':3,'matisse':2,'courbet':3,'delacroix':3} },
+        { a: ['victor hugo','hugo','proust','flaubert','balzac','camus','sartre','voltaire','zola','dumas','moliere'],
+          r: {'victor hugo':1,'hugo':1,'proust':2,'flaubert':2,'balzac':2,'camus':2,'sartre':3,'voltaire':3,'zola':2,'dumas':3,'moliere':3} },
+        { a: ['einstein','heisenberg','planck','gauss','kepler','leibniz','fahrenheit','bunsen','ohm'],
+          r: {'einstein':1,'heisenberg':2,'planck':2,'gauss':3,'kepler':3,'leibniz':3,'fahrenheit':4,'bunsen':4,'ohm':4} },
+        { a: ['durer','holbein','cranach','ernst','beckmann','grosz','kirchner','nolde'],
+          r: {'durer':2,'holbein':2,'cranach':3,'ernst':3,'beckmann':3,'grosz':3,'kirchner':4,'nolde':4} },
+        { a: ['goethe','kafka','hesse','schiller','nietzsche','mann','brecht','rilke','grass'],
+          r: {'goethe':1,'kafka':1,'hesse':2,'schiller':2,'nietzsche':3,'mann':2,'brecht':3,'rilke':3,'grass':3} },
+        { a: ['newton','darwin','faraday','hawking','turing','boyle','hooke','maxwell','kelvin'],
+          r: {'newton':1,'darwin':1,'faraday':2,'hawking':2,'turing':3,'boyle':3,'hooke':3,'maxwell':3,'kelvin':4} },
+        { a: ['turner','constable','hockney','bacon','banksy','freud','lowry','hogarth'],
+          r: {'turner':2,'constable':2,'hockney':3,'bacon':3,'banksy':2,'freud':3,'lowry':3,'hogarth':3} },
+        { a: ['shakespeare','dickens','orwell','tolkien','rowling','austen','hardy','wilde','chaucer','kipling','woolf'],
+          r: {'shakespeare':1,'dickens':1,'orwell':1,'tolkien':2,'rowling':1,'austen':1,'hardy':2,'wilde':2,'chaucer':3,'kipling':3,'woolf':3} }
+      ]
+    },
+    // 1: 19th Century/20th Century/Ancient x Philosopher/Inventor/Explorer
+    {
+      rows: ['19th Century', '20th Century', 'Ancient'],
+      cols: ['Philosopher', 'Inventor', 'Explorer'],
+      cells: [
+        { a: ['nietzsche','kierkegaard','mill','schopenhauer','hegel','marx','comte','spencer'],
+          r: {'nietzsche':2,'kierkegaard':2,'mill':2,'schopenhauer':3,'hegel':3,'marx':1,'comte':3,'spencer':4} },
+        { a: ['edison','tesla','bell','morse','marconi','diesel','benz','wright brothers','wright'],
+          r: {'edison':1,'tesla':2,'bell':2,'morse':3,'marconi':3,'diesel':3,'benz':3,'wright brothers':2,'wright':2} },
+        { a: ['livingstone','stanley','burke','speke','amundsen','scott','shackleton','burton'],
+          r: {'livingstone':2,'stanley':2,'burke':3,'speke':3,'amundsen':2,'scott':2,'shackleton':3,'burton':3} },
+        { a: ['wittgenstein','heidegger','sartre','russell','camus','de beauvoir','popper','dewey'],
+          r: {'wittgenstein':2,'heidegger':3,'sartre':2,'russell':2,'camus':2,'de beauvoir':3,'popper':3,'dewey':3} },
+        { a: ['turing','fleming','gates','jobs','berners-lee','curie','einstein','watson','crick'],
+          r: {'turing':2,'fleming':2,'gates':1,'jobs':1,'berners-lee':3,'curie':2,'einstein':2,'watson':3,'crick':3} },
+        { a: ['amundsen','scott','hillary','shackleton','byrd','heyerdahl','cousteau','earhart'],
+          r: {'amundsen':2,'scott':2,'hillary':2,'shackleton':2,'byrd':3,'heyerdahl':3,'cousteau':3,'earhart':3} },
+        { a: ['socrates','plato','aristotle','epicurus','pythagoras','heraclitus','zeno'],
+          r: {'socrates':1,'plato':1,'aristotle':1,'epicurus':2,'pythagoras':2,'heraclitus':3,'zeno':3} },
+        { a: ['archimedes','hero','ctesibius','euclid','vitruvius'],
+          r: {'archimedes':2,'hero':3,'ctesibius':4,'euclid':3,'vitruvius':4} },
+        { a: ['pytheas','hanno','alexander','herodotus','strabo','nearchus'],
+          r: {'pytheas':3,'hanno':3,'alexander':1,'herodotus':2,'strabo':3,'nearchus':4} }
+      ]
+    },
+    // 2: American/Japanese/Russian x Athlete/Musician/Film Director
+    {
+      rows: ['American', 'Japanese', 'Russian'],
+      cols: ['Athlete', 'Musician', 'Film Director'],
+      cells: [
+        { a: ['michael jordan','lebron james','ali','muhammad ali','serena williams','babe ruth','tiger woods','jordan'],
+          r: {'michael jordan':1,'lebron james':1,'ali':1,'muhammad ali':1,'serena williams':1,'babe ruth':2,'tiger woods':1,'jordan':1} },
+        { a: ['elvis presley','bob dylan','beyonce','michael jackson','bruce springsteen','madonna','jimi hendrix','johnny cash'],
+          r: {'elvis presley':1,'bob dylan':1,'beyonce':1,'michael jackson':1,'bruce springsteen':2,'madonna':1,'jimi hendrix':2,'johnny cash':2} },
+        { a: ['spielberg','kubrick','scorsese','tarantino','coppola','lynch','ford','welles'],
+          r: {'spielberg':1,'kubrick':2,'scorsese':2,'tarantino':2,'coppola':2,'lynch':3,'ford':3,'welles':3} },
+        { a: ['ichiro','shohei ohtani','ohtani','naomi osaka','osaka','hideki matsui'],
+          r: {'ichiro':2,'shohei ohtani':2,'ohtani':2,'naomi osaka':2,'osaka':2,'hideki matsui':3} },
+        { a: ['ryuichi sakamoto','sakamoto','yoko ono','hikaru utada','utada','joe hisaishi','hisaishi'],
+          r: {'ryuichi sakamoto':3,'sakamoto':3,'yoko ono':2,'hikaru utada':3,'utada':3,'joe hisaishi':3,'hisaishi':3} },
+        { a: ['akira kurosawa','kurosawa','hayao miyazaki','miyazaki','yasujiro ozu','ozu','takeshi kitano','kitano'],
+          r: {'akira kurosawa':2,'kurosawa':2,'hayao miyazaki':2,'miyazaki':2,'yasujiro ozu':3,'ozu':3,'takeshi kitano':3,'kitano':3} },
+        { a: ['alex ovechkin','ovechkin','maria sharapova','sharapova','garry kasparov','kasparov'],
+          r: {'alex ovechkin':2,'ovechkin':2,'maria sharapova':2,'sharapova':2,'garry kasparov':3,'kasparov':3} },
+        { a: ['tchaikovsky','rachmaninoff','stravinsky','shostakovich','prokofiev','rimsky-korsakov','mussorgsky'],
+          r: {'tchaikovsky':1,'rachmaninoff':2,'stravinsky':2,'shostakovich':2,'prokofiev':3,'rimsky-korsakov':3,'mussorgsky':3} },
+        { a: ['andrei tarkovsky','tarkovsky','eisenstein','nikita mikhalkov','mikhalkov','zvyagintsev'],
+          r: {'andrei tarkovsky':3,'tarkovsky':3,'eisenstein':2,'nikita mikhalkov':3,'mikhalkov':3,'zvyagintsev':4} }
+      ]
+    },
+    // 3: Mammal/Bird/Fish x Endangered/Domesticated/Nocturnal
+    {
+      rows: ['Mammal', 'Bird', 'Fish'],
+      cols: ['Endangered', 'Domesticated', 'Nocturnal'],
+      cells: [
+        { a: ['panda','giant panda','tiger','rhino','rhinoceros','gorilla','snow leopard','amur leopard'],
+          r: {'panda':1,'giant panda':1,'tiger':1,'rhino':1,'rhinoceros':1,'gorilla':2,'snow leopard':2,'amur leopard':3} },
+        { a: ['dog','cat','horse','cow','pig','sheep','goat','rabbit','hamster'],
+          r: {'dog':1,'cat':1,'horse':1,'cow':1,'pig':1,'sheep':1,'goat':1,'rabbit':1,'hamster':1} },
+        { a: ['bat','hedgehog','raccoon','opossum','badger','aye-aye','bushbaby','aardvark'],
+          r: {'bat':1,'hedgehog':2,'raccoon':2,'opossum':2,'badger':2,'aye-aye':3,'bushbaby':3,'aardvark':3} },
+        { a: ['california condor','whooping crane','kakapo','spix macaw','philippine eagle'],
+          r: {'california condor':2,'whooping crane':2,'kakapo':3,'spix macaw':3,'philippine eagle':3} },
+        { a: ['chicken','duck','turkey','goose','pigeon','canary','parrot','dove'],
+          r: {'chicken':1,'duck':1,'turkey':1,'goose':1,'pigeon':1,'canary':1,'parrot':1,'dove':2} },
+        { a: ['owl','nightjar','nighthawk','tawny frogmouth','kiwi','barn owl'],
+          r: {'owl':1,'nightjar':2,'nighthawk':3,'tawny frogmouth':3,'kiwi':3,'barn owl':2} },
+        { a: ['coelacanth','sawfish','pallid sturgeon','atlantic cod','bluefin tuna'],
+          r: {'coelacanth':3,'sawfish':3,'pallid sturgeon':3,'atlantic cod':2,'bluefin tuna':2} },
+        { a: ['goldfish','koi','salmon','trout','carp','tilapia','catfish'],
+          r: {'goldfish':1,'koi':2,'salmon':1,'trout':1,'carp':1,'tilapia':2,'catfish':2} },
+        { a: ['oilfish','lanternfish','moray eel','dragonfish','anglerfish','flashlight fish'],
+          r: {'oilfish':3,'lanternfish':3,'moray eel':2,'dragonfish':4,'anglerfish':3,'flashlight fish':4} }
+      ]
+    },
+    // 4: Rock/Classical/Jazz x American/British/European
+    {
+      rows: ['Rock', 'Classical', 'Jazz'],
+      cols: ['American', 'British', 'European'],
+      cells: [
+        { a: ['bruce springsteen','jimi hendrix','tom petty','nirvana','metallica','pearl jam','the doors','grateful dead'],
+          r: {'bruce springsteen':2,'jimi hendrix':2,'tom petty':2,'nirvana':1,'metallica':2,'pearl jam':2,'the doors':3,'grateful dead':3} },
+        { a: ['the beatles','rolling stones','led zeppelin','pink floyd','queen','david bowie','the who','sex pistols'],
+          r: {'the beatles':1,'rolling stones':1,'led zeppelin':2,'pink floyd':2,'queen':2,'david bowie':2,'the who':3,'sex pistols':3} },
+        { a: ['kraftwerk','can','tangerine dream','rammstein','scorpions','abba'],
+          r: {'kraftwerk':2,'can':3,'tangerine dream':3,'rammstein':2,'scorpions':3,'abba':2} },
+        { a: ['aaron copland','samuel barber','leonard bernstein','john cage','philip glass','charles ives'],
+          r: {'aaron copland':2,'samuel barber':3,'leonard bernstein':2,'john cage':3,'philip glass':2,'charles ives':3} },
+        { a: ['edward elgar','benjamin britten','ralph vaughan williams','william walton','thomas tallis'],
+          r: {'edward elgar':2,'benjamin britten':2,'ralph vaughan williams':3,'william walton':3,'thomas tallis':3} },
+        { a: ['beethoven','mozart','bach','brahms','chopin','debussy','tchaikovsky','liszt','wagner'],
+          r: {'beethoven':1,'mozart':1,'bach':1,'brahms':2,'chopin':2,'debussy':2,'liszt':3,'wagner':3} },
+        { a: ['miles davis','john coltrane','louis armstrong','duke ellington','charlie parker','thelonious monk'],
+          r: {'miles davis':1,'john coltrane':2,'louis armstrong':1,'duke ellington':2,'charlie parker':2,'thelonious monk':3} },
+        { a: ['john surman','tubby hayes','ronnie scott','evan parker'],
+          r: {'john surman':4,'tubby hayes':3,'ronnie scott':3,'evan parker':4} },
+        { a: ['django reinhardt','stephane grappelli','michel petrucciani','toots thielemans'],
+          r: {'django reinhardt':2,'stephane grappelli':3,'michel petrucciani':3,'toots thielemans':3} }
+      ]
+    },
+    // 5: Comedy/Drama/Action x 1980s/1990s/2000s (movies)
+    {
+      rows: ['Comedy Film', 'Drama Film', 'Action Film'],
+      cols: ['1980s', '1990s', '2000s'],
+      cells: [
+        { a: ['ghostbusters','back to the future','beetlejuice','spaceballs','airplane','big'],
+          r: {'ghostbusters':1,'back to the future':1,'beetlejuice':2,'spaceballs':2,'airplane':2,'big':2} },
+        { a: ['home alone','dumb and dumber','groundhog day','mrs doubtfire','the mask','clueless'],
+          r: {'home alone':1,'dumb and dumber':2,'groundhog day':2,'mrs doubtfire':2,'the mask':2,'clueless':3} },
+        { a: ['the hangover','superbad','knocked up','juno','little miss sunshine','step brothers'],
+          r: {'the hangover':2,'superbad':2,'knocked up':2,'juno':2,'little miss sunshine':3,'step brothers':3} },
+        { a: ['platoon','raging bull','ordinary people','tootsie','terms of endearment'],
+          r: {'platoon':2,'raging bull':2,'ordinary people':3,'tootsie':3,'terms of endearment':3} },
+        { a: ['schindlers list','pulp fiction','the shawshank redemption','forrest gump','silence of the lambs','goodfellas'],
+          r: {'schindlers list':1,'pulp fiction':1,'the shawshank redemption':1,'forrest gump':1,'silence of the lambs':1,'goodfellas':2} },
+        { a: ['no country for old men','there will be blood','the departed','brokeback mountain','million dollar baby'],
+          r: {'no country for old men':2,'there will be blood':2,'the departed':2,'brokeback mountain':2,'million dollar baby':3} },
+        { a: ['die hard','predator','lethal weapon','robocop','the terminator','beverly hills cop'],
+          r: {'die hard':1,'predator':2,'lethal weapon':2,'robocop':3,'the terminator':2,'beverly hills cop':3} },
+        { a: ['the matrix','gladiator','braveheart','speed','mission impossible','the rock'],
+          r: {'the matrix':1,'gladiator':1,'braveheart':1,'speed':2,'mission impossible':2,'the rock':2} },
+        { a: ['the dark knight','iron man','casino royale','batman begins','bourne identity','kill bill'],
+          r: {'the dark knight':1,'iron man':1,'casino royale':2,'batman begins':2,'bourne identity':2,'kill bill':2} }
+      ]
+    },
+    // 6: Nobel Prize/Oscar/Grammy x American/British/French
+    {
+      rows: ['Nobel Prize', 'Oscar Winner', 'Grammy Winner'],
+      cols: ['American', 'British', 'French'],
+      cells: [
+        { a: ['hemingway','steinbeck','toni morrison','faulkner','sinclair lewis','eugene oneill','pearl buck'],
+          r: {'hemingway':1,'steinbeck':2,'toni morrison':2,'faulkner':2,'sinclair lewis':3,'eugene oneill':3,'pearl buck':3} },
+        { a: ['harold pinter','rudyard kipling','william golding','doris lessing','v s naipaul'],
+          r: {'harold pinter':2,'rudyard kipling':2,'william golding':3,'doris lessing':3,'v s naipaul':3} },
+        { a: ['albert camus','camus','jean paul sartre','sartre','patrick modiano'],
+          r: {'albert camus':1,'camus':1,'jean paul sartre':2,'sartre':2,'patrick modiano':3} },
+        { a: ['meryl streep','katharine hepburn','jack nicholson','daniel day-lewis','audrey hepburn'],
+          r: {'meryl streep':1,'katharine hepburn':2,'jack nicholson':2,'daniel day-lewis':2,'audrey hepburn':2} },
+        { a: ['vivien leigh','charlie chaplin','anthony hopkins','helen mirren','peter sellers'],
+          r: {'vivien leigh':2,'charlie chaplin':2,'anthony hopkins':2,'helen mirren':2,'peter sellers':3} },
+        { a: ['marion cotillard','jean dujardin','emmanuelle riva','isabelle huppert'],
+          r: {'marion cotillard':2,'jean dujardin':3,'emmanuelle riva':3,'isabelle huppert':3} },
+        { a: ['beyonce','taylor swift','michael jackson','stevie wonder','adele','jay z'],
+          r: {'beyonce':1,'taylor swift':1,'michael jackson':1,'stevie wonder':2,'adele':1,'jay z':2} },
+        { a: ['adele','coldplay','the beatles','sam smith','george michael','elton john'],
+          r: {'adele':1,'coldplay':2,'the beatles':2,'sam smith':2,'george michael':2,'elton john':2} },
+        { a: ['daft punk','david guetta','charlotte gainsbourg','stromae'],
+          r: {'daft punk':2,'david guetta':2,'charlotte gainsbourg':3,'stromae':4} }
+      ]
+    },
+    // 7: Red/Blue/Yellow x Fruit/Flower/Animal
+    {
+      rows: ['Red', 'Blue', 'Yellow'],
+      cols: ['Fruit', 'Flower', 'Animal'],
+      cells: [
+        { a: ['strawberry','apple','cherry','raspberry','watermelon','tomato','pomegranate'],
+          r: {'strawberry':1,'apple':1,'cherry':1,'raspberry':1,'watermelon':2,'tomato':1,'pomegranate':3} },
+        { a: ['rose','poppy','tulip','carnation','hibiscus','geranium','begonia'],
+          r: {'rose':1,'poppy':2,'tulip':2,'carnation':2,'hibiscus':2,'geranium':3,'begonia':3} },
+        { a: ['ladybug','cardinal','flamingo','red panda','scarlet macaw'],
+          r: {'ladybug':2,'cardinal':2,'flamingo':2,'red panda':2,'scarlet macaw':3} },
+        { a: ['blueberry','damson','elderberry','blackberry'],
+          r: {'blueberry':1,'damson':3,'elderberry':3,'blackberry':2} },
+        { a: ['bluebell','hydrangea','iris','morning glory','delphinium','forget-me-not','cornflower'],
+          r: {'bluebell':2,'hydrangea':2,'iris':2,'morning glory':2,'delphinium':3,'forget-me-not':3,'cornflower':3} },
+        { a: ['blue jay','peacock','morpho butterfly','blue tang','blue whale','indigo bunting'],
+          r: {'blue jay':2,'peacock':1,'morpho butterfly':3,'blue tang':3,'blue whale':2,'indigo bunting':4} },
+        { a: ['banana','lemon','pineapple','mango','papaya','starfruit','yuzu'],
+          r: {'banana':1,'lemon':1,'pineapple':1,'mango':1,'papaya':2,'starfruit':3,'yuzu':3} },
+        { a: ['sunflower','daffodil','marigold','buttercup','dandelion','forsythia','mimosa'],
+          r: {'sunflower':1,'daffodil':1,'marigold':2,'buttercup':2,'dandelion':2,'forsythia':3,'mimosa':3} },
+        { a: ['canary','goldfinch','bumblebee','cheetah','golden poison frog','swallowtail'],
+          r: {'canary':1,'goldfinch':2,'bumblebee':2,'cheetah':2,'golden poison frog':3,'swallowtail':3} }
+      ]
+    },
+    // 8: Mountain/Ocean/Desert x Africa/Asia/Americas
+    {
+      rows: ['Mountain', 'Ocean/Sea', 'Desert'],
+      cols: ['Africa', 'Asia', 'Americas'],
+      cells: [
+        { a: ['kilimanjaro','mount kenya','atlas mountains','drakensberg','rwenzori'],
+          r: {'kilimanjaro':1,'mount kenya':2,'atlas mountains':2,'drakensberg':3,'rwenzori':3} },
+        { a: ['everest','k2','himalayas','kangchenjunga','lhotse','makalu'],
+          r: {'everest':1,'k2':2,'himalayas':2,'kangchenjunga':3,'lhotse':3,'makalu':4} },
+        { a: ['andes','rockies','aconcagua','appalachians','sierra nevada'],
+          r: {'andes':1,'rockies':1,'aconcagua':2,'appalachians':2,'sierra nevada':2} },
+        { a: ['indian ocean','red sea','gulf of guinea','mozambique channel'],
+          r: {'indian ocean':1,'red sea':2,'gulf of guinea':3,'mozambique channel':2} },
+        { a: ['south china sea','bay of bengal','arabian sea','yellow sea','sea of japan'],
+          r: {'south china sea':2,'bay of bengal':2,'arabian sea':2,'yellow sea':3,'sea of japan':3} },
+        { a: ['pacific ocean','atlantic ocean','caribbean sea','gulf of mexico','bering sea'],
+          r: {'pacific ocean':1,'atlantic ocean':1,'caribbean sea':2,'gulf of mexico':2,'bering sea':3} },
+        { a: ['sahara','kalahari','namib','danakil'],
+          r: {'sahara':1,'kalahari':2,'namib':2,'danakil':3} },
+        { a: ['gobi','arabian desert','thar','taklamakan','syrian desert'],
+          r: {'gobi':1,'arabian desert':2,'thar':2,'taklamakan':3,'syrian desert':3} },
+        { a: ['atacama','mojave','sonoran','patagonian','chihuahuan'],
+          r: {'atacama':2,'mojave':2,'sonoran':2,'patagonian':3,'chihuahuan':3} }
+      ]
+    },
+    // 9: Winter/Summer/Spring x Olympic Sport/Seasonal Food/Cultural Festival
+    {
+      rows: ['Winter', 'Summer', 'Spring'],
+      cols: ['Olympic Sport', 'Seasonal Food', 'Cultural Festival'],
+      cells: [
+        { a: ['skiing','ice hockey','figure skating','biathlon','bobsled','luge','curling','speed skating'],
+          r: {'skiing':1,'ice hockey':1,'figure skating':1,'biathlon':2,'bobsled':2,'luge':2,'curling':3,'speed skating':2} },
+        { a: ['christmas cake','mulled wine','turkey','mince pie','gingerbread','eggnog','panettone'],
+          r: {'christmas cake':2,'mulled wine':2,'turkey':1,'mince pie':2,'gingerbread':2,'eggnog':3,'panettone':3} },
+        { a: ['christmas','hanukkah','winter solstice','yule','kwanzaa','dongzhi'],
+          r: {'christmas':1,'hanukkah':1,'winter solstice':2,'yule':3,'kwanzaa':3,'dongzhi':3} },
+        { a: ['swimming','diving','athletics','gymnastics','tennis','rowing','volleyball'],
+          r: {'swimming':1,'diving':1,'athletics':1,'gymnastics':1,'tennis':1,'rowing':2,'volleyball':2} },
+        { a: ['ice cream','watermelon','barbecue','lemonade','strawberries'],
+          r: {'ice cream':1,'watermelon':1,'barbecue':1,'lemonade':2,'strawberries':2} },
+        { a: ['mardi gras','carnival','bastille day','fourth of july','holi','songkran'],
+          r: {'mardi gras':2,'carnival':2,'bastille day':2,'fourth of july':1,'holi':2,'songkran':3} },
+        { a: ['archery','triathlon','cycling','equestrian','fencing','pentathlon'],
+          r: {'archery':2,'triathlon':2,'cycling':2,'equestrian':3,'fencing':3,'pentathlon':3} },
+        { a: ['asparagus','lamb','strawberry','peas','artichoke','rhubarb','morel'],
+          r: {'asparagus':2,'lamb':2,'strawberry':2,'peas':2,'artichoke':3,'rhubarb':2,'morel':3} },
+        { a: ['easter','hanami','cherry blossom festival','nowruz','beltane','mothers day'],
+          r: {'easter':1,'hanami':2,'cherry blossom festival':2,'nowruz':3,'beltane':3,'mothers day':1} }
+      ]
+    },
+    // 10: Greek/Roman/Egyptian x God/Structure/Ruler
+    {
+      rows: ['Greek', 'Roman', 'Egyptian'],
+      cols: ['God or Goddess', 'Structure or Monument', 'Ruler or Pharaoh'],
+      cells: [
+        { a: ['zeus','athena','apollo','aphrodite','hermes','ares','poseidon','hera','artemis','dionysus'],
+          r: {'zeus':1,'athena':1,'apollo':1,'aphrodite':1,'hermes':2,'ares':2,'poseidon':2,'hera':2,'artemis':2,'dionysus':3} },
+        { a: ['parthenon','acropolis','temple of zeus','olympia','erechtheion'],
+          r: {'parthenon':1,'acropolis':1,'temple of zeus':2,'olympia':2,'erechtheion':3} },
+        { a: ['alexander','pericles','solon','leonidas','cleisthenes','themistocles'],
+          r: {'alexander':1,'pericles':2,'solon':2,'leonidas':2,'cleisthenes':3,'themistocles':3} },
+        { a: ['jupiter','juno','mars','venus','mercury','neptune','minerva','diana','bacchus','vulcan'],
+          r: {'jupiter':1,'juno':1,'mars':1,'venus':1,'mercury':2,'neptune':2,'minerva':2,'diana':2,'bacchus':3,'vulcan':3} },
+        { a: ['colosseum','pantheon','roman forum','aqueduct','circus maximus'],
+          r: {'colosseum':1,'pantheon':2,'roman forum':2,'aqueduct':3,'circus maximus':3} },
+        { a: ['caesar','augustus','nero','hadrian','marcus aurelius','trajan','constantine'],
+          r: {'caesar':1,'augustus':1,'nero':2,'hadrian':2,'marcus aurelius':2,'trajan':3,'constantine':2} },
+        { a: ['ra','osiris','isis','anubis','horus','thoth','seth','bastet','hathor','amun'],
+          r: {'ra':1,'osiris':1,'isis':1,'anubis':1,'horus':2,'thoth':2,'seth':2,'bastet':2,'hathor':3,'amun':3} },
+        { a: ['pyramids','sphinx','abu simbel','valley of the kings','luxor temple','karnak'],
+          r: {'pyramids':1,'sphinx':1,'abu simbel':2,'valley of the kings':2,'luxor temple':2,'karnak':2} },
+        { a: ['cleopatra','ramesses','tutankhamun','nefertiti','akhenaten','hatshepsut','thutmose'],
+          r: {'cleopatra':1,'ramesses':1,'tutankhamun':1,'nefertiti':2,'akhenaten':2,'hatshepsut':3,'thutmose':3} }
+      ]
+    },
+    // 11: Jazz/Blues/Soul x Solo Male/Solo Female/Band
+    {
+      rows: ['Jazz', 'Blues', 'Soul or R&B'],
+      cols: ['Solo Male', 'Solo Female', 'Band or Group'],
+      cells: [
+        { a: ['miles davis','john coltrane','charlie parker','chet baker','thelonious monk','herbie hancock','dizzy gillespie'],
+          r: {'miles davis':1,'john coltrane':2,'charlie parker':2,'chet baker':2,'thelonious monk':3,'herbie hancock':3,'dizzy gillespie':3} },
+        { a: ['billie holiday','ella fitzgerald','sarah vaughan','nina simone','diana krall','norah jones'],
+          r: {'billie holiday':1,'ella fitzgerald':1,'sarah vaughan':2,'nina simone':2,'diana krall':2,'norah jones':2} },
+        { a: ['dave brubeck quartet','modern jazz quartet','weather report','jazz messengers'],
+          r: {'dave brubeck quartet':2,'modern jazz quartet':3,'weather report':3,'jazz messengers':4} },
+        { a: ['bb king','muddy waters','robert johnson','john lee hooker','bo diddley','howlin wolf'],
+          r: {'bb king':1,'muddy waters':2,'robert johnson':2,'john lee hooker':2,'bo diddley':3,'howlin wolf':3} },
+        { a: ['bessie smith','ma rainey','sister rosetta tharpe','big mama thornton','etta james','koko taylor'],
+          r: {'bessie smith':2,'ma rainey':2,'sister rosetta tharpe':3,'big mama thornton':3,'etta james':2,'koko taylor':3} },
+        { a: ['rolling stones','led zeppelin','canned heat','cream','the animals','the allman brothers'],
+          r: {'rolling stones':2,'led zeppelin':2,'canned heat':3,'cream':2,'the animals':2,'the allman brothers':3} },
+        { a: ['marvin gaye','stevie wonder','james brown','otis redding','al green','sam cooke'],
+          r: {'marvin gaye':1,'stevie wonder':1,'james brown':1,'otis redding':2,'al green':2,'sam cooke':2} },
+        { a: ['aretha franklin','tina turner','whitney houston','diana ross','mary j blige','erykah badu','lauryn hill'],
+          r: {'aretha franklin':1,'tina turner':1,'whitney houston':1,'diana ross':2,'mary j blige':2,'erykah badu':2,'lauryn hill':2} },
+        { a: ['earth wind and fire','the temptations','four tops','boyz ii men','destinys child','en vogue'],
+          r: {'earth wind and fire':2,'the temptations':2,'four tops':2,'boyz ii men':2,'destinys child':2,'en vogue':3} }
+      ]
+    },
+    // 12: Space/Ocean/Jungle x Animal/Plant/Phenomenon
+    {
+      rows: ['Space', 'Deep Ocean', 'Jungle'],
+      cols: ['Animal or Creature', 'Plant or Organism', 'Natural Phenomenon'],
+      cells: [
+        { a: ['tardigrade','fruit fly','nematode','dust mite'],
+          r: {'tardigrade':3,'fruit fly':2,'nematode':4,'dust mite':3} },
+        { a: ['aurora borealis','aurora','solar flare','meteor shower','nebula'],
+          r: {'aurora borealis':1,'aurora':1,'solar flare':2,'meteor shower':2,'nebula':3} },
+        { a: ['black hole','pulsar','quasar','magnetar'],
+          r: {'black hole':1,'pulsar':3,'quasar':3,'magnetar':3} },
+        { a: ['anglerfish','giant squid','oarfish','gulper eel','viperfish'],
+          r: {'anglerfish':2,'giant squid':2,'oarfish':3,'gulper eel':3,'viperfish':3} },
+        { a: ['giant kelp','sea grass','coralline algae','bioluminescent algae'],
+          r: {'giant kelp':2,'sea grass':2,'coralline algae':3,'bioluminescent algae':3} },
+        { a: ['bioluminescence','rogue wave','waterspout','marine snow'],
+          r: {'bioluminescence':2,'rogue wave':2,'waterspout':2,'marine snow':3} },
+        { a: ['jaguar','toucan','poison dart frog','anaconda','piranha','tapir','capybara','harpy eagle'],
+          r: {'jaguar':1,'toucan':2,'poison dart frog':2,'anaconda':2,'piranha':2,'tapir':3,'capybara':2,'harpy eagle':3} },
+        { a: ['strangler fig','rafflesia','pitcher plant','brazil nut tree','kapok','orchid'],
+          r: {'strangler fig':2,'rafflesia':3,'pitcher plant':2,'brazil nut tree':3,'kapok':3,'orchid':2} },
+        { a: ['thunderstorm','flash flood','landslide','fog'],
+          r: {'thunderstorm':1,'flash flood':2,'landslide':2,'fog':2} }
+      ]
+    },
+    // 13: Italian/Mexican/Indian x Dish/Ingredient/Dessert
+    {
+      rows: ['Italian', 'Mexican', 'Indian'],
+      cols: ['Main Dish', 'Key Ingredient', 'Dessert'],
+      cells: [
+        { a: ['pizza','pasta','risotto','lasagna','carbonara','osso buco'],
+          r: {'pizza':1,'pasta':1,'risotto':1,'lasagna':1,'carbonara':2,'osso buco':2} },
+        { a: ['tomato','basil','mozzarella','parmesan','prosciutto','balsamic'],
+          r: {'tomato':1,'basil':1,'mozzarella':2,'parmesan':2,'prosciutto':2,'balsamic':2} },
+        { a: ['tiramisu','panna cotta','gelato','cannoli','zabaglione'],
+          r: {'tiramisu':1,'panna cotta':2,'gelato':1,'cannoli':2,'zabaglione':3} },
+        { a: ['tacos','enchiladas','quesadilla','tamales','pozole','mole'],
+          r: {'tacos':1,'enchiladas':1,'quesadilla':1,'tamales':2,'pozole':3,'mole':2} },
+        { a: ['cilantro','avocado','jalapeno','tomatillo','chipotle','ancho chile'],
+          r: {'cilantro':1,'avocado':1,'jalapeno':2,'tomatillo':2,'chipotle':2,'ancho chile':3} },
+        { a: ['churros','tres leches','flan','arroz con leche','cajeta'],
+          r: {'churros':1,'tres leches':2,'flan':2,'arroz con leche':2,'cajeta':4} },
+        { a: ['curry','biryani','dal','tikka masala','korma','vindaloo','butter chicken'],
+          r: {'curry':1,'biryani':1,'dal':2,'tikka masala':1,'korma':2,'vindaloo':2,'butter chicken':1} },
+        { a: ['cardamom','turmeric','ghee','garam masala','paneer','asafoetida','tamarind','fenugreek'],
+          r: {'cardamom':2,'turmeric':2,'ghee':2,'garam masala':2,'paneer':2,'asafoetida':3,'tamarind':3,'fenugreek':3} },
+        { a: ['gulab jamun','kheer','jalebi','rasgulla','kulfi','halwa','barfi'],
+          r: {'gulab jamun':2,'kheer':2,'jalebi':2,'rasgulla':3,'kulfi':2,'halwa':2,'barfi':3} }
+      ]
+    },
+    // 14: Literature x Love Theme/War Theme/Nature Theme
+    {
+      rows: ['19th Century Novel', 'Classic Poem', 'Shakespeare Play'],
+      cols: ['Love Theme', 'War or Death Theme', 'Nature Theme'],
+      cells: [
+        { a: ['jane eyre','pride and prejudice','anna karenina','wuthering heights','madame bovary'],
+          r: {'jane eyre':1,'pride and prejudice':1,'anna karenina':2,'wuthering heights':1,'madame bovary':2} },
+        { a: ['a farewell to arms','war and peace','all quiet on the western front','for whom the bell tolls'],
+          r: {'a farewell to arms':2,'war and peace':1,'all quiet on the western front':2,'for whom the bell tolls':2} },
+        { a: ['walden','the call of the wild','tess of the durbervilles','the jungle book'],
+          r: {'walden':2,'the call of the wild':2,'tess of the durbervilles':2,'the jungle book':2} },
+        { a: ['the love song of j alfred prufrock','prufrock','annabel lee','the wasteland','howl'],
+          r: {'the love song of j alfred prufrock':2,'prufrock':2,'annabel lee':2,'the wasteland':2,'howl':3} },
+        { a: ['in flanders fields','dulce et decorum est','the charge of the light brigade','strange meeting'],
+          r: {'in flanders fields':2,'dulce et decorum est':2,'the charge of the light brigade':2,'strange meeting':3} },
+        { a: ['the road not taken','ode to autumn','daffodils','the tyger'],
+          r: {'the road not taken':1,'ode to autumn':2,'daffodils':1,'the tyger':2} },
+        { a: ['romeo and juliet','a midsummer nights dream','much ado about nothing','twelfth night'],
+          r: {'romeo and juliet':1,'a midsummer nights dream':2,'much ado about nothing':2,'twelfth night':2} },
+        { a: ['hamlet','macbeth','othello','king lear','julius caesar','richard iii','henry v'],
+          r: {'hamlet':1,'macbeth':1,'othello':2,'king lear':2,'julius caesar':2,'richard iii':3,'henry v':3} },
+        { a: ['the tempest','as you like it','the winters tale','a midsummer nights dream'],
+          r: {'the tempest':2,'as you like it':2,'the winters tale':3,'a midsummer nights dream':2} }
+      ]
+    },
+    // 15: Physics/Chemistry/Biology x Discovery/Law/Nobel Laureate
+    {
+      rows: ['Physics', 'Chemistry', 'Biology'],
+      cols: ['Famous Discovery', 'Named Law or Theory', 'Nobel Laureate'],
+      cells: [
+        { a: ['gravity','relativity','quantum mechanics','photoelectric effect','x-ray','radioactivity','electron'],
+          r: {'gravity':1,'relativity':1,'quantum mechanics':2,'photoelectric effect':2,'x-ray':2,'radioactivity':2,'electron':3} },
+        { a: ['newtons law','ohms law','hubbles law','keplers law','coulombs law'],
+          r: {'newtons law':2,'ohms law':2,'hubbles law':3,'keplers law':3,'coulombs law':3} },
+        { a: ['einstein','feynman','bohr','dirac','heisenberg','schrodinger','planck'],
+          r: {'einstein':1,'feynman':2,'bohr':2,'dirac':3,'heisenberg':2,'schrodinger':2,'planck':2} },
+        { a: ['periodic table','benzene ring','noble gases','penicillin','nylon','plastic'],
+          r: {'periodic table':1,'benzene ring':2,'noble gases':2,'penicillin':2,'nylon':3,'plastic':2} },
+        { a: ['le chateliers principle','avogadros law','hunds rule','mendeleevs law'],
+          r: {'le chateliers principle':3,'avogadros law':3,'hunds rule':3,'mendeleevs law':2} },
+        { a: ['marie curie','linus pauling','ernest rutherford','fritz haber','dorothy hodgkin','frederick sanger'],
+          r: {'marie curie':1,'linus pauling':2,'ernest rutherford':2,'fritz haber':2,'dorothy hodgkin':3,'frederick sanger':3} },
+        { a: ['dna','evolution','cell theory','vaccination','germ theory','natural selection'],
+          r: {'dna':1,'evolution':1,'cell theory':2,'vaccination':2,'germ theory':2,'natural selection':1} },
+        { a: ['darwins theory','mendels law','hardy-weinberg'],
+          r: {'darwins theory':2,'mendels law':2,'hardy-weinberg':3} },
+        { a: ['watson','crick','alexander fleming','barbara mcclintock','paul ehrlich'],
+          r: {'watson':2,'crick':2,'alexander fleming':2,'barbara mcclintock':3,'paul ehrlich':3} }
+      ]
+    },
+    // 16: Gothic/Art Deco/Modernist x Famous Building/Key Material/Country of Origin
+    {
+      rows: ['Gothic', 'Art Deco', 'Modernist'],
+      cols: ['Famous Building', 'Key Material', 'Country of Origin'],
+      cells: [
+        { a: ['notre dame','cologne cathedral','chartres cathedral','westminster abbey','sagrada familia'],
+          r: {'notre dame':1,'cologne cathedral':2,'chartres cathedral':2,'westminster abbey':2,'sagrada familia':2} },
+        { a: ['flying buttress','stained glass','pointed arch','stone','limestone','gargoyle'],
+          r: {'flying buttress':2,'stained glass':2,'pointed arch':2,'stone':1,'limestone':2,'gargoyle':2} },
+        { a: ['france','england','germany','italy','spain','scotland'],
+          r: {'france':1,'england':1,'germany':2,'italy':2,'spain':2,'scotland':3} },
+        { a: ['empire state building','chrysler building','rockefeller center','one canada square'],
+          r: {'empire state building':1,'chrysler building':2,'rockefeller center':2,'one canada square':3} },
+        { a: ['steel','chrome','aluminum','copper','bronze','terracotta'],
+          r: {'steel':1,'chrome':2,'aluminum':2,'copper':2,'bronze':2,'terracotta':2} },
+        { a: ['united states','usa','united kingdom','france','netherlands','australia'],
+          r: {'united states':1,'usa':1,'united kingdom':1,'france':2,'netherlands':2,'australia':2} },
+        { a: ['bauhaus','villa savoye','farnsworth house','fallingwater','sydney opera house','guggenheim bilbao'],
+          r: {'bauhaus':2,'villa savoye':3,'farnsworth house':3,'fallingwater':2,'sydney opera house':2,'guggenheim bilbao':2} },
+        { a: ['reinforced concrete','glass','steel','curtain wall','open plan'],
+          r: {'reinforced concrete':2,'glass':1,'steel':2,'curtain wall':3,'open plan':2} },
+        { a: ['germany','france','united states','usa','spain','finland','brazil'],
+          r: {'germany':1,'france':1,'united states':1,'usa':1,'spain':2,'finland':2,'brazil':2} }
+      ]
+    },
+    // 17: Soccer/Basketball/Tennis x Greatest Player/Home Country/World Record
+    {
+      rows: ['Soccer', 'Basketball', 'Tennis'],
+      cols: ['Greatest Player', 'Home Country', 'Famous Record or Feat'],
+      cells: [
+        { a: ['messi','ronaldo','pele','maradona','zidane','cruyff','platini'],
+          r: {'messi':1,'ronaldo':1,'pele':1,'maradona':1,'zidane':2,'cruyff':2,'platini':3} },
+        { a: ['brazil','argentina','france','germany','spain','netherlands','italy','england'],
+          r: {'brazil':1,'argentina':1,'france':1,'germany':1,'spain':1,'netherlands':2,'italy':2,'england':2} },
+        { a: ['world cup hat trick','world cup golden boot','champions league goals record','most ballon dor'],
+          r: {'world cup hat trick':3,'world cup golden boot':2,'champions league goals record':3,'most ballon dor':2} },
+        { a: ['michael jordan','lebron james','kareem abdul-jabbar','magic johnson','larry bird','bill russell','wilt chamberlain'],
+          r: {'michael jordan':1,'lebron james':1,'kareem abdul-jabbar':2,'magic johnson':2,'larry bird':2,'bill russell':3,'wilt chamberlain':2} },
+        { a: ['usa','united states','nigeria','australia','spain','france','yugoslavia'],
+          r: {'usa':1,'united states':1,'nigeria':2,'australia':2,'spain':2,'france':2,'yugoslavia':3} },
+        { a: ['most nba points','most nba rebounds','most triple doubles','most nba titles'],
+          r: {'most nba points':2,'most nba rebounds':2,'most triple doubles':2,'most nba titles':2} },
+        { a: ['federer','djokovic','nadal','sampras','agassi','borg','connors','mcenroe','laver'],
+          r: {'federer':1,'djokovic':1,'nadal':1,'sampras':2,'agassi':2,'borg':2,'connors':2,'mcenroe':2,'laver':3} },
+        { a: ['switzerland','serbia','spain','usa','united states','sweden','australia','czech republic'],
+          r: {'switzerland':1,'serbia':1,'spain':1,'usa':1,'united states':1,'sweden':2,'australia':2,'czech republic':2} },
+        { a: ['most grand slams','wimbledon record','calendar grand slam','golden slam'],
+          r: {'most grand slams':2,'wimbledon record':2,'calendar grand slam':3,'golden slam':3} }
+      ]
+    },
+    // 18: French/American/Russian x Revolution or War/Key Figure/Outcome
+    {
+      rows: ['French', 'American', 'Russian'],
+      cols: ['Revolution or War', 'Key Figure', 'Outcome or Result'],
+      cells: [
+        { a: ['french revolution','storming the bastille','reign of terror','napoleonic wars'],
+          r: {'french revolution':1,'storming the bastille':2,'reign of terror':2,'napoleonic wars':2} },
+        { a: ['robespierre','marie antoinette','napoleon','marquis de lafayette','danton'],
+          r: {'robespierre':2,'marie antoinette':1,'napoleon':1,'marquis de lafayette':2,'danton':3} },
+        { a: ['republic','napoleonic code','end of monarchy','abolition of feudalism','metric system'],
+          r: {'republic':2,'napoleonic code':2,'end of monarchy':2,'abolition of feudalism':3,'metric system':3} },
+        { a: ['american revolution','civil war','war of independence','boston tea party','revolutionary war'],
+          r: {'american revolution':1,'civil war':1,'war of independence':2,'boston tea party':2,'revolutionary war':2} },
+        { a: ['george washington','abraham lincoln','thomas jefferson','benjamin franklin','hamilton'],
+          r: {'george washington':1,'abraham lincoln':1,'thomas jefferson':1,'benjamin franklin':1,'hamilton':2} },
+        { a: ['constitution','declaration of independence','bill of rights','democracy'],
+          r: {'constitution':1,'declaration of independence':1,'bill of rights':2,'democracy':2} },
+        { a: ['russian revolution','october revolution','bolshevik revolution','red army','civil war'],
+          r: {'russian revolution':1,'october revolution':2,'bolshevik revolution':2,'red army':2,'civil war':2} },
+        { a: ['vladimir lenin','leon trotsky','trotsky','joseph stalin','stalin','nicholas ii','rasputin'],
+          r: {'vladimir lenin':1,'leon trotsky':2,'trotsky':2,'joseph stalin':1,'stalin':1,'nicholas ii':2,'rasputin':2} },
+        { a: ['soviet union','ussr','communism','red terror','gulags','five year plan'],
+          r: {'soviet union':1,'ussr':1,'communism':1,'red terror':2,'gulags':2,'five year plan':2} }
+      ]
+    },
+    // 19: Communication/Transportation/Computing x Key Invention/Pioneer/Decade
+    {
+      rows: ['Communication', 'Transportation', 'Computing'],
+      cols: ['Key Invention', 'Pioneer or Inventor', 'Decade of Revolution'],
+      cells: [
+        { a: ['telephone','internet','printing press','telegraph','radio','television','smartphone'],
+          r: {'telephone':1,'internet':1,'printing press':1,'telegraph':2,'radio':2,'television':1,'smartphone':1} },
+        { a: ['alexander graham bell','tim berners-lee','gutenberg','marconi','samuel morse','edison'],
+          r: {'alexander graham bell':1,'tim berners-lee':2,'gutenberg':1,'marconi':2,'samuel morse':2,'edison':1} },
+        { a: ['1990s','2000s','1450s','1800s','1920s','1950s','2010s'],
+          r: {'1990s':2,'2000s':1,'1450s':3,'1800s':2,'1920s':2,'1950s':2,'2010s':1} },
+        { a: ['steam engine','automobile','airplane','bicycle','rocket','electric car'],
+          r: {'steam engine':1,'automobile':1,'airplane':1,'bicycle':2,'rocket':2,'electric car':2} },
+        { a: ['james watt','henry ford','wright brothers','karl benz','elon musk','george stephenson'],
+          r: {'james watt':1,'henry ford':1,'wright brothers':1,'karl benz':2,'elon musk':1,'george stephenson':2} },
+        { a: ['1800s','1900s','1960s','1880s','1970s','2000s'],
+          r: {'1800s':2,'1900s':2,'1960s':2,'1880s':3,'1970s':2,'2000s':1} },
+        { a: ['computer','microchip','transistor','internet','algorithm','smartphone','artificial intelligence'],
+          r: {'computer':1,'microchip':2,'transistor':2,'internet':1,'algorithm':2,'smartphone':1,'artificial intelligence':2} },
+        { a: ['alan turing','bill gates','steve jobs','john von neumann','grace hopper','ada lovelace'],
+          r: {'alan turing':1,'bill gates':1,'steve jobs':1,'john von neumann':2,'grace hopper':2,'ada lovelace':2} },
+        { a: ['1940s','1950s','1980s','1990s','2010s','2020s'],
+          r: {'1940s':2,'1950s':2,'1980s':1,'1990s':1,'2010s':1,'2020s':1} }
+      ]
+    }
+  ];
+
+  // ===== CONSTANTS =====
+  var RARITY_PTS  = [0, 100, 250, 500, 1000];
+  var RARITY_STAR = ['', '\u2B50', '\u2B50\u2B50', '\u2B50\u2B50\u2B50', '\u2B50\u2B50\u2B50\u2B50'];
+  var RARITY_COLOR = ['', '#ffd700', '#39ff14', '#00f0ff', '#b44dff'];
+
+  // ===== DAILY SEED =====
+  var EPOCH = new Date('2026-01-01').getTime();
+  var dayNum = Math.floor((Date.now() - EPOCH) / 86400000);
+  var puzzleIdx = ((dayNum % PUZZLES.length) + PUZZLES.length) % PUZZLES.length;
+  var puzzle = PUZZLES[puzzleIdx];
+
+  // ===== STATE =====
+  var inputs = [];
+  var results = new Array(9).fill(null);
+  var submitted = false;
+
+  // ===== DOM =====
+  var startScreen    = document.getElementById('startScreen');
+  var gameScreen     = document.getElementById('gameScreen');
+  var completeScreen = document.getElementById('completeScreen');
+
+  // ===== NEON.JS =====
+  Neon.init({
+    game: 'faction',
+    mode: 'high',
+    key: 'neonarcade_neonmind_faction_scores',
+    formatScore: function(s) { return Number(s).toLocaleString() + ' pts'; }
+  });
+  Neon.render(document.getElementById('startLB'));
+  document.getElementById('dailyBadge').textContent = 'PUZZLE #' + (dayNum + 1);
+
+  // ===== SCREEN SWITCHER =====
+  function showScreen(name) {
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    completeScreen.classList.remove('active');
+    if (name === 'start')    startScreen.classList.add('active');
+    if (name === 'game')     gameScreen.classList.add('active');
+    if (name === 'complete') completeScreen.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ===== BUILD GAME GRID =====
+  function buildGrid() {
+    var grid = document.getElementById('factionGrid');
+    grid.textContent = '';
+    inputs = [];
+
+    // Top-left corner
+    var corner = document.createElement('div');
+    corner.className = 'grid-corner';
+    grid.appendChild(corner);
+
+    // Column headers
+    puzzle.cols.forEach(function(col) {
+      var el = document.createElement('div');
+      el.className = 'col-label';
+      el.textContent = col;
+      grid.appendChild(el);
+    });
+
+    // Rows of cells
+    puzzle.rows.forEach(function(row, ri) {
+      var rowEl = document.createElement('div');
+      rowEl.className = 'row-label';
+      rowEl.textContent = row;
+      grid.appendChild(rowEl);
+
+      puzzle.cols.forEach(function(col, ci) {
+        var idx = ri * 3 + ci;
+        var cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.dataset.idx = idx;
+
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'cell-input';
+        inp.placeholder = '...';
+        inp.maxLength = 50;
+        inp.autocomplete = 'off';
+        inp.autocorrect = 'off';
+        inp.autocapitalize = 'off';
+        inp.spellcheck = false;
+        inp.dataset.idx = idx;
+
+        var starsEl = document.createElement('div');
+        starsEl.className = 'cell-stars';
+        starsEl.id = 'stars-' + idx;
+
+        var ptsEl = document.createElement('div');
+        ptsEl.className = 'cell-pts';
+        ptsEl.id = 'pts-' + idx;
+
+        var hintEl = document.createElement('div');
+        hintEl.className = 'cell-hint';
+        hintEl.id = 'hint-' + idx;
+
+        cell.appendChild(inp);
+        cell.appendChild(starsEl);
+        cell.appendChild(ptsEl);
+        cell.appendChild(hintEl);
+        grid.appendChild(cell);
+        inputs.push(inp);
+
+        inp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            var next = idx + 1;
+            if (next < 9) inputs[next].focus();
+            else document.getElementById('submitBtn').focus();
+          }
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            showScreen('start');
+          }
+        });
+        inp.addEventListener('input', updateProgress);
+      });
+    });
+  }
+
+  function updateProgress() {
+    var filled = inputs.filter(function(i) { return i.value.trim().length > 0; }).length;
+    document.getElementById('fillProgress').textContent = filled + ' / 9 filled';
+    document.getElementById('submitBtn').disabled = (filled === 0);
+  }
+
+  // ===== VALIDATION =====
+  function normalize(s) {
+    return s.toLowerCase().trim().replace(/\s+/g, ' ');
+  }
+
+  function validateCell(idx, raw) {
+    var val = normalize(raw);
+    if (!val) return { valid: false, pts: 0, stars: '', answer: raw, rarity: 0 };
+    var cell = puzzle.cells[idx];
+    var matchedAnswer = null;
+    for (var i = 0; i < cell.a.length; i++) {
+      if (cell.a[i] === val) { matchedAnswer = cell.a[i]; break; }
+    }
+    if (matchedAnswer !== null) {
+      var r = cell.r[matchedAnswer] || 1;
+      return { valid: true, pts: RARITY_PTS[r], stars: RARITY_STAR[r], answer: raw, rarity: r };
+    }
+    return { valid: false, pts: 0, stars: '', answer: raw, rarity: 0 };
+  }
+
+  function getHint(idx) {
+    var cell = puzzle.cells[idx];
+    var keys = Object.keys(cell.r);
+    var best = keys.filter(function(k) { return cell.r[k] === 1; });
+    if (best.length) return best[0];
+    var ok = keys.filter(function(k) { return cell.r[k] === 2; });
+    if (ok.length) return ok[0];
+    return keys[0] || '';
+  }
+
+  // ===== SUBMIT =====
+  document.getElementById('submitBtn').addEventListener('click', function() {
+    if (submitted) return;
+    submitted = true;
+
+    inputs.forEach(function(inp) { inp.disabled = true; });
+
+    var totalPts = 0;
+    inputs.forEach(function(inp, idx) {
+      var raw = inp.value.trim();
+      var res = validateCell(idx, raw);
+      results[idx] = res;
+      totalPts += res.pts;
+
+      var cell = inp.closest('.grid-cell');
+      var starsEl = document.getElementById('stars-' + idx);
+      var ptsEl   = document.getElementById('pts-' + idx);
+      var hintEl  = document.getElementById('hint-' + idx);
+
+      if (!raw) {
+        cell.classList.add('state-invalid');
+        hintEl.textContent = 'Try: ' + getHint(idx);
+        spawnParticles(cell, '#ff2d7b', 4);
+      } else if (res.valid) {
+        cell.classList.add('state-valid');
+        starsEl.textContent = res.stars;
+        starsEl.style.color = RARITY_COLOR[res.rarity];
+        ptsEl.textContent = '+' + res.pts + ' pts';
+        ptsEl.style.color = RARITY_COLOR[res.rarity];
+        spawnParticles(cell, RARITY_COLOR[res.rarity], 8);
+        playSuccess(res.rarity);
+      } else {
+        cell.classList.add('state-invalid');
+        starsEl.textContent = '\u2717';
+        starsEl.style.color = '#ff2d7b';
+        hintEl.textContent = 'Try: ' + getHint(idx);
+        spawnParticles(cell, '#ff2d7b', 4);
+        playFail();
+      }
+    });
+
+    document.getElementById('topScore').textContent = totalPts.toLocaleString() + ' pts';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = 'SUBMITTED';
+
+    setTimeout(function() {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(totalPts);
+      }).then(function(result) {
+        buildComplete(totalPts, result);
+        showScreen('complete');
+        if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+        Neon.render(document.getElementById('completeLB'));
+      }).catch(function() {
+        buildComplete(totalPts, null);
+        showScreen('complete');
+        Neon.render(document.getElementById('completeLB'));
+      });
+    }, 1400);
+  });
+
+  // ===== BUILD COMPLETE SCREEN =====
+  function buildComplete(totalPts, neonResult) {
+    document.getElementById('completeDay').textContent = 'FACTION #' + (dayNum + 1);
+    document.getElementById('scoreTotal').textContent = totalPts.toLocaleString();
+
+    var validCount = results.filter(function(r) { return r && r.valid; }).length;
+    var rareCount  = results.filter(function(r) { return r && r.rarity >= 3; }).length;
+
+    document.getElementById('statValid').textContent = validCount + '/9';
+    document.getElementById('statRare').textContent  = rareCount;
+
+    var best = Neon.getHighScore();
+    document.getElementById('statBest').textContent = best ? Number(best).toLocaleString() : '--';
+
+    if (totalPts === 9000) {
+      document.getElementById('completeTitle').textContent = 'PERFECT!';
+    } else if (validCount === 9) {
+      document.getElementById('completeTitle').textContent = 'COMPLETE!';
+    } else if (validCount === 0) {
+      document.getElementById('completeTitle').textContent = 'KEEP TRYING';
+    } else {
+      document.getElementById('completeTitle').textContent = 'COMPLETE';
+    }
+
+    // Result grid
+    var rg = document.getElementById('resultGrid');
+    rg.textContent = '';
+
+    var corner = document.createElement('div');
+    corner.className = 'res-corner';
+    rg.appendChild(corner);
+
+    puzzle.cols.forEach(function(c) {
+      var el = document.createElement('div');
+      el.className = 'res-col-lbl';
+      el.textContent = c;
+      rg.appendChild(el);
+    });
+
+    puzzle.rows.forEach(function(row, ri) {
+      var rl = document.createElement('div');
+      rl.className = 'res-row-lbl';
+      rl.textContent = row;
+      rg.appendChild(rl);
+
+      puzzle.cols.forEach(function(col, ci) {
+        var idx = ri * 3 + ci;
+        var res = results[idx];
+        var cell = document.createElement('div');
+        cell.className = 'res-cell ' + ((res && res.valid) ? 'valid' : 'invalid');
+
+        if (res && res.valid) {
+          var ans = document.createElement('div');
+          ans.className = 'res-answer';
+          ans.textContent = res.answer;
+          cell.appendChild(ans);
+
+          var st = document.createElement('div');
+          st.className = 'res-stars';
+          st.textContent = res.stars;
+          st.style.color = RARITY_COLOR[res.rarity];
+          cell.appendChild(st);
+
+          var p = document.createElement('div');
+          p.className = 'res-pts';
+          p.textContent = '+' + res.pts;
+          cell.appendChild(p);
+        } else {
+          var inv = document.createElement('div');
+          inv.className = 'res-invalid-lbl';
+          inv.textContent = (res && res.answer) ? ('"' + res.answer + '"') : '(blank)';
+          cell.appendChild(inv);
+
+          var h = document.createElement('div');
+          h.className = 'res-hint-lbl';
+          h.textContent = '\u2192 ' + getHint(idx);
+          cell.appendChild(h);
+        }
+        rg.appendChild(cell);
+      });
+    });
+  }
+
+  // ===== SHARE =====
+  document.getElementById('shareBtn').addEventListener('click', function() {
+    var totalPts = results.reduce(function(a, r) { return a + (r ? r.pts : 0); }, 0);
+    var lines = [
+      '\uD83C\uDFAF FACTION #' + (dayNum + 1) + ' \u2014 Knowledge Grid',
+      'Score: ' + totalPts.toLocaleString() + ' / 9,000'
+    ];
+    for (var ri = 0; ri < 3; ri++) {
+      var row = [];
+      for (var ci = 0; ci < 3; ci++) {
+        var idx = ri * 3 + ci;
+        var res = results[idx];
+        row.push((res && res.valid) ? res.stars : '\u274C');
+      }
+      lines.push(row.join(' | '));
+    }
+    lines.push('neonarcade.net/neonmind/faction.html');
+    var text = lines.join('\n');
+
+    function fallback() { showToast('Copied!'); }
+    if (navigator.share) {
+      navigator.share({ title: 'FACTION #' + (dayNum + 1), text: text }).catch(function() {
+        navigator.clipboard && navigator.clipboard.writeText(text).then(fallback).catch(fallback);
+      });
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(fallback).catch(fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  // ===== NAVIGATION =====
+  document.getElementById('startBtn').addEventListener('click', function() {
+    submitted = false;
+    results = new Array(9).fill(null);
+    showScreen('game');
+    buildGrid();
+    document.getElementById('topPuzzle').textContent = 'FACTION #' + (dayNum + 1);
+    document.getElementById('topScore').textContent = '0 pts';
+    document.getElementById('fillProgress').textContent = '0 / 9 filled';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = 'SUBMIT ANSWERS';
+    setTimeout(function() { if (inputs[0]) inputs[0].focus(); }, 150);
+  });
+
+  document.getElementById('backBtn').addEventListener('click', function() {
+    showScreen('start');
+    Neon.render(document.getElementById('startLB'));
+  });
+
+  document.getElementById('menuBtn').addEventListener('click', function() {
+    showScreen('start');
+    Neon.render(document.getElementById('startLB'));
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active')) {
+      showScreen('start');
+    }
+  });
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2200);
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(el, color, count) {
+    var rect = el.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var size = 4 + Math.random() * 5;
+      var angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+      var dist  = 28 + Math.random() * 36;
+      p.style.cssText =
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        'background:' + color + ';' +
+        'left:' + (cx - size/2) + 'px;' +
+        'top:' + (cy - size/2) + 'px;' +
+        '--dx:' + (Math.cos(angle)*dist) + 'px;' +
+        '--dy:' + (Math.sin(angle)*dist) + 'px;';
+      document.body.appendChild(p);
+      setTimeout(function(pp) { if (pp.parentNode) pp.parentNode.removeChild(pp); }, 850, p);
+    }
+  }
+
+  // ===== SOUND =====
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; }
+    }
+    return audioCtx;
+  }
+  function playSuccess(rarity) {
+    var ctx = getAudio(); if (!ctx) return;
+    var freqs = [440, 523, 659, 880];
+    var freq = freqs[Math.min(rarity - 1, 3)];
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.35);
+  }
+  function playFail() {
+    var ctx = getAudio(); if (!ctx) return;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(200, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.25);
+  }
+})();
+</script>
+</body>
+</html>

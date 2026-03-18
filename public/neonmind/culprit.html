@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Culprit — Free Online Daily Logic Puzzle | NEON ARCADE</title>
+<meta name="description" content="Play Culprit free online — daily deduction mystery. Deduce the suspect, location, and weapon from logical clues. No download, no login.">
+<meta name="keywords" content="culprit, deduction puzzle, logic puzzle game, daily mystery game, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://neonarcade.net/neonmind/culprit.html">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/culprit.html">
+<meta property="og:title" content="Culprit — Free Online Daily Logic Puzzle | NEON ARCADE">
+<meta property="og:description" content="Play Culprit free online — daily deduction mystery. Deduce the suspect, location, and weapon from logical clues. No download, no login.">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/culprit.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/culprit.html">
+<meta name="twitter:title" content="Culprit — Free Online Daily Logic Puzzle | NEON ARCADE">
+<meta name="twitter:description" content="Daily deduction mystery — deduce the suspect, location, and weapon from logical clues.">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/culprit.png">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Culprit","url":"https://neonarcade.net/neonmind/culprit.html","description":"Play Culprit free online — daily deduction mystery. Deduce the suspect, location, and weapon from logical clues.","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"NEON ARCADE","url":"https://neonarcade.net"},"image":"https://neonarcade.net/neonmind/screenshots/culprit.png","inLanguage":"en","isFamilyFriendly":true}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://neonarcade.net/"},{"@type":"ListItem","position":2,"name":"NEON MIND","item":"https://neonarcade.net/neonmind/"},{"@type":"ListItem","position":3,"name":"Culprit","item":"https://neonarcade.net/neonmind/culprit.html"}]}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.05) 0%,transparent 50%)}
+
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-4px)}30%{transform:translateX(4px)}45%{transform:translateX(-3px)}60%{transform:translateX(3px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes particleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}}
+
+.shaking{animation:shake 0.25s ease-out}
+
+.screen{display:none;position:fixed;z-index:10;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;overflow-y:auto;padding:20px 16px 60px}
+.screen.active{display:flex}
+
+/* ===== START SCREEN ===== */
+#startScreen{justify-content:flex-start;padding-top:36px;gap:8px}
+.brand-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:10px;letter-spacing:4px;color:#b44dff;text-transform:uppercase;text-shadow:0 0 8px rgba(180,77,255,0.4)}
+.main-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,8vw,54px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-align:center}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(13px,3vw,17px);letter-spacing:3px;color:#8888aa;text-transform:uppercase;text-align:center;max-width:400px;line-height:1.5}
+.puzzle-num{font-family:'Orbitron',monospace;font-weight:400;font-size:13px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4)}
+.theme-name{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(13px,3vw,18px);letter-spacing:3px;color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.5);text-transform:uppercase;text-align:center}
+
+.start-entities{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:6px 0;width:100%;max-width:520px}
+.entity-group{background:rgba(18,18,31,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:10px 14px;min-width:140px;flex:1}
+.entity-group-label{font-family:'Orbitron',monospace;font-weight:400;font-size:9px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-bottom:6px}
+.entity-item{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;letter-spacing:1px;color:#9999bb;padding:2px 0}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:3px;padding:13px 36px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:4px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-align:center}
+.leaderboard-wrap{width:100%;max-width:320px;margin-top:4px}
+
+/* ===== GAME SCREEN ===== */
+#gameScreen{justify-content:flex-start;padding-top:12px;gap:0}
+
+.game-top-bar{display:flex;width:100%;max-width:900px;justify-content:space-between;align-items:center;padding:6px 0;margin-bottom:10px;flex-shrink:0}
+.top-puzzle-info{display:flex;flex-direction:column;gap:2px}
+.top-puzzle-num{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:2px;color:#ffd700}
+.top-theme{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(11px,2vw,14px);letter-spacing:2px;color:#ff2d7b}
+.top-timer{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(16px,3.5vw,22px);letter-spacing:2px;color:#8888aa}
+.top-back{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:22px;color:#7a7a9a;cursor:pointer;padding:4px 8px;border:none;background:none;transition:color 0.2s}
+.top-back:hover{color:#00f0ff}
+
+.game-layout{display:flex;width:100%;max-width:900px;gap:14px;align-items:flex-start;flex:1}
+
+/* Clues panel */
+.clues-panel{flex:0 0 220px;background:rgba(18,18,31,0.7);border:1px solid rgba(0,240,255,0.12);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.clues-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#00f0ff;text-transform:uppercase;margin-bottom:4px;text-shadow:0 0 8px rgba(0,240,255,0.3)}
+.clue-item{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:clamp(11px,2vw,13px);line-height:1.4;color:#9999bb;padding:7px 9px;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.08);border-radius:4px;border-left:3px solid rgba(0,240,255,0.25)}
+
+/* Grid area */
+.grid-area{flex:1;display:flex;flex-direction:column;gap:12px}
+
+.sub-grid-section{background:rgba(18,18,31,0.6);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px}
+.sub-grid-title{font-family:'Orbitron',monospace;font-weight:700;font-size:9px;letter-spacing:3px;color:#7a7a9a;text-transform:uppercase;margin-bottom:8px}
+
+.deduction-grid{display:grid;gap:0}
+
+.grid-header-cell{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(9px,1.6vw,11px);letter-spacing:0.5px;text-transform:uppercase;color:#7a7a9a;padding:4px 2px;text-align:center;line-height:1.2;border-bottom:1px solid rgba(255,255,255,0.06)}
+.grid-corner{border-bottom:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06)}
+.grid-row-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(9px,1.6vw,11px);letter-spacing:0.5px;text-transform:uppercase;color:#8888aa;padding:4px 8px 4px 0;text-align:right;display:flex;align-items:center;justify-content:flex-end;border-right:1px solid rgba(255,255,255,0.06);line-height:1.2;min-height:38px}
+
+.grid-cell{display:flex;align-items:center;justify-content:center;height:clamp(34px,5.5vw,46px);border:1px solid rgba(255,255,255,0.05);cursor:pointer;font-size:clamp(13px,2.5vw,18px);transition:all 0.15s;background:rgba(255,255,255,0.01)}
+.grid-cell:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.12)}
+.grid-cell.state-x{color:#ff2d7b;background:rgba(255,45,123,0.08);border-color:rgba(255,45,123,0.2)}
+.grid-cell.state-x:hover{background:rgba(255,45,123,0.14)}
+.grid-cell.state-check{color:#39ff14;background:rgba(57,255,20,0.1);border-color:rgba(57,255,20,0.3);box-shadow:inset 0 0 8px rgba(57,255,20,0.1)}
+.grid-cell.state-check:hover{background:rgba(57,255,20,0.16)}
+.grid-cell.auto-x{color:#ff2d7b;background:rgba(255,45,123,0.04);border-color:rgba(255,45,123,0.12);opacity:0.6;cursor:default}
+.grid-cell.auto-x:hover{background:rgba(255,45,123,0.04)}
+
+/* Accusation section */
+.accusation-section{background:rgba(18,18,31,0.7);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px;width:100%;max-width:900px;margin-top:6px;flex-shrink:0}
+.accusation-title{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:3px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.3)}
+.accusation-dropdowns{display:flex;gap:10px;flex-wrap:wrap}
+.accuse-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
+.accuse-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:10px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+.accuse-select{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(12px,2.5vw,15px);letter-spacing:1px;text-transform:uppercase;background:rgba(10,10,18,0.9);border:1px solid rgba(255,215,0,0.25);color:#ffd700;padding:8px 10px;border-radius:4px;cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;outline:none}
+.accuse-select:focus{border-color:rgba(255,215,0,0.5);box-shadow:0 0 10px rgba(255,215,0,0.1)}
+.accuse-select option{background:#12121f;color:#ffd700}
+
+.accuse-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:3px;padding:12px 28px;border:1px solid #ffd700;background:rgba(255,215,0,0.06);color:#ffd700;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;align-self:flex-end}
+.accuse-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2);transform:scale(1.04)}
+
+/* ===== RESULT SCREEN ===== */
+#resultScreen{justify-content:flex-start;padding-top:36px;gap:12px}
+.result-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(26px,7vw,48px);letter-spacing:6px;text-align:center}
+.result-title.solved{color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.5),0 0 40px rgba(57,255,20,0.2)}
+.result-title.failed{color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.5),0 0 40px rgba(255,45,123,0.2)}
+
+.result-puzzle-label{font-family:'Orbitron',monospace;font-weight:400;font-size:12px;letter-spacing:3px;color:#ffd700}
+.result-theme{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(13px,3vw,18px);letter-spacing:3px;color:#ff2d7b}
+
+.result-verdict{width:100%;max-width:480px;background:rgba(18,18,31,0.8);border:1px solid rgba(57,255,20,0.2);border-radius:8px;padding:14px 18px;display:flex;flex-direction:column;gap:8px;animation:fadeIn 0.4s ease-out}
+.result-verdict.wrong{border-color:rgba(255,45,123,0.25)}
+.verdict-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.verdict-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;flex:0 0 54px}
+.verdict-value{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(13px,2.5vw,16px);letter-spacing:1px;text-transform:uppercase;flex:1;color:#fff}
+.verdict-status{font-size:18px;flex:0 0 26px;text-align:center}
+.verdict-row.correct .verdict-value{color:#39ff14}
+.verdict-row.wrong-part .verdict-value{color:#ff2d7b}
+
+.result-stats{display:flex;gap:20px;justify-content:center}
+.result-stat{text-align:center}
+.result-stat .stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(18px,4vw,28px);color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.result-stat .stat-lbl{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:11px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.play-btn.share-btn{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.06)}
+.play-btn.share-btn:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 20px rgba(255,215,0,0.2)}
+.play-btn.menu-btn{border-color:#8888aa;color:#8888aa;background:rgba(136,136,170,0.04)}
+.play-btn.menu-btn:hover{background:rgba(136,136,170,0.12)}
+
+.leaderboard-wrap-result{width:100%;max-width:340px}
+
+/* Mobile */
+@media(max-width:680px){
+  .game-layout{flex-direction:column}
+  .clues-panel{flex:none;width:100%}
+  .accusation-dropdowns{flex-direction:column}
+  .accuse-btn{width:100%;align-self:stretch}
+  .grid-row-label{padding-right:5px;font-size:9px}
+}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(18,18,31,0.95);border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-family:'Rajdhani',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;padding:10px 22px;border-radius:4px;z-index:10000;pointer-events:none;transition:opacity 0.4s;white-space:nowrap}
+.toast.hidden{opacity:0}
+
+/* Particles */
+.particle{position:fixed;pointer-events:none;z-index:9998;border-radius:50%;animation:particleFly 0.8s ease-out forwards}
+</style>
+</head>
+<body>
+
+<!-- ===== START SCREEN ===== -->
+<div id="startScreen" class="screen active">
+  <div class="brand-tag">NEON MIND</div>
+  <div class="main-title">CULPRIT</div>
+  <div class="subtitle">Daily Deduction Mystery</div>
+  <div class="puzzle-num" id="startPuzzleNum">PUZZLE #1</div>
+  <div class="theme-name" id="startThemeName">MIDNIGHT MANOR</div>
+
+  <div class="start-entities">
+    <div class="entity-group">
+      <div class="entity-group-label">Suspects</div>
+      <div id="startSuspects"></div>
+    </div>
+    <div class="entity-group">
+      <div class="entity-group-label">Locations</div>
+      <div id="startLocations"></div>
+    </div>
+    <div class="entity-group">
+      <div class="entity-group-label">Weapons</div>
+      <div id="startWeapons"></div>
+    </div>
+  </div>
+
+  <button class="play-btn" id="startBtn">INVESTIGATE</button>
+  <div class="controls-hint">Click cells: empty &rarr; &times; eliminated &rarr; &check; confirmed</div>
+  <div class="leaderboard-wrap" id="startLB"></div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="gameScreen" class="screen">
+  <div class="game-top-bar">
+    <div class="top-puzzle-info">
+      <div class="top-puzzle-num" id="topPuzzleNum">PUZZLE #1</div>
+      <div class="top-theme" id="topTheme">MIDNIGHT MANOR</div>
+    </div>
+    <div class="top-timer" id="topTimer">00:00</div>
+    <button class="top-back" id="backBtn" title="Back to menu">&#10005;</button>
+  </div>
+
+  <div class="game-layout">
+    <div class="clues-panel">
+      <div class="clues-title">CLUES</div>
+      <div id="cluesList"></div>
+    </div>
+    <div class="grid-area" id="gridArea"></div>
+  </div>
+
+  <div class="accusation-section">
+    <div class="accusation-title">MAKE YOUR ACCUSATION</div>
+    <div class="accusation-dropdowns">
+      <div class="accuse-group">
+        <div class="accuse-label">WHO?</div>
+        <select class="accuse-select" id="accuseSuspect"></select>
+      </div>
+      <div class="accuse-group">
+        <div class="accuse-label">WHERE?</div>
+        <select class="accuse-select" id="accuseLocation"></select>
+      </div>
+      <div class="accuse-group">
+        <div class="accuse-label">WEAPON?</div>
+        <select class="accuse-select" id="accuseWeapon"></select>
+      </div>
+    </div>
+    <button class="accuse-btn" id="accuseBtn">ACCUSE</button>
+  </div>
+</div>
+
+<!-- ===== RESULT SCREEN ===== -->
+<div id="resultScreen" class="screen">
+  <div class="result-title solved" id="resultTitle">CASE CLOSED</div>
+  <div class="result-puzzle-label" id="resultPuzzleNum">PUZZLE #1</div>
+  <div class="result-theme" id="resultTheme">MIDNIGHT MANOR</div>
+
+  <div class="result-verdict" id="resultVerdict">
+    <div class="verdict-row correct" id="verdictSuspectRow">
+      <span class="verdict-label">WHO</span>
+      <span class="verdict-value" id="verdictSuspectName"></span>
+      <span class="verdict-status" id="verdictSuspectIcon">&#9989;</span>
+    </div>
+    <div class="verdict-row correct" id="verdictLocationRow">
+      <span class="verdict-label">WHERE</span>
+      <span class="verdict-value" id="verdictLocationName"></span>
+      <span class="verdict-status" id="verdictLocationIcon">&#9989;</span>
+    </div>
+    <div class="verdict-row correct" id="verdictWeaponRow">
+      <span class="verdict-label">WITH</span>
+      <span class="verdict-value" id="verdictWeaponName"></span>
+      <span class="verdict-status" id="verdictWeaponIcon">&#9989;</span>
+    </div>
+  </div>
+
+  <div class="result-stats">
+    <div class="result-stat">
+      <div class="stat-val" id="resultTime">0:00</div>
+      <div class="stat-lbl">Time</div>
+    </div>
+    <div class="result-stat">
+      <div class="stat-val" id="resultAccuracy">&#10003;</div>
+      <div class="stat-lbl">Accuracy</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="play-btn share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn menu-btn" id="menuBtn">MENU</button>
+  </div>
+  <div class="leaderboard-wrap-result" id="resultLB"></div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ===== PUZZLE DATA (30 puzzles, logically verified) =====
+  var PUZZLES = [
+    // 1 — Noir Mansion: Inspector Morrow, Library, Crystal Vase
+    {
+      theme: 'MIDNIGHT MANOR',
+      suspects:  ['DUCHESS VANE', 'INSPECTOR MORROW', 'LORD ASHTON'],
+      locations: ['BALLROOM', 'LIBRARY', 'GARDEN'],
+      weapons:   ['LETTER OPENER', 'CRYSTAL VASE', 'ROPE'],
+      solution:  { suspect: 1, location: 1, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:1},
+        {type:'notScene', location:2},
+        {type:'wasIn',    suspect:2, location:0},
+        {type:'notUsed',  weapon:0},
+        {type:'notDone',  suspect:0, weapon:2}
+      ]
+    },
+    // 2 — Sci-fi: Commander Zara, Airlock, Gravity Wrench
+    {
+      theme: 'STELLAR DEEP-6',
+      suspects:  ['COMMANDER ZARA', 'DR. KEX', 'ENGINEER RHO'],
+      locations: ['BRIDGE', 'LAB', 'AIRLOCK'],
+      weapons:   ['PLASMA CUTTER', 'NEURAL SPIKE', 'GRAVITY WRENCH'],
+      solution:  { suspect: 0, location: 2, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:1, location:2},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'notUsed',  weapon:1},
+        {type:'wasIn',    suspect:1, location:1},
+        {type:'notIn',    suspect:2, location:2}
+      ]
+    },
+    // 3 — Fantasy Castle: Captain Grim, Throne Room, Silver Arrow
+    {
+      theme: 'CASTLE ASHENMERE',
+      suspects:  ['LADY EMBER', 'THE WIZARD', 'CAPTAIN GRIM'],
+      locations: ['THRONE ROOM', 'DUNGEON', 'TOWER'],
+      weapons:   ['ENCHANTED BLADE', 'POISON VIAL', 'SILVER ARROW'],
+      solution:  { suspect: 2, location: 0, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notScene', location:1},
+        {type:'notUsed',  weapon:1},
+        {type:'wasIn',    suspect:1, location:2},
+        {type:'notDone',  suspect:0, weapon:2}
+      ]
+    },
+    // 4 — Victorian Manor: Mrs. Blackwood, Cellar, Pistol
+    {
+      theme: 'BLACKWOOD ESTATE',
+      suspects:  ['COLONEL ROOK', 'MRS. BLACKWOOD', 'THE BUTLER'],
+      locations: ['STUDY', 'CONSERVATORY', 'CELLAR'],
+      weapons:   ['PISTOL', 'CANDLESTICK', 'GARROTE'],
+      solution:  { suspect: 1, location: 2, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notDone',  suspect:2, weapon:0},
+        {type:'wasIn',    suspect:2, location:0},
+        {type:'notUsed',  weapon:1},
+        {type:'notIn',    suspect:0, location:1}
+      ]
+    },
+    // 5 — Art Museum: Curator Vale, Vault, Tranq Dart
+    {
+      theme: 'THE VANDAL HEIST',
+      suspects:  ['CURATOR VALE', 'SECURITY CHIEF', 'ART RESTORER'],
+      locations: ['GALLERY A', 'VAULT', 'ROOFTOP'],
+      weapons:   ['SCALPEL', 'SECURITY ROD', 'TRANQ DART'],
+      solution:  { suspect: 0, location: 1, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:1, location:1},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'wasIn',    suspect:2, location:0},
+        {type:'notUsed',  weapon:1},
+        {type:'notIn',    suspect:0, location:2}
+      ]
+    },
+    // 6 — Cruise Ship: Lady Jade, Deck, Wine Bottle
+    {
+      theme: 'VOYAGE OF PERIL',
+      suspects:  ['CAPTAIN HELM', 'DR. CRESSIDA', 'LADY JADE'],
+      locations: ['DECK', 'DINING ROOM', 'ENGINE ROOM'],
+      weapons:   ['ICE PICK', 'WINE BOTTLE', 'SPANNER'],
+      solution:  { suspect: 2, location: 0, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:1, weapon:1},
+        {type:'wasIn',    suspect:0, location:2},
+        {type:'notUsed',  weapon:2},
+        {type:'notScene', location:1}
+      ]
+    },
+    // 7 — Film Noir: Dame Falcone, Penthouse, Revolver
+    {
+      theme: 'NEON CITY BLUES',
+      suspects:  ['DETECTIVE REYES', 'DAME FALCONE', 'THE FIXER'],
+      locations: ['PENTHOUSE', 'JAZZ CLUB', 'BACK ALLEY'],
+      weapons:   ['REVOLVER', 'POKER CHIP', 'STILETTO'],
+      solution:  { suspect: 1, location: 0, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notScene', location:2},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:1},
+        {type:'notDone',  suspect:2, weapon:0}
+      ]
+    },
+    // 8 — Spy Thriller: Mole Sigma, Safehouse, Cipher Bomb
+    {
+      theme: 'OPERATION REDLINE',
+      suspects:  ['AGENT CROSS', 'HANDLER DUSK', 'MOLE SIGMA'],
+      locations: ['EMBASSY', 'SAFEHOUSE', 'UNDERGROUND'],
+      weapons:   ['CIPHER BOMB', 'POISON PEN', 'WIRE'],
+      solution:  { suspect: 2, location: 1, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:1},
+        {type:'notDone',  suspect:1, weapon:0},
+        {type:'wasIn',    suspect:0, location:2},
+        {type:'notUsed',  weapon:2},
+        {type:'notIn',    suspect:2, location:0}
+      ]
+    },
+    // 9 — Gothic Horror: The Alchemist, Moor, Belladonna
+    {
+      theme: 'DRAKENMORE MANOR',
+      suspects:  ['COUNTESS VOSS', 'THE ALCHEMIST', 'GRAVE WARDEN'],
+      locations: ['CRYPT', 'BELL TOWER', 'MOOR'],
+      weapons:   ['SILVER DAGGER', 'BELLADONNA', 'IRON CHAIN'],
+      solution:  { suspect: 1, location: 2, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notScene', location:0},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notDone',  suspect:0, weapon:1}
+      ]
+    },
+    // 10 — Corporate: CEO March, Boardroom, Briefcase Bomb
+    {
+      theme: 'APEX CORPORATION',
+      suspects:  ['CEO MARCH', 'CFO STERLING', 'AUDITOR COLE'],
+      locations: ['BOARDROOM', 'SERVER VAULT', 'ROOFTOP HELIPAD'],
+      weapons:   ['ENCRYPTED DRIVE', 'SYRINGE', 'BRIEFCASE BOMB'],
+      solution:  { suspect: 0, location: 0, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:1, location:0},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'wasIn',    suspect:1, location:1},
+        {type:'notUsed',  weapon:1},
+        {type:'notIn',    suspect:2, location:0}
+      ]
+    },
+    // 11 — Deep Sea: Researcher Gray, Control Room, Sedative Syringe
+    {
+      theme: 'ABYSS STATION ZETA',
+      suspects:  ['DR. MIREN', 'PILOT NAVARRO', 'RESEARCHER GRAY'],
+      locations: ['CONTROL ROOM', 'SPECIMEN LAB', 'DIVE LOCK'],
+      weapons:   ['SONAR PROBE', 'SEDATIVE SYRINGE', 'PRESSURE VALVE'],
+      solution:  { suspect: 2, location: 0, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:1, weapon:1},
+        {type:'wasIn',    suspect:1, location:2},
+        {type:'notUsed',  weapon:2},
+        {type:'notScene', location:1}
+      ]
+    },
+    // 12 — Theatre: Prima Donna, Dressing Room, Sandbag
+    {
+      theme: 'THE FINAL CURTAIN',
+      suspects:  ['PRIMA DONNA', 'STAGE MANAGER', 'LIGHTING TECH'],
+      locations: ['STAGE', 'DRESSING ROOM', 'PROP ROOM'],
+      weapons:   ['TRAPDOOR LATCH', 'MAKEUP POISON', 'SANDBAG'],
+      solution:  { suspect: 0, location: 1, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:1, location:1},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'wasIn',    suspect:1, location:0},
+        {type:'notUsed',  weapon:0},
+        {type:'notIn',    suspect:0, location:0}
+      ]
+    },
+    // 13 — Antarctic: Navigator Kane, Supply Depot, Ice Axe
+    {
+      theme: 'WHITEOUT STATION',
+      suspects:  ['DR. FROST', 'NAVIGATOR KANE', 'MEDIC SABLE'],
+      locations: ['ICE CORE LAB', 'RADIO HUT', 'SUPPLY DEPOT'],
+      weapons:   ['ICE AXE', 'FLARE GUN', 'THERMAL CORD'],
+      solution:  { suspect: 1, location: 2, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notScene', location:0},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:1},
+        {type:'notDone',  suspect:2, weapon:0}
+      ]
+    },
+    // 14 — Wild West: Barkeep Dunn, Stables, Lasso
+    {
+      theme: 'DUSTFIRE GULCH',
+      suspects:  ['OUTLAW BLAKE', 'SHERIFF CLAY', 'BARKEEP DUNN'],
+      locations: ['SALOON', 'JAILHOUSE', 'STABLES'],
+      weapons:   ['SIX-SHOOTER', 'LASSO', 'WHISKEY BOTTLE'],
+      solution:  { suspect: 2, location: 2, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notDone',  suspect:1, weapon:1},
+        {type:'wasIn',    suspect:0, location:1},
+        {type:'notUsed',  weapon:2},
+        {type:'notScene', location:0}
+      ]
+    },
+    // 15 — Ancient Temple: Archaeologist Mei, Inner Sanctum, Serpent Blade
+    {
+      theme: 'TEMPLE OF KHAROS',
+      suspects:  ['ARCHAEOLOGIST MEI', 'TOMB RAIDER VEX', 'CULT PRIEST'],
+      locations: ['INNER SANCTUM', 'TREASURE VAULT', 'SACRIFICE PIT'],
+      weapons:   ['CURSED IDOL', 'SERPENT BLADE', 'STONE TRAP'],
+      solution:  { suspect: 0, location: 0, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:1, location:0},
+        {type:'notDone',  suspect:2, weapon:1},
+        {type:'wasIn',    suspect:1, location:2},
+        {type:'notUsed',  weapon:2},
+        {type:'notScene', location:1}
+      ]
+    },
+    // 16 — Luxury Train: Arms Dealer Holm, Dining Car, Velvet Rope
+    {
+      theme: 'THE CRIMSON EXPRESS',
+      suspects:  ['DOWAGER RITZ', 'ARMS DEALER HOLM', 'TICKET MASTER'],
+      locations: ['DINING CAR', 'SLEEPING BERTH', 'LUGGAGE CAR'],
+      weapons:   ['HATPIN', 'BRANDY FLASK', 'VELVET ROPE'],
+      solution:  { suspect: 1, location: 0, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notIn',    suspect:1, location:2}
+      ]
+    },
+    // 17 — Renaissance: Papal Envoy, Chapel, Jewelled Dagger
+    {
+      theme: 'PALAZZO MORETTI',
+      suspects:  ['DUKE MORETTI', 'COURT PAINTER', 'PAPAL ENVOY'],
+      locations: ['GALLERY', 'CHAPEL', 'COURTYARD'],
+      weapons:   ['JEWELLED DAGGER', 'ARSENIC WINE', 'GARROTE SILK'],
+      solution:  { suspect: 2, location: 1, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:1},
+        {type:'notDone',  suspect:1, weapon:0},
+        {type:'wasIn',    suspect:1, location:2},
+        {type:'notUsed',  weapon:1},
+        {type:'notScene', location:0}
+      ]
+    },
+    // 18 — Nuclear Bunker: Nuclear Scientist, Reactor Hall, Neural Blocker
+    {
+      theme: 'BUNKER SEVEN',
+      suspects:  ['GENERAL VOSS', 'NUCLEAR SCIENTIST', 'DOUBLE AGENT'],
+      locations: ['LAUNCH ROOM', 'COMMS CENTER', 'REACTOR HALL'],
+      weapons:   ['DETONATOR', 'NEURAL BLOCKER', 'CLASSIFIED FILE'],
+      solution:  { suspect: 1, location: 2, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notScene', location:0},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notDone',  suspect:2, weapon:1}
+      ]
+    },
+    // 19 — Yakuza: Oyabun Tanaka, Dojo, Poison Sake
+    {
+      theme: 'KURO SYNDICATE',
+      suspects:  ['OYABUN TANAKA', 'ENFORCER RIKU', 'INFORMANT YUI'],
+      locations: ['TEA ROOM', 'DOJO', 'ROOFTOP GARDEN'],
+      weapons:   ['KATANA', 'POISON SAKE', 'THROWING STAR'],
+      solution:  { suspect: 0, location: 1, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:1, location:1},
+        {type:'notDone',  suspect:2, weapon:1},
+        {type:'wasIn',    suspect:2, location:0},
+        {type:'notUsed',  weapon:2},
+        {type:'notScene', location:2}
+      ]
+    },
+    // 20 — Arctic Vessel: Journalist Vance, Bridge, Flare Pistol
+    {
+      theme: 'ICEBREAKER AURORA',
+      suspects:  ['CAPTAIN SOLBERG', 'BIOLOGIST PELL', 'JOURNALIST VANCE'],
+      locations: ['BRIDGE', 'HOLD', 'MESS HALL'],
+      weapons:   ['FLARE PISTOL', 'CHEMICAL VIAL', 'ANCHOR CHAIN'],
+      solution:  { suspect: 2, location: 0, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:1, weapon:0},
+        {type:'wasIn',    suspect:0, location:2},
+        {type:'notUsed',  weapon:1},
+        {type:'notScene', location:1}
+      ]
+    },
+    // 21 — Catacombs: Tour Guide Laval, Ossuary Vault, Trip Wire
+    {
+      theme: 'UNDER PARIS',
+      suspects:  ['ARCHAEOLOGIST DUMAS', 'TOUR GUIDE LAVAL', 'URBAN EXPLORER'],
+      locations: ['BONE CHAMBER', 'FLOODED TUNNEL', 'OSSUARY VAULT'],
+      weapons:   ['SPELUNKER PICK', 'CALCIUM DUST', 'TRIP WIRE'],
+      solution:  { suspect: 1, location: 2, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notScene', location:0},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notDone',  suspect:0, weapon:2}
+      ]
+    },
+    // 22 — Luxury Hotel: Countess Laviere, Wine Cellar, Corkscrew
+    {
+      theme: 'GRAND PALAIS NOIR',
+      suspects:  ['COUNTESS LAVIERE', 'CONCIERGE MAST', 'SOMMELIER BRAU'],
+      locations: ['PENTHOUSE SUITE', 'WINE CELLAR', 'ROOFTOP POOL'],
+      weapons:   ['CORKSCREW', 'SLEEPING DRAFT', 'LUGGAGE STRAP'],
+      solution:  { suspect: 0, location: 1, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:1, location:1},
+        {type:'notDone',  suspect:2, weapon:0},
+        {type:'wasIn',    suspect:2, location:2},
+        {type:'notUsed',  weapon:1},
+        {type:'notScene', location:0}
+      ]
+    },
+    // 23 — Cyberpunk: Corpo Fixer, Data Haven, Monofilament
+    {
+      theme: 'NEO NEON DISTRICT',
+      suspects:  ['NETRUNNER AZIZ', 'CORPO FIXER', 'STREET DOC'],
+      locations: ['DATA HAVEN', 'CORP TOWER', 'SLUM CLINIC'],
+      weapons:   ['ICE SPIKE', 'NEURAL STUNNER', 'MONOFILAMENT'],
+      solution:  { suspect: 1, location: 0, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'wasIn',    suspect:0, location:2},
+        {type:'notUsed',  weapon:0},
+        {type:'notIn',    suspect:1, location:1}
+      ]
+    },
+    // 24 — Viking: Thrall Ulfric, Prow, Poisoned Mead
+    {
+      theme: 'DRAGONSHIP GRIMNIR',
+      suspects:  ['JARL HALVARD', 'SKALD BREEN', 'THRALL ULFRIC'],
+      locations: ['OARSMEN DECK', 'HOLD', 'PROW'],
+      weapons:   ['BATTLE AXE', 'POISONED MEAD', 'ROPE KNOT'],
+      solution:  { suspect: 2, location: 2, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notDone',  suspect:1, weapon:1},
+        {type:'wasIn',    suspect:0, location:0},
+        {type:'notUsed',  weapon:2},
+        {type:'notScene', location:1}
+      ]
+    },
+    // 25 — Fight Club: Promoter Vale, Back Office, Performance Drug
+    {
+      theme: 'THE IRON CIRCLE',
+      suspects:  ['PROMOTER VALE', 'TRAINER MONK', 'FIGHTER DAZA'],
+      locations: ['RING', 'LOCKER ROOM', 'BACK OFFICE'],
+      weapons:   ['BRASS KNUCKLES', 'PERFORMANCE DRUG', 'BETTING SLIP'],
+      solution:  { suspect: 0, location: 2, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:1, location:2},
+        {type:'notDone',  suspect:2, weapon:1},
+        {type:'wasIn',    suspect:2, location:0},
+        {type:'notUsed',  weapon:0},
+        {type:'notScene', location:1}
+      ]
+    },
+    // 26 — Ice Base: Geologist Park, Observatory, Fuel Igniter
+    {
+      theme: 'TERRA ICE BASE',
+      suspects:  ['COMMANDER RHYS', 'GEOLOGIST PARK', 'SUPPLY RUNNER'],
+      locations: ['OBSERVATORY', 'GENERATOR ROOM', 'AIRSTRIP'],
+      weapons:   ['THERMAL DRILL', 'CRYOGENIC SPRAY', 'FUEL IGNITER'],
+      solution:  { suspect: 1, location: 0, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:2, weapon:2},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notScene', location:2}
+      ]
+    },
+    // 27 — Mafia: Underboss Vita, Private Study, Silenced Pistol
+    {
+      theme: 'FAMIGLIA MOROSA',
+      suspects:  ['DON MOROSA', 'CONSIGLIERE LUCA', 'UNDERBOSS VITA'],
+      locations: ['DINING ROOM', 'PRIVATE STUDY', 'ROOFTOP'],
+      weapons:   ['GARROTE', 'POISON WINE', 'SILENCED PISTOL'],
+      solution:  { suspect: 2, location: 1, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:1},
+        {type:'notDone',  suspect:1, weapon:2},
+        {type:'wasIn',    suspect:0, location:0},
+        {type:'notUsed',  weapon:0},
+        {type:'notScene', location:2}
+      ]
+    },
+    // 28 — Pirates: Bosun Cray, Crow's Nest, Cutlass
+    {
+      theme: 'THE BLACK MERIDIAN',
+      suspects:  ["CAPTAIN REDTHORN", "BOSUN CRAY", "NAVIGATOR WREN"],
+      locations: ["CAPTAIN'S CABIN", "CANNON DECK", "CROW'S NEST"],
+      weapons:   ['CUTLASS', 'BLACK POWDER', 'MARLINSPIKE'],
+      solution:  { suspect: 1, location: 2, weapon: 0 },
+      clues: [
+        {type:'notIn',    suspect:0, location:2},
+        {type:'notScene', location:0},
+        {type:'wasIn',    suspect:2, location:1},
+        {type:'notUsed',  weapon:1},
+        {type:'notDone',  suspect:2, weapon:0}
+      ]
+    },
+    // 29 — Museum: Private Donor, Dinosaur Hall, Glass Shard
+    {
+      theme: 'NIGHT AT THE NEXUS',
+      suspects:  ['CURATOR SHAW', 'JANITOR FELIX', 'PRIVATE DONOR'],
+      locations: ['DINOSAUR HALL', 'STORAGE LEVEL', 'GIFT SHOP'],
+      weapons:   ['FOSSIL FRAGMENT', 'CLEANING FLUID', 'GLASS SHARD'],
+      solution:  { suspect: 2, location: 0, weapon: 2 },
+      clues: [
+        {type:'notIn',    suspect:0, location:0},
+        {type:'notDone',  suspect:1, weapon:2},
+        {type:'wasIn',    suspect:0, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notScene', location:2}
+      ]
+    },
+    // 30 — Olympics: Head Coach Vell, Training Track, Sabotaged Gear
+    {
+      theme: 'OLYMPIAD ZERO DAY',
+      suspects:  ['HEAD COACH VELL', 'DOPING OFFICER', 'RIVAL ATHLETE'],
+      locations: ['LOCKER ROOM', 'MEDICAL CENTER', 'TRAINING TRACK'],
+      weapons:   ['BANNED SUBSTANCE', 'SABOTAGED GEAR', 'SEDATIVE DRINK'],
+      solution:  { suspect: 0, location: 2, weapon: 1 },
+      clues: [
+        {type:'notIn',    suspect:1, location:2},
+        {type:'notDone',  suspect:2, weapon:1},
+        {type:'wasIn',    suspect:1, location:1},
+        {type:'notUsed',  weapon:0},
+        {type:'notScene', location:0}
+      ]
+    }
+  ];
+
+  // ===== DAILY SEED =====
+  var EPOCH = new Date('2026-01-01').getTime();
+  var dayIndex = Math.floor((Date.now() - EPOCH) / 86400000);
+  var puzzleIndex = ((dayIndex % PUZZLES.length) + PUZZLES.length) % PUZZLES.length;
+  var currentPuzzle = null;
+
+  // ===== GAME STATE =====
+  var timerInterval = null;
+  var timerStart = 0;
+  var elapsed = 0;
+  var gameActive = false;
+  var lastWon = false;
+
+  // gridStates[gridId][row][col]: 0=empty, 1=manual-x, 2=check, 3=auto-x
+  var gridStates = {};
+
+  // ===== DOM REFS =====
+  var startScreen    = document.getElementById('startScreen');
+  var gameScreen     = document.getElementById('gameScreen');
+  var resultScreen   = document.getElementById('resultScreen');
+  var startBtn       = document.getElementById('startBtn');
+  var backBtn        = document.getElementById('backBtn');
+  var shareBtn       = document.getElementById('shareBtn');
+  var menuBtn        = document.getElementById('menuBtn');
+  var accuseBtn      = document.getElementById('accuseBtn');
+  var topTimerEl     = document.getElementById('topTimer');
+  var topPuzzleNumEl = document.getElementById('topPuzzleNum');
+  var topThemeEl     = document.getElementById('topTheme');
+  var cluesList      = document.getElementById('cluesList');
+  var gridArea       = document.getElementById('gridArea');
+  var accuseSuspect  = document.getElementById('accuseSuspect');
+  var accuseLocation = document.getElementById('accuseLocation');
+  var accuseWeapon   = document.getElementById('accuseWeapon');
+  var toast          = document.getElementById('toast');
+  var startLB        = document.getElementById('startLB');
+  var resultLB       = document.getElementById('resultLB');
+  var resultTitle        = document.getElementById('resultTitle');
+  var resultPuzzleNumEl  = document.getElementById('resultPuzzleNum');
+  var resultThemeEl      = document.getElementById('resultTheme');
+  var resultVerdict      = document.getElementById('resultVerdict');
+  var verdictSuspectName  = document.getElementById('verdictSuspectName');
+  var verdictSuspectIcon  = document.getElementById('verdictSuspectIcon');
+  var verdictSuspectRow   = document.getElementById('verdictSuspectRow');
+  var verdictLocationName = document.getElementById('verdictLocationName');
+  var verdictLocationIcon = document.getElementById('verdictLocationIcon');
+  var verdictLocationRow  = document.getElementById('verdictLocationRow');
+  var verdictWeaponName   = document.getElementById('verdictWeaponName');
+  var verdictWeaponIcon   = document.getElementById('verdictWeaponIcon');
+  var verdictWeaponRow    = document.getElementById('verdictWeaponRow');
+  var resultTimeEl        = document.getElementById('resultTime');
+  var resultAccuracyEl    = document.getElementById('resultAccuracy');
+
+  // ===== NEON.JS INIT =====
+  Neon.init({
+    game: 'culprit',
+    mode: 'low',
+    key: 'neonarcade_neonmind_culprit_scores',
+    formatScore: function(s) {
+      var m = Math.floor(s / 60);
+      var sec = Math.floor(s % 60);
+      return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+  });
+
+  // ===== HELPERS =====
+  function showScreen(scr) {
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    resultScreen.classList.remove('active');
+    scr.classList.add('active');
+  }
+
+  function fmtTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function showToast(msg, dur) {
+    toast.textContent = msg;
+    toast.classList.remove('hidden');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function() { toast.classList.add('hidden'); }, dur || 2200);
+  }
+
+  // ===== CLUE TEXT =====
+  function clueToText(clue, p) {
+    var s = p.suspects;
+    var l = p.locations;
+    var w = p.weapons;
+    switch (clue.type) {
+      case 'notIn':    return s[clue.suspect] + ' was NOT in the ' + l[clue.location] + '.';
+      case 'notScene': return 'The crime did NOT occur in the ' + l[clue.location] + '.';
+      case 'notUsed':  return 'The ' + w[clue.weapon] + ' was NOT the murder weapon.';
+      case 'notDone':  return s[clue.suspect] + ' did NOT use the ' + w[clue.weapon] + '.';
+      case 'wasIn':    return s[clue.suspect] + ' was CONFIRMED in the ' + l[clue.location] + '.';
+      case 'usedBy':   return 'The ' + w[clue.weapon] + ' was found near ' + s[clue.suspect] + '.';
+      default:         return '';
+    }
+  }
+
+  // ===== GRID STATE =====
+  function initGridStates() {
+    gridStates = { SL: [], SW: [], LW: [] };
+    for (var r = 0; r < 3; r++) {
+      gridStates.SL.push([0, 0, 0]);
+      gridStates.SW.push([0, 0, 0]);
+      gridStates.LW.push([0, 0, 0]);
+    }
+  }
+
+  // After any manual cell change, auto-fill: confirmed row/col fills rest with auto-x
+  function autoFill(gid) {
+    var g = gridStates[gid];
+    // First clear all auto-x (3) that haven't become manual
+    for (var r = 0; r < 3; r++) {
+      for (var c = 0; c < 3; c++) {
+        if (g[r][c] === 3) g[r][c] = 0;
+      }
+    }
+    // Then fill based on checks
+    for (var r2 = 0; r2 < 3; r2++) {
+      for (var c2 = 0; c2 < 3; c2++) {
+        if (g[r2][c2] === 2) {
+          for (var cc = 0; cc < 3; cc++) {
+            if (cc !== c2 && g[r2][cc] === 0) g[r2][cc] = 3;
+          }
+          for (var rr = 0; rr < 3; rr++) {
+            if (rr !== r2 && g[rr][c2] === 0) g[rr][c2] = 3;
+          }
+        }
+      }
+    }
+  }
+
+  // ===== RENDER CLUES =====
+  function renderClues(p) {
+    // Clear safely
+    while (cluesList.firstChild) { cluesList.removeChild(cluesList.firstChild); }
+    p.clues.forEach(function(clue, i) {
+      var el = document.createElement('div');
+      el.className = 'clue-item';
+      el.textContent = (i + 1) + '. ' + clueToText(clue, p);
+      cluesList.appendChild(el);
+    });
+  }
+
+  // ===== RENDER GRIDS =====
+  var GRID_DEFS = [
+    { id: 'SL', title: 'SUSPECTS \u00D7 LOCATIONS', rows: 'suspects',  cols: 'locations' },
+    { id: 'SW', title: 'SUSPECTS \u00D7 WEAPONS',   rows: 'suspects',  cols: 'weapons'   },
+    { id: 'LW', title: 'LOCATIONS \u00D7 WEAPONS',  rows: 'locations', cols: 'weapons'   }
+  ];
+
+  function renderGrids(p) {
+    while (gridArea.firstChild) { gridArea.removeChild(gridArea.firstChild); }
+
+    GRID_DEFS.forEach(function(def) {
+      var section = document.createElement('div');
+      section.className = 'sub-grid-section';
+
+      var titleEl = document.createElement('div');
+      titleEl.className = 'sub-grid-title';
+      titleEl.textContent = def.title;
+      section.appendChild(titleEl);
+
+      var rowLabels = p[def.rows];
+      var colLabels = p[def.cols];
+
+      var grid = document.createElement('div');
+      grid.className = 'deduction-grid';
+      grid.style.gridTemplateColumns = 'minmax(76px,110px) repeat(3,1fr)';
+
+      // Corner
+      var corner = document.createElement('div');
+      corner.className = 'grid-corner';
+      grid.appendChild(corner);
+
+      // Column headers
+      colLabels.forEach(function(lbl) {
+        var h = document.createElement('div');
+        h.className = 'grid-header-cell';
+        h.textContent = lbl;
+        grid.appendChild(h);
+      });
+
+      // Row data
+      rowLabels.forEach(function(rowLbl, r) {
+        var rl = document.createElement('div');
+        rl.className = 'grid-row-label';
+        rl.textContent = rowLbl;
+        grid.appendChild(rl);
+
+        for (var c = 0; c < 3; c++) {
+          var cell = document.createElement('div');
+          cell.className = 'grid-cell';
+          cell.dataset.grid = def.id;
+          cell.dataset.row  = String(r);
+          cell.dataset.col  = String(c);
+          applyCellState(cell, gridStates[def.id][r][c]);
+          cell.addEventListener('click', onCellClick);
+          grid.appendChild(cell);
+        }
+      });
+
+      section.appendChild(grid);
+      gridArea.appendChild(section);
+    });
+  }
+
+  function applyCellState(cell, state) {
+    cell.classList.remove('state-x', 'state-check', 'auto-x');
+    cell.textContent = '';
+    if (state === 1) {
+      cell.classList.add('state-x');
+      cell.textContent = '\u2717';
+    } else if (state === 2) {
+      cell.classList.add('state-check');
+      cell.textContent = '\u2713';
+    } else if (state === 3) {
+      cell.classList.add('auto-x');
+      cell.textContent = '\u2717';
+    }
+  }
+
+  function refreshAllCells() {
+    var cells = gridArea.querySelectorAll('.grid-cell');
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var gid  = cell.dataset.grid;
+      var r    = parseInt(cell.dataset.row, 10);
+      var c    = parseInt(cell.dataset.col, 10);
+      applyCellState(cell, gridStates[gid][r][c]);
+    }
+  }
+
+  function onCellClick(e) {
+    if (!gameActive) return;
+    var cell = e.currentTarget;
+    var gid  = cell.dataset.grid;
+    var r    = parseInt(cell.dataset.row, 10);
+    var c    = parseInt(cell.dataset.col, 10);
+
+    // Auto-x cells toggle back to 0 on click
+    var cur = gridStates[gid][r][c];
+    if (cur === 3) {
+      gridStates[gid][r][c] = 0;
+    } else {
+      // cycle: 0 → 1 → 2 → 0
+      gridStates[gid][r][c] = (cur + 1) % 3;
+    }
+
+    autoFill(gid);
+    refreshAllCells();
+    soundClick(gridStates[gid][r][c]);
+  }
+
+  // ===== POPULATE DROPDOWNS =====
+  function populateDropdowns(p) {
+    function fill(sel, items) {
+      while (sel.firstChild) { sel.removeChild(sel.firstChild); }
+      items.forEach(function(item, i) {
+        var opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = item;
+        sel.appendChild(opt);
+      });
+    }
+    fill(accuseSuspect,  p.suspects);
+    fill(accuseLocation, p.locations);
+    fill(accuseWeapon,   p.weapons);
+  }
+
+  // ===== TIMER =====
+  function startTimer() {
+    timerStart = Date.now();
+    elapsed = 0;
+    topTimerEl.textContent = '00:00';
+    clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+      elapsed = (Date.now() - timerStart) / 1000;
+      topTimerEl.textContent = fmtTime(elapsed);
+    }, 250);
+  }
+
+  // ===== START SCREEN =====
+  function updateStartScreen() {
+    currentPuzzle = PUZZLES[puzzleIndex];
+    document.getElementById('startPuzzleNum').textContent = 'PUZZLE #' + (puzzleIndex + 1);
+    document.getElementById('startThemeName').textContent = currentPuzzle.theme;
+
+    var suspEl = document.getElementById('startSuspects');
+    var locEl  = document.getElementById('startLocations');
+    var wepEl  = document.getElementById('startWeapons');
+    while (suspEl.firstChild) { suspEl.removeChild(suspEl.firstChild); }
+    while (locEl.firstChild)  { locEl.removeChild(locEl.firstChild); }
+    while (wepEl.firstChild)  { wepEl.removeChild(wepEl.firstChild); }
+
+    currentPuzzle.suspects.forEach(function(s) {
+      var d = document.createElement('div');
+      d.className = 'entity-item';
+      d.textContent = s;
+      suspEl.appendChild(d);
+    });
+    currentPuzzle.locations.forEach(function(l) {
+      var d = document.createElement('div');
+      d.className = 'entity-item';
+      d.textContent = l;
+      locEl.appendChild(d);
+    });
+    currentPuzzle.weapons.forEach(function(w) {
+      var d = document.createElement('div');
+      d.className = 'entity-item';
+      d.textContent = w;
+      wepEl.appendChild(d);
+    });
+
+    Neon.render(startLB);
+  }
+
+  // ===== START GAME =====
+  function startGame() {
+    currentPuzzle = PUZZLES[puzzleIndex];
+    topPuzzleNumEl.textContent = 'PUZZLE #' + (puzzleIndex + 1);
+    topThemeEl.textContent = currentPuzzle.theme;
+
+    initGridStates();
+    renderClues(currentPuzzle);
+    renderGrids(currentPuzzle);
+    populateDropdowns(currentPuzzle);
+
+    gameActive = true;
+    lastWon = false;
+    showScreen(gameScreen);
+    startTimer();
+    soundStart();
+  }
+
+  // ===== ACCUSATION =====
+  function makeAccusation() {
+    if (!gameActive) return;
+
+    var guessS = parseInt(accuseSuspect.value, 10);
+    var guessL = parseInt(accuseLocation.value, 10);
+    var guessW = parseInt(accuseWeapon.value, 10);
+
+    clearInterval(timerInterval);
+    gameActive = false;
+
+    var sol = currentPuzzle.solution;
+    var correctS = (guessS === sol.suspect);
+    var correctL = (guessL === sol.location);
+    var correctW = (guessW === sol.weapon);
+    var allCorrect = correctS && correctL && correctW;
+
+    endGame(allCorrect, guessS, guessL, guessW, correctS, correctL, correctW);
+  }
+
+  // ===== END GAME =====
+  function endGame(won, guessS, guessL, guessW, correctS, correctL, correctW) {
+    var p   = currentPuzzle;
+    var sol = p.solution;
+    var totalTime = Math.floor(elapsed);
+    lastWon = won;
+
+    resultPuzzleNumEl.textContent = 'PUZZLE #' + (puzzleIndex + 1);
+    resultThemeEl.textContent = p.theme;
+
+    // Always reveal the correct answer
+    verdictSuspectName.textContent  = p.suspects[sol.suspect];
+    verdictLocationName.textContent = p.locations[sol.location];
+    verdictWeaponName.textContent   = p.weapons[sol.weapon];
+
+    if (won) {
+      resultTitle.textContent = 'CASE CLOSED';
+      resultTitle.className   = 'result-title solved';
+      resultVerdict.className = 'result-verdict';
+      verdictSuspectRow.className   = 'verdict-row correct';
+      verdictLocationRow.className  = 'verdict-row correct';
+      verdictWeaponRow.className    = 'verdict-row correct';
+      verdictSuspectIcon.textContent  = '\u2705';
+      verdictLocationIcon.textContent = '\u2705';
+      verdictWeaponIcon.textContent   = '\u2705';
+      resultAccuracyEl.textContent = 'PERFECT';
+      soundVictory();
+    } else {
+      resultTitle.textContent = 'CASE FAILED';
+      resultTitle.className   = 'result-title failed';
+      resultVerdict.className = 'result-verdict wrong';
+      verdictSuspectRow.className  = 'verdict-row ' + (correctS ? 'correct' : 'wrong-part');
+      verdictLocationRow.className = 'verdict-row ' + (correctL ? 'correct' : 'wrong-part');
+      verdictWeaponRow.className   = 'verdict-row ' + (correctW ? 'correct' : 'wrong-part');
+      verdictSuspectIcon.textContent  = correctS ? '\u2705' : '\u274C';
+      verdictLocationIcon.textContent = correctL ? '\u2705' : '\u274C';
+      verdictWeaponIcon.textContent   = correctW ? '\u2705' : '\u274C';
+      var hits = (correctS ? 1 : 0) + (correctL ? 1 : 0) + (correctW ? 1 : 0);
+      resultAccuracyEl.textContent = hits + '/3';
+      document.body.classList.add('shaking');
+      setTimeout(function() { document.body.classList.remove('shaking'); }, 300);
+      soundLose();
+    }
+
+    resultTimeEl.textContent = fmtTime(totalTime);
+    showScreen(resultScreen);
+
+    if (won) {
+      var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+      nameReady.then(function() {
+        return Neon.save(totalTime);
+      }).then(function(result) {
+        Neon.render(resultLB);
+        if (result.globalRank >= 1 && result.globalRank <= 5) {
+          Neon.showGlobalSplash(result.globalRank);
+        }
+      });
+      var colors = ['#00f0ff', '#39ff14', '#ffd700', '#b44dff', '#ff2d7b'];
+      for (var pi = 0; pi < 6; pi++) {
+        (function(idx) {
+          setTimeout(function() {
+            spawnParticles(
+              window.innerWidth  * (0.15 + Math.random() * 0.7),
+              window.innerHeight * (0.15 + Math.random() * 0.5),
+              colors[idx % colors.length], 10
+            );
+          }, idx * 160);
+        })(pi);
+      }
+    } else {
+      Neon.render(resultLB);
+    }
+  }
+
+  // ===== SHARE =====
+  function buildShareText() {
+    var p = currentPuzzle;
+    var num = puzzleIndex + 1;
+    var totalTime = Math.floor(elapsed);
+    var lines = [
+      '\uD83D\uDD0D CULPRIT #' + num + ' \u2014 ' + p.theme,
+      'Solved in ' + fmtTime(totalTime) + (lastWon ? '' : ' | Case failed')
+    ];
+    if (lastWon) {
+      lines.push('\uD83D\uDD75\uFE0F WHO: \u2705 WHERE: \u2705 WITH: \u2705');
+    }
+    lines.push('neonarcade.net/neonmind/culprit.html');
+    return lines.join('\n');
+  }
+
+  function doShare() {
+    var text = buildShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {
+        navigator.clipboard.writeText(text)
+          .then(function() { showToast('Copied to clipboard!'); })
+          .catch(function() { showToast('Could not copy'); });
+      });
+    } else {
+      navigator.clipboard.writeText(text)
+        .then(function() { showToast('Result copied!'); })
+        .catch(function() { showToast('Could not copy'); });
+    }
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+      var el = document.createElement('div');
+      el.className = 'particle';
+      var angle = Math.random() * Math.PI * 2;
+      var dist  = 40 + Math.random() * 80;
+      var dx    = Math.cos(angle) * dist;
+      var dy    = Math.sin(angle) * dist - 30;
+      var size  = 4 + Math.random() * 5;
+      el.style.cssText = [
+        'left:' + (x - size / 2) + 'px',
+        'top:'  + (y - size / 2) + 'px',
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'background:' + color,
+        '--dx:' + dx + 'px',
+        '--dy:' + dy + 'px',
+        'animation-duration:' + (0.6 + Math.random() * 0.5) + 's'
+      ].join(';');
+      document.body.appendChild(el);
+      setTimeout(function(node) { if (node.parentNode) { node.parentNode.removeChild(node); } }, 1200, el);
+    }
+  }
+
+  // ===== AUDIO =====
+  var audioCtx = null;
+  function getCtx() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; }
+    }
+    return audioCtx;
+  }
+
+  function playTone(freq, type, vol, dur, delay) {
+    var ctx = getCtx();
+    if (!ctx) return;
+    var d = delay || 0;
+    var osc  = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + d);
+    gain.gain.setValueAtTime(vol || 0.12, ctx.currentTime + d);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d + (dur || 0.2));
+    osc.start(ctx.currentTime + d);
+    osc.stop(ctx.currentTime  + d + (dur || 0.2));
+  }
+
+  function soundClick(state) {
+    if (state === 1)      { playTone(220, 'square', 0.07, 0.08); }
+    else if (state === 2) { playTone(440, 'sine',   0.11, 0.14); }
+    else                  { playTone(180, 'sine',   0.05, 0.07); }
+  }
+
+  function soundStart() {
+    playTone(330, 'sine', 0.09, 0.12, 0.00);
+    playTone(440, 'sine', 0.09, 0.12, 0.13);
+    playTone(550, 'sine', 0.09, 0.18, 0.26);
+  }
+
+  function soundVictory() {
+    var notes = [392, 523, 659, 784, 1047];
+    notes.forEach(function(f, i) { playTone(f, 'sine', 0.11, 0.22, i * 0.11); });
+  }
+
+  function soundLose() {
+    playTone(280, 'sawtooth', 0.09, 0.15, 0.00);
+    playTone(220, 'sawtooth', 0.09, 0.20, 0.16);
+    playTone(160, 'sawtooth', 0.09, 0.35, 0.32);
+  }
+
+  // ===== EVENTS =====
+  startBtn.addEventListener('click', startGame);
+
+  backBtn.addEventListener('click', function() {
+    if (gameActive) {
+      gameActive = false;
+      clearInterval(timerInterval);
+    }
+    showScreen(startScreen);
+    updateStartScreen();
+  });
+
+  accuseBtn.addEventListener('click', makeAccusation);
+  shareBtn.addEventListener('click', doShare);
+  menuBtn.addEventListener('click', function() {
+    showScreen(startScreen);
+    updateStartScreen();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && gameScreen.classList.contains('active') && gameActive) {
+      gameActive = false;
+      clearInterval(timerInterval);
+      showScreen(startScreen);
+      updateStartScreen();
+    }
+  });
+
+  // ===== INIT =====
+  updateStartScreen();
+
+})();
+</script>
+</body>
+</html>
