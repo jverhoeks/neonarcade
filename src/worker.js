@@ -137,6 +137,59 @@ async function increment(kv, key) {
   return next;
 }
 
+// Update score distribution buckets for percentile calculation
+async function updateDistribution(kv, game, score) {
+  const config = KNOWN_GAMES[game];
+  if (!config) return null;
+  const key = `dist:${game}`;
+  let dist;
+  try {
+    const raw = await kv.get(key);
+    dist = raw ? JSON.parse(raw) : null;
+  } catch { dist = null; }
+
+  if (!dist || typeof dist !== 'object') {
+    dist = { totalScores: 0, buckets: {} };
+  }
+
+  const maxScore = config.maxScore;
+  const bucketSize = Math.ceil(maxScore / 10);
+  const bucketIdx = Math.min(Math.floor(score / bucketSize), 9);
+  const bucketKey = String(bucketIdx);
+
+  dist.totalScores = (dist.totalScores || 0) + 1;
+  dist.buckets[bucketKey] = (dist.buckets[bucketKey] || 0) + 1;
+
+  await kv.put(key, JSON.stringify(dist));
+  return dist;
+}
+
+function calcPercentile(dist, score, game) {
+  if (!dist || dist.totalScores === 0) return { percentile: 50, rank: 'Top 50%', totalScores: 0 };
+
+  const config = KNOWN_GAMES[game];
+  const maxScore = config.maxScore;
+  const bucketSize = Math.ceil(maxScore / 10);
+  const bucketIdx = Math.min(Math.floor(score / bucketSize), 9);
+  const mode = config.mode;
+
+  let below = 0;
+  if (mode === 'low') {
+    for (let i = bucketIdx + 1; i <= 9; i++) {
+      below += (dist.buckets[String(i)] || 0);
+    }
+  } else {
+    for (let i = 0; i < bucketIdx; i++) {
+      below += (dist.buckets[String(i)] || 0);
+    }
+  }
+
+  const percentile = Math.round((below / dist.totalScores) * 100);
+  const clamped = Math.max(1, Math.min(99, percentile));
+  const topPct = 100 - clamped;
+  return { percentile: clamped, rank: 'Top ' + topPct + '%', totalScores: dist.totalScores };
+}
+
 // Per-IP rate limiting: 30 requests/minute across all POST endpoints
 async function checkRateLimit(kv, request) {
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
@@ -264,12 +317,19 @@ export default {
         if (!allowed) return json({ error: 'rate limit exceeded' }, 429);
       }
 
-      // POST /api/play/:game — increment play count
+      // POST /api/play/:game — increment play count + daily plays
       if (request.method === 'POST' && segments[0] === 'play' && segments[1]) {
         const game = sanitizeGame(segments[1]);
         if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
-        const plays = await increment(env.GAME_DATA, `plays:${game}`);
-        return json({ game, plays });
+        const today = new Date().toISOString().slice(0, 10);
+        const dailyKey = `plays_daily:${game}:${today}`;
+        const [plays, dailyPlays] = await Promise.all([
+          increment(env.GAME_DATA, `plays:${game}`),
+          increment(env.GAME_DATA, dailyKey),
+        ]);
+        // Re-put daily count with 48h TTL for auto-cleanup
+        await env.GAME_DATA.put(dailyKey, String(dailyPlays), { expirationTtl: 172800 });
+        return json({ game, plays, playsToday: dailyPlays });
       }
 
       // POST /api/like/:game — increment likes
@@ -311,20 +371,23 @@ export default {
         return json({ games });
       }
 
-      // GET /api/stats/:game — single game stats
+      // GET /api/stats/:game — single game stats (with daily plays)
       if (request.method === 'GET' && segments[0] === 'stats' && segments[1]) {
         const game = sanitizeGame(segments[1]);
         if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
-        const [plays, likes, issues] = await Promise.all([
+        const today = new Date().toISOString().slice(0, 10);
+        const [plays, likes, issues, playsToday] = await Promise.all([
           env.GAME_DATA.get(`plays:${game}`),
           env.GAME_DATA.get(`likes:${game}`),
           env.GAME_DATA.get(`issues:${game}`),
+          env.GAME_DATA.get(`plays_daily:${game}:${today}`),
         ]);
         return json({
           game,
           plays: parseInt(plays || '0', 10),
           likes: parseInt(likes || '0', 10),
           issues: parseInt(issues || '0', 10),
+          playsToday: parseInt(playsToday || '0', 10),
         });
       }
 
@@ -395,6 +458,24 @@ export default {
         await env.GAME_DATA.put(key, JSON.stringify(top));
 
         return json({ game, leaderboard: top });
+      }
+
+      // GET /api/leaderboard/:game/percentile/:score — read-only percentile lookup
+      if (request.method === 'GET' && segments[0] === 'leaderboard' && segments[2] === 'percentile' && segments[3]) {
+        const game = sanitizeGame(segments[1]);
+        if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
+
+        const score = parseInt(segments[3], 10);
+        if (isNaN(score) || score <= 0) return json({ error: 'valid score required' }, 400);
+
+        let dist;
+        try {
+          const raw = await env.GAME_DATA.get(`dist:${game}`);
+          dist = raw ? JSON.parse(raw) : null;
+        } catch { dist = null; }
+
+        const result = calcPercentile(dist || { totalScores: 0, buckets: {} }, score, game);
+        return json(result);
       }
 
       // GET /api/leaderboard/:game — get leaderboard
@@ -499,6 +580,25 @@ export default {
           challenge: { game: data.game, score: data.score, name: data.name },
           response: { score, name },
         });
+      }
+
+      // ─── Score Distribution & Percentile Endpoints ─────────────────
+
+      // POST /api/score/:game — record score in distribution, return percentile
+      if (request.method === 'POST' && segments[0] === 'score' && segments[1]) {
+        const game = sanitizeGame(segments[1]);
+        if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
+
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const score = parseInt(body.score, 10);
+        if (isNaN(score) || score <= 0) return json({ error: 'valid score required' }, 400);
+        if (score > KNOWN_GAMES[game].maxScore) return json({ error: 'score exceeds maximum' }, 400);
+
+        const dist = await updateDistribution(env.GAME_DATA, game, score);
+        const result = calcPercentile(dist, score, game);
+        return json(result);
       }
 
       // ─── Multiplayer Room Endpoints ────────────────────────────────
