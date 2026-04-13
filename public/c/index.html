@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>__OG_TITLE__</title>
+<meta name="description" content="__OG_DESC__">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="__OG_URL__">
+<meta property="og:title" content="__OG_TITLE__">
+<meta property="og:description" content="__OG_DESC__">
+<meta property="og:image" content="__OG_IMAGE__">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="__OG_URL__">
+<meta name="twitter:title" content="__OG_TITLE__">
+<meta name="twitter:description" content="__OG_DESC__">
+<meta name="twitter:image" content="__OG_IMAGE__">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  background: #0a0a12;
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  overflow-x: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+body {
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.05) 0%, transparent 60%),
+    #0a0a12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+}
+
+/* Loading state */
+#loading {
+  text-align: center;
+}
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(0,240,255,0.15);
+  border-top-color: #00f0ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+}
+
+/* Error state */
+#error {
+  display: none;
+  text-align: center;
+  max-width: 500px;
+}
+.error-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+.error-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 28px;
+  color: #ff2d7b;
+  text-shadow: 0 0 10px rgba(255,45,123,0.6), 0 0 40px rgba(255,45,123,0.2);
+  margin-bottom: 12px;
+  letter-spacing: 4px;
+}
+.error-msg {
+  font-size: 18px;
+  color: #9999bb;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+.home-btn {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.home-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.04);
+}
+
+/* Challenge card */
+#challenge {
+  display: none;
+  text-align: center;
+  max-width: 560px;
+  width: 100%;
+}
+.challenge-card {
+  background: #12121f;
+  border: 1px solid rgba(0,240,255,0.15);
+  border-radius: 8px;
+  padding: 40px 32px;
+  box-shadow:
+    0 0 30px rgba(0,240,255,0.05),
+    inset 0 0 60px rgba(0,0,0,0.3);
+}
+.brand {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.challenger-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.challenger-name {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 36px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+  letter-spacing: 6px;
+  margin-bottom: 20px;
+}
+.score-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.score-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 56px;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+.game-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #9999bb;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.challenge-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #b44dff;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  font-style: italic;
+}
+.divider {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.3), transparent);
+  margin: 24px auto;
+}
+.cta-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 20px;
+  color: #ff2d7b;
+  text-shadow: 0 0 10px rgba(255,45,123,0.5), 0 0 30px rgba(255,45,123,0.15);
+  letter-spacing: 4px;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+.play-btn {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 4px;
+  padding: 16px 48px;
+  border: 2px solid #39ff14;
+  background: rgba(57,255,20,0.08);
+  color: #39ff14;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 0 15px rgba(57,255,20,0.1);
+}
+.play-btn:hover {
+  background: rgba(57,255,20,0.18);
+  box-shadow: 0 0 30px rgba(57,255,20,0.25);
+  transform: scale(1.06);
+}
+.play-btn:active {
+  transform: scale(0.98);
+}
+
+/* Responded / VS result */
+.vs-result {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid rgba(180,77,255,0.2);
+  border-radius: 6px;
+  background: rgba(180,77,255,0.04);
+}
+.vs-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.vs-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+.vs-player {
+  text-align: center;
+  flex: 1;
+  max-width: 160px;
+}
+.vs-player-name {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.vs-player-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+.vs-divider {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 20px;
+  color: #7a7a9a;
+  letter-spacing: 2px;
+}
+.vs-outcome {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 4px;
+  margin-top: 6px;
+}
+.vs-outcome.win {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57,255,20,0.6);
+}
+.vs-outcome.lose {
+  color: #ff2d7b;
+  text-shadow: 0 0 10px rgba(255,45,123,0.6);
+}
+
+.timestamp {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: #7a7a9a;
+  margin-top: 20px;
+  letter-spacing: 1px;
+}
+
+/* Particles */
+.particle {
+  position: fixed;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  animation: particleDrift 6s ease-out infinite;
+}
+@keyframes particleDrift {
+  0% { opacity: 0; transform: translateY(0) scale(0); }
+  10% { opacity: 0.8; transform: translateY(-20px) scale(1); }
+  100% { opacity: 0; transform: translateY(-200px) scale(0.3); }
+}
+
+/* Screen shake for error */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+.shake { animation: shake 0.25s ease; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .challenger-name { font-size: 26px; letter-spacing: 4px; }
+  .score-value { font-size: 40px; }
+  .challenge-card { padding: 28px 20px; }
+  .cta-text { font-size: 16px; letter-spacing: 3px; }
+  .play-btn { font-size: 14px; padding: 14px 36px; letter-spacing: 3px; }
+  .vs-player-score { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading state -->
+<div id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading challenge...</div>
+</div>
+
+<!-- Error state -->
+<div id="error">
+  <div class="error-icon"></div>
+  <div class="error-title">CHALLENGE NOT FOUND</div>
+  <div class="error-msg" id="error-msg">This challenge link may have expired or is invalid.</div>
+  <a href="/" class="home-btn">Browse Games</a>
+</div>
+
+<!-- Challenge display -->
+<div id="challenge">
+  <div class="challenge-card">
+    <div class="brand">NEON ARCADE</div>
+    <div class="challenger-label">CHALLENGER</div>
+    <div class="challenger-name" id="ch-name"></div>
+    <div class="score-label">SCORED</div>
+    <div class="score-value" id="ch-score"></div>
+    <div class="game-name" id="ch-game"></div>
+    <div class="challenge-text" id="ch-text"></div>
+    <div class="divider"></div>
+    <div class="cta-text" id="ch-cta">CAN YOU BEAT THIS?</div>
+    <a id="ch-play-btn" class="play-btn" href="#">PLAY NOW</a>
+
+    <!-- VS result (shown if already responded) -->
+    <div id="vs-result" class="vs-result" style="display:none">
+      <div class="vs-label">CHALLENGE RESULT</div>
+      <div class="vs-row">
+        <div class="vs-player">
+          <div class="vs-player-name" id="vs-challenger-name" style="color:#00f0ff"></div>
+          <div class="vs-player-score" id="vs-challenger-score" style="color:#ffd700"></div>
+        </div>
+        <div class="vs-divider">VS</div>
+        <div class="vs-player">
+          <div class="vs-player-name" id="vs-responder-name" style="color:#b44dff"></div>
+          <div class="vs-player-score" id="vs-responder-score" style="color:#ffd700"></div>
+        </div>
+      </div>
+      <div class="vs-outcome" id="vs-outcome"></div>
+    </div>
+
+    <div class="timestamp" id="ch-time"></div>
+  </div>
+</div>
+
+<!-- Background particles -->
+<div id="particles"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── Game slug → category mapping ───────────────────────────
+  var GAME_CATEGORIES = {
+    'neon-snake': 'neonarcade', 'impostor-pixel': 'neonarcade', 'catalyst': 'neonarcade',
+    'pong-both-sides': 'neonarcade', 'afterglow': 'neonarcade', 'flappy-rewind': 'neonarcade',
+    'palette': 'neonarcade', 'pacman-amnesia': 'neonarcade', 'territory': 'neonarcade',
+    'signal': 'neonarcade', 'burndown': 'neonarcade', 'mine-finder': 'neonarcade',
+    'tetris-betrayal': 'neonarcade', 'faultline': 'neonarcade', 'wordchain': 'neonarcade',
+    'wordchain-duel': 'neonarcade', 'split-second': 'neonarcade', 'chromaself': 'neonarcade',
+    'curfew': 'neonarcade', 'truecolor': 'neonarcade', 'gridlock': 'neonarcade',
+    'doodle-drop': 'neonarcade', 'breakout-architect': 'neonarcade', 'chimp': 'neonarcade',
+    'pour': 'neonarcade', 'bloomfield': 'neonarcade', 'typeblitz': 'neonarcade',
+    'battleship': 'neonarcade', 'veto': 'neonarcade', 'mimic': 'neonarcade',
+
+    'sudoku': 'neonmind', 'minisudoku': 'neonmind', 'queens': 'neonmind',
+    'minesweeper': 'neonmind', 'kakuro': 'neonmind', 'nonogram': 'neonmind',
+    'nurikabe': 'neonmind', 'bridges': 'neonmind', 'tango': 'neonmind',
+    'lightup': 'neonmind', 'tents': 'neonmind', 'skyscrapers': 'neonmind',
+    'connections': 'neonmind', 'hitori': 'neonmind', 'kenken': 'neonmind',
+
+    'mathblitz': 'neongrind', 'reflex-chain': 'neongrind', 'neurosort': 'neongrind',
+    'colorname': 'neongrind', 'numbersense': 'neongrind', 'gridmatch': 'neongrind',
+    'sequencer': 'neongrind', 'clickspeed': 'neongrind',
+
+    'invaders': 'neonclassic', 'breakout': 'neonclassic', 'tetris': 'neonclassic',
+    '2048': 'neonclassic', 'pairs': 'neonclassic', 'asteroids': 'neonclassic',
+    'frogger': 'neonclassic', 'tictactoe': 'neonclassic',
+
+    'blackjack': 'neoncasino', 'poker': 'neoncasino', 'roulette': 'neoncasino',
+    'slots': 'neoncasino', 'video-poker': 'neoncasino',
+
+    'fusion': 'neonquest', 'jackpot': 'neonquest', 'firewall': 'neonquest',
+    'swarm': 'neonquest', 'synthesis': 'neonquest'
+  };
+
+  // Resolve category for a slug, with prefix fallback
+  function getCategory(slug) {
+    if (GAME_CATEGORIES[slug]) return GAME_CATEGORIES[slug];
+    // Try prefix match (e.g. "clickspeed-standard" → "clickspeed")
+    var keys = Object.keys(GAME_CATEGORIES);
+    for (var i = 0; i < keys.length; i++) {
+      if (slug.indexOf(keys[i]) === 0) return GAME_CATEGORIES[keys[i]];
+    }
+    return null;
+  }
+
+  // Build game URL: /{category}/{slug}.html?challenge={code}
+  // For slug variants like "clickspeed-standard", the file is the base slug
+  function getGameUrl(slug, code) {
+    var cat = getCategory(slug);
+    if (!cat) return '/?challenge=' + encodeURIComponent(code);
+    // Determine the HTML file name — use the base slug that matches a category key
+    var fileSlug = slug;
+    if (!GAME_CATEGORIES[slug]) {
+      var keys = Object.keys(GAME_CATEGORIES);
+      for (var i = 0; i < keys.length; i++) {
+        if (slug.indexOf(keys[i]) === 0) { fileSlug = keys[i]; break; }
+      }
+    }
+    return '/' + cat + '/' + fileSlug + '.html?challenge=' + encodeURIComponent(code);
+  }
+
+  // Escape HTML for safe insertion (createElement + textContent approach)
+  function escHtml(str) {
+    var el = document.createElement('span');
+    el.textContent = str;
+    return el.innerHTML;
+  }
+
+  // Format game slug as display name
+  function formatGameName(slug) {
+    return slug.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+  }
+
+  // Format score with commas
+  function formatScore(n) {
+    return Number(n).toLocaleString();
+  }
+
+  // Format timestamp
+  function formatTime(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    var now = new Date();
+    var diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' minutes ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' hours ago';
+    if (diff < 2592000000) return Math.floor(diff / 86400000) + ' days ago';
+    return d.toLocaleDateString();
+  }
+
+  // ─── Determine challenge code ───────────────────────────────
+  // The worker injects __CHALLENGE_CODE__ into this page.
+  // If that placeholder was NOT replaced (direct access), parse from URL path.
+  var challengeCode = '__CHALLENGE_CODE__';
+
+  // Check if the placeholder was NOT replaced by the worker
+  if (challengeCode.indexOf('__') === 0 && challengeCode.indexOf('CHALLENGE') > 0) {
+    // Parse from URL path: /c/{code}
+    var pathParts = window.location.pathname.split('/');
+    // Expected: ['', 'c', '{code}']
+    var rawCode = (pathParts[2] || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    challengeCode = rawCode.length === 6 ? rawCode : '';
+  }
+
+  var loadingEl = document.getElementById('loading');
+  var errorEl = document.getElementById('error');
+  var challengeEl = document.getElementById('challenge');
+
+  function showError(title, msg) {
+    loadingEl.style.display = 'none';
+    challengeEl.style.display = 'none';
+    errorEl.style.display = 'block';
+    // Safe text rendering
+    var titleEl = errorEl.querySelector('.error-title');
+    var msgEl = document.getElementById('error-msg');
+    titleEl.textContent = title;
+    msgEl.textContent = msg;
+    errorEl.classList.add('shake');
+  }
+
+  function showChallenge(data) {
+    loadingEl.style.display = 'none';
+    errorEl.style.display = 'none';
+    challengeEl.style.display = 'block';
+
+    // SAFE: all user data set via textContent
+    document.getElementById('ch-name').textContent = data.name || '???';
+    document.getElementById('ch-score').textContent = formatScore(data.score);
+    document.getElementById('ch-game').textContent = formatGameName(data.game);
+
+    // Challenge text (optional taunt message)
+    var textEl = document.getElementById('ch-text');
+    if (data.text && data.text.trim()) {
+      textEl.textContent = '"' + data.text.trim() + '"';
+      textEl.style.display = 'block';
+    } else {
+      textEl.style.display = 'none';
+    }
+
+    // Timestamp
+    document.getElementById('ch-time').textContent = data.ts ? 'Challenged ' + formatTime(data.ts) : '';
+
+    // Play button
+    var playBtn = document.getElementById('ch-play-btn');
+    playBtn.href = getGameUrl(data.game, challengeCode);
+
+    // If already responded, show VS result and change CTA
+    if (data.responded && data.response) {
+      var r = data.response;
+      document.getElementById('ch-cta').textContent = 'CHALLENGE COMPLETED';
+
+      document.getElementById('vs-challenger-name').textContent = data.name || '???';
+      document.getElementById('vs-challenger-score').textContent = formatScore(data.score);
+      document.getElementById('vs-responder-name').textContent = r.name || '???';
+      document.getElementById('vs-responder-score').textContent = formatScore(r.score);
+
+      var outcomeEl = document.getElementById('vs-outcome');
+      if (r.result === 'win') {
+        outcomeEl.textContent = r.name + ' WINS!';
+        outcomeEl.className = 'vs-outcome win';
+      } else {
+        outcomeEl.textContent = data.name + ' WINS!';
+        outcomeEl.className = 'vs-outcome lose';
+      }
+
+      document.getElementById('vs-result').style.display = 'block';
+
+      // Change button to "PLAY AGAIN" instead of hiding it
+      playBtn.textContent = 'PLAY THIS GAME';
+      // Link to game without challenge param since it's already responded
+      var cat = getCategory(data.game);
+      if (cat) {
+        var fileSlug = data.game;
+        if (!GAME_CATEGORIES[data.game]) {
+          var keys = Object.keys(GAME_CATEGORIES);
+          for (var i = 0; i < keys.length; i++) {
+            if (data.game.indexOf(keys[i]) === 0) { fileSlug = keys[i]; break; }
+          }
+        }
+        playBtn.href = '/' + cat + '/' + fileSlug + '.html';
+      }
+    }
+
+    // Spawn celebration particles
+    spawnParticles();
+  }
+
+  // ─── Background particles ──────────────────────────────────
+  function spawnParticles() {
+    var container = document.getElementById('particles');
+    var colors = ['#00f0ff', '#ffd700', '#ff2d7b', '#39ff14', '#b44dff'];
+    for (var i = 0; i < 15; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var p = document.createElement('div');
+          p.className = 'particle';
+          p.style.left = (Math.random() * 100) + 'vw';
+          p.style.bottom = '0';
+          p.style.background = colors[idx % colors.length];
+          p.style.animationDelay = (Math.random() * 3) + 's';
+          p.style.animationDuration = (4 + Math.random() * 4) + 's';
+          container.appendChild(p);
+          // Clean up after animation
+          setTimeout(function() {
+            if (p.parentNode) p.parentNode.removeChild(p);
+          }, 10000);
+        }, idx * 200);
+      })(i);
+    }
+  }
+
+  // ─── Fetch challenge data ──────────────────────────────────
+  if (!challengeCode || challengeCode.length !== 6) {
+    showError('INVALID LINK', 'This challenge link appears to be malformed. Check the URL and try again.');
+  } else {
+    fetch('/api/challenge/' + encodeURIComponent(challengeCode))
+      .then(function(res) {
+        if (res.status === 404) {
+          showError('CHALLENGE NOT FOUND', 'This challenge may have expired or the link is invalid. Challenges expire after 30 days.');
+          return null;
+        }
+        if (!res.ok) {
+          showError('SOMETHING WENT WRONG', 'Unable to load this challenge. Please try again later.');
+          return null;
+        }
+        return res.json();
+      })
+      .then(function(data) {
+        if (!data) return;
+        if (data.error) {
+          showError('CHALLENGE NOT FOUND', data.error);
+          return;
+        }
+        showChallenge(data);
+      })
+      .catch(function() {
+        showError('CONNECTION ERROR', 'Unable to reach the server. Check your internet connection and try again.');
+      });
+  }
+})();
+</script>
+</body>
+</html>
