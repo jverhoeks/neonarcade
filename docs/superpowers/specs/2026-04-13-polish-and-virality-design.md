@@ -8,51 +8,9 @@
 
 ## Phase 1: Polish
 
-Three targeted fixes across existing games. No new features — just bringing everything to baseline quality.
+One targeted fix. Audit confirmed HiDPI (devicePixelRatio) and ESC key handling are already present in all 72 games.
 
-### 1.1 HiDPI Canvas Fix (~35 games)
-
-**Problem:** About half of canvas-based games don't use `devicePixelRatio`, causing blurry rendering on Retina/HiDPI displays.
-
-**Fix pattern:**
-```javascript
-var dpr = window.devicePixelRatio || 1;
-canvas.width = logicalWidth * dpr;
-canvas.height = logicalHeight * dpr;
-canvas.style.width = logicalWidth + 'px';
-canvas.style.height = logicalHeight + 'px';
-ctx.scale(dpr, dpr);
-```
-
-**Approach:** Script-assisted audit of all canvas games. For each game missing `devicePixelRatio`:
-- Add `dpr` variable near canvas setup
-- Scale canvas dimensions by dpr
-- Set CSS dimensions to logical size
-- Add `ctx.scale(dpr, dpr)` after getting context
-
-**Risk:** Some games do manual pixel math that assumes 1:1 canvas-to-CSS ratio. Each fix needs a quick play-test.
-
-### 1.2 ESC Key Handler (~35 games)
-
-**Problem:** About half of games don't handle ESC key. Per project rules, ESC during gameplay must return to start screen (no score save, no game-over flow).
-
-**Fix pattern:**
-```javascript
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && gameState === 'playing') {
-    // Stop game loop, hide game UI, show start screen
-    gameState = 'menu';
-    showStartScreen();
-  }
-});
-```
-
-**Approach:** Each game has its own state management pattern, so this can't be fully automated. Each game needs:
-- Identify the game state variable and playing state value
-- Identify the start screen show function
-- Add ESC handler that transitions cleanly (stop animations, reset state)
-
-### 1.3 Missing Screenshots (4 games)
+### 1.1 Missing Screenshots (4 games)
 
 Generate screenshots for: `chimp`, `connections`, `tango`, `clickspeed`.
 
@@ -498,7 +456,7 @@ Neon.init({
 
 ### Per-Game Changes
 
-**Polish (Phase 1):** ~35 games get HiDPI fix, ~35 games get ESC handler. 4 games get screenshots.
+**Polish (Phase 1):** 4 games get screenshots. HiDPI and ESC handling already complete across all 72 games.
 
 **Virality (Phase 2):** Minimal per-game changes needed:
 - Games wanting daily mode: add `daily: true` to `Neon.init()` and use `Neon.getDailySeed()` in their RNG
@@ -509,7 +467,7 @@ Neon.init({
 
 ## Build Order
 
-1. **Phase 1: Polish** — HiDPI, ESC, screenshots (can be parallelized)
+1. **Phase 1: Polish** — 4 missing screenshots
 2. **Phase 2a: Challenge links** — worker endpoints + neon.js challenge methods + challenge page + worker OG injection
 3. **Phase 2b: Share upgrades** — formatShare, enhanced share(), score card generation
 4. **Phase 2c: Daily & streaks** — daily seed, streak tracking, auto-injected UI, enable on Wave 1 games
