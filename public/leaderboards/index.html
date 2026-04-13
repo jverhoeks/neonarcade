@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Leaderboards — NEON ARCADE | Top Scores & Rankings</title>
+<meta name="description" content="View global leaderboards and top scores for all NEON ARCADE games. See who holds the #1 spot across 70+ free browser games.">
+<meta name="keywords" content="leaderboard, high scores, rankings, neon arcade, browser games, global scores">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/leaderboards/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/leaderboards/">
+<meta property="og:title" content="Global Leaderboards — NEON ARCADE | Top Scores & Rankings">
+<meta property="og:description" content="View global leaderboards and top scores for all NEON ARCADE games. See who holds the #1 spot across 70+ free browser games.">
+<meta property="og:image" content="https://neonarcade.net/og-image.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/leaderboards/">
+<meta name="twitter:title" content="Global Leaderboards — NEON ARCADE | Top Scores & Rankings">
+<meta name="twitter:description" content="View global leaderboards and top scores for all NEON ARCADE games. See who holds the #1 spot across 70+ free browser games.">
+<meta name="twitter:image" content="https://neonarcade.net/og-image.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Global Leaderboards",
+  "url": "https://neonarcade.net/leaderboards/",
+  "description": "View global leaderboards and top scores for all NEON ARCADE games.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "Leaderboards", "item": "https://neonarcade.net/leaderboards/" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    min-height: 100vh;
+    background: #0a0a12;
+    font-family: 'Rajdhani', sans-serif;
+    color: #fff;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0,0,0,0.07) 2px,
+      rgba(0,0,0,0.07) 4px
+    );
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,240,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,123,0.06) 0%, transparent 60%);
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .page-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .page-header h1 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 6px;
+    color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .page-header .subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: #7a7a9a;
+    text-transform: uppercase;
+  }
+
+  /* Game picker */
+  .picker-section {
+    margin-bottom: 32px;
+  }
+  .picker-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #7a7a9a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .picker-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #fff;
+    background: #12121f;
+    border: 1px solid rgba(0,240,255,0.3);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300f0ff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+  .picker-select:focus {
+    border-color: #00f0ff;
+    box-shadow: 0 0 12px rgba(0,240,255,0.15);
+  }
+  .picker-select option {
+    background: #12121f;
+    color: #fff;
+  }
+  .picker-select optgroup {
+    color: #00f0ff;
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  /* Board card */
+  .board-card {
+    background: #12121f;
+    border: 1px solid rgba(0,240,255,0.12);
+    border-radius: 6px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .board-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(0,240,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .board-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: #00f0ff;
+    text-shadow: 0 0 8px rgba(0,240,255,0.4);
+    text-transform: uppercase;
+  }
+  .play-link {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 8px 20px;
+    border: 1px solid #39ff14;
+    background: rgba(57,255,20,0.06);
+    color: #39ff14;
+    text-decoration: none;
+    border-radius: 3px;
+    text-transform: uppercase;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+  .play-link:hover {
+    background: rgba(57,255,20,0.15);
+    box-shadow: 0 0 16px rgba(57,255,20,0.2);
+    transform: scale(1.04);
+  }
+
+  /* Leaderboard table */
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .lb-table th {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #7a7a9a;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 12px 24px 8px;
+    border-bottom: 1px solid rgba(0,240,255,0.08);
+  }
+  .lb-table th:last-child {
+    text-align: right;
+  }
+  .lb-table td {
+    padding: 10px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .lb-table tr:last-child td {
+    border-bottom: none;
+  }
+  .lb-table tr:hover td {
+    background: rgba(0,240,255,0.03);
+  }
+
+  /* Rank column */
+  .rank-cell {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    width: 56px;
+    text-align: center;
+  }
+  .rank-1 { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+  .rank-2 { color: #c0c0c0; text-shadow: 0 0 8px rgba(192,192,192,0.4); }
+  .rank-3 { color: #cd7f32; text-shadow: 0 0 8px rgba(205,127,50,0.4); }
+  .rank-other { color: #7a7a9a; }
+
+  /* Name column */
+  .name-cell {
+    font-family: 'Orbitron', monospace;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  .rank-1-row .name-cell {
+    color: #ffd700;
+    text-shadow: 0 0 6px rgba(255,215,0,0.3);
+  }
+  .rank-2-row .name-cell {
+    color: #c0c0c0;
+  }
+  .rank-3-row .name-cell {
+    color: #cd7f32;
+  }
+
+  /* Score column */
+  .score-cell {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: right;
+    color: #00f0ff;
+    text-shadow: 0 0 6px rgba(0,240,255,0.4);
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    padding: 14px 24px;
+    border-top: 1px solid rgba(0,240,255,0.08);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #7a7a9a;
+    text-align: center;
+  }
+  .stats-bar .stat-num {
+    color: #9999bb;
+    font-weight: 500;
+  }
+
+  /* Empty / loading states */
+  .state-msg {
+    padding: 48px 24px;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #7a7a9a;
+    text-transform: uppercase;
+  }
+  .state-msg.error {
+    color: #ff2d7b;
+  }
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.2s steps(3, end) infinite;
+  }
+  @keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+  }
+
+  /* Prompt (no game selected) */
+  .prompt-state {
+    padding: 64px 24px;
+    text-align: center;
+  }
+  .prompt-state .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    color: #00f0ff;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 20px rgba(0,240,255,0.4);
+  }
+  .prompt-state .msg {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #7a7a9a;
+    text-transform: uppercase;
+  }
+
+  /* Footer */
+  .page-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,240,255,0.08);
+  }
+  .back-link {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: #00f0ff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,240,255,0.3);
+    padding-bottom: 2px;
+    text-transform: uppercase;
+    transition: border-color 0.2s, text-shadow 0.2s;
+  }
+  .back-link:hover {
+    text-shadow: 0 0 10px rgba(0,240,255,0.5);
+    border-color: #00f0ff;
+  }
+
+  /* Responsive */
+  @media (max-width: 520px) {
+    .container { padding: 24px 12px 40px; }
+    .page-header h1 { font-size: 20px; letter-spacing: 4px; }
+    .board-header { padding: 14px 16px 12px; }
+    .board-title { font-size: 14px; letter-spacing: 2px; }
+    .lb-table th, .lb-table td { padding-left: 16px; padding-right: 16px; }
+    .stats-bar { padding: 12px 16px; }
+    .rank-cell { width: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="page-header">
+    <h1>Leaderboards</h1>
+    <div class="subtitle">Global Top Scores</div>
+  </header>
+
+  <div class="picker-section">
+    <label class="picker-label" for="game-picker">Select a game</label>
+    <select id="game-picker" class="picker-select">
+      <option value="">-- Choose a game --</option>
+      <optgroup label="NEON ARCADE">
+        <option value="neon-snake">Neon Snake</option>
+        <option value="impostor-pixel">Impostor Pixel</option>
+        <option value="catalyst">Catalyst</option>
+        <option value="pong-both-sides">Pong Both Sides</option>
+        <option value="afterglow">Afterglow</option>
+        <option value="flappy-rewind">Flappy Rewind</option>
+        <option value="palette">Palette</option>
+        <option value="pacman-amnesia">Pac-Man Amnesia</option>
+        <option value="territory">Territory</option>
+        <option value="signal">Signal</option>
+        <option value="burndown">Burndown</option>
+        <option value="mine-finder">Mine Finder</option>
+        <option value="tetris-betrayal">Tetris Betrayal</option>
+        <option value="faultline">Faultline</option>
+        <option value="wordchain">Wordchain</option>
+        <option value="split-second">Split Second</option>
+        <option value="chimp">Chimp</option>
+        <option value="pour">Pour</option>
+        <option value="bloomfield">Bloomfield</option>
+        <option value="typeblitz">Typeblitz</option>
+      </optgroup>
+      <optgroup label="NEON MIND">
+        <option value="sudoku">Sudoku</option>
+        <option value="minisudoku">Mini Sudoku</option>
+        <option value="queens">Queens</option>
+        <option value="minesweeper">Minesweeper</option>
+        <option value="kakuro">Kakuro</option>
+        <option value="nonogram">Nonogram</option>
+        <option value="bridges">Bridges</option>
+        <option value="tango">Tango</option>
+        <option value="lightup">Light Up</option>
+        <option value="tents">Tents</option>
+        <option value="skyscrapers">Skyscrapers</option>
+        <option value="connections">Connections</option>
+        <option value="hitori">Hitori</option>
+        <option value="kenken">KenKen</option>
+      </optgroup>
+      <optgroup label="NEON GRIND">
+        <option value="mathblitz">MathBlitz</option>
+        <option value="reflex-chain">Reflex Chain</option>
+        <option value="neurosort">NeuroSort</option>
+        <option value="colorname">ColorName</option>
+        <option value="numbersense">NumberSense</option>
+        <option value="gridmatch">GridMatch</option>
+        <option value="sequencer">Sequencer</option>
+      </optgroup>
+      <optgroup label="NEON CLASSIC">
+        <option value="invaders">Invaders</option>
+        <option value="breakout">Breakout</option>
+        <option value="tetris">Tetris</option>
+        <option value="2048">2048</option>
+        <option value="pairs">Pairs</option>
+        <option value="asteroids">Asteroids</option>
+        <option value="frogger">Frogger</option>
+      </optgroup>
+      <optgroup label="NEON QUEST">
+        <option value="fusion">Fusion</option>
+        <option value="jackpot">Jackpot</option>
+        <option value="firewall">Firewall</option>
+        <option value="swarm">Swarm</option>
+        <option value="synthesis">Synthesis</option>
+      </optgroup>
+      <optgroup label="NEON CASINO">
+        <option value="blackjack">Blackjack</option>
+        <option value="poker">Poker</option>
+        <option value="roulette">Roulette</option>
+        <option value="slots">Slots</option>
+        <option value="video-poker">Video Poker</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div id="board-area">
+    <div class="board-card">
+      <div class="prompt-state">
+        <span class="icon">#</span>
+        <div class="msg">Select a game to view the leaderboard</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <a href="/" class="back-link">Back to NEON ARCADE</a>
+  </footer>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // Game slug -> category path mapping
+  var GAME_CATEGORY = {
+    'neon-snake': 'neonarcade', 'impostor-pixel': 'neonarcade', 'catalyst': 'neonarcade',
+    'pong-both-sides': 'neonarcade', 'afterglow': 'neonarcade', 'flappy-rewind': 'neonarcade',
+    'palette': 'neonarcade', 'pacman-amnesia': 'neonarcade', 'territory': 'neonarcade',
+    'signal': 'neonarcade', 'burndown': 'neonarcade', 'mine-finder': 'neonarcade',
+    'tetris-betrayal': 'neonarcade', 'faultline': 'neonarcade', 'wordchain': 'neonarcade',
+    'split-second': 'neonarcade', 'chimp': 'neonarcade', 'pour': 'neonarcade',
+    'bloomfield': 'neonarcade', 'typeblitz': 'neonarcade',
+    'sudoku': 'neonmind', 'minisudoku': 'neonmind', 'queens': 'neonmind',
+    'minesweeper': 'neonmind', 'kakuro': 'neonmind', 'nonogram': 'neonmind',
+    'bridges': 'neonmind', 'tango': 'neonmind', 'lightup': 'neonmind',
+    'tents': 'neonmind', 'skyscrapers': 'neonmind', 'connections': 'neonmind',
+    'hitori': 'neonmind', 'kenken': 'neonmind',
+    'mathblitz': 'neongrind', 'reflex-chain': 'neongrind', 'neurosort': 'neongrind',
+    'colorname': 'neongrind', 'numbersense': 'neongrind', 'gridmatch': 'neongrind',
+    'sequencer': 'neongrind',
+    'invaders': 'neonclassic', 'breakout': 'neonclassic', 'tetris': 'neonclassic',
+    '2048': 'neonclassic', 'pairs': 'neonclassic', 'asteroids': 'neonclassic',
+    'frogger': 'neonclassic',
+    'fusion': 'neonquest', 'jackpot': 'neonquest', 'firewall': 'neonquest',
+    'swarm': 'neonquest', 'synthesis': 'neonquest',
+    'blackjack': 'neoncasino', 'poker': 'neoncasino', 'roulette': 'neoncasino',
+    'slots': 'neoncasino', 'video-poker': 'neoncasino'
+  };
+
+  // Time-based games (mode: low — lower is better, display as mm:ss)
+  var TIME_GAMES = {
+    'sudoku': true, 'minisudoku': true, 'queens': true, 'minesweeper': true,
+    'kakuro': true, 'nonogram': true, 'bridges': true, 'tango': true,
+    'lightup': true, 'tents': true, 'skyscrapers': true, 'connections': true,
+    'hitori': true, 'kenken': true, 'pairs': true, 'battleship': true
+  };
+
+  var picker = document.getElementById('game-picker');
+  var boardArea = document.getElementById('board-area');
+
+  // Read ?game= param on load
+  var params = new URLSearchParams(window.location.search);
+  var initialGame = params.get('game');
+  if (initialGame && picker.querySelector('option[value="' + CSS.escape(initialGame) + '"]')) {
+    picker.value = initialGame;
+    loadBoard(initialGame);
+  }
+
+  picker.addEventListener('change', function() {
+    var slug = picker.value;
+    if (slug) {
+      // Update URL without reload
+      var url = new URL(window.location);
+      url.searchParams.set('game', slug);
+      window.history.replaceState(null, '', url);
+      loadBoard(slug);
+    } else {
+      var url2 = new URL(window.location);
+      url2.searchParams.delete('game');
+      window.history.replaceState(null, '', url2);
+      showPrompt();
+    }
+  });
+
+  function showPrompt() {
+    boardArea.textContent = '';
+    var card = document.createElement('div');
+    card.className = 'board-card';
+    var ps = document.createElement('div');
+    ps.className = 'prompt-state';
+    var icon = document.createElement('span');
+    icon.className = 'icon';
+    icon.textContent = '#';
+    var msg = document.createElement('div');
+    msg.className = 'msg';
+    msg.textContent = 'Select a game to view the leaderboard';
+    ps.appendChild(icon);
+    ps.appendChild(msg);
+    card.appendChild(ps);
+    boardArea.appendChild(card);
+  }
+
+  function showLoading() {
+    boardArea.textContent = '';
+    var card = document.createElement('div');
+    card.className = 'board-card';
+    var s = document.createElement('div');
+    s.className = 'state-msg';
+    s.textContent = 'Loading leaderboard';
+    var dots = document.createElement('span');
+    dots.className = 'loading-dots';
+    s.appendChild(dots);
+    card.appendChild(s);
+    boardArea.appendChild(card);
+  }
+
+  function showError(message) {
+    boardArea.textContent = '';
+    var card = document.createElement('div');
+    card.className = 'board-card';
+    var s = document.createElement('div');
+    s.className = 'state-msg error';
+    s.textContent = message;
+    card.appendChild(s);
+    boardArea.appendChild(card);
+  }
+
+  function formatScore(score, slug) {
+    if (TIME_GAMES[slug]) {
+      var total = Math.floor(score);
+      var m = Math.floor(total / 60);
+      var sec = total % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+    return score.toLocaleString();
+  }
+
+  function getGameName(slug) {
+    var opt = picker.querySelector('option[value="' + CSS.escape(slug) + '"]');
+    return opt ? opt.textContent : slug;
+  }
+
+  function getGameURL(slug) {
+    var cat = GAME_CATEGORY[slug];
+    if (!cat) return '/';
+    return '/' + cat + '/' + slug + '.html';
+  }
+
+  function loadBoard(slug) {
+    showLoading();
+
+    var lbURL = '/api/leaderboard/' + encodeURIComponent(slug);
+    var statsURL = '/api/stats/' + encodeURIComponent(slug);
+
+    Promise.all([
+      fetch(lbURL).then(function(r) { return r.ok ? r.json() : Promise.reject('leaderboard fetch failed'); }),
+      fetch(statsURL).then(function(r) { return r.ok ? r.json() : Promise.reject('stats fetch failed'); })
+    ]).then(function(results) {
+      var lbData = results[0];
+      var statsData = results[1];
+      renderBoard(slug, lbData.leaderboard || [], statsData);
+    }).catch(function(err) {
+      showError('Failed to load leaderboard');
+    });
+  }
+
+  function renderBoard(slug, entries, stats) {
+    boardArea.textContent = '';
+
+    var card = document.createElement('div');
+    card.className = 'board-card';
+
+    // Header
+    var header = document.createElement('div');
+    header.className = 'board-header';
+
+    var title = document.createElement('div');
+    title.className = 'board-title';
+    title.textContent = getGameName(slug);
+
+    var playLink = document.createElement('a');
+    playLink.className = 'play-link';
+    playLink.href = getGameURL(slug);
+    playLink.textContent = 'PLAY';
+
+    header.appendChild(title);
+    header.appendChild(playLink);
+    card.appendChild(header);
+
+    // Leaderboard table or empty
+    if (entries.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'state-msg';
+      empty.textContent = 'No scores yet — be the first!';
+      card.appendChild(empty);
+    } else {
+      var table = document.createElement('table');
+      table.className = 'lb-table';
+
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      var thRank = document.createElement('th');
+      thRank.textContent = 'Rank';
+      var thName = document.createElement('th');
+      thName.textContent = 'Player';
+      var thScore = document.createElement('th');
+      thScore.textContent = 'Score';
+      headRow.appendChild(thRank);
+      headRow.appendChild(thName);
+      headRow.appendChild(thScore);
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      var tbody = document.createElement('tbody');
+      for (var i = 0; i < entries.length; i++) {
+        var entry = entries[i];
+        var rank = i + 1;
+
+        var tr = document.createElement('tr');
+        if (rank === 1) tr.className = 'rank-1-row';
+        else if (rank === 2) tr.className = 'rank-2-row';
+        else if (rank === 3) tr.className = 'rank-3-row';
+
+        var tdRank = document.createElement('td');
+        tdRank.className = 'rank-cell';
+        if (rank === 1) tdRank.className += ' rank-1';
+        else if (rank === 2) tdRank.className += ' rank-2';
+        else if (rank === 3) tdRank.className += ' rank-3';
+        else tdRank.className += ' rank-other';
+        tdRank.textContent = rank <= 3 ? ['', '#1', '#2', '#3'][rank] : rank;
+
+        var tdName = document.createElement('td');
+        tdName.className = 'name-cell';
+        tdName.textContent = entry.name || '???';
+
+        var tdScore = document.createElement('td');
+        tdScore.className = 'score-cell';
+        tdScore.textContent = formatScore(entry.score, slug);
+
+        tr.appendChild(tdRank);
+        tr.appendChild(tdName);
+        tr.appendChild(tdScore);
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      card.appendChild(table);
+    }
+
+    // Stats bar
+    var statsBar = document.createElement('div');
+    statsBar.className = 'stats-bar';
+    var totalPlays = (stats && stats.plays) || 0;
+    var todayPlays = (stats && stats.playsToday) || 0;
+    var totalSpan = document.createElement('span');
+    totalSpan.className = 'stat-num';
+    totalSpan.textContent = totalPlays.toLocaleString();
+    var todaySpan = document.createElement('span');
+    todaySpan.className = 'stat-num';
+    todaySpan.textContent = todayPlays.toLocaleString();
+
+    statsBar.appendChild(totalSpan);
+    statsBar.appendChild(document.createTextNode(' total plays \u00B7 '));
+    statsBar.appendChild(todaySpan);
+    statsBar.appendChild(document.createTextNode(' today'));
+
+    card.appendChild(statsBar);
+
+    boardArea.appendChild(card);
+  }
+
+})();
+</script>
+</body>
+</html>
