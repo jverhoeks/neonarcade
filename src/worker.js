@@ -163,6 +163,16 @@ function generateToken() {
   return Math.random().toString(36).slice(2, 14);
 }
 
+// Generate a random 6-char alphanumeric challenge code (uppercase + digits)
+function generateChallengeCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * 36)];
+  }
+  return code;
+}
+
 // Sanitize room code: uppercase A-Z only, exactly 4 chars
 function sanitizeRoomCode(code) {
   if (typeof code !== 'string') return null;
@@ -204,6 +214,34 @@ export default {
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    // Challenge page with dynamic OG tags
+    if (url.pathname.startsWith('/c/') && url.pathname.length > 3) {
+      const code = url.pathname.slice(3).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+      if (code.length === 6) {
+        const data = safeParseObject(await env.GAME_DATA.get(`challenge:${code}`));
+        if (data && data.game) {
+          const gameName = data.game.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          const title = `${data.name} scored ${data.score.toLocaleString()} in ${gameName} — Can you beat it?`;
+          const desc = 'Challenge accepted? Play now on NEON ARCADE. No download, no login.';
+          const screenshotUrl = `https://neonarcade.net/screenshots/${data.game}.png`;
+
+          const assetResponse = await env.ASSETS.fetch(new Request(url.origin + '/c/index.html', request));
+          let html = await assetResponse.text();
+
+          html = html.replace(/__OG_TITLE__/g, title.replace(/"/g, '&quot;'));
+          html = html.replace(/__OG_DESC__/g, desc);
+          html = html.replace(/__OG_IMAGE__/g, screenshotUrl);
+          html = html.replace(/__OG_URL__/g, `https://neonarcade.net/c/${code}`);
+          html = html.replace(/__CHALLENGE_CODE__/g, code);
+
+          return new Response(html, {
+            headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+          });
+        }
+      }
+      return env.ASSETS.fetch(new Request(url.origin + '/c/index.html', request));
     }
 
     // Only handle /api/ routes
@@ -365,6 +403,102 @@ export default {
         if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
         const data = safeParseArray(await env.GAME_DATA.get(`lb:${game}`));
         return json({ game, leaderboard: data });
+      }
+
+      // ─── Challenge Link Endpoints ──────────────────────────────────
+
+      // POST /api/challenge — create a challenge link
+      if (request.method === 'POST' && segments[0] === 'challenge' && segments.length === 1) {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const game = sanitizeGame(body.game);
+        if (!game || !KNOWN_GAMES[game]) return json({ error: 'unknown game' }, 404);
+
+        const gameConfig = KNOWN_GAMES[game];
+        const name = sanitizeName(body.name);
+        const score = parseInt(body.score, 10);
+        if (!name || name.length < 1) return json({ error: 'name required' }, 400);
+        if (isNaN(score) || score <= 0) return json({ error: 'valid score required' }, 400);
+        if (score > gameConfig.maxScore) return json({ error: 'score exceeds maximum' }, 400);
+
+        const text = typeof body.text === 'string' ? body.text.slice(0, 500) : '';
+
+        // Generate unique code with collision check
+        let code = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const candidate = generateChallengeCode();
+          const existing = await env.GAME_DATA.get(`challenge:${candidate}`);
+          if (!existing) {
+            code = candidate;
+            break;
+          }
+        }
+        if (!code) return json({ error: 'failed to generate code, try again' }, 503);
+
+        const challenge = { game, score, name, text, ts: Date.now(), response: null };
+        await env.GAME_DATA.put(`challenge:${code}`, JSON.stringify(challenge), { expirationTtl: 2592000 }); // 30 days
+        return json({ code });
+      }
+
+      // GET /api/challenge/:code — retrieve a challenge
+      if (request.method === 'GET' && segments[0] === 'challenge' && segments.length === 2) {
+        const code = (segments[1] || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+        if (code.length !== 6) return json({ error: 'invalid code' }, 400);
+
+        const data = safeParseObject(await env.GAME_DATA.get(`challenge:${code}`));
+        if (!data) return json({ error: 'challenge not found' }, 404);
+
+        return json({
+          game: data.game,
+          score: data.score,
+          name: data.name,
+          text: data.text,
+          ts: data.ts,
+          responded: !!data.response,
+          response: data.response,
+        });
+      }
+
+      // POST /api/challenge/:code/respond — submit a challenge response
+      if (request.method === 'POST' && segments[0] === 'challenge' && segments.length === 3 && segments[2] === 'respond') {
+        const code = (segments[1] || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+        if (code.length !== 6) return json({ error: 'invalid code' }, 400);
+
+        const data = safeParseObject(await env.GAME_DATA.get(`challenge:${code}`));
+        if (!data) return json({ error: 'challenge not found' }, 404);
+        if (data.response) return json({ error: 'challenge already responded' }, 400);
+
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const name = sanitizeName(body.name);
+        const score = parseInt(body.score, 10);
+        if (!name) return json({ error: 'name required' }, 400);
+        if (isNaN(score) || score <= 0) return json({ error: 'valid score required' }, 400);
+
+        const gameConfig = KNOWN_GAMES[data.game];
+        if (!gameConfig) return json({ error: 'unknown game' }, 404);
+
+        const mode = gameConfig.mode;
+        let result, diff;
+        if (mode === 'low') {
+          result = score <= data.score ? 'win' : 'lose';
+          diff = data.score - score;
+        } else {
+          result = score >= data.score ? 'win' : 'lose';
+          diff = score - data.score;
+        }
+
+        data.response = { name, score, ts: Date.now(), result, diff };
+        await env.GAME_DATA.put(`challenge:${code}`, JSON.stringify(data), { expirationTtl: 2592000 });
+
+        return json({
+          result,
+          diff,
+          challenge: { game: data.game, score: data.score, name: data.name },
+          response: { score, name },
+        });
       }
 
       // ─── Multiplayer Room Endpoints ────────────────────────────────
