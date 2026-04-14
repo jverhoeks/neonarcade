@@ -395,6 +395,7 @@ export default {
           body: JSON.stringify({
             code,
             client_id: env.WORKOS_CLIENT_ID || '',
+            client_secret: env.WORKOS_API_KEY || '',
             grant_type: 'authorization_code',
           }),
         });
