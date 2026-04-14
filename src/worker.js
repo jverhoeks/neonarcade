@@ -96,6 +96,9 @@ const KNOWN_GAMES = {
   'frogger':             { mode: 'high', maxScore: 1000000 },
   'battleship':          { mode: 'low', maxScore: 200 },
   'tictactoe':           { mode: 'high', maxScore: 10000 },
+  'pinball':             { mode: 'high', maxScore: 10000000 },
+  'sopwith':             { mode: 'high', maxScore: 1000000 },
+  'outrun':              { mode: 'high', maxScore: 1000000 },
 
   // NEON CASINO (mode: high — bankroll-based)
   'blackjack':           { mode: 'high', maxScore: 1000000 },

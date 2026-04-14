@@ -9,7 +9,7 @@ NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven ca
 - [NEON ARCADE](https://neonarcade.net/neonarcade/) — 31 quick viral action games (30-60 seconds)
 - [NEON MIND](https://neonarcade.net/neonmind/) — 17 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
 - [NEON GRIND](https://neonarcade.net/neongrind/) — 8 progressive skill challenges
-- [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 8 retro arcade classics reimagined
+- [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 11 retro arcade classics reimagined
 - [NEON QUEST](https://neonarcade.net/neonquest/) — 5 deep games for longer sessions (roguelikes, tower defense, crafting)
 - [NEON CASINO](https://neonarcade.net/neoncasino/) — 5 casino card and table games with virtual chips
 - [NEON WORLD](https://neonarcade.net/neonworld/) — 2 world knowledge games (history, art, geography)
@@ -91,6 +91,9 @@ NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven ca
 - [Neon Pairs](https://neonarcade.net/neonclassic/pairs.html) — Memory card matching
 - [Neon Tetris](https://neonarcade.net/neonclassic/tetris.html) — Classic block stacking reimagined
 - [Tic Tac Toe](https://neonarcade.net/neonclassic/tictactoe.html) — 3x3 or 4x4, VS AI or VS Friend
+- [Pinball](https://neonarcade.net/neonclassic/pinball.html) — Neon pinball machine with bumpers, flippers, and ramps
+- [Sopwith](https://neonarcade.net/neonclassic/sopwith.html) — Classic 1984 DOS biplane combat reimagined with neon aesthetics
+- [OutRun](https://neonarcade.net/neonclassic/outrun.html) — Pseudo-3D arcade racer with neon highway, traffic, and checkpoints
 
 ### NEON QUEST
 - [Fusion](https://neonarcade.net/neonquest/fusion.html) — Atomic merge physics — drop elements, fuse them up the periodic table

@@ -459,6 +459,21 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://neonarcade.net/neonclassic/pinball.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonclassic/sopwith.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonclassic/outrun.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://neonarcade.net/neonmind/culprit.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
