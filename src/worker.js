@@ -843,7 +843,7 @@ export default {
           const throttleKey = `sync_throttle:${session.userId}`;
           const lastSync = await env.GAME_DATA.get(throttleKey);
           if (lastSync) return json({ error: 'sync too frequent' }, 429);
-          await env.GAME_DATA.put(throttleKey, '1', { expirationTtl: 10 });
+          await env.GAME_DATA.put(throttleKey, '1', { expirationTtl: 60 });
 
           let body;
           try { body = await request.json(); } catch (parseErr) { return json({ error: 'invalid JSON body: ' + parseErr.message }, 400); }
