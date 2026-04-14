@@ -284,6 +284,72 @@ function makeRedirectWithCookies(url, sessionId, displayName) {
   return new Response(null, { status: 302, headers });
 }
 
+// Merge sync data: client + server → merged
+function mergeSyncData(client, server) {
+  if (!server) return client;
+  if (!client) return server;
+  const merged = {};
+
+  merged.playerName = client.playerName || server.playerName || '';
+
+  // Profile
+  const cp = client.profile || {};
+  const sp = server.profile || {};
+  merged.profile = {
+    firstVisit: (cp.firstVisit && sp.firstVisit) ? (cp.firstVisit < sp.firstVisit ? cp.firstVisit : sp.firstVisit) : (cp.firstVisit || sp.firstVisit || ''),
+    gamesPlayed: [...new Set([...(cp.gamesPlayed || []), ...(sp.gamesPlayed || [])])],
+    challengeWins: Math.max(cp.challengeWins || 0, sp.challengeWins || 0),
+    challengeLosses: Math.max(cp.challengeLosses || 0, sp.challengeLosses || 0),
+    topPercentiles: {},
+  };
+  const allPctKeys = new Set([...Object.keys(cp.topPercentiles || {}), ...Object.keys(sp.topPercentiles || {})]);
+  for (const g of allPctKeys) {
+    const cv = (cp.topPercentiles || {})[g];
+    const sv = (sp.topPercentiles || {})[g];
+    merged.profile.topPercentiles[g] = (cv !== undefined && sv !== undefined) ? Math.min(cv, sv) : (cv !== undefined ? cv : sv);
+  }
+
+  // Badges: union, keep earliest earned
+  merged.badges = {};
+  const allBadgeKeys = new Set([...Object.keys(client.badges || {}), ...Object.keys(server.badges || {})]);
+  for (const id of allBadgeKeys) {
+    const cb = (client.badges || {})[id];
+    const sb = (server.badges || {})[id];
+    if (cb && sb) {
+      merged.badges[id] = { earned: cb.earned < sb.earned ? cb.earned : sb.earned, seen: true };
+    } else {
+      merged.badges[id] = cb || sb;
+    }
+  }
+
+  // Hub streak: keep higher/more recent
+  const cs = client.hubStreak || {};
+  const ss = server.hubStreak || {};
+  merged.hubStreak = {
+    current: Math.max(cs.current || 0, ss.current || 0),
+    best: Math.max(cs.best || 0, ss.best || 0),
+    lastPlayed: (cs.lastPlayed || '') > (ss.lastPlayed || '') ? cs.lastPlayed : ss.lastPlayed,
+    perfectCurrent: Math.max(cs.perfectCurrent || 0, ss.perfectCurrent || 0),
+    perfectBest: Math.max(cs.perfectBest || 0, ss.perfectBest || 0),
+    lastPerfect: (cs.lastPerfect || '') > (ss.lastPerfect || '') ? cs.lastPerfect : ss.lastPerfect,
+  };
+
+  // Scores: union by timestamp, deduplicate, keep top 10
+  merged.scores = {};
+  const allScoreKeys = new Set([...Object.keys(client.scores || {}), ...Object.keys(server.scores || {})]);
+  for (const key of allScoreKeys) {
+    const ca = (client.scores || {})[key] || [];
+    const sa = (server.scores || {})[key] || [];
+    const byTs = {};
+    [...ca, ...sa].forEach(entry => { if (entry && entry.ts) byTs[entry.ts] = entry; });
+    const combined = Object.values(byTs);
+    combined.sort((a, b) => b.score - a.score);
+    merged.scores[key] = combined.slice(0, 10);
+  }
+
+  return merged;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -757,6 +823,47 @@ export default {
         const today = new Date().toISOString().slice(0, 10);
         const count = parseInt(await env.GAME_DATA.get(`daily_complete:${today}`) || '0', 10);
         return json({ completions: count, date: today });
+      }
+
+      // ─── Sync Endpoints ───────────────────────────────────────────
+
+      // POST /api/sync — upload localStorage data to server
+      if (request.method === 'POST' && segments[0] === 'sync' && segments.length === 1) {
+        const session = await getSession(request, env.GAME_DATA);
+        if (!session) return json({ error: 'not authenticated' }, 401);
+
+        const throttleKey = `sync_throttle:${session.userId}`;
+        const lastSync = await env.GAME_DATA.get(throttleKey);
+        if (lastSync) return json({ error: 'sync too frequent' }, 429);
+        await env.GAME_DATA.put(throttleKey, '1', { expirationTtl: 10 });
+
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+        if (JSON.stringify(body).length > 524288) return json({ error: 'payload too large' }, 413);
+
+        const userKey = `user:${session.userId}`;
+        const existing = safeParseObject(await env.GAME_DATA.get(userKey));
+        const merged = mergeSyncData(body, existing ? existing.data : null);
+
+        const userData = {
+          email: session.email,
+          name: session.name,
+          provider: session.provider,
+          data: merged,
+          lastSync: new Date().toISOString(),
+        };
+        await env.GAME_DATA.put(userKey, JSON.stringify(userData));
+        return json({ ok: true, lastSync: userData.lastSync });
+      }
+
+      // GET /api/sync — download server data to device
+      if (request.method === 'GET' && segments[0] === 'sync' && segments.length === 1) {
+        const session = await getSession(request, env.GAME_DATA);
+        if (!session) return json({ error: 'not authenticated' }, 401);
+
+        const userData = safeParseObject(await env.GAME_DATA.get(`user:${session.userId}`));
+        if (!userData || !userData.data) return json({ empty: true });
+        return json(userData.data);
       }
 
       // ─── Multiplayer Room Endpoints ────────────────────────────────
