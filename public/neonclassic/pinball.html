@@ -375,7 +375,7 @@ canvas {
   // Physics
   var GRAVITY = 500; // px/s^2
   var RESTITUTION = 0.45;
-  var BALL_MAX_SPEED = 900;
+  var BALL_MAX_SPEED = 750;
 
   // Table geometry
   // Walls: array of line segments {x1,y1,x2,y2}
@@ -755,19 +755,33 @@ canvas {
   function updatePhysics(dt) {
     if (!ball.active) return;
 
-    // Gravity
-    ball.vy += GRAVITY * dt;
+    // Sub-step to prevent tunneling: split into steps where ball moves max 4px
+    var speed = len(ball.vx, ball.vy + GRAVITY * dt);
+    var maxStep = 4; // px per sub-step (less than ball radius)
+    var distance = speed * dt;
+    var subSteps = Math.max(1, Math.ceil(distance / maxStep));
+    var subDt = dt / subSteps;
 
-    // Move
-    ball.x += ball.vx * dt;
-    ball.y += ball.vy * dt;
+    for (var step = 0; step < subSteps; step++) {
+      // Gravity
+      ball.vy += GRAVITY * subDt;
 
-    // Clamp speed
-    clampSpeed();
+      // Move
+      ball.x += ball.vx * subDt;
+      ball.y += ball.vy * subDt;
 
-    // Wall collisions
-    for (var i = 0; i < walls.length; i++) {
-      collideBallWall(walls[i]);
+      // Clamp speed
+      clampSpeed();
+
+      // Wall collisions (check every sub-step)
+      for (var i = 0; i < walls.length; i++) {
+        collideBallWall(walls[i]);
+      }
+
+      // Hard boundary clamp (every sub-step)
+      if (ball.x < 20 + ball.r) { ball.x = 20 + ball.r; ball.vx = Math.abs(ball.vx) * 0.5; }
+      if (ball.x > 400 - ball.r) { ball.x = 400 - ball.r; ball.vx = -Math.abs(ball.vx) * 0.5; }
+      if (ball.y < 15 + ball.r) { ball.y = 15 + ball.r; ball.vy = Math.abs(ball.vy) * 0.5; }
     }
 
     // Bumper collisions
@@ -817,10 +831,7 @@ canvas {
       }
     }
 
-    // Boundary keep-in (safety)
-    if (ball.x < 20 + ball.r) { ball.x = 20 + ball.r; ball.vx = Math.abs(ball.vx) * 0.6; }
-    if (ball.x > 395 - ball.r) { ball.x = 395 - ball.r; ball.vx = -Math.abs(ball.vx) * 0.6; }
-    if (ball.y < 20 + ball.r) { ball.y = 20 + ball.r; ball.vy = Math.abs(ball.vy) * 0.6; }
+    // (Boundary clamping is now inside the sub-step loop above)
 
     // Drain detection
     if (ball.y > 740) {
