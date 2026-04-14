@@ -13,3 +13,8 @@ binding = "ASSETS"
 [[kv_namespaces]]
 binding = "GAME_DATA"
 id = "1a83accd339440ebab05563fea7335e0"
+
+# Secrets (set via: wrangler secret put <NAME>):
+# WORKOS_CLIENT_ID — from WorkOS dashboard
+# WORKOS_API_KEY — from WorkOS dashboard
+# SESSION_SECRET — random 32-char string

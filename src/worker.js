@@ -255,6 +255,35 @@ function safeParseArray(data) {
   }
 }
 
+// Generate a random session ID (32 hex chars)
+function generateSessionId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Parse a specific cookie from the Cookie header
+function getCookie(request, name) {
+  const header = request.headers.get('Cookie') || '';
+  const match = header.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return match ? match[1] : null;
+}
+
+// Validate session from cookie, returns session object or null
+async function getSession(request, kv) {
+  const sessionId = getCookie(request, 'neon_session');
+  if (!sessionId || sessionId.length !== 32) return null;
+  return safeParseObject(await kv.get(`session:${sessionId}`));
+}
+
+// Create redirect response with login cookies (uses Headers.append for multiple Set-Cookie)
+function makeRedirectWithCookies(url, sessionId, displayName) {
+  const headers = new Headers({ 'Location': url });
+  headers.append('Set-Cookie', `neon_session=${sessionId}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000`);
+  headers.append('Set-Cookie', `neon_user=${encodeURIComponent(displayName)}; Secure; SameSite=Lax; Path=/; Max-Age=2592000`);
+  return new Response(null, { status: 302, headers });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -267,6 +296,93 @@ export default {
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    // ─── Auth Routes ─────────────────────────────────────────────────
+    if (url.pathname.startsWith('/auth/')) {
+      const authPath = url.pathname.slice(6);
+
+      // GET /auth/login — redirect to WorkOS AuthKit
+      if (request.method === 'GET' && authPath === 'login') {
+        const returnTo = url.searchParams.get('return_to') || '/';
+        const state = btoa(JSON.stringify({ returnTo }));
+        const workosUrl = 'https://api.workos.com/user_management/authorize?' +
+          'client_id=' + encodeURIComponent(env.WORKOS_CLIENT_ID || '') +
+          '&redirect_uri=' + encodeURIComponent('https://neonarcade.net/auth/callback') +
+          '&response_type=code&provider=authkit' +
+          '&state=' + encodeURIComponent(state);
+        return Response.redirect(workosUrl, 302);
+      }
+
+      // GET /auth/callback — exchange code, create session
+      if (request.method === 'GET' && authPath === 'callback') {
+        const code = url.searchParams.get('code');
+        const stateParam = url.searchParams.get('state');
+        if (!code) return new Response('Missing code', { status: 400 });
+
+        const tokenRes = await fetch('https://api.workos.com/user_management/authenticate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (env.WORKOS_API_KEY || ''),
+          },
+          body: JSON.stringify({
+            code,
+            client_id: env.WORKOS_CLIENT_ID || '',
+            grant_type: 'authorization_code',
+          }),
+        });
+
+        if (!tokenRes.ok) return new Response('Auth failed', { status: 401 });
+
+        const tokenData = await tokenRes.json();
+        const user = tokenData.user;
+        if (!user || !user.id) return new Response('Invalid user data', { status: 401 });
+
+        const sessionId = generateSessionId();
+        const displayName = sanitizeName(user.first_name || (user.email || '').split('@')[0] || 'PLR');
+        const session = {
+          userId: user.id,
+          email: user.email || '',
+          name: displayName,
+          provider: user.provider || 'unknown',
+          created: Date.now(),
+        };
+        await env.GAME_DATA.put(`session:${sessionId}`, JSON.stringify(session), { expirationTtl: 2592000 });
+
+        let returnTo = '/';
+        try {
+          const stateObj = JSON.parse(atob(stateParam || ''));
+          if (stateObj.returnTo && stateObj.returnTo.startsWith('/')) returnTo = stateObj.returnTo;
+        } catch(e) {}
+
+        const redirectUrl = returnTo + (returnTo.indexOf('?') >= 0 ? '&' : '?') + 'just_logged_in=1';
+        return makeRedirectWithCookies(redirectUrl, sessionId, displayName);
+      }
+
+      // POST /auth/logout — clear session
+      if (request.method === 'POST' && authPath === 'logout') {
+        const sessionId = getCookie(request, 'neon_session');
+        if (sessionId) await env.GAME_DATA.delete(`session:${sessionId}`);
+        const headers = new Headers({ 'Content-Type': 'application/json' });
+        headers.append('Set-Cookie', 'neon_session=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0');
+        headers.append('Set-Cookie', 'neon_user=; Secure; SameSite=Lax; Path=/; Max-Age=0');
+        return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
+      }
+
+      // GET /auth/status — check if logged in
+      if (request.method === 'GET' && authPath === 'status') {
+        const session = await getSession(request, env.GAME_DATA);
+        if (session) {
+          const email = session.email || '';
+          const atIdx = email.indexOf('@');
+          const masked = atIdx > 1 ? email[0] + '...' + email.slice(atIdx) : email;
+          return json({ loggedIn: true, name: session.name, email: masked, provider: session.provider });
+        }
+        return json({ loggedIn: false });
+      }
+
+      return new Response('Not found', { status: 404 });
     }
 
     // Challenge page with dynamic OG tags
