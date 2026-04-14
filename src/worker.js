@@ -41,6 +41,7 @@ const KNOWN_GAMES = {
   'typeblitz':           { mode: 'high', maxScore: 5000 },
   'veto':                { mode: 'high', maxScore: 100 },
   'mimic':               { mode: 'high', maxScore: 100 },
+  'orbit':               { mode: 'high', maxScore: 100000 },
 
   // NEON GRIND (mode: high)
   'mathblitz':           { mode: 'high', maxScore: 100000 },

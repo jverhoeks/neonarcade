@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Orbit — Free Online Gravity Physics Game | NEON ARCADE</title>
+<meta name="description" content="Play Orbit free online — launch satellites into orbit around planets using real gravity physics. Time your launch, ride the curves, achieve stable orbit. No download, no login.">
+<meta name="keywords" content="orbit game, gravity game, space physics game, satellite game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/orbit.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/orbit.html">
+<meta property="og:title" content="Orbit — Free Online Gravity Physics Game | NEON ARCADE">
+<meta property="og:description" content="Play Orbit free online — launch satellites into orbit around planets using real gravity physics. Time your launch, ride the curves, achieve stable orbit.">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/orbit.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/orbit.html">
+<meta name="twitter:title" content="Orbit — Free Online Gravity Physics Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Orbit free online — launch satellites into orbit around planets using real gravity physics. Time your launch, ride the curves, achieve stable orbit.">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/orbit.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Orbit",
+  "url": "https://neonarcade.net/neonarcade/orbit.html",
+  "description": "Play Orbit free online — launch satellites into orbit around planets using real gravity physics. Time your launch, ride the curves, achieve stable orbit.",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonarcade/screenshots/orbit.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON ARCADE", "item": "https://neonarcade.net/neonarcade/" },
+    { "@type": "ListItem", "position": 3, "name": "Orbit", "item": "https://neonarcade.net/neonarcade/orbit.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden; background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif; color: #fff;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+}
+body::after {
+  content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+canvas { display: block; position: absolute; top: 0; left: 0; }
+
+/* HUD */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 12px 16px; display: none; pointer-events: none;
+  font-family: 'Orbitron', monospace;
+}
+#hud .hud-row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+#hud .hud-label {
+  font-size: 10px; letter-spacing: 2px; color: var(--text-dim);
+  text-transform: uppercase; font-weight: 300;
+}
+#hud .hud-val {
+  font-size: 22px; font-weight: 700; color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0,240,255,0.6);
+}
+#hud .hud-lives { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,45,123,0.6); }
+#hud .hud-streak { color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.6); }
+#hud .hud-level { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,20,0.6); }
+
+/* Screens */
+.screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  display: none; flex-direction: column; justify-content: center; align-items: center;
+  z-index: 200; text-align: center; padding: 20px;
+}
+.screen.active { display: flex; }
+.screen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: clamp(36px, 8vw, 72px);
+  letter-spacing: 8px; color: var(--neon-cyan);
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.2);
+  margin-bottom: 8px;
+}
+.screen .subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: clamp(14px, 3vw, 20px);
+  color: var(--text-mid); letter-spacing: 2px; text-transform: uppercase;
+  max-width: 500px; margin-bottom: 32px; line-height: 1.5;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+  text-decoration: none;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 13px;
+  color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase;
+  margin-top: 24px;
+}
+
+/* Game Over */
+#gameOver h1 { color: var(--neon-pink); text-shadow: 0 0 20px rgba(255,45,123,0.6), 0 0 60px rgba(255,45,123,0.2); }
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin: 24px 0; max-width: 320px; width: 100%;
+}
+.stat-box {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px; padding: 12px;
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 11px;
+  letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 24px;
+  color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.5);
+  margin-top: 4px;
+}
+.btn-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+.share-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; padding: 12px 28px;
+  border: 1px solid var(--neon-green); background: rgba(57,255,20,0.06);
+  color: var(--neon-green); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+#leaderboard-container { margin-top: 16px; width: 100%; max-width: 400px; }
+#startLB { margin-top: 16px; width: 100%; max-width: 400px; }
+
+@keyframes shake {
+  0%,100% { transform: translate(0,0); }
+  10% { transform: translate(-3px, 2px); }
+  20% { transform: translate(3px, -2px); }
+  30% { transform: translate(-2px, 3px); }
+  40% { transform: translate(2px, -3px); }
+  50% { transform: translate(-3px, 1px); }
+  60% { transform: translate(3px, -1px); }
+  70% { transform: translate(-1px, 3px); }
+  80% { transform: translate(1px, -2px); }
+  90% { transform: translate(-2px, 2px); }
+}
+.shaking { animation: shake 0.25s ease-in-out; }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div class="hud-row">
+    <div><span class="hud-label">SCORE</span><br><span class="hud-val" id="hudScore">0</span></div>
+    <div><span class="hud-label">LEVEL</span><br><span class="hud-val hud-level" id="hudLevel">1</span></div>
+    <div><span class="hud-label">STREAK</span><br><span class="hud-val hud-streak" id="hudStreak">0</span></div>
+    <div><span class="hud-label">LIVES</span><br><span class="hud-val hud-lives" id="hudLives">3</span></div>
+  </div>
+</div>
+
+<div id="startScreen" class="screen active">
+  <h1>ORBIT</h1>
+  <div class="subtitle">Launch satellites into stable orbit around target planets. Gravity bends your path &mdash; timing is everything.</div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">CLICK / TAP TO LAUNCH &bull; ESC TO QUIT</div>
+  <div id="startLB"></div>
+</div>
+
+<div id="gameOver" class="screen">
+  <h1>LOST IN SPACE</h1>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-label">CAPTURES</div><div class="stat-value" id="statCaptures">0</div></div>
+    <div class="stat-box"><div class="stat-label">BEST STREAK</div><div class="stat-value" id="statStreak">0</div></div>
+    <div class="stat-box"><div class="stat-label">SCORE</div><div class="stat-value" id="statScore">0</div></div>
+    <div class="stat-box"><div class="stat-label">LEVEL</div><div class="stat-value" id="statLevel">0</div></div>
+  </div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="replayBtn">PLAY AGAIN</button>
+  </div>
+  <div id="leaderboard-container"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(() => {
+  // ========== CONFIG ==========
+  const G = 0.8;               // gravitational constant
+  const STAR_MASS = 600;       // central star mass
+  const PLANET_MASS = 120;     // planet gravitational mass
+  const SAT_SPEED = 3.2;       // initial satellite speed
+  const CAPTURE_DIST = 50;     // max distance for capture check
+  const CAPTURE_VEL = 1.8;     // max velocity for capture
+  const TRAIL_LEN = 120;       // satellite trail length
+  const MAX_LIVES = 3;
+  const ORBIT_TICKS = 90;      // frames satellite must orbit to capture
+  const LAUNCH_COOLDOWN = 300; // ms between launches
+
+  // Planet colors from the palette
+  const PLANET_COLORS = [
+    '#00f0ff', '#39ff14', '#ffd700', '#ff2d7b', '#b44dff', '#ff8c00'
+  ];
+
+  // ========== DOM ==========
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const hud = document.getElementById('hud');
+  const startScreen = document.getElementById('startScreen');
+  const gameOverScreen = document.getElementById('gameOver');
+  const startBtn = document.getElementById('startBtn');
+  const replayBtn = document.getElementById('replayBtn');
+  const shareBtn = document.getElementById('shareBtn');
+
+  // ========== HiDPI ==========
+  let dpr = window.devicePixelRatio || 1;
+  let W, H, cx, cy;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cx = W / 2;
+    cy = H / 2;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ========== AUDIO ==========
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  function playTone(freq, dur, type, vol, detune) {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    if (detune) osc.detune.value = detune;
+    gain.gain.value = vol || 0.15;
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  }
+  function sndLaunch() {
+    playTone(200, 0.3, 'sawtooth', 0.1);
+    playTone(400, 0.2, 'sine', 0.08);
+  }
+  function sndCapture() {
+    playTone(523, 0.1, 'sine', 0.15);
+    setTimeout(() => playTone(659, 0.1, 'sine', 0.15), 80);
+    setTimeout(() => playTone(784, 0.15, 'sine', 0.2), 160);
+    setTimeout(() => playTone(1047, 0.3, 'sine', 0.12), 240);
+  }
+  function sndCrash() {
+    playTone(120, 0.4, 'sawtooth', 0.2);
+    playTone(80, 0.5, 'square', 0.1, 50);
+  }
+  function sndHum(intensity) {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 60 + intensity * 40;
+    gain.gain.value = Math.min(intensity * 0.04, 0.06);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+  }
+
+  // ========== STARS BACKGROUND ==========
+  let bgStars = [];
+  function generateStars() {
+    bgStars = [];
+    for (let i = 0; i < 200; i++) {
+      bgStars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.5 + 0.3,
+        a: Math.random() * 0.6 + 0.2,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinklePhase: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+  generateStars();
+  window.addEventListener('resize', () => { resize(); generateStars(); });
+
+  // ========== PARTICLES ==========
+  let particles = [];
+  function spawnParticles(x, y, color, count, spread) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * (spread || 3) + 1;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: Math.random() * 0.02 + 0.015,
+        r: Math.random() * 3 + 1,
+        color,
+      });
+    }
+  }
+  function updateParticles(dt) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.life -= p.decay * dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+  function drawParticles() {
+    for (const p of particles) {
+      ctx.globalAlpha = p.life * 0.8;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ========== GAME STATE ==========
+  let state = 'menu'; // 'menu', 'play', 'over'
+  let score = 0;
+  let lives = MAX_LIVES;
+  let level = 1;
+  let streak = 0;
+  let bestStreak = 0;
+  let captures = 0;
+  let satellite = null;
+  let planets = [];
+  let star = null;
+  let targetPlanetIdx = 0;
+  let lastLaunchTime = 0;
+  let captureTimer = 0;
+  let levelTransition = 0;
+  let aimLine = null;
+  let humTimer = 0;
+  let lastGain = 0;
+
+  // ========== LEVEL GENERATION ==========
+  function generateLevel() {
+    const numPlanets = Math.min(2 + Math.floor(level / 2), 6);
+    const minOrbitR = Math.min(W, H) * 0.12;
+    const maxOrbitR = Math.min(W, H) * 0.4;
+    planets = [];
+    star = { x: cx, y: cy, r: 18, mass: STAR_MASS, color: '#ffd700' };
+
+    for (let i = 0; i < numPlanets; i++) {
+      const orbitR = minOrbitR + (maxOrbitR - minOrbitR) * ((i + 0.5) / numPlanets);
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (0.3 + Math.random() * 0.4) / (1 + i * 0.3);
+      const dir = Math.random() < 0.3 ? -1 : 1;
+      const r = 8 + Math.random() * 6;
+      planets.push({
+        orbitR,
+        angle,
+        speed: speed * dir * (1 + level * 0.05),
+        r,
+        mass: PLANET_MASS + r * 8,
+        color: PLANET_COLORS[i % PLANET_COLORS.length],
+        x: cx + Math.cos(angle) * orbitR,
+        y: cy + Math.sin(angle) * orbitR,
+      });
+    }
+
+    // Choose target — prefer farther planets at higher levels
+    targetPlanetIdx = Math.min(Math.floor(Math.random() * numPlanets * 0.5 + numPlanets * 0.3), numPlanets - 1);
+    satellite = null;
+    captureTimer = 0;
+    levelTransition = 0;
+  }
+
+  // ========== SATELLITE ==========
+  function launchSatellite(mx, my) {
+    if (satellite) return;
+    const now = Date.now();
+    if (now - lastLaunchTime < LAUNCH_COOLDOWN) return;
+    lastLaunchTime = now;
+
+    // Determine launch position: from click/tap position
+    // Direction: toward center with slight bias
+    const dx = cx - mx;
+    const dy = cy - my;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 30) return; // too close to center
+
+    const speed = SAT_SPEED + level * 0.1;
+    satellite = {
+      x: mx,
+      y: my,
+      vx: (dx / dist) * speed,
+      vy: (dy / dist) * speed,
+      trail: [],
+      alive: true,
+      orbitTicks: 0,
+      nearTarget: false,
+    };
+    sndLaunch();
+    spawnParticles(mx, my, '#00f0ff', 8, 2);
+  }
+
+  // ========== PHYSICS ==========
+  function applyGravity(sat, body) {
+    const dx = body.x - sat.x;
+    const dy = body.y - sat.y;
+    const distSq = dx * dx + dy * dy;
+    const dist = Math.sqrt(distSq);
+    if (dist < body.r + 3) return 'collide';
+    const force = G * body.mass / distSq;
+    sat.vx += (dx / dist) * force;
+    sat.vy += (dy / dist) * force;
+    return dist;
+  }
+
+  function updateSatellite(dt) {
+    if (!satellite || !satellite.alive) return;
+
+    // Apply gravity from star
+    const starResult = applyGravity(satellite, star);
+    if (starResult === 'collide') {
+      crashSatellite('star');
+      return;
+    }
+
+    // Apply gravity from all planets
+    let closestTargetDist = Infinity;
+    for (let i = 0; i < planets.length; i++) {
+      const p = planets[i];
+      const result = applyGravity(satellite, p);
+      if (result === 'collide') {
+        crashSatellite('planet');
+        return;
+      }
+      if (i === targetPlanetIdx && typeof result === 'number') {
+        closestTargetDist = result;
+      }
+    }
+
+    // Update position
+    satellite.x += satellite.vx * dt;
+    satellite.y += satellite.vy * dt;
+
+    // Trail
+    satellite.trail.push({ x: satellite.x, y: satellite.y });
+    if (satellite.trail.length > TRAIL_LEN) satellite.trail.shift();
+
+    // Check off-screen
+    const margin = 80;
+    if (satellite.x < -margin || satellite.x > W + margin ||
+        satellite.y < -margin || satellite.y > H + margin) {
+      crashSatellite('offscreen');
+      return;
+    }
+
+    // Gravitational hum near target
+    humTimer += dt;
+    if (humTimer > 8 && closestTargetDist < CAPTURE_DIST * 2) {
+      const intensity = 1 - (closestTargetDist / (CAPTURE_DIST * 2));
+      sndHum(intensity);
+      humTimer = 0;
+    }
+
+    // Check capture: near target planet + low relative velocity
+    const tp = planets[targetPlanetIdx];
+    const relVx = satellite.vx - (-Math.sin(tp.angle) * tp.speed * tp.orbitR * 0.016);
+    const relVy = satellite.vy - (Math.cos(tp.angle) * tp.speed * tp.orbitR * 0.016);
+    const relVel = Math.sqrt(relVx * relVx + relVy * relVy);
+    const captureDist = CAPTURE_DIST + level * 2;
+    const captureVel = CAPTURE_VEL + level * 0.08;
+
+    if (closestTargetDist < captureDist && relVel < captureVel) {
+      satellite.nearTarget = true;
+      captureTimer += dt;
+      if (captureTimer >= ORBIT_TICKS) {
+        captureSuccess();
+      }
+    } else {
+      satellite.nearTarget = false;
+      captureTimer = Math.max(0, captureTimer - dt * 0.5);
+    }
+  }
+
+  function crashSatellite(reason) {
+    if (!satellite) return;
+    sndCrash();
+    spawnParticles(satellite.x, satellite.y, '#ff2d7b', 20, 4);
+    document.body.classList.add('shaking');
+    setTimeout(() => document.body.classList.remove('shaking'), 250);
+    satellite = null;
+    captureTimer = 0;
+    streak = 0;
+    lives--;
+    if (lives <= 0) {
+      endGame();
+    }
+  }
+
+  function captureSuccess() {
+    const tp = planets[targetPlanetIdx];
+    sndCapture();
+    spawnParticles(tp.x, tp.y, tp.color, 25, 5);
+    spawnParticles(tp.x, tp.y, '#ffd700', 15, 3);
+
+    captures++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+
+    // Scoring: base 100 + bonus for fast capture + streak multiplier
+    const basePoints = 100;
+    const speedBonus = Math.max(0, 50 - Math.floor(captureTimer / 2)); // faster = more bonus
+    const streakMult = Math.min(streak, 5);
+    const gained = (basePoints + speedBonus) * streakMult;
+    score += gained;
+    lastGain = gained;
+
+    satellite = null;
+    captureTimer = 0;
+    levelTransition = 60; // frames of celebration before next level
+
+    // Level up every 2 captures
+    if (captures % 2 === 0) {
+      level++;
+    }
+  }
+
+  function endGame() {
+    state = 'over';
+    hud.style.display = 'none';
+    gameOverScreen.classList.add('active');
+
+    document.getElementById('statCaptures').textContent = captures;
+    document.getElementById('statStreak').textContent = bestStreak;
+    document.getElementById('statScore').textContent = score;
+    document.getElementById('statLevel').textContent = level;
+
+    // Neon.js save
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(score);
+    }).then(function(result) {
+      Neon.render(document.getElementById('leaderboard-container'));
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+  }
+
+  // ========== SHARE ==========
+  function shareResult() {
+    const text = [
+      '\u{1f30c} ORBIT',
+      'Captures: ' + captures + ' | Streak: ' + bestStreak,
+      'Score: ' + score + ' | Level: ' + level,
+      genOrbitArt(),
+      'neonarcade.net/neonarcade/orbit.html',
+    ].join('\n');
+
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {
+        navigator.clipboard.writeText(text);
+        showCopied();
+      });
+    } else {
+      navigator.clipboard.writeText(text).then(showCopied);
+    }
+  }
+
+  function genOrbitArt() {
+    // Simple emoji art for share
+    const emojis = ['\u{2b1b}', '\u{1f7e6}', '\u{2b1c}', '\u{1f7e1}'];
+    let art = '';
+    for (let r = 0; r < 3; r++) {
+      let row = '';
+      for (let c = 0; c < 7; c++) {
+        if (r === 1 && c === 3) row += '\u{2b50}';
+        else if (Math.abs(r - 1) + Math.abs(c - 3) === 2 && Math.random() < 0.5) row += '\u{1f7e2}';
+        else row += (Math.random() < 0.15 ? '\u{2b1c}' : '\u{2b1b}');
+      }
+      art += row + '\n';
+    }
+    return art.trim();
+  }
+
+  function showCopied() {
+    const btn = shareBtn;
+    btn.textContent = 'COPIED!';
+    setTimeout(() => btn.textContent = 'SHARE', 2000);
+  }
+
+  // ========== HELPERS ==========
+  function darkenColor(hex, amount) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return 'rgb(' + Math.floor(r * amount) + ',' + Math.floor(g * amount) + ',' + Math.floor(b * amount) + ')';
+  }
+
+  function hexToRgba(hex, a) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  // ========== DRAW ==========
+  function drawBg(time) {
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle radial gradients
+    const grd1 = ctx.createRadialGradient(cx, cy * 0.3, 0, cx, cy * 0.3, Math.max(W, H) * 0.6);
+    grd1.addColorStop(0, 'rgba(0,240,255,0.03)');
+    grd1.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = grd1;
+    ctx.fillRect(0, 0, W, H);
+
+    const grd2 = ctx.createRadialGradient(W * 0.8, H * 0.8, 0, W * 0.8, H * 0.8, Math.max(W, H) * 0.5);
+    grd2.addColorStop(0, 'rgba(255,45,123,0.02)');
+    grd2.addColorStop(1, 'rgba(255,45,123,0)');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars
+    for (const s of bgStars) {
+      const twinkle = Math.sin(time * s.twinkleSpeed + s.twinklePhase) * 0.3 + 0.7;
+      ctx.globalAlpha = s.a * twinkle;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawStar(time) {
+    if (!star) return;
+    const pulse = 1 + Math.sin(time * 0.003) * 0.05;
+    const r = star.r * pulse;
+
+    // Glow
+    const grd = ctx.createRadialGradient(star.x, star.y, r * 0.2, star.x, star.y, r * 4);
+    grd.addColorStop(0, 'rgba(255,215,0,0.3)');
+    grd.addColorStop(0.5, 'rgba(255,215,0,0.08)');
+    grd.addColorStop(1, 'rgba(255,215,0,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, r * 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Core
+    const coreGrd = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, r);
+    coreGrd.addColorStop(0, '#fff');
+    coreGrd.addColorStop(0.3, '#ffd700');
+    coreGrd.addColorStop(1, '#ff8c00');
+    ctx.fillStyle = coreGrd;
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawPlanets(time) {
+    for (let i = 0; i < planets.length; i++) {
+      const p = planets[i];
+      const isTarget = i === targetPlanetIdx;
+
+      // Orbit ring
+      ctx.strokeStyle = isTarget ? 'rgba(255,215,0,0.2)' : 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = isTarget ? 1.5 : 0.5;
+      if (isTarget) ctx.setLineDash([4, 8]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, p.orbitR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Planet glow
+      if (isTarget) {
+        const glowPulse = 1 + Math.sin(time * 0.005) * 0.3;
+        const grd = ctx.createRadialGradient(p.x, p.y, p.r * 0.5, p.x, p.y, p.r * 3 * glowPulse);
+        grd.addColorStop(0, hexToRgba(p.color, 0.3));
+        grd.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3 * glowPulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Target ring
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.4 + Math.sin(time * 0.004) * 0.3;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r + 10 + Math.sin(time * 0.003) * 3, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // "TARGET" label
+        ctx.font = '700 9px Orbitron, monospace';
+        ctx.fillStyle = '#ffd700';
+        ctx.textAlign = 'center';
+        ctx.globalAlpha = 0.7;
+        ctx.fillText('TARGET', p.x, p.y - p.r - 16);
+        ctx.globalAlpha = 1;
+      }
+
+      // Planet body
+      const pGrd = ctx.createRadialGradient(p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.1, p.x, p.y, p.r);
+      pGrd.addColorStop(0, '#fff');
+      pGrd.addColorStop(0.4, p.color);
+      pGrd.addColorStop(1, darkenColor(p.color, 0.4));
+      ctx.fillStyle = pGrd;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawSatellite(time) {
+    if (!satellite || !satellite.alive) return;
+
+    // Trail
+    if (satellite.trail.length > 1) {
+      for (let i = 1; i < satellite.trail.length; i++) {
+        const alpha = i / satellite.trail.length;
+        ctx.strokeStyle = satellite.nearTarget
+          ? 'rgba(255,215,0,' + (alpha * 0.6) + ')'
+          : 'rgba(0,240,255,' + (alpha * 0.6) + ')';
+        ctx.lineWidth = alpha * 2.5;
+        ctx.beginPath();
+        ctx.moveTo(satellite.trail[i - 1].x, satellite.trail[i - 1].y);
+        ctx.lineTo(satellite.trail[i].x, satellite.trail[i].y);
+        ctx.stroke();
+      }
+    }
+
+    // Satellite body
+    const pulse = 1 + Math.sin(time * 0.01) * 0.15;
+    const sr = 4 * pulse;
+    const col = satellite.nearTarget ? '#ffd700' : '#00f0ff';
+
+    // Glow
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.arc(satellite.x, satellite.y, sr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Inner white core
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(satellite.x, satellite.y, sr * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Capture progress ring
+    if (captureTimer > 0) {
+      const progress = Math.min(captureTimer / ORBIT_TICKS, 1);
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(satellite.x, satellite.y, sr + 8, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function drawAimLine(time) {
+    if (!aimLine || satellite) return;
+    const dx = cx - aimLine.x;
+    const dy = cy - aimLine.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 30) return;
+
+    // Draw dotted line from mouse toward center
+    ctx.strokeStyle = 'rgba(0,240,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.moveTo(aimLine.x, aimLine.y);
+    const len = Math.min(60, dist);
+    ctx.lineTo(aimLine.x + (dx / dist) * len, aimLine.y + (dy / dist) * len);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Launch position indicator
+    ctx.strokeStyle = 'rgba(0,240,255,' + (0.3 + Math.sin(time * 0.005) * 0.2) + ')';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(aimLine.x, aimLine.y, 8, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawGravityField(time) {
+    if (!star) return;
+    // Subtle gravity visualization around star
+    for (let i = 1; i <= 3; i++) {
+      const r = star.r + i * 25 + Math.sin(time * 0.002 + i) * 5;
+      ctx.strokeStyle = 'rgba(255,215,0,' + (0.04 / i) + ')';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  function drawLevelTransition(time) {
+    if (levelTransition <= 0) return;
+    const alpha = levelTransition / 60;
+    ctx.font = '900 ' + (30 + (1 - alpha) * 20) + 'px Orbitron, monospace';
+    ctx.fillStyle = 'rgba(57,255,20,' + alpha + ')';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#39ff14';
+    ctx.shadowBlur = 20 * alpha;
+    ctx.fillText('CAPTURED!', cx, cy * 0.4);
+    ctx.font = '700 16px Orbitron, monospace';
+    ctx.fillStyle = 'rgba(255,215,0,' + alpha + ')';
+    ctx.fillText('+' + lastGain, cx, cy * 0.4 + 40);
+    ctx.shadowBlur = 0;
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  // ========== UPDATE ==========
+  function updatePlanets(dt) {
+    for (const p of planets) {
+      p.angle += p.speed * 0.016 * dt;
+      p.x = cx + Math.cos(p.angle) * p.orbitR;
+      p.y = cy + Math.sin(p.angle) * p.orbitR;
+    }
+  }
+
+  // ========== GAME LOOP ==========
+  let lastTime = 0;
+  let animFrame = 0;
+
+  function gameLoop(timestamp) {
+    animFrame = requestAnimationFrame(gameLoop);
+    if (!lastTime) lastTime = timestamp;
+    const rawDt = (timestamp - lastTime) / 16.667; // normalize to ~60fps
+    const dt = Math.min(rawDt, 3); // cap delta
+    lastTime = timestamp;
+
+    if (state === 'play') {
+      // Level transition delay
+      if (levelTransition > 0) {
+        levelTransition -= dt;
+        if (levelTransition <= 0) {
+          generateLevel();
+        }
+      }
+
+      updatePlanets(dt);
+      updateSatellite(dt);
+      updateParticles(dt);
+
+      // HUD update
+      document.getElementById('hudScore').textContent = score;
+      document.getElementById('hudLevel').textContent = level;
+      document.getElementById('hudStreak').textContent = streak;
+      document.getElementById('hudLives').textContent = '\u2764'.repeat(lives);
+    }
+
+    // Draw
+    drawBg(timestamp);
+
+    if (state === 'play' || state === 'over') {
+      drawGravityField(timestamp);
+      drawStar(timestamp);
+      drawPlanets(timestamp);
+      drawSatellite(timestamp);
+      drawAimLine(timestamp);
+      drawParticles();
+      drawLevelTransition(timestamp);
+    }
+
+    if (state === 'menu') {
+      drawMenuAnim(timestamp);
+    }
+  }
+
+  // ========== MENU ANIMATION ==========
+  let menuStar, menuPlanets;
+  function initMenuAnim() {
+    menuStar = { x: cx, y: cy, r: 16 };
+    menuPlanets = [];
+    for (let i = 0; i < 4; i++) {
+      menuPlanets.push({
+        orbitR: 60 + i * 40,
+        angle: (Math.PI * 2 / 4) * i,
+        speed: (0.4 - i * 0.06),
+        r: 6 + i * 2,
+        color: PLANET_COLORS[i],
+        x: cx, y: cy,
+      });
+    }
+  }
+
+  function drawMenuAnim(time) {
+    // Animate menu planets
+    for (const p of menuPlanets) {
+      p.angle += p.speed * 0.016;
+      p.x = cx + Math.cos(p.angle) * p.orbitR;
+      p.y = cy + Math.sin(p.angle) * p.orbitR;
+
+      // Orbit ring
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, p.orbitR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Planet
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // Central star
+    const pulse = 1 + Math.sin(time * 0.003) * 0.05;
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, menuStar.r * pulse);
+    grd.addColorStop(0, '#fff');
+    grd.addColorStop(0.4, '#ffd700');
+    grd.addColorStop(1, '#ff8c00');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(cx, cy, menuStar.r * pulse, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ========== START / RESTART ==========
+  function startGame() {
+    ensureAudio();
+    state = 'play';
+    score = 0;
+    lives = MAX_LIVES;
+    level = 1;
+    streak = 0;
+    bestStreak = 0;
+    captures = 0;
+    satellite = null;
+    particles = [];
+    captureTimer = 0;
+    lastGain = 0;
+
+    startScreen.classList.remove('active');
+    gameOverScreen.classList.remove('active');
+    hud.style.display = 'block';
+
+    generateLevel();
+  }
+
+  function returnToMenu() {
+    state = 'menu';
+    hud.style.display = 'none';
+    gameOverScreen.classList.remove('active');
+    startScreen.classList.add('active');
+    satellite = null;
+    particles = [];
+    initMenuAnim();
+    Neon.render(document.getElementById('startLB'));
+  }
+
+  // ========== INPUT ==========
+  function handleClick(px, py) {
+    if (state === 'play' && levelTransition <= 0) {
+      launchSatellite(px, py);
+    }
+  }
+
+  canvas.addEventListener('click', function(e) {
+    handleClick(e.clientX, e.clientY);
+  });
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      handleClick(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('mousemove', function(e) {
+    if (state === 'play') {
+      aimLine = { x: e.clientX, y: e.clientY };
+    }
+  });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (state === 'play' && e.touches.length > 0) {
+      aimLine = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('mouseleave', function() {
+    aimLine = null;
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (state === 'play') {
+        returnToMenu();
+      } else if (state === 'over') {
+        returnToMenu();
+      }
+    }
+  });
+
+  startBtn.addEventListener('click', startGame);
+  replayBtn.addEventListener('click', startGame);
+  shareBtn.addEventListener('click', shareResult);
+
+  // ========== INIT ==========
+  Neon.init({
+    game: 'orbit',
+    mode: 'high',
+    emoji: '\u{1f30c}',
+    title: 'ORBIT',
+    key: 'neonarcade_neonarcade_orbit_scores'
+  });
+
+  initMenuAnim();
+  Neon.render(document.getElementById('startLB'));
+  requestAnimationFrame(gameLoop);
+
+})();
+</script>
+</body>
+</html>
