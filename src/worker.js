@@ -280,7 +280,7 @@ export default {
           const desc = 'Challenge accepted? Play now on NEON ARCADE. No download, no login.';
           const screenshotUrl = `https://neonarcade.net/screenshots/${data.game}.png`;
 
-          const assetResponse = await env.ASSETS.fetch(new Request(url.origin + '/c/index.html', request));
+          const assetResponse = await env.ASSETS.fetch(new Request(url.origin + '/c/', request));
           let html = await assetResponse.text();
 
           html = html.replace(/__OG_TITLE__/g, title.replace(/"/g, '&quot;'));
@@ -294,7 +294,7 @@ export default {
           });
         }
       }
-      return env.ASSETS.fetch(new Request(url.origin + '/c/index.html', request));
+      return env.ASSETS.fetch(new Request(url.origin + '/c/', request));
     }
 
     // Only handle /api/ routes
