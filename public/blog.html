@@ -239,6 +239,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 14 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Score Protection — Optional Auth Without the Friction",
+  "description": "How we added optional Google and Discord sign-in to NEON ARCADE — protecting scores, badges, and streaks across devices without ever requiring an account to play.",
+  "url": "https://neonarcade.net/blog.html#score-protection",
+  "datePublished": "2026-04-14",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#score-protection"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -837,6 +853,18 @@
     <li><a href="#neon-quest">
       <span class="toc-num">11</span>
       <span class="toc-text">NEON QUEST &mdash; Why We Built Games You Can&rsquo;t Finish in 60 Seconds</span>
+    </a></li>
+    <li><a href="#neon-casino">
+      <span class="toc-num">12</span>
+      <span class="toc-text">Building a Casino With Fake Money and Real Architecture</span>
+    </a></li>
+    <li><a href="#virality-engine">
+      <span class="toc-num">13</span>
+      <span class="toc-text">The Virality Engine &mdash; Making Every Game Shareable</span>
+    </a></li>
+    <li><a href="#score-protection">
+      <span class="toc-num">14</span>
+      <span class="toc-text">Score Protection &mdash; Optional Auth Without the Friction</span>
     </a></li>
   </ol>
 </nav>
@@ -1994,6 +2022,182 @@ Neon.getPercentile()       <span class="cmt">// last score's global rank</span><
   <div class="highlight-box">
     <span class="hl-label">The Takeaway</span>
     <p>Virality is not a feature you bolt on at the end. It is infrastructure. The challenge link system touches the worker (KV storage, OG injection), the client library (URL handling, UI injection), and a new landing page &mdash; three layers that must work together for one seamless flow. Building it into the shared library means every game on the site &mdash; past, present, and future &mdash; gets viral mechanics for free. The next game we build will be shareable from the first commit.</p>
+  </div>
+</article>
+
+<!-- ================================================================ -->
+<!-- ARTICLE 14 -->
+<!-- ================================================================ -->
+<article class="article" id="score-protection">
+  <p class="article-num">Article 14 &mdash; April 14, 2026</p>
+  <h2 class="article-title">Score Protection &mdash; Optional Auth Without the Friction</h2>
+
+  <p>NEON ARCADE has always been a zero-friction experience. No signup, no login, no account. Open a link, play a game. That principle built the site. But it also created a fragile promise: everything you earn &mdash; scores, streaks, badges &mdash; lives in one browser&rsquo;s localStorage. Clear your cache, switch devices, or use incognito mode, and it is all gone.</p>
+
+  <p>Players started asking for it. Not accounts. Not profiles. Just: <strong>&ldquo;Can I keep my stuff?&rdquo;</strong></p>
+
+  <p>So we built score protection. Optional sign-in that backs up your data to the server. You can still play anonymously forever. But if you want to protect what you have built, five seconds and a Google or Discord account is all it takes.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val cyan">~200</div>
+      <div class="stat-label">Lines of Worker Code</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">2</div>
+      <div class="stat-label">OAuth Providers</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">30d</div>
+      <div class="stat-label">Session TTL</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">0</div>
+      <div class="stat-label">Passwords</div>
+    </div>
+  </div>
+
+  <h3>The Design Philosophy: Protect, Don&rsquo;t Gate</h3>
+
+  <p>Most games get auth backwards. They put a login wall before you can play, then let you earn things. We did the opposite. You play first. You earn things. And <em>then</em>, if you want to protect what you have earned, you sign in.</p>
+
+  <p>This changes the psychology completely. A login wall says &ldquo;prove who you are.&rdquo; Score protection says &ldquo;you have something worth keeping &mdash; want us to back it up?&rdquo; One is a gate. The other is a service. The difference is who benefits.</p>
+
+  <p>Anonymous players and signed-in players get the exact same gameplay experience. Same leaderboards, same challenges, same sharing. Auth adds exactly one thing: your localStorage data gets a backup on the server. That is it.</p>
+
+  <h3>WorkOS AuthKit: Zero Passwords, Five Seconds</h3>
+
+  <p>We chose <a href="https://workos.com/authkit" style="color:var(--neon-cyan);text-decoration:underline;text-underline-offset:3px;">WorkOS AuthKit</a> for authentication. It handles the OAuth dance with Google and Discord, issues tokens, and gives us a clean user object with an ID, email, and display name. No password storage, no email verification flows, no &ldquo;forgot password&rdquo; pages.</p>
+
+  <p>The flow is minimal. Click &ldquo;Protect Scores,&rdquo; pick Google or Discord, authorize, bounce back. The whole round-trip takes about five seconds. On the server side, the Cloudflare Worker handles the callback:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="cmt">// POST to WorkOS to exchange the auth code for a user</span>
+<span class="kw">const</span> resp = <span class="kw">await</span> fetch(<span class="str">'https://api.workos.com/user_management/authenticate'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+  body: JSON.stringify({
+    grant_type: <span class="str">'authorization_code'</span>,
+    client_id: env.WORKOS_CLIENT_ID,
+    client_secret: env.WORKOS_API_KEY,
+    code: authCode
+  })
+});
+<span class="kw">const</span> { user } = <span class="kw">await</span> resp.json();
+
+<span class="cmt">// Create a session in KV with 30-day TTL</span>
+<span class="kw">const</span> sessionId = crypto.randomUUID();
+<span class="kw">await</span> env.KV.put(<span class="str">`session:${sessionId}`</span>, JSON.stringify({
+  userId: user.id,
+  name: user.firstName || user.email.split(<span class="str">'@'</span>)[<span class="num">0</span>],
+  email: user.email
+}), { expirationTtl: <span class="num">2592000</span> }); <span class="cmt">// 30 days</span></code>
+  </div>
+
+  <p>No database. The session lives in Cloudflare KV with a 30-day TTL. When it expires, the player signs in again. Simple.</p>
+
+  <h3>The Two-Cookie Pattern</h3>
+
+  <p>Authentication on a static site with a Worker backend creates an interesting problem. The Worker needs to set a session cookie that JavaScript cannot tamper with (HttpOnly, Secure, SameSite=Lax). But <code>neon.js</code> needs to know who is signed in so it can show the player&rsquo;s name and enable sync UI.</p>
+
+  <p>The solution is two cookies:</p>
+
+  <div class="code-block" data-lang="http">
+<code>Set-Cookie: neon_session=abc123; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000
+Set-Cookie: neon_display=JCB; Path=/; Max-Age=2592000</code>
+  </div>
+
+  <p>The first cookie (<code>neon_session</code>) is the real session token. HttpOnly means JavaScript cannot read or modify it &mdash; it travels automatically with every API request. The second cookie (<code>neon_display</code>) contains only the player&rsquo;s display name. JavaScript can read it to show &ldquo;Signed in as JCB&rdquo; in the UI, but stealing it gives an attacker nothing useful.</p>
+
+  <p>This pattern is old and boring. That is why it works. No JWTs, no client-side token storage, no refresh token rotation. Just a session ID in an HttpOnly cookie and a display name in a readable one.</p>
+
+  <h3>The Sync System: localStorage Is Truth</h3>
+
+  <p>Here is the key design decision: <strong>localStorage is always the source of truth during gameplay.</strong> The server is a backup, not a database. When you finish a game, <code>neon.js</code> saves your score to localStorage first (instant, offline-capable), then pushes it to the server in the background if you are signed in.</p>
+
+  <p>The upload endpoint is simple. <code>neon.js</code> gathers all localStorage keys that match the NEON ARCADE prefix, bundles them into a JSON object, and POSTs them to <code>/api/sync/upload</code>. The Worker validates the session cookie, identifies the user, and stores the blob in KV under their user ID.</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="cmt">// Client-side: collect all neon data from localStorage</span>
+<span class="kw">const</span> data = {};
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; localStorage.length; i++) {
+  <span class="kw">const</span> k = localStorage.key(i);
+  <span class="kw">if</span> (k.startsWith(<span class="str">'neonarcade_'</span>) || k === <span class="str">'neon_player_name'</span>) {
+    data[k] = localStorage.getItem(k);
+  }
+}
+<span class="cmt">// POST to server — session cookie sent automatically</span>
+fetch(<span class="str">'/api/sync/upload'</span>, {
+  method: <span class="str">'POST'</span>,
+  credentials: <span class="str">'include'</span>,
+  headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+  body: JSON.stringify(data)
+});</code>
+  </div>
+
+  <p>Download works the same way in reverse. <code>GET /api/sync/download</code> returns the stored blob, and <code>neon.js</code> writes it back to localStorage. But you cannot just overwrite everything &mdash; what if the player has newer scores on this device?</p>
+
+  <h3>The Merge Strategy: Keep the Best of Both</h3>
+
+  <p>When downloading, <code>neon.js</code> merges the server data with what is already in localStorage. The rules are straightforward:</p>
+
+  <ul style="list-style:none;padding:0;margin:16px 0;">
+    <li style="padding:4px 0;color:#9999bb;">&bull; <strong>Scores:</strong> Union by timestamp. If both devices have a score for the same game at the same time, keep the higher one. If a score exists on only one device, keep it.</li>
+    <li style="padding:4px 0;color:#9999bb;">&bull; <strong>Streaks:</strong> Keep the best current streak and the best all-time streak from either source.</li>
+    <li style="padding:4px 0;color:#9999bb;">&bull; <strong>Badges:</strong> Union all badges, keeping the earliest earned timestamp for each.</li>
+    <li style="padding:4px 0;color:#9999bb;">&bull; <strong>Player name:</strong> Server wins (it is the &ldquo;canonical&rdquo; identity).</li>
+  </ul>
+
+  <p>The merge happens entirely on the client. The server stores and returns opaque JSON blobs &mdash; it has no idea what a &ldquo;streak&rdquo; or &ldquo;badge&rdquo; is. This keeps the Worker dumb and the data model flexible. If we add a new feature that stores something in localStorage, sync picks it up automatically.</p>
+
+  <h3>The Risk-Triggered Nudge</h3>
+
+  <p>We do not want to nag players to sign in. Nobody opened NEON ARCADE to create an account. But we also do not want someone to lose a 14-day streak because they never knew backup existed.</p>
+
+  <p>The solution is a risk-triggered nudge. <code>neon.js</code> checks three conditions after every game:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code><span class="kw">const</span> dominated = localStorage.length;
+<span class="kw">const</span> streak = Neon.getStreak();
+<span class="kw">const</span> badges = (JSON.parse(localStorage.getItem(<span class="str">'neon_badges'</span>)) || []).length;
+
+<span class="kw">const</span> atRisk = !isSignedIn &amp;&amp; (
+  (streak &amp;&amp; streak.current >= <span class="num">7</span>) ||  <span class="cmt">// 7+ day streak</span>
+  dominated >= <span class="num">5</span> ||                     <span class="cmt">// 5+ games with scores</span>
+  badges >= <span class="num">3</span>                            <span class="cmt">// 3+ badges earned</span>
+);</code>
+  </div>
+
+  <p>If <code>atRisk</code> is true and the player has not dismissed the nudge in this session, a subtle prompt slides in from the bottom: <span style="color:var(--neon-gold);">&ldquo;You have a 14-day streak. Protect your scores?&rdquo;</span> One click starts the auth flow. Dismiss it and it will not appear again until the next session.</p>
+
+  <p>The thresholds are deliberately high. A brand-new player will never see the nudge. You have to earn it. By the time it appears, you have already invested enough that the value proposition is obvious.</p>
+
+  <h3>~200 Lines of Worker Code</h3>
+
+  <p>The entire auth and sync system adds roughly 200 lines to <code>worker.js</code>. Four new routes:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code>GET  /auth/login          <span class="cmt">// redirect to WorkOS AuthKit</span>
+GET  /auth/callback        <span class="cmt">// handle OAuth callback, set cookies, redirect</span>
+POST /api/sync/upload      <span class="cmt">// save localStorage blob to KV</span>
+GET  /api/sync/download    <span class="cmt">// retrieve localStorage blob from KV</span></code>
+  </div>
+
+  <p>Session validation is a single KV lookup: read the <code>neon_session</code> cookie, check if <code>session:{id}</code> exists in KV. If it does, the user is authenticated. If it does not (expired or invalid), return 401. No middleware, no token introspection, no JWKS endpoints.</p>
+
+  <p>The sync data lives at <code>user_sync:{userId}</code> in KV. One key per user. The entire localStorage blob is a single JSON string, typically 2&ndash;10 KB. Cloudflare KV&rsquo;s 25 MB value limit means we will never hit a ceiling.</p>
+
+  <p>On the client side, <code>neon.js</code> gained a few new functions: <code>Neon.isSignedIn()</code> checks the display cookie, <code>Neon.syncUp()</code> pushes to server, <code>Neon.syncDown()</code> pulls and merges, and <code>Neon.autoSync()</code> runs after every <code>Neon.save()</code> call if the player is signed in. The profile page on the hub got a new &ldquo;Protect Your Scores&rdquo; section with sign-in/sign-out controls.</p>
+
+  <h3>What We Did Not Build</h3>
+
+  <p>No user profiles. No friend lists. No achievements page. No &ldquo;linked accounts&rdquo; settings. No email notifications. Every one of those features would be nice and every one would add friction. The entire point is that auth is invisible until you need it. You sign in, your data syncs, you forget about it. That is the whole feature.</p>
+
+  <p>We also chose not to make the server authoritative. Some games do server-side score validation, but our sync system trusts the client. A malicious user could upload fake scores via the sync endpoint. But they could already do that with the existing leaderboard API. The threat model has not changed &mdash; sync just adds a backup path for the same data.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Takeaway</span>
+    <p>The best auth system is the one players forget exists. No login wall, no mandatory accounts, no email verification. Just a quiet offer to protect what you have already earned. localStorage remains the source of truth. The server is a safety net, not a requirement. Two cookies, four endpoints, ~200 lines of Worker code, and a merge strategy that always picks the best data from both sides. If you are building a free web app and wondering whether to add auth &mdash; make it optional, make it fast, and only ask when the player has something to lose.</p>
   </div>
 </article>
 
