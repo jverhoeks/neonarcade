@@ -388,8 +388,8 @@ canvas {
   var ramps = [];
 
   // Plunger lane
-  var PLUNGER_LANE_X = 370;
-  var PLUNGER_LANE_W = 25;
+  var PLUNGER_LANE_X = 360;
+  var PLUNGER_LANE_W = 40;
 
   // Particles
   var particles = [];
@@ -413,15 +413,15 @@ canvas {
     // Left wall
     walls.push({ x1: 20, y1: 40, x2: 20, y2: 620 });
     // Right wall (above plunger lane)
-    walls.push({ x1: 380, y1: 40, x2: 380, y2: 100 });
+    walls.push({ x1: 380, y1: 40, x2: 380, y2: 80 });
     // Right wall (plunger lane right side)
-    walls.push({ x1: 395, y1: 40, x2: 395, y2: 700 });
-    // Plunger lane left wall
-    walls.push({ x1: 370, y1: 100, x2: 370, y2: 700 });
+    walls.push({ x1: 400, y1: 40, x2: 400, y2: 700 });
+    // Plunger lane left wall (starts lower to create wider exit)
+    walls.push({ x1: 360, y1: 130, x2: 360, y2: 700 });
     // Top wall
     walls.push({ x1: 20, y1: 40, x2: 380, y2: 40 });
     // Top right corner to plunger lane
-    walls.push({ x1: 380, y1: 40, x2: 395, y2: 40 });
+    walls.push({ x1: 380, y1: 40, x2: 400, y2: 40 });
 
     // Curved top — approximate with angled segments
     // Top left curve
@@ -433,25 +433,24 @@ canvas {
     // Left guide
     walls.push({ x1: 20, y1: 620, x2: 75, y2: 685 });
     // Right guide
-    walls.push({ x1: 370, y1: 620, x2: 315, y2: 685 });
+    walls.push({ x1: 360, y1: 620, x2: 305, y2: 685 });
 
-    // Drain walls (below flippers, narrowing)
-    walls.push({ x1: 75, y1: 685, x2: 95, y2: 700 });
-    walls.push({ x1: 315, y1: 685, x2: 295, y2: 700 });
+    // Drain walls (below flippers, wider gap so ball can escape)
+    walls.push({ x1: 75, y1: 685, x2: 110, y2: 710 });
+    walls.push({ x1: 305, y1: 685, x2: 270, y2: 710 });
 
     // Bottom (drain detection line at y=730)
 
     // Side kickers (bounce walls near bottom)
     walls.push({ x1: 20, y1: 580, x2: 40, y2: 620 });
-    walls.push({ x1: 370, y1: 580, x2: 350, y2: 620 });
+    walls.push({ x1: 360, y1: 580, x2: 340, y2: 620 });
 
     // Upper side guide rails
     walls.push({ x1: 50, y1: 140, x2: 30, y2: 250 });
     walls.push({ x1: 340, y1: 140, x2: 360, y2: 250 });
 
-    // Plunger curve at top — ball enters playing field
-    walls.push({ x1: 380, y1: 100, x2: 370, y2: 80 });
-    walls.push({ x1: 370, y1: 80, x2: 360, y2: 60 });
+    // Plunger curve at top — ball enters playing field (wide exit)
+    walls.push({ x1: 380, y1: 80, x2: 360, y2: 50 });
 
     // Bumpers (3 round bumpers in triangle formation)
     bumpers.push({ x: 150, y: 200, r: 25, color: COL.pink });
@@ -508,7 +507,7 @@ canvas {
   }
 
   function resetBall() {
-    ball.x = 382;
+    ball.x = 380;
     ball.y = 650;
     ball.vx = 0;
     ball.vy = 0;

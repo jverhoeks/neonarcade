@@ -423,14 +423,14 @@ canvas { display: block; }
   const CRASH_DURATION = 1.5; // seconds of spin-out
 
   // Colors
-  const C_ROAD_DARK = '#1a1a30';
-  const C_ROAD_LIGHT = '#222244';
+  const C_ROAD_DARK = '#2a2a45';
+  const C_ROAD_LIGHT = '#333355';
   const C_RUMBLE_DARK = '#00f0ff';
-  const C_RUMBLE_LIGHT = '#1a1a30';
-  const C_GRASS_DARK = '#0c1a0c';
-  const C_GRASS_LIGHT = '#0f240f';
+  const C_RUMBLE_LIGHT = '#ff2d7b';
+  const C_GRASS_DARK = '#0a1a10';
+  const C_GRASS_LIGHT = '#122a18';
   const C_LINE_GOLD = '#ffd700';
-  const C_LINE_HIDDEN = '#222244';
+  const C_LINE_HIDDEN = '#333355';
   const C_EDGE_CYAN = '#00f0ff';
   const C_EDGE_PINK = '#ff2d7b';
 
@@ -750,8 +750,8 @@ canvas { display: block; }
     drawPolygon(roadColor, x1 - width1, y1, x1 + width1, y1, x2 + width2, y2, x2 - width2, y2);
 
     // Rumble strips (left edge)
-    const rumbleW1 = width1 * 0.06;
-    const rumbleW2 = width2 * 0.06;
+    const rumbleW1 = width1 * 0.10;
+    const rumbleW2 = width2 * 0.10;
     const rumbleColor = isDark ? C_RUMBLE_DARK : C_RUMBLE_LIGHT;
     drawPolygon(rumbleColor,
       x1 - width1, y1, x1 - width1 + rumbleW1, y1,
@@ -764,8 +764,8 @@ canvas { display: block; }
     // Edge glow lines
     if (isDark) {
       ctx.strokeStyle = C_EDGE_CYAN;
-      ctx.lineWidth = Math.max(1, width1 * 0.004);
-      ctx.globalAlpha = 0.6;
+      ctx.lineWidth = Math.max(2, width1 * 0.008);
+      ctx.globalAlpha = 0.9;
       ctx.beginPath();
       ctx.moveTo(x1 - width1, y1);
       ctx.lineTo(x2 - width2, y2);
@@ -780,10 +780,10 @@ canvas { display: block; }
 
     // Center lane dashes
     if (isDark) {
-      const lineW1 = width1 * 0.015;
-      const lineW2 = width2 * 0.015;
+      const lineW1 = width1 * 0.025;
+      const lineW2 = width2 * 0.025;
       ctx.fillStyle = C_LINE_GOLD;
-      ctx.globalAlpha = 0.7;
+      ctx.globalAlpha = 1.0;
       ctx.beginPath();
       ctx.moveTo(x1 - lineW1, y1);
       ctx.lineTo(x1 + lineW1, y1);
@@ -821,9 +821,9 @@ canvas { display: block; }
 
   // ── DRAW SPRITES ──
   function drawPalm(x, y, scale) {
-    if (scale < 0.003) return;
-    const h = 120 * scale;
-    const trunkW = 6 * scale;
+    if (scale < 0.002) return;
+    const h = 180 * scale;
+    const trunkW = 10 * scale;
     // Trunk
     ctx.strokeStyle = '#39ff14';
     ctx.lineWidth = trunkW;
