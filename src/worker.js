@@ -399,7 +399,11 @@ export default {
           }),
         });
 
-        if (!tokenRes.ok) return new Response('Auth failed', { status: 401 });
+        if (!tokenRes.ok) {
+          const errBody = await tokenRes.text();
+          console.error('WorkOS auth failed:', tokenRes.status, errBody);
+          return new Response('Auth failed: ' + tokenRes.status + ' ' + errBody, { status: 401 });
+        }
 
         const tokenData = await tokenRes.json();
         const user = tokenData.user;
