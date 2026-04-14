@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Slitherlink — Free Online Loop Puzzle Game | NEON ARCADE</title>
+<meta name="description" content="Play Slitherlink free online — draw a single continuous loop on a dot grid using number clues. A beautiful Nikoli logic puzzle with neon aesthetics. No download, no login.">
+<meta name="keywords" content="slitherlink, slitherlink puzzle, loop puzzle, nikoli puzzle, free slitherlink game online, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonmind/slitherlink.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonmind/slitherlink.html">
+<meta property="og:title" content="Slitherlink — Free Online Loop Puzzle Game | NEON ARCADE">
+<meta property="og:description" content="Play Slitherlink free online — draw a single continuous loop on a dot grid using number clues. No download, no login.">
+<meta property="og:image" content="https://neonarcade.net/neonmind/screenshots/slitherlink.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonmind/slitherlink.html">
+<meta name="twitter:title" content="Slitherlink — Free Online Loop Puzzle Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Slitherlink free online — draw a single continuous loop on a dot grid using number clues. No download, no login.">
+<meta name="twitter:image" content="https://neonarcade.net/neonmind/screenshots/slitherlink.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Slitherlink",
+  "url": "https://neonarcade.net/neonmind/slitherlink.html",
+  "description": "Play Slitherlink free online — draw a single continuous loop on a dot grid using number clues. A classic Nikoli logic puzzle with neon aesthetics.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonmind/screenshots/slitherlink.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON MIND", "item": "https://neonarcade.net/neonmind/" },
+    { "@type": "ListItem", "position": 3, "name": "Slitherlink", "item": "https://neonarcade.net/neonmind/slitherlink.html" }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px)}
+body{background:#0a0a12;background-image:radial-gradient(ellipse at 50% 0%,rgba(0,240,255,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(255,45,123,0.06) 0%,transparent 50%)}
+
+.screen{display:none;position:fixed;z-index:10;top:0;left:0;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.screen.active{display:flex}
+
+.title{font-family:'Orbitron',monospace;font-weight:900;font-size:42px;letter-spacing:8px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);margin-bottom:6px}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:16px;letter-spacing:3px;text-transform:uppercase;color:#8888aa;margin-bottom:10px}
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:1px;color:#7a7a9a;margin-bottom:28px;text-align:center;line-height:1.6}
+
+.diff-selector{display:flex;gap:12px;margin-bottom:30px;flex-wrap:wrap;justify-content:center}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 24px;border:1px solid #7a7a9a;background:rgba(255,255,255,0.03);color:#8888aa;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.diff-btn:hover{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.06)}
+.diff-btn.selected{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.1);box-shadow:0 0 15px rgba(0,240,255,0.15)}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;margin-top:10px}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.best-times{margin-top:30px;text-align:center}
+.best-times h3{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;color:#ffd700;margin-bottom:12px}
+.best-row{font-family:'Rajdhani',sans-serif;font-size:15px;color:#8888aa;margin:4px 0;display:flex;gap:12px;justify-content:center}
+.best-row .rank{color:#7a7a9a;width:20px;text-align:right}
+.best-row .score{color:#00f0ff;width:60px;text-align:right}
+.best-row .ago{color:#7a7a9a;width:90px;text-align:left}
+
+/* Game screen */
+#gameScreen{padding:0;justify-content:flex-start}
+.top-bar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(18,18,31,0.9);border-bottom:1px solid rgba(0,240,255,0.1);z-index:10;flex-shrink:0}
+.top-bar .back-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:#8888aa;cursor:pointer;border:none;background:none;padding:6px 10px;letter-spacing:1px}
+.top-bar .back-btn:hover{color:#00f0ff}
+.top-bar .info{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;color:#8888aa}
+.top-bar .timer{font-family:'Orbitron',monospace;font-size:16px;letter-spacing:2px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;width:100%;position:relative;overflow:hidden}
+#gameCanvas{cursor:pointer;touch-action:none}
+
+.toolbar{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 16px 50px;background:rgba(18,18,31,0.9);border-top:1px solid rgba(0,240,255,0.1);flex-shrink:0}
+.tool-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8888aa;background:none;border:1px solid rgba(255,255,255,0.1);padding:8px 16px;cursor:pointer;border-radius:3px;transition:all 0.2s}
+.tool-btn:hover{border-color:#00f0ff;color:#00f0ff}
+.tool-btn.active{border-color:#ff2d7b;color:#ff2d7b;background:rgba(255,45,123,0.1)}
+.tool-btn.disabled{opacity:0.3;pointer-events:none}
+
+/* Complete screen */
+.complete-title{font-family:'Orbitron',monospace;font-weight:900;font-size:36px;letter-spacing:6px;color:#39ff14;text-shadow:0 0 10px rgba(57,255,20,0.6),0 0 40px rgba(57,255,20,0.2);margin-bottom:6px}
+.complete-sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:14px;letter-spacing:2px;color:#8888aa;text-transform:uppercase;margin-bottom:24px}
+.stat-row{display:flex;gap:30px;margin-bottom:20px;flex-wrap:wrap;justify-content:center}
+.stat{text-align:center}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:28px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.4)}
+.stat-label{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#7a7a9a}
+.stars{font-size:32px;margin-bottom:20px;letter-spacing:4px}
+.btn-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:center}
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 28px;border:1px solid #b44dff;background:rgba(180,77,255,0.08);color:#b44dff;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s}
+.share-btn:hover{background:rgba(180,77,255,0.18);box-shadow:0 0 15px rgba(180,77,255,0.2)}
+
+#completeLB{width:100%;max-width:360px;margin-top:16px}
+
+.screen-shake{animation:shake 0.25s ease}
+@keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,3px)}}
+
+.particle{position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:9998}
+
+/* More Games Navigation */
+.na-more-games{position:fixed;bottom:0;left:0;right:0;z-index:900;padding:8px 12px;background:linear-gradient(to top,rgba(10,10,18,0.97),rgba(10,10,18,0.85));border-top:1px solid rgba(0,240,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.na-more-inner{max-width:600px;margin:0 auto}
+.na-more-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:3px;color:#7a7a9a;margin-bottom:6px;text-align:center}
+.na-more-links{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.na-more-link{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:13px;color:#8888aa;text-decoration:none;padding:4px 10px;border:1px solid rgba(0,240,255,0.08);border-radius:3px;background:rgba(0,240,255,0.03);transition:all 0.15s;white-space:nowrap}
+.na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
+.na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
+.na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="title">SLITHERLINK</div>
+  <div class="subtitle">DRAW THE LOOP</div>
+  <div class="controls-hint">Click edges between dots to draw a single closed loop.<br>Each number tells how many of its 4 edges are part of the loop.<br>Right-click or use X MODE to mark edges that are NOT part of the loop.</div>
+  <div class="diff-selector">
+    <button class="diff-btn selected" data-size="5">5 x 5</button>
+    <button class="diff-btn" data-size="7">7 x 7</button>
+    <button class="diff-btn" data-size="10">10 x 10</button>
+  </div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="best-times" id="bestTimes"></div>
+  <div id="startLB" style="width:100%;max-width:360px;margin-top:16px"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" id="backBtn">&lt; BACK</button>
+    <div class="info" id="diffLabel">5x5</div>
+    <div class="timer" id="timer">00:00</div>
+  </div>
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+  <div class="toolbar">
+    <button class="tool-btn" id="undoBtn">UNDO</button>
+    <button class="tool-btn" id="xModeBtn">X MODE</button>
+    <button class="tool-btn" id="clearBtn">CLEAR</button>
+  </div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="completeScreen" class="screen">
+  <div class="complete-title">LOOP CLOSED</div>
+  <div class="complete-sub">PERFECT SLITHERLINK</div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-val" id="cTime">00:00</div><div class="stat-label">TIME</div></div>
+    <div class="stat"><div class="stat-val" id="cSize">5x5</div><div class="stat-label">SIZE</div></div>
+  </div>
+  <div class="stars" id="cStars"></div>
+  <div class="btn-row">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="playAgainBtn">PLAY AGAIN</button>
+  </div>
+  <div id="completeLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ====== AUDIO ======
+var audioCtx = null;
+function getAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol){
+  try{
+    var ctx = getAudio();
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = type||'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol||0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    o.connect(g);g.connect(ctx.destination);
+    o.start(ctx.currentTime);o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+function sndPlace(){playTone(800,0.08,'square',0.06);playTone(1200,0.06,'sine',0.04);}
+function sndRemove(){playTone(400,0.1,'sine',0.04);}
+function sndX(){playTone(300,0.06,'triangle',0.04);playTone(200,0.08,'triangle',0.03);}
+function sndError(){playTone(200,0.2,'sawtooth',0.06);playTone(160,0.25,'sawtooth',0.04);}
+function sndComplete(){
+  playTone(523,0.15,'sine',0.07);
+  setTimeout(function(){playTone(659,0.15,'sine',0.07);},120);
+  setTimeout(function(){playTone(784,0.15,'sine',0.07);},240);
+  setTimeout(function(){playTone(1047,0.3,'sine',0.08);},360);
+}
+
+// ====== NEON INTEGRATION ======
+var neonFormatScore = function(s){
+  var m = Math.floor(s/60);
+  var sec = Math.floor(s%60);
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+};
+function neonInitForSize(n){
+  if(typeof Neon!=='undefined'){
+    Neon.init({game:'slitherlink',mode:'low',key:'neonarcade_neonmind_slitherlink_scores_'+n,emoji:'\uD83D\uDD17',title:'SLITHERLINK',formatScore:neonFormatScore});
+  }
+}
+neonInitForSize(5);
+
+// ====== SCORES ======
+function saveLocalScore(key,score){
+  var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
+  scores.push({score:score,ts:Date.now()});
+  scores.sort(function(a,b){return a.score-b.score;});
+  scores=scores.slice(0,5);
+  localStorage.setItem(key,JSON.stringify(scores));
+  return scores;
+}
+function timeAgo(ts){
+  var diff=Date.now()-ts;
+  var mins=Math.floor(diff/60000);
+  var hours=Math.floor(diff/3600000);
+  var days=Math.floor(diff/86400000);
+  if(days>0) return days+(days===1?' day ago':' days ago');
+  if(hours>0) return hours+(hours===1?' hour ago':' hours ago');
+  if(mins>0) return mins+(mins===1?' min ago':' mins ago');
+  return 'just now';
+}
+function fmtTime(s){
+  var m=Math.floor(s/60);var sec=Math.floor(s%60);
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+
+// ====== DOM REFS ======
+var $=function(id){return document.getElementById(id);};
+var startScreen=$('startScreen'),gameScreen=$('gameScreen'),completeScreen=$('completeScreen');
+var canvas=$('gameCanvas'),ctx=canvas.getContext('2d');
+var canvasWrap=$('canvasWrap');
+var timerEl=$('timer'),diffLabel=$('diffLabel');
+var undoBtn=$('undoBtn'),clearBtn=$('clearBtn'),xModeBtn=$('xModeBtn');
+
+// ====== STATE ======
+var gridRows=5, gridCols=5;
+// Edges: horizontal edges[row][col] (row 0..rows, col 0..cols-1)
+// Vertical edges[row][col] (row 0..rows-1, col 0..cols+1)
+// State: 0=empty, 1=line, 2=X
+var hEdges=[], vEdges=[];
+var clues=[]; // clues[row][col] = -1 (no clue) or 0-3
+var solutionH=[], solutionV=[]; // solution edges (1=line, 0=no line)
+var historyStack=[];
+var timerStart=0, timerVal=0, timerInterval=null;
+var gameActive=false, completed=false, timerStarted=false;
+var xMode=false;
+var dpr=window.devicePixelRatio||1;
+var cellSize=50;
+var canvasW=0, canvasH=0;
+var padX=0, padY=0;
+var pulsePhase=0, pulseAnim=null;
+
+// ====== DIFFICULTY SELECTOR ======
+var diffBtns=document.querySelectorAll('.diff-btn');
+for(var di=0;di<diffBtns.length;di++){
+  (function(btn){
+    btn.addEventListener('click',function(){
+      for(var j=0;j<diffBtns.length;j++) diffBtns[j].classList.remove('selected');
+      btn.classList.add('selected');
+      gridRows=gridCols=parseInt(btn.dataset.size);
+      neonInitForSize(gridRows);
+      renderBestTimes();
+      renderStartLB();
+    });
+  })(diffBtns[di]);
+}
+
+function renderBestTimes(){
+  var key='neonarcade_neonmind_slitherlink_scores_'+gridRows;
+  var scores;try{scores=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){scores=[];}
+  var el=$('bestTimes');
+  el.textContent='';
+  if(!scores.length) return;
+  var h3=document.createElement('h3');
+  h3.textContent='YOUR BESTS ('+gridRows+'x'+gridCols+')';
+  el.appendChild(h3);
+  for(var i=0;i<scores.length;i++){
+    var row=document.createElement('div');
+    row.className='best-row';
+    var rk=document.createElement('span');rk.className='rank';rk.textContent=(i+1);
+    var sc=document.createElement('span');sc.className='score';sc.textContent=fmtTime(scores[i].score);
+    var ag=document.createElement('span');ag.className='ago';ag.textContent=timeAgo(scores[i].ts);
+    row.appendChild(rk);row.appendChild(sc);row.appendChild(ag);
+    el.appendChild(row);
+  }
+}
+function renderStartLB(){
+  if(typeof Neon!=='undefined'){
+    try{Neon.render($('startLB'));}catch(e){}
+  }
+}
+renderBestTimes();
+setTimeout(renderStartLB,500);
+
+// ====== SCREENS ======
+function showScreen(sc){
+  startScreen.classList.remove('active');
+  gameScreen.classList.remove('active');
+  completeScreen.classList.remove('active');
+  sc.classList.add('active');
+}
+
+// ====== UTILITY ======
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i];arr[i]=arr[j];arr[j]=t;
+  }
+}
+
+// ====== PUZZLE GENERATION ======
+// Generate a random closed loop on grid edges, then derive clues.
+// Strategy: start with a rectangular loop, then randomly deform it.
+
+function makeEmptyEdges(rows,cols){
+  var h=[], v=[];
+  for(var r=0;r<=rows;r++){
+    h[r]=[];
+    for(var c=0;c<cols;c++) h[r][c]=0;
+  }
+  for(var r=0;r<rows;r++){
+    v[r]=[];
+    for(var c=0;c<=cols;c++) v[r][c]=0;
+  }
+  return {h:h,v:v};
+}
+
+function copyEdges(e,rows,cols){
+  var h=[], v=[];
+  for(var r=0;r<=rows;r++){
+    h[r]=[];
+    for(var c=0;c<cols;c++) h[r][c]=e.h[r][c];
+  }
+  for(var r=0;r<rows;r++){
+    v[r]=[];
+    for(var c=0;c<=cols;c++) v[r][c]=e.v[r][c];
+  }
+  return {h:h,v:v};
+}
+
+function getDegree(edges,rows,cols,dr,dc){
+  // Count edges touching dot (dr,dc)
+  var deg=0;
+  // top edge: h[dr-1] doesn't exist for dot, actually:
+  // horizontal edge above dot: hEdges[dr][dc-1] (left) and hEdges[dr][dc] (right)
+  // vertical edge above dot: vEdges[dr-1][dc] (up) and vEdges[dr][dc] (down)
+  if(dc>0 && edges.h[dr][dc-1]) deg++;
+  if(dc<cols && edges.h[dr][dc]) deg++;
+  if(dr>0 && edges.v[dr-1][dc]) deg++;
+  if(dr<rows && edges.v[dr][dc]) deg++;
+  return deg;
+}
+
+function isValidLoop(edges,rows,cols){
+  // Check all dots have degree 0 or 2
+  for(var dr=0;dr<=rows;dr++){
+    for(var dc=0;dc<=cols;dc++){
+      var d=getDegree(edges,rows,cols,dr,dc);
+      if(d!==0 && d!==2) return false;
+    }
+  }
+  // Check single connected component of edges
+  var edgeCount=0;
+  var startDot=null;
+  for(var dr=0;dr<=rows;dr++){
+    for(var dc=0;dc<=cols;dc++){
+      if(getDegree(edges,rows,cols,dr,dc)===2){
+        if(!startDot) startDot={r:dr,c:dc};
+      }
+    }
+  }
+  if(!startDot) return false;
+
+  // Count total edges
+  for(var r=0;r<=rows;r++) for(var c=0;c<cols;c++) if(edges.h[r][c]) edgeCount++;
+  for(var r=0;r<rows;r++) for(var c=0;c<=cols;c++) if(edges.v[r][c]) edgeCount++;
+  if(edgeCount<4) return false;
+
+  // BFS on dots with degree 2
+  var visited={};
+  var q=[startDot.r+','+startDot.c];
+  visited[q[0]]=true;
+  var count=1;
+  while(q.length){
+    var key=q.shift();
+    var parts=key.split(',');
+    var dr=parseInt(parts[0]),dc=parseInt(parts[1]);
+    // Neighbors via edges
+    var neighbors=[];
+    if(dc>0 && edges.h[dr][dc-1]) neighbors.push(dr+','+(dc-1));
+    if(dc<cols && edges.h[dr][dc]) neighbors.push(dr+','+(dc+1));
+    if(dr>0 && edges.v[dr-1][dc]) neighbors.push((dr-1)+','+dc);
+    if(dr<rows && edges.v[dr][dc]) neighbors.push((dr+1)+','+dc);
+    for(var i=0;i<neighbors.length;i++){
+      if(!visited[neighbors[i]]){
+        visited[neighbors[i]]=true;
+        count++;
+        q.push(neighbors[i]);
+      }
+    }
+  }
+  // Count dots with degree 2
+  var dotCount=0;
+  for(var dr=0;dr<=rows;dr++){
+    for(var dc=0;dc<=cols;dc++){
+      if(getDegree(edges,rows,cols,dr,dc)===2) dotCount++;
+    }
+  }
+  return count===dotCount;
+}
+
+function countCellEdges(edges,r,c){
+  var cnt=0;
+  if(edges.h[r][c]) cnt++;     // top
+  if(edges.h[r+1][c]) cnt++;   // bottom
+  if(edges.v[r][c]) cnt++;     // left
+  if(edges.v[r][c+1]) cnt++;   // right
+  return cnt;
+}
+
+function generatePuzzle(rows,cols){
+  var best=null;
+  for(var attempt=0;attempt<80;attempt++){
+    var edges=generateLoop(rows,cols);
+    if(edges && isValidLoop(edges,rows,cols)){
+      best=edges;
+      break;
+    }
+  }
+  if(!best){
+    best=generateSimpleLoop(rows,cols);
+  }
+
+  // Derive clues
+  var allClues=[];
+  for(var r=0;r<rows;r++){
+    allClues[r]=[];
+    for(var c=0;c<cols;c++){
+      allClues[r][c]=countCellEdges(best,r,c);
+    }
+  }
+
+  // Decide which clues to show based on difficulty
+  var showRatio;
+  if(rows<=5) showRatio=0.60;
+  else if(rows<=7) showRatio=0.48;
+  else showRatio=0.35;
+
+  var cluePositions=[];
+  for(var r=0;r<rows;r++){
+    for(var c=0;c<cols;c++){
+      cluePositions.push({r:r,c:c});
+    }
+  }
+  shuffle(cluePositions);
+
+  var shownClues=[];
+  for(var r=0;r<rows;r++){
+    shownClues[r]=[];
+    for(var c=0;c<cols;c++) shownClues[r][c]=-1;
+  }
+
+  var numToShow=Math.round(rows*cols*showRatio);
+  // Prioritize showing 0s and 3s first as they're most constraining
+  var priority=[];
+  var rest=[];
+  for(var i=0;i<cluePositions.length;i++){
+    var p=cluePositions[i];
+    var val=allClues[p.r][p.c];
+    if(val===0||val===3) priority.push(p);
+    else rest.push(p);
+  }
+  shuffle(priority);
+  shuffle(rest);
+  var ordered=priority.concat(rest);
+
+  for(var i=0;i<Math.min(numToShow,ordered.length);i++){
+    var p=ordered[i];
+    shownClues[p.r][p.c]=allClues[p.r][p.c];
+  }
+
+  return {clues:shownClues, solutionH:best.h, solutionV:best.v};
+}
+
+function generateLoop(rows,cols){
+  // Start with rectangle loop and deform it
+  var edges=makeEmptyEdges(rows,cols);
+
+  // Create initial rectangle — pick random inner rectangle
+  var r1=Math.floor(Math.random()*Math.floor(rows/2));
+  var r2=r1+2+Math.floor(Math.random()*(rows-r1-2));
+  var c1=Math.floor(Math.random()*Math.floor(cols/2));
+  var c2=c1+2+Math.floor(Math.random()*(cols-c1-2));
+  if(r2>rows) r2=rows;
+  if(c2>cols) c2=cols;
+
+  // Top and bottom horizontal edges
+  for(var c=c1;c<c2;c++){
+    edges.h[r1][c]=1;
+    edges.h[r2][c]=1;
+  }
+  // Left and right vertical edges
+  for(var r=r1;r<r2;r++){
+    edges.v[r][c1]=1;
+    edges.v[r][c2]=1;
+  }
+
+  // Deform the loop many times
+  var deformations=rows*cols*4;
+  for(var i=0;i<deformations;i++){
+    deformOnce(edges,rows,cols);
+  }
+
+  return edges;
+}
+
+function deformOnce(edges,rows,cols){
+  // Pick a random edge that is ON the loop
+  // Try to push it outward (add a bump) or inward (remove a bump)
+  var onEdges=[];
+  for(var r=0;r<=rows;r++){
+    for(var c=0;c<cols;c++){
+      if(edges.h[r][c]) onEdges.push({type:'h',r:r,c:c});
+    }
+  }
+  for(var r=0;r<rows;r++){
+    for(var c=0;c<=cols;c++){
+      if(edges.v[r][c]) onEdges.push({type:'v',r:r,c:c});
+    }
+  }
+  if(!onEdges.length) return;
+
+  var pick=onEdges[Math.floor(Math.random()*onEdges.length)];
+
+  if(pick.type==='h'){
+    // Horizontal edge at row pick.r, between dots (pick.r,pick.c) and (pick.r,pick.c+1)
+    // Try to push up or down
+    var dir=Math.random()<0.5?-1:1;
+    var newRow=pick.r+dir;
+    if(newRow<0||newRow>rows) return;
+    if(dir===-1 && pick.r===0) return;
+    if(dir===1 && pick.r===rows) return;
+    // The cell above or below this edge
+    var cellR=dir===-1?pick.r-1:pick.r;
+    // Check we can create the bump: need 3 edges to form a U shape
+    // Remove current edge, add 3 new edges
+    var newH_r=newRow;
+    var newV1_r=Math.min(pick.r,newRow);
+    var newV2_r=newV1_r;
+    var newV1_c=pick.c;
+    var newV2_c=pick.c+1;
+
+    if(newH_r<0||newH_r>rows) return;
+    if(newV1_r<0||newV1_r>=rows) return;
+    // Check the 3 new edges are currently OFF
+    if(edges.h[newH_r][pick.c]) return;
+    if(edges.v[newV1_r][newV1_c]) return;
+    if(edges.v[newV2_r][newV2_c]) return;
+
+    // Apply deformation
+    edges.h[pick.r][pick.c]=0;
+    edges.h[newH_r][pick.c]=1;
+    edges.v[newV1_r][newV1_c]=1;
+    edges.v[newV2_r][newV2_c]=1;
+
+    // Validate — every dot degree must be 0 or 2
+    var valid=true;
+    var dotsToCheck=[
+      {r:pick.r,c:pick.c},{r:pick.r,c:pick.c+1},
+      {r:newRow,c:pick.c},{r:newRow,c:pick.c+1}
+    ];
+    for(var d=0;d<dotsToCheck.length;d++){
+      var deg=getDegree(edges,rows,cols,dotsToCheck[d].r,dotsToCheck[d].c);
+      if(deg!==0&&deg!==2){valid=false;break;}
+    }
+    if(!valid){
+      // Revert
+      edges.h[pick.r][pick.c]=1;
+      edges.h[newH_r][pick.c]=0;
+      edges.v[newV1_r][newV1_c]=0;
+      edges.v[newV2_r][newV2_c]=0;
+    }
+  } else {
+    // Vertical edge at col pick.c, between dots (pick.r,pick.c) and (pick.r+1,pick.c)
+    var dir=Math.random()<0.5?-1:1;
+    var newCol=pick.c+dir;
+    if(newCol<0||newCol>cols) return;
+    if(dir===-1 && pick.c===0) return;
+    if(dir===1 && pick.c===cols) return;
+
+    var newV_c=newCol;
+    var newH1_c=Math.min(pick.c,newCol);
+    var newH2_c=newH1_c;
+    var newH1_r=pick.r;
+    var newH2_r=pick.r+1;
+
+    if(newV_c<0||newV_c>cols) return;
+    if(newH1_c<0||newH1_c>=cols) return;
+    if(edges.v[pick.r][newV_c]) return;
+    if(edges.h[newH1_r][newH1_c]) return;
+    if(edges.h[newH2_r][newH2_c]) return;
+
+    edges.v[pick.r][pick.c]=0;
+    edges.v[pick.r][newV_c]=1;
+    edges.h[newH1_r][newH1_c]=1;
+    edges.h[newH2_r][newH2_c]=1;
+
+    var valid=true;
+    var dotsToCheck=[
+      {r:pick.r,c:pick.c},{r:pick.r+1,c:pick.c},
+      {r:pick.r,c:newCol},{r:pick.r+1,c:newCol}
+    ];
+    for(var d=0;d<dotsToCheck.length;d++){
+      var deg=getDegree(edges,rows,cols,dotsToCheck[d].r,dotsToCheck[d].c);
+      if(deg!==0&&deg!==2){valid=false;break;}
+    }
+    if(!valid){
+      edges.v[pick.r][pick.c]=1;
+      edges.v[pick.r][newV_c]=0;
+      edges.h[newH1_r][newH1_c]=0;
+      edges.h[newH2_r][newH2_c]=0;
+    }
+  }
+}
+
+function generateSimpleLoop(rows,cols){
+  // Fallback: create a rectangular loop
+  var edges=makeEmptyEdges(rows,cols);
+  var margin=1;
+  if(rows<=5) margin=0;
+  var r1=margin, r2=rows-margin;
+  var c1=margin, c2=cols-margin;
+  for(var c=c1;c<c2;c++){
+    edges.h[r1][c]=1;
+    edges.h[r2][c]=1;
+  }
+  for(var r=r1;r<r2;r++){
+    edges.v[r][c1]=1;
+    edges.v[r][c2]=1;
+  }
+  // Try many deformations
+  for(var i=0;i<rows*cols*10;i++){
+    deformOnce(edges,rows,cols);
+  }
+  return edges;
+}
+
+// ====== GAME INIT ======
+function startGame(){
+  completed=false;
+  timerStarted=false;
+  historyStack=[];
+  xMode=false;
+  xModeBtn.classList.remove('active');
+  if(pulseAnim){cancelAnimationFrame(pulseAnim);pulseAnim=null;}
+
+  diffLabel.textContent=gridRows+'x'+gridCols;
+  showScreen(gameScreen);
+
+  var puzzle=generatePuzzle(gridRows,gridCols);
+  clues=puzzle.clues;
+  solutionH=puzzle.solutionH;
+  solutionV=puzzle.solutionV;
+
+  // Init edge state arrays
+  var e=makeEmptyEdges(gridRows,gridCols);
+  hEdges=[];
+  for(var r=0;r<=gridRows;r++){
+    hEdges[r]=[];
+    for(var c=0;c<gridCols;c++) hEdges[r][c]=0;
+  }
+  vEdges=[];
+  for(var r=0;r<gridRows;r++){
+    vEdges[r]=[];
+    for(var c=0;c<=gridCols;c++) vEdges[r][c]=0;
+  }
+
+  sizeCanvas();
+  draw();
+
+  timerVal=0;
+  timerEl.textContent='00:00';
+  if(timerInterval) clearInterval(timerInterval);
+  gameActive=true;
+}
+
+// ====== CANVAS SIZING ======
+function sizeCanvas(){
+  var wrapW=canvasWrap.clientWidth-20;
+  var wrapH=canvasWrap.clientHeight-20;
+  var maxCells=Math.max(gridRows,gridCols);
+  cellSize=Math.floor(Math.min(wrapW,wrapH)/(maxCells+1.5));
+  cellSize=Math.max(cellSize,24);
+  cellSize=Math.min(cellSize,60);
+  canvasW=cellSize*(gridCols)+cellSize*1.5;
+  canvasH=cellSize*(gridRows)+cellSize*1.5;
+  canvas.style.width=Math.round(canvasW)+'px';
+  canvas.style.height=Math.round(canvasH)+'px';
+  canvas.width=Math.round(canvasW*dpr);
+  canvas.height=Math.round(canvasH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  padX=cellSize*0.75;
+  padY=cellSize*0.75;
+}
+
+function dotPos(r,c){
+  return {x:padX+c*cellSize, y:padY+r*cellSize};
+}
+
+function cellCenter(r,c){
+  return {x:padX+c*cellSize+cellSize/2, y:padY+r*cellSize+cellSize/2};
+}
+
+// ====== DRAWING ======
+function draw(){
+  ctx.clearRect(0,0,canvasW,canvasH);
+
+  // Draw cell clues
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      if(clues[r][c]>=0){
+        drawClue(r,c);
+      }
+    }
+  }
+
+  // Draw edges (lines and X marks)
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      if(hEdges[r][c]===1) drawEdgeLine('h',r,c,false);
+      else if(hEdges[r][c]===2) drawEdgeX('h',r,c);
+    }
+  }
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<=gridCols;c++){
+      if(vEdges[r][c]===1) drawEdgeLine('v',r,c,false);
+      else if(vEdges[r][c]===2) drawEdgeX('v',r,c);
+    }
+  }
+
+  // Draw dots
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<=gridCols;c++){
+      drawDot(r,c);
+    }
+  }
+}
+
+function drawCompletedLoop(){
+  ctx.clearRect(0,0,canvasW,canvasH);
+
+  // Draw cell clues (all satisfied)
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      if(clues[r][c]>=0) drawClue(r,c);
+    }
+  }
+
+  // Draw edges with pulse
+  var glow=0.4+0.3*Math.sin(pulsePhase);
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      if(hEdges[r][c]===1) drawEdgeLine('h',r,c,true,glow);
+    }
+  }
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<=gridCols;c++){
+      if(vEdges[r][c]===1) drawEdgeLine('v',r,c,true,glow);
+    }
+  }
+
+  // Draw dots
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<=gridCols;c++){
+      drawDot(r,c);
+    }
+  }
+}
+
+function drawDot(r,c){
+  var p=dotPos(r,c);
+  var deg=getPlayerDegree(r,c);
+  var radius=3;
+  if(deg>0) radius=4;
+
+  ctx.fillStyle=deg>0?'rgba(0,240,255,0.7)':'#7a7a9a';
+  if(deg>0){
+    ctx.shadowColor='rgba(0,240,255,0.4)';
+    ctx.shadowBlur=6;
+  }
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+function drawEdgeLine(type,r,c,pulse,glow){
+  var p1,p2;
+  if(type==='h'){
+    p1=dotPos(r,c);
+    p2=dotPos(r,c+1);
+  } else {
+    p1=dotPos(r,c);
+    p2=dotPos(r+1,c);
+  }
+
+  var alpha=pulse?glow+0.3:0.7;
+  var blur=pulse?12:6;
+
+  ctx.strokeStyle='rgba(0,240,255,'+alpha+')';
+  ctx.lineWidth=pulse?3:2.5;
+  ctx.lineCap='round';
+  ctx.shadowColor='rgba(0,240,255,'+(alpha*0.6)+')';
+  ctx.shadowBlur=blur;
+  ctx.beginPath();
+  ctx.moveTo(p1.x,p1.y);
+  ctx.lineTo(p2.x,p2.y);
+  ctx.stroke();
+  ctx.shadowBlur=0;
+}
+
+function drawEdgeX(type,r,c){
+  var mid;
+  if(type==='h'){
+    var p1=dotPos(r,c);
+    var p2=dotPos(r,c+1);
+    mid={x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2};
+  } else {
+    var p1=dotPos(r,c);
+    var p2=dotPos(r+1,c);
+    mid={x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2};
+  }
+  var s=Math.max(5,cellSize*0.12);
+  ctx.strokeStyle='rgba(255,45,123,0.4)';
+  ctx.lineWidth=1.5;
+  ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(mid.x-s,mid.y-s);
+  ctx.lineTo(mid.x+s,mid.y+s);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(mid.x+s,mid.y-s);
+  ctx.lineTo(mid.x-s,mid.y+s);
+  ctx.stroke();
+}
+
+function drawClue(r,c){
+  var ctr=cellCenter(r,c);
+  var val=clues[r][c];
+  // Count current edges around this cell
+  var cnt=0;
+  if(hEdges[r][c]===1) cnt++;
+  if(hEdges[r+1][c]===1) cnt++;
+  if(vEdges[r][c]===1) cnt++;
+  if(vEdges[r][c+1]===1) cnt++;
+
+  var color='#fff';
+  if(cnt===val) color='#39ff14'; // satisfied
+  else if(cnt>val) color='#ff2d7b'; // violated
+
+  var fontSize=Math.max(14,cellSize*0.4);
+  ctx.fillStyle=color;
+  ctx.font='700 '+fontSize+'px Orbitron,monospace';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+
+  if(cnt===val && cnt>0){
+    ctx.shadowColor='rgba(57,255,20,0.4)';
+    ctx.shadowBlur=8;
+  } else if(cnt>val){
+    ctx.shadowColor='rgba(255,45,123,0.4)';
+    ctx.shadowBlur=8;
+  }
+  ctx.fillText(String(val),ctr.x,ctr.y+1);
+  ctx.shadowBlur=0;
+}
+
+function getPlayerDegree(dr,dc){
+  var deg=0;
+  if(dc>0 && hEdges[dr][dc-1]===1) deg++;
+  if(dc<gridCols && hEdges[dr][dc]===1) deg++;
+  if(dr>0 && vEdges[dr-1][dc]===1) deg++;
+  if(dr<gridRows && vEdges[dr][dc]===1) deg++;
+  return deg;
+}
+
+// ====== INPUT ======
+function getCanvasPos(e){
+  var rect=canvas.getBoundingClientRect();
+  var x,y;
+  if(e.touches&&e.touches.length>0){
+    x=e.touches[0].clientX-rect.left;
+    y=e.touches[0].clientY-rect.top;
+  }else{
+    x=e.clientX-rect.left;
+    y=e.clientY-rect.top;
+  }
+  return {x:x,y:y};
+}
+
+function findNearestEdge(px,py){
+  // Find the closest edge to the click point
+  var bestDist=Infinity, bestEdge=null;
+  var threshold=cellSize*0.4;
+
+  // Check horizontal edges
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      var p1=dotPos(r,c);
+      var p2=dotPos(r,c+1);
+      var midX=(p1.x+p2.x)/2;
+      var midY=(p1.y+p2.y)/2;
+      var dx=px-midX, dy=py-midY;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<bestDist&&dist<threshold){
+        bestDist=dist;
+        bestEdge={type:'h',r:r,c:c};
+      }
+    }
+  }
+
+  // Check vertical edges
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<=gridCols;c++){
+      var p1=dotPos(r,c);
+      var p2=dotPos(r+1,c);
+      var midX=(p1.x+p2.x)/2;
+      var midY=(p1.y+p2.y)/2;
+      var dx=px-midX, dy=py-midY;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<bestDist&&dist<threshold){
+        bestDist=dist;
+        bestEdge={type:'v',r:r,c:c};
+      }
+    }
+  }
+
+  return bestEdge;
+}
+
+function handleClick(e,forceX){
+  if(!gameActive||completed) return;
+  e.preventDefault();
+  var pos=getCanvasPos(e);
+  var edge=findNearestEdge(pos.x,pos.y);
+  if(!edge) return;
+
+  // Start timer on first click
+  if(!timerStarted){
+    timerStarted=true;
+    timerStart=Date.now();
+    timerInterval=setInterval(function(){
+      if(!gameActive) return;
+      timerVal=Math.floor((Date.now()-timerStart)/1000);
+      timerEl.textContent=fmtTime(timerVal);
+    },250);
+  }
+
+  var arr=(edge.type==='h')?hEdges:vEdges;
+  var oldVal=arr[edge.r][edge.c];
+  var newVal;
+
+  var useX=xMode||forceX;
+
+  if(useX){
+    // X mode: toggle between empty and X
+    if(oldVal===0) newVal=2;
+    else if(oldVal===2) newVal=0;
+    else newVal=0; // if line, remove it
+  } else {
+    // Normal mode: toggle between empty and line
+    if(oldVal===0) newVal=1;
+    else if(oldVal===1) newVal=0;
+    else newVal=1; // if X, replace with line
+  }
+
+  historyStack.push({type:edge.type,r:edge.r,c:edge.c,oldVal:oldVal});
+  arr[edge.r][edge.c]=newVal;
+
+  if(newVal===1) sndPlace();
+  else if(newVal===2) sndX();
+  else sndRemove();
+
+  draw();
+  checkComplete();
+}
+
+canvas.addEventListener('click',function(e){handleClick(e,false);});
+canvas.addEventListener('contextmenu',function(e){
+  e.preventDefault();
+  handleClick(e,true);
+});
+canvas.addEventListener('touchstart',function(e){
+  e.preventDefault();
+  handleClick(e,false);
+},{passive:false});
+
+// ====== COMPLETION CHECK ======
+function checkComplete(){
+  // First verify all clues are satisfied
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      if(clues[r][c]>=0){
+        var cnt=0;
+        if(hEdges[r][c]===1) cnt++;
+        if(hEdges[r+1][c]===1) cnt++;
+        if(vEdges[r][c]===1) cnt++;
+        if(vEdges[r][c+1]===1) cnt++;
+        if(cnt!==clues[r][c]) return;
+      }
+    }
+  }
+
+  // Check all dots have degree 0 or 2
+  for(var dr=0;dr<=gridRows;dr++){
+    for(var dc=0;dc<=gridCols;dc++){
+      var d=getPlayerDegree(dr,dc);
+      if(d!==0&&d!==2) return;
+    }
+  }
+
+  // Check there are some edges
+  var edgeCount=0;
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<gridCols;c++){
+      if(hEdges[r][c]===1) edgeCount++;
+    }
+  }
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<=gridCols;c++){
+      if(vEdges[r][c]===1) edgeCount++;
+    }
+  }
+  if(edgeCount<4) return;
+
+  // Check single connected loop
+  var startDot=null;
+  for(var dr=0;dr<=gridRows&&!startDot;dr++){
+    for(var dc=0;dc<=gridCols&&!startDot;dc++){
+      if(getPlayerDegree(dr,dc)===2) startDot={r:dr,c:dc};
+    }
+  }
+  if(!startDot) return;
+
+  var visited={};
+  var q=[startDot.r+','+startDot.c];
+  visited[q[0]]=true;
+  var reachable=1;
+  while(q.length){
+    var key=q.shift();
+    var parts=key.split(',');
+    var dr=parseInt(parts[0]),dc=parseInt(parts[1]);
+    var neighbors=[];
+    if(dc>0 && hEdges[dr][dc-1]===1) neighbors.push(dr+','+(dc-1));
+    if(dc<gridCols && hEdges[dr][dc]===1) neighbors.push(dr+','+(dc+1));
+    if(dr>0 && vEdges[dr-1][dc]===1) neighbors.push((dr-1)+','+dc);
+    if(dr<gridRows && vEdges[dr][dc]===1) neighbors.push((dr+1)+','+dc);
+    for(var i=0;i<neighbors.length;i++){
+      if(!visited[neighbors[i]]){
+        visited[neighbors[i]]=true;
+        reachable++;
+        q.push(neighbors[i]);
+      }
+    }
+  }
+
+  var dotCount=0;
+  for(var dr=0;dr<=gridRows;dr++){
+    for(var dc=0;dc<=gridCols;dc++){
+      if(getPlayerDegree(dr,dc)===2) dotCount++;
+    }
+  }
+  if(reachable!==dotCount) return;
+
+  // Also check ALL clue cells match (including hidden ones, by checking edges vs solution)
+  // Actually, just check that the loop satisfies all VISIBLE clues.
+  // The loop must be a valid single closed loop satisfying all shown clues.
+  // We already checked visible clues above and loop validity.
+
+  onComplete();
+}
+
+function onComplete(){
+  completed=true;
+  gameActive=false;
+  if(timerInterval) clearInterval(timerInterval);
+  sndComplete();
+  spawnParticles(canvasWrap,20,'#39ff14');
+
+  // Start pulse animation
+  pulsePhase=0;
+  function animatePulse(){
+    pulsePhase+=0.06;
+    drawCompletedLoop();
+    pulseAnim=requestAnimationFrame(animatePulse);
+  }
+  pulseAnim=requestAnimationFrame(animatePulse);
+
+  var capturedTime=timerVal;
+  var stars=3;
+  var baseTime=gridRows<=5?90:gridRows<=7?180:360;
+  if(capturedTime>baseTime*1.5) stars=2;
+  if(capturedTime>baseTime*2.5) stars=1;
+
+  var key='neonarcade_neonmind_slitherlink_scores_'+gridRows;
+  saveLocalScore(key,capturedTime);
+
+  setTimeout(function(){
+    if(pulseAnim){cancelAnimationFrame(pulseAnim);pulseAnim=null;}
+    $('cTime').textContent=fmtTime(capturedTime);
+    $('cSize').textContent=gridRows+'x'+gridCols;
+
+    var starStr='';
+    for(var i=0;i<3;i++) starStr+=(i<stars?'\u2B50':'\u2606');
+    $('cStars').textContent=starStr;
+
+    showScreen(completeScreen);
+
+    if(typeof Neon!=='undefined'){
+      var nameReady=Neon.getName()?Promise.resolve():Neon.promptName();
+      nameReady.then(function(){
+        return Neon.save(capturedTime);
+      }).then(function(neonResult){
+        Neon.render($('completeLB'));
+        if(neonResult&&neonResult.globalRank>=1&&neonResult.globalRank<=5){
+          Neon.showGlobalSplash(neonResult.globalRank);
+        }
+      }).catch(function(){});
+    }
+  },1500);
+}
+
+// ====== TOOLBAR ======
+undoBtn.addEventListener('click',function(){
+  if(!gameActive||!historyStack.length) return;
+  var last=historyStack.pop();
+  var arr=(last.type==='h')?hEdges:vEdges;
+  arr[last.r][last.c]=last.oldVal;
+  sndRemove();
+  draw();
+});
+
+clearBtn.addEventListener('click',function(){
+  if(!gameActive) return;
+  for(var r=0;r<=gridRows;r++){
+    for(var c=0;c<gridCols;c++) hEdges[r][c]=0;
+  }
+  for(var r=0;r<gridRows;r++){
+    for(var c=0;c<=gridCols;c++) vEdges[r][c]=0;
+  }
+  historyStack=[];
+  draw();
+});
+
+xModeBtn.addEventListener('click',function(){
+  xMode=!xMode;
+  if(xMode) xModeBtn.classList.add('active');
+  else xModeBtn.classList.remove('active');
+});
+
+// ====== NAVIGATION ======
+$('backBtn').addEventListener('click',function(){
+  gameActive=false;
+  if(timerInterval) clearInterval(timerInterval);
+  if(pulseAnim){cancelAnimationFrame(pulseAnim);pulseAnim=null;}
+  showScreen(startScreen);
+  renderBestTimes();
+  renderStartLB();
+});
+
+$('startBtn').addEventListener('click',function(){
+  getAudio();
+  startGame();
+});
+
+$('playAgainBtn').addEventListener('click',function(){
+  startGame();
+});
+
+// ====== SHARE ======
+$('shareBtn').addEventListener('click',function(){
+  var capturedTime=timerVal;
+  var stars=3;
+  var baseTime=gridRows<=5?90:gridRows<=7?180:360;
+  if(capturedTime>baseTime*1.5) stars=2;
+  if(capturedTime>baseTime*2.5) stars=1;
+  var starStr='';
+  for(var i=0;i<stars;i++) starStr+='\u2B50';
+
+  var text='\uD83D\uDD17 SLITHERLINK '+gridRows+'x'+gridCols+'\n';
+  text+='\u23F1 '+fmtTime(capturedTime)+' | '+starStr+'\n';
+  text+='\u2022\u2500\u2022\u2500\u2022\n';
+  text+='\u2502 3 \u2502\n';
+  text+='\u2022\u2500\u2022 \u2022\n';
+  text+='neonarcade.net/neonmind';
+
+  if(navigator.share){
+    navigator.share({text:text}).catch(function(){});
+  }else{
+    navigator.clipboard.writeText(text).then(function(){
+      var btn=$('shareBtn');
+      btn.textContent='COPIED!';
+      setTimeout(function(){btn.textContent='SHARE';},1500);
+    }).catch(function(){});
+  }
+});
+
+// ====== PARTICLES ======
+function spawnParticles(parent,count,color){
+  for(var i=0;i<count;i++){
+    var p=document.createElement('div');
+    p.className='particle';
+    p.style.background=color;
+    p.style.left=Math.random()*100+'%';
+    p.style.top=Math.random()*100+'%';
+    p.style.boxShadow='0 0 6px '+color;
+    parent.appendChild(p);
+    var angle=Math.random()*Math.PI*2;
+    var speed=40+Math.random()*60;
+    var dx=Math.cos(angle)*speed;
+    var dy=Math.sin(angle)*speed;
+    (function(el,ddx,ddy){
+      var start=performance.now();
+      function animate(t){
+        var elapsed=(t-start)/1000;
+        if(elapsed>1){el.remove();return;}
+        el.style.transform='translate('+ddx*elapsed+'px,'+ddy*elapsed+'px)';
+        el.style.opacity=String(1-elapsed);
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    })(p,dx,dy);
+  }
+}
+
+// ====== RESIZE ======
+window.addEventListener('resize',function(){
+  if(gameScreen.classList.contains('active')&&!completed){
+    dpr=window.devicePixelRatio||1;
+    sizeCanvas();
+    draw();
+  }
+});
+
+// ====== KEYBOARD ======
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    if(gameActive){
+      gameActive=false;
+      if(timerInterval) clearInterval(timerInterval);
+      if(pulseAnim){cancelAnimationFrame(pulseAnim);pulseAnim=null;}
+      showScreen(startScreen);
+      renderBestTimes();
+      renderStartLB();
+    }
+    return;
+  }
+  if(e.key==='z'&&(e.ctrlKey||e.metaKey)){
+    e.preventDefault();
+    undoBtn.click();
+  }
+  if(e.key==='x'||e.key==='X'){
+    xModeBtn.click();
+  }
+});
+
+})();
+
+// Show More Games bar after delay
+setTimeout(function(){var mg=document.getElementById('neonMoreGames');if(mg)mg.style.display='block';},3000);
+</script>
+<!-- More Games Navigation -->
+<div id="neonMoreGames" class="na-more-games" style="display:none">
+  <div class="na-more-inner">
+    <div class="na-more-title">MORE GAMES</div>
+    <div class="na-more-links">
+      <a href="bridges.html" class="na-more-link">&#x1F309; Bridges</a>
+      <a href="nurikabe.html" class="na-more-link">&#x1F3DD; Nurikabe</a>
+      <a href="sudoku.html" class="na-more-link">&#x1F522; Sudoku</a>
+      <a href="minesweeper.html" class="na-more-link">&#x1F4A3; Minesweeper</a>
+      <a href="/neonmind/" class="na-more-link na-more-hub">&larr; All NEON MIND Games</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
