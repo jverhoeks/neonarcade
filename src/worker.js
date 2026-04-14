@@ -874,8 +874,11 @@ export default {
           await env.GAME_DATA.put(userKey, serialized);
           return json({ ok: true, lastSync: userData.lastSync });
         } catch (syncErr) {
-          console.error('Sync error:', syncErr);
-          return json({ error: 'sync failed: ' + syncErr.message }, 500);
+          console.error('Sync error:', syncErr.stack || syncErr.message || syncErr);
+          return new Response(JSON.stringify({ error: 'sync failed', detail: String(syncErr.message || syncErr) }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+          });
         }
       }
 
@@ -1176,8 +1179,11 @@ export default {
       return json({ error: 'not found' }, 404);
 
     } catch (err) {
-      console.error(err);
-      return json({ error: 'internal error' }, 500);
+      console.error('Worker error:', err.stack || err.message || err);
+      return new Response(JSON.stringify({ error: 'internal error', detail: String(err.message || err) }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
     }
   },
 };
