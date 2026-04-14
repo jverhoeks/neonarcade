@@ -402,6 +402,128 @@ body::before {
   background: rgba(57,255,20,0.06);
 }
 
+/* Protect Your Scores */
+.protect-card {
+  background: #12121f;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.protect-card-loggedout {
+  border: 1px solid rgba(255,215,0,0.2);
+}
+.protect-card-loggedin {
+  border: 1px solid rgba(57,255,20,0.2);
+}
+.protect-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.protect-shield {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.protect-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.protect-title-gold {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255,215,0,0.4);
+}
+.protect-title-green {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57,255,20,0.4);
+}
+.protect-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #9999bb;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.protect-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.protect-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 3px;
+  padding: 12px 28px;
+  border: 1px solid #ffd700;
+  background: rgba(255,215,0,0.06);
+  color: #ffd700;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+.protect-btn:hover {
+  background: rgba(255,215,0,0.15);
+  box-shadow: 0 0 20px rgba(255,215,0,0.2);
+  transform: scale(1.04);
+}
+.protect-btn-green {
+  border-color: #39ff14;
+  background: rgba(57,255,20,0.06);
+  color: #39ff14;
+}
+.protect-btn-green:hover {
+  background: rgba(57,255,20,0.15);
+  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+}
+.protect-signout {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #7a7a9a;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.protect-signout:hover {
+  color: #ff2d7b;
+}
+.protect-note {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #7a7a9a;
+  margin-top: 12px;
+}
+.protect-email {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #9999bb;
+  margin-bottom: 4px;
+}
+.protect-sync-time {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: #7a7a9a;
+  margin-bottom: 16px;
+}
+
 /* Empty state */
 .empty-state {
   text-align: center;
@@ -480,6 +602,9 @@ body::before {
     <div class="profile-name" id="profileName">PLAYER</div>
     <div class="profile-since" id="profileSince"></div>
   </div>
+
+  <!-- Protect Your Scores -->
+  <div id="protectSection"></div>
 
   <!-- Streaks -->
   <div class="card" id="streaksCard" style="display:none">
@@ -682,6 +807,200 @@ body::before {
     var monthIdx = parseInt(parts[1], 10) - 1;
     $('profileSince').textContent = 'PLAYING SINCE ' + months[monthIdx] + ' ' + parts[0];
   }
+
+  // ========== PROTECT YOUR SCORES ==========
+  function isLoggedIn() {
+    return document.cookie.indexOf('neon_user=') >= 0;
+  }
+
+  function timeAgo(isoStr) {
+    if (!isoStr) return 'never';
+    var diff = Date.now() - new Date(isoStr).getTime();
+    var mins = Math.floor(diff / 60000);
+    var hours = Math.floor(diff / 3600000);
+    if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+    if (mins > 0) return mins + (mins === 1 ? ' minute ago' : ' minutes ago');
+    return 'just now';
+  }
+
+  function collectSyncData() {
+    var scores = {};
+    for (var si = 0; si < localStorage.length; si++) {
+      var skey = localStorage.key(si);
+      if (skey && skey.indexOf('neonarcade_') === 0 && skey.indexOf('scores') >= 0) {
+        try { var v = JSON.parse(localStorage.getItem(skey)); if (Array.isArray(v)) scores[skey] = v; } catch(e) {}
+      }
+    }
+    return {
+      playerName: localStorage.getItem('neonarcade_player_name') || '',
+      profile: JSON.parse(localStorage.getItem('neonarcade_profile') || '{}'),
+      badges: JSON.parse(localStorage.getItem('neonarcade_badges') || '{}'),
+      hubStreak: JSON.parse(localStorage.getItem('neonarcade_daily_hub_streak') || '{}'),
+      scores: scores
+    };
+  }
+
+  function maskEmail(email) {
+    if (!email) return '';
+    var parts = email.split('@');
+    if (parts.length !== 2) return email;
+    var local = parts[0];
+    var masked = local.charAt(0) + '...' + (local.length > 1 ? local.charAt(local.length - 1) : '');
+    return masked + '@' + parts[1];
+  }
+
+  function renderProtectSection() {
+    var container = $('protectSection');
+    while (container.firstChild) container.removeChild(container.firstChild);
+
+    if (!isLoggedIn()) {
+      // Logged out state
+      var card = document.createElement('div');
+      card.className = 'protect-card protect-card-loggedout';
+
+      var header = document.createElement('div');
+      header.className = 'protect-header';
+      var shield = document.createElement('span');
+      shield.className = 'protect-shield';
+      shield.textContent = '\uD83D\uDEE1\uFE0F';
+      header.appendChild(shield);
+      var title = document.createElement('span');
+      title.className = 'protect-title protect-title-gold';
+      title.textContent = 'PROTECT YOUR SCORES';
+      header.appendChild(title);
+      card.appendChild(header);
+
+      var desc = document.createElement('div');
+      desc.className = 'protect-desc';
+      desc.textContent = 'Sign in to back up your scores, badges, and streaks across devices. Play anonymously \u2014 sign in when ready.';
+      card.appendChild(desc);
+
+      var actions = document.createElement('div');
+      actions.className = 'protect-actions';
+      var signInBtn = document.createElement('a');
+      signInBtn.className = 'protect-btn';
+      signInBtn.href = '/auth/login?return_to=/profile/';
+      signInBtn.textContent = 'SIGN IN';
+      actions.appendChild(signInBtn);
+      card.appendChild(actions);
+
+      var note = document.createElement('div');
+      note.className = 'protect-note';
+      note.textContent = 'Free \u00B7 No password \u00B7 Takes 5 seconds';
+      card.appendChild(note);
+
+      container.appendChild(card);
+    } else {
+      // Logged in state
+      var card = document.createElement('div');
+      card.className = 'protect-card protect-card-loggedin';
+
+      var header = document.createElement('div');
+      header.className = 'protect-header';
+      var check = document.createElement('span');
+      check.className = 'protect-shield';
+      check.textContent = '\u2705';
+      header.appendChild(check);
+      var title = document.createElement('span');
+      title.className = 'protect-title protect-title-green';
+      title.textContent = 'SCORES PROTECTED';
+      header.appendChild(title);
+      card.appendChild(header);
+
+      var emailEl = document.createElement('div');
+      emailEl.className = 'protect-email';
+      emailEl.textContent = 'Signed in as ...';
+      card.appendChild(emailEl);
+
+      var syncTimeEl = document.createElement('div');
+      syncTimeEl.className = 'protect-sync-time';
+      var lastSync = localStorage.getItem('neonarcade_last_sync');
+      syncTimeEl.textContent = 'Last synced: ' + timeAgo(lastSync);
+      card.appendChild(syncTimeEl);
+
+      // Fetch auth status to get email
+      fetch('/auth/status', { credentials: 'same-origin' })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+          if (data && data.email) {
+            emailEl.textContent = 'Signed in as ' + maskEmail(data.email);
+          } else {
+            emailEl.textContent = 'Signed in';
+          }
+        })
+        .catch(function() {
+          emailEl.textContent = 'Signed in';
+        });
+
+      var actions = document.createElement('div');
+      actions.className = 'protect-actions';
+
+      var syncBtn = document.createElement('button');
+      syncBtn.className = 'protect-btn protect-btn-green';
+      syncBtn.textContent = 'SYNC NOW';
+      syncBtn.addEventListener('click', function() {
+        syncBtn.textContent = 'SYNCING...';
+        syncBtn.disabled = true;
+        var payload = collectSyncData();
+        fetch('/api/sync', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(function(r) {
+          if (r.ok) {
+            var now = new Date().toISOString();
+            localStorage.setItem('neonarcade_last_sync', now);
+            syncBtn.textContent = 'SYNCED!';
+            syncTimeEl.textContent = 'Last synced: just now';
+            setTimeout(function() {
+              syncBtn.textContent = 'SYNC NOW';
+              syncBtn.disabled = false;
+            }, 2000);
+          } else {
+            syncBtn.textContent = 'SYNC FAILED';
+            setTimeout(function() {
+              syncBtn.textContent = 'SYNC NOW';
+              syncBtn.disabled = false;
+            }, 2000);
+          }
+        })
+        .catch(function() {
+          syncBtn.textContent = 'SYNC FAILED';
+          setTimeout(function() {
+            syncBtn.textContent = 'SYNC NOW';
+            syncBtn.disabled = false;
+          }, 2000);
+        });
+      });
+      actions.appendChild(syncBtn);
+
+      var signOutBtn = document.createElement('button');
+      signOutBtn.className = 'protect-signout';
+      signOutBtn.textContent = 'SIGN OUT';
+      signOutBtn.addEventListener('click', function() {
+        signOutBtn.textContent = 'SIGNING OUT...';
+        signOutBtn.disabled = true;
+        fetch('/auth/logout', {
+          method: 'POST',
+          credentials: 'same-origin'
+        })
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function() {
+          window.location.reload();
+        });
+      });
+      actions.appendChild(signOutBtn);
+
+      card.appendChild(actions);
+      container.appendChild(card);
+    }
+  }
+
+  renderProtectSection();
 
   // ========== STREAKS ==========
   var streak = safeJSON('neonarcade_daily_hub_streak');
