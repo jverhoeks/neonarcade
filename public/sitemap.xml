@@ -94,7 +94,7 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- NEON ARCADE Games (31) -->
+  <!-- NEON ARCADE Games (33) -->
   <url>
     <loc>https://neonarcade.net/neonarcade/veto.html</loc>
     <changefreq>monthly</changefreq>
@@ -102,6 +102,16 @@
   </url>
   <url>
     <loc>https://neonarcade.net/neonarcade/mimic.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonarcade/echofield.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonarcade/orbit.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -251,7 +261,7 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- NEON MIND Games (15) -->
+  <!-- NEON MIND Games (18) -->
   <url>
     <loc>https://neonarcade.net/neonmind/connections.html</loc>
     <changefreq>monthly</changefreq>
@@ -456,6 +466,11 @@
   <url>
     <loc>https://neonarcade.net/neonmind/faction.html</loc>
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neonarcade.net/neonmind/slitherlink.html</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>

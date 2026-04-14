@@ -42,6 +42,7 @@ const KNOWN_GAMES = {
   'veto':                { mode: 'high', maxScore: 100 },
   'mimic':               { mode: 'high', maxScore: 100 },
   'orbit':               { mode: 'high', maxScore: 100000 },
+  'echofield':           { mode: 'high', maxScore: 100000 },
 
   // NEON GRIND (mode: high)
   'mathblitz':           { mode: 'high', maxScore: 100000 },
@@ -70,6 +71,7 @@ const KNOWN_GAMES = {
   'connections':         { mode: 'low', maxScore: 86400 },
   'hitori':              { mode: 'low', maxScore: 86400 },
   'kenken':              { mode: 'low', maxScore: 86400 },
+  'slitherlink':         { mode: 'low', maxScore: 86400 },
   'culprit':             { mode: 'low', maxScore: 86400 },
   'faction':             { mode: 'high', maxScore: 9000 },
 
