@@ -98,6 +98,21 @@ window.Neon = (function() {
 
     // Check badge conditions
     checkBadges();
+
+    // Restore from server on first login
+    if (isLoggedIn()) {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('just_logged_in') === '1') {
+          _restoreFromServer().then(function() {
+            try {
+              var cleanUrl = window.location.pathname + window.location.search.replace(/[?&]just_logged_in=1/, '');
+              history.replaceState(null, '', cleanUrl);
+            } catch(e) {}
+          });
+        }
+      } catch(e) {}
+    }
   }
 
   function getHighScore() {
@@ -202,6 +217,8 @@ window.Neon = (function() {
       // Inject challenge bar after all async work
       _injectChallengeBar();
       checkBadges();
+      _autoSync();
+      _showAuthNudge();
       return {
         scores: localScores,
         isNewBest: isNewBest,
@@ -1192,6 +1209,210 @@ window.Neon = (function() {
     }, 3000);
   }
 
+  // ========== AUTH & SYNC ==========
+  var _lastSyncTime = 0;
+  var _authNudgeEl = null;
+
+  function isLoggedIn() {
+    return document.cookie.indexOf('neon_user=') !== -1;
+  }
+
+  function getLoggedInName() {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var c = cookies[i].replace(/^\s+/, '');
+      if (c.indexOf('neon_user=') === 0) {
+        try {
+          return decodeURIComponent(c.substring(10));
+        } catch(e) {
+          return c.substring(10);
+        }
+      }
+    }
+    return null;
+  }
+
+  function _collectSyncData() {
+    var scores = {};
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf('neonarcade_') === 0 && k.indexOf('scores') !== -1) {
+          try {
+            var val = JSON.parse(localStorage.getItem(k));
+            if (Array.isArray(val)) {
+              scores[k] = val;
+            }
+          } catch(e) {}
+        }
+      }
+    } catch(e) {}
+    return {
+      playerName: localStorage.getItem(NAME_KEY) || '',
+      profile: _loadProfile(),
+      badges: _loadBadges(),
+      hubStreak: _loadHubStreak(),
+      scores: scores
+    };
+  }
+
+  function syncNow() {
+    if (!isLoggedIn()) {
+      return Promise.resolve(null);
+    }
+    var data = _collectSyncData();
+    return fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(data)
+    }).then(function(r) { return r.json(); }).then(function(result) {
+      try {
+        localStorage.setItem('neonarcade_last_sync', String(Date.now()));
+      } catch(e) {}
+      _lastSyncTime = Date.now();
+      return result;
+    }).catch(function() { return null; });
+  }
+
+  function _autoSync() {
+    if (Date.now() - _lastSyncTime < 30000) return;
+    _lastSyncTime = Date.now();
+    syncNow();
+  }
+
+  function _restoreFromServer() {
+    return fetch('/api/sync', {
+      method: 'GET',
+      credentials: 'same-origin'
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      if (!data) return;
+      try {
+        if (data.playerName) {
+          localStorage.setItem(NAME_KEY, data.playerName);
+        }
+        if (data.profile && typeof data.profile === 'object') {
+          localStorage.setItem(PROFILE_KEY, JSON.stringify(data.profile));
+        }
+        if (data.badges && typeof data.badges === 'object') {
+          localStorage.setItem(BADGES_KEY, JSON.stringify(data.badges));
+        }
+        if (data.hubStreak && typeof data.hubStreak === 'object') {
+          localStorage.setItem(HUB_STREAK_KEY, JSON.stringify(data.hubStreak));
+        }
+        if (data.scores && typeof data.scores === 'object') {
+          for (var k in data.scores) {
+            if (data.scores.hasOwnProperty(k)) {
+              localStorage.setItem(k, JSON.stringify(data.scores[k]));
+            }
+          }
+        }
+      } catch(e) {}
+    }).catch(function() {});
+  }
+
+  function logout() {
+    return fetch('/auth/logout', {
+      method: 'POST',
+      credentials: 'same-origin'
+    }).then(function(r) { return r.json(); }).then(function(result) {
+      document.cookie = 'neon_user=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+      try {
+        localStorage.removeItem('neonarcade_last_sync');
+      } catch(e) {}
+      return result;
+    }).catch(function() {
+      document.cookie = 'neon_user=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+      try {
+        localStorage.removeItem('neonarcade_last_sync');
+      } catch(e) {}
+      return null;
+    });
+  }
+
+  function _shouldShowAuthNudge() {
+    if (isLoggedIn()) return false;
+    try {
+      if (sessionStorage.getItem('neonarcade_nudge_dismissed')) return false;
+    } catch(e) {}
+    var hubStreak = _loadHubStreak();
+    if (hubStreak.current >= 7) return true;
+    var profile = _loadProfile();
+    if (profile.gamesPlayed && profile.gamesPlayed.length >= 5) return true;
+    var badges = _loadBadges();
+    var badgeCount = 0;
+    for (var b in badges) {
+      if (badges.hasOwnProperty(b)) badgeCount++;
+    }
+    if (badgeCount >= 3) return true;
+    if (lastGlobalRank >= 1 && lastGlobalRank <= 20) return true;
+    return false;
+  }
+
+  function _buildNudgeMessage() {
+    var parts = [];
+    var hubStreak = _loadHubStreak();
+    if (hubStreak.current >= 7) {
+      parts.push('a ' + hubStreak.current + '-day streak');
+    }
+    var badges = _loadBadges();
+    var badgeCount = 0;
+    for (var b in badges) {
+      if (badges.hasOwnProperty(b)) badgeCount++;
+    }
+    if (badgeCount >= 3) {
+      parts.push(badgeCount + ' badges');
+    }
+    var profile = _loadProfile();
+    if (profile.gamesPlayed && profile.gamesPlayed.length >= 5) {
+      parts.push(profile.gamesPlayed.length + ' games played');
+    }
+    if (lastGlobalRank >= 1 && lastGlobalRank <= 20) {
+      parts.push('a #' + lastGlobalRank + ' global rank');
+    }
+    if (parts.length === 0) return 'Protect your scores?';
+    if (parts.length === 1) return 'You have ' + parts[0] + '. Protect your scores?';
+    return 'You have ' + parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] + '. Protect your scores?';
+  }
+
+  function _showAuthNudge() {
+    if (!_shouldShowAuthNudge()) return;
+    if (_authNudgeEl) return;
+    var bar = document.createElement('div');
+    bar.className = 'ns-auth-nudge';
+
+    var shield = document.createElement('span');
+    shield.textContent = '\uD83D\uDEE1\uFE0F';
+    shield.style.fontSize = '18px';
+    bar.appendChild(shield);
+
+    var msg = document.createElement('span');
+    msg.className = 'ns-an-msg';
+    msg.textContent = _buildNudgeMessage();
+    bar.appendChild(msg);
+
+    var btn = document.createElement('a');
+    btn.className = 'ns-an-btn';
+    btn.textContent = 'SIGN IN';
+    btn.href = '/auth/login?return_to=' + encodeURIComponent(window.location.pathname);
+    bar.appendChild(btn);
+
+    var dismiss = document.createElement('button');
+    dismiss.className = 'ns-an-dismiss';
+    dismiss.textContent = '\u00D7';
+    dismiss.addEventListener('click', function() {
+      bar.remove();
+      _authNudgeEl = null;
+      try {
+        sessionStorage.setItem('neonarcade_nudge_dismissed', '1');
+      } catch(e) {}
+    });
+    bar.appendChild(dismiss);
+
+    document.body.appendChild(bar);
+    _authNudgeEl = bar;
+  }
+
   // ========== INJECT STYLES ==========
   function injectStyles() {
     if (document.getElementById('neon-styles')) return;
@@ -1269,7 +1490,14 @@ window.Neon = (function() {
       // Badge toast
       '.ns-badge-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10001;animation:nsCcIn .3s ease}' +
       '.ns-bt-inner{font-family:"Orbitron",monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 24px;background:#0e0e1a;border:1px solid #ffd700;color:#ffd700;border-radius:4px;box-shadow:0 0 20px rgba(255,215,0,0.3);white-space:nowrap}' +
-      '.ns-badge-toast.ns-bt-out{animation:nsCcOut .4s ease forwards}';
+      '.ns-badge-toast.ns-bt-out{animation:nsCcOut .4s ease forwards}' +
+      // Auth nudge
+      '.ns-auth-nudge{position:fixed;bottom:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 20px;background:#0e0e1a;border-top:1px solid rgba(255,215,0,0.2);font-family:"Rajdhani",sans-serif;animation:nsSlideUp .3s ease}' +
+      '@keyframes nsSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}' +
+      '.ns-an-msg{color:#9999bb;font-size:14px;letter-spacing:1px}' +
+      '.ns-an-btn{font-family:"Orbitron",monospace;font-weight:700;font-size:11px;letter-spacing:2px;padding:8px 20px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:3px;text-decoration:none;text-transform:uppercase;white-space:nowrap}' +
+      '.ns-an-btn:hover{background:rgba(0,240,255,0.15)}' +
+      '.ns-an-dismiss{background:none;border:none;color:#7a7a9a;font-size:18px;cursor:pointer;padding:4px 8px}';
     document.head.appendChild(el);
   }
 
@@ -1298,6 +1526,10 @@ window.Neon = (function() {
     getProfile: getProfile,
     checkBadges: checkBadges,
     getBadges: getBadges,
+    isLoggedIn: isLoggedIn,
+    getLoggedInName: getLoggedInName,
+    syncNow: syncNow,
+    logout: logout,
   };
 
   return {
@@ -1330,5 +1562,9 @@ window.Neon = (function() {
     getProfile: getProfile,
     checkBadges: checkBadges,
     getBadges: getBadges,
+    isLoggedIn: isLoggedIn,
+    getLoggedInName: getLoggedInName,
+    syncNow: syncNow,
+    logout: logout,
   };
 })();
