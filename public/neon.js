@@ -92,6 +92,9 @@ window.Neon = (function() {
 
     // Auto-inject floating feedback bar
     _injectFeedbackBar(cfg.game);
+
+    // Track profile
+    _updateProfile();
   }
 
   function getHighScore() {
@@ -178,6 +181,7 @@ window.Neon = (function() {
     var percentilePromise = _post('/score/' + cfg.game, { score: score }).then(function(data) {
       if (data && data.percentile !== undefined) {
         _lastPercentile = data.percentile;
+        _updateProfilePercentile(cfg.game, data.percentile);
       }
     }).catch(function() {});
 
@@ -592,6 +596,7 @@ window.Neon = (function() {
     }).then(function(data) {
       if (data) {
         _showChallengeResult(data);
+        _updateProfileChallenge(data.result === 'win');
       }
       return data;
     });
@@ -983,6 +988,66 @@ window.Neon = (function() {
     });
   }
 
+  // ========== PROFILE & BADGES ==========
+  var PROFILE_KEY = 'neonarcade_profile';
+  var BADGES_KEY = 'neonarcade_badges';
+  var HUB_STREAK_KEY = 'neonarcade_daily_hub_streak';
+
+  function _loadProfile() {
+    try {
+      var data = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+      if (data && typeof data === 'object') {
+        return {
+          firstVisit: data.firstVisit || '',
+          gamesPlayed: Array.isArray(data.gamesPlayed) ? data.gamesPlayed : [],
+          challengeWins: data.challengeWins || 0,
+          challengeLosses: data.challengeLosses || 0,
+          topPercentiles: data.topPercentiles || {}
+        };
+      }
+    } catch(e) {}
+    return { firstVisit: '', gamesPlayed: [], challengeWins: 0, challengeLosses: 0, topPercentiles: {} };
+  }
+
+  function _saveProfile(profile) {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch(e) {}
+  }
+
+  function getProfile() {
+    return _loadProfile();
+  }
+
+  function _updateProfile() {
+    var profile = _loadProfile();
+    if (!profile.firstVisit) {
+      profile.firstVisit = _todayStr();
+    }
+    if (cfg.game && profile.gamesPlayed.indexOf(cfg.game) === -1) {
+      profile.gamesPlayed.push(cfg.game);
+    }
+    _saveProfile(profile);
+  }
+
+  function _updateProfilePercentile(game, percentile) {
+    var profile = _loadProfile();
+    var pct = parseInt(percentile, 10);
+    if (isNaN(pct)) return;
+    if (!profile.topPercentiles[game] || pct < profile.topPercentiles[game]) {
+      profile.topPercentiles[game] = pct;
+    }
+    _saveProfile(profile);
+  }
+
+  function _updateProfileChallenge(won) {
+    var profile = _loadProfile();
+    if (won) {
+      profile.challengeWins = (profile.challengeWins || 0) + 1;
+    } else {
+      profile.challengeLosses = (profile.challengeLosses || 0) + 1;
+    }
+    _saveProfile(profile);
+  }
+
   // ========== INJECT STYLES ==========
   function injectStyles() {
     if (document.getElementById('neon-styles')) return;
@@ -1082,6 +1147,7 @@ window.Neon = (function() {
     getPlaysToday: function() { return _playsToday || 0; },
     getPlaysTotal: function() { return _playsTotal || 0; },
     getPercentile: function() { return _lastPercentile; },
+    getProfile: getProfile,
   };
 
   return {
@@ -1111,5 +1177,6 @@ window.Neon = (function() {
     getPlaysToday: function() { return _playsToday || 0; },
     getPlaysTotal: function() { return _playsTotal || 0; },
     getPercentile: function() { return _lastPercentile; },
+    getProfile: getProfile,
   };
 })();
