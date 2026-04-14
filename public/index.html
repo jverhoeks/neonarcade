@@ -497,6 +497,97 @@
   .share-link:hover { color: var(--neon-cyan); border-color: rgba(0,240,255,0.35); background: rgba(0,240,255,0.08); }
   .share-icon { font-size: 14px; }
 
+  /* --- DAILY CHALLENGE BANNER --- */
+  .daily-challenge {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px 0;
+  }
+
+  .daily-challenge-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.06) 0%, rgba(255,140,0,0.04) 100%);
+    border: 1px solid rgba(255,215,0,0.25);
+    border-radius: 8px;
+    padding: 28px 32px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .daily-challenge-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 10% 50%, rgba(255,215,0,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .daily-challenge-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,140,0,0.07) 100%);
+    border-color: rgba(255,215,0,0.45);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 40px rgba(255,215,0,0.12), 0 0 0 1px rgba(255,215,0,0.15);
+  }
+
+  .daily-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(255,215,0,0.4));
+  }
+
+  .daily-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .daily-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(18px, 3.5vw, 26px);
+    letter-spacing: 4px;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px rgba(255,215,0,0.5), 0 0 40px rgba(255,215,0,0.15);
+  }
+
+  .daily-subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: clamp(13px, 2.5vw, 16px);
+    letter-spacing: 2px;
+    color: var(--text-mid);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .daily-play {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--neon-gold);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .daily-challenge-card:hover .daily-play { letter-spacing: 5px; }
+  .daily-challenge-card:hover .daily-play .play-arrow { transform: translateX(4px); }
+
+  @media (max-width: 700px) {
+    .daily-challenge { padding: 24px 16px 0; }
+    .daily-challenge-card { flex-direction: column; text-align: center; padding: 24px 20px; gap: 12px; }
+    .daily-play { justify-content: center; }
+  }
+
   /* --- LOADING --- */
   .loading {
     font-family: 'Rajdhani', sans-serif;
@@ -527,6 +618,19 @@
 </header>
 
 <main>
+
+<!-- DAILY CHALLENGE -->
+<div class="daily-challenge">
+  <a href="/daily/" class="daily-challenge-card">
+    <div class="daily-icon">&#x1F525;</div>
+    <div class="daily-content">
+      <h2 class="daily-title">DAILY CHALLENGE</h2>
+      <p class="daily-subtitle">Complete 5 puzzles every day</p>
+    </div>
+    <div class="daily-play">PLAY TODAY <span class="play-arrow">&rarr;</span></div>
+  </a>
+</div>
+
 <!-- NEON ARCADE — Viral Games -->
 <div class="category">
   <div class="category-header">
