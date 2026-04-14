@@ -95,6 +95,9 @@ window.Neon = (function() {
 
     // Track profile
     _updateProfile();
+
+    // Check badge conditions
+    checkBadges();
   }
 
   function getHighScore() {
@@ -198,6 +201,7 @@ window.Neon = (function() {
     return Promise.all([leaderboardPromise, percentilePromise, challengePromise]).then(function() {
       // Inject challenge bar after all async work
       _injectChallengeBar();
+      checkBadges();
       return {
         scores: localScores,
         isNewBest: isNewBest,
@@ -584,6 +588,8 @@ window.Neon = (function() {
           _showChallengeConfirm();
         });
       }
+      _awardBadge('challenger');
+      _showUnseenBadgeToasts();
       return { code: data.code, url: url };
     });
   }
@@ -1048,6 +1054,144 @@ window.Neon = (function() {
     _saveProfile(profile);
   }
 
+  // --- Badge System ---
+  var BADGE_DEFS = [
+    { id: 'first_daily', name: 'FIRST LIGHT', emoji: '\uD83C\uDF05', desc: 'Complete your first daily game' },
+    { id: 'streak7', name: 'WEEK WARRIOR', emoji: '\uD83D\uDD25', desc: '7-day streak on any daily game' },
+    { id: 'streak30', name: 'MONTHLY MASTER', emoji: '\u26A1', desc: '30-day streak on any daily game' },
+    { id: 'streak100', name: 'CENTURION', emoji: '\uD83D\uDC8E', desc: '100-day streak on any daily game' },
+    { id: 'perfect_day', name: 'PERFECT DAY', emoji: '\u2B50', desc: 'Complete all daily games in one day' },
+    { id: 'perfect_week', name: 'PERFECT WEEK', emoji: '\uD83C\uDFC6', desc: 'Perfect day 7 days in a row' },
+    { id: 'explorer', name: 'EXPLORER', emoji: '\uD83D\uDDFA\uFE0F', desc: 'Play 10 different games' },
+    { id: 'collector', name: 'COLLECTOR', emoji: '\uD83C\uDFAE', desc: 'Play 25 different games' },
+    { id: 'completionist', name: 'COMPLETIONIST', emoji: '\uD83D\uDC51', desc: 'Play all 72 games' },
+    { id: 'speed_demon', name: 'SPEED DEMON', emoji: '\uD83D\uDE80', desc: 'Reach top 10% globally in any game' },
+    { id: 'world_class', name: 'WORLD CLASS', emoji: '\uD83C\uDF0D', desc: 'Reach top 1% globally in any game' },
+    { id: 'challenger', name: 'CHALLENGER', emoji: '\u2694\uFE0F', desc: 'Send your first challenge' },
+    { id: 'rival', name: 'RIVAL', emoji: '\uD83E\uDD4A', desc: 'Win 5 challenges' }
+  ];
+
+  function _loadBadges() {
+    try {
+      var data = JSON.parse(localStorage.getItem(BADGES_KEY) || 'null');
+      if (data && typeof data === 'object') return data;
+    } catch(e) {}
+    return {};
+  }
+
+  function _saveBadges(badges) {
+    try { localStorage.setItem(BADGES_KEY, JSON.stringify(badges)); } catch(e) {}
+  }
+
+  function getBadges() {
+    return _loadBadges();
+  }
+
+  function _awardBadge(id) {
+    var badges = _loadBadges();
+    if (badges[id]) return false;
+    badges[id] = { earned: _todayStr(), seen: false };
+    _saveBadges(badges);
+    return true;
+  }
+
+  function _loadHubStreak() {
+    try {
+      var data = JSON.parse(localStorage.getItem(HUB_STREAK_KEY) || 'null');
+      if (data && typeof data === 'object' && typeof data.current === 'number') return data;
+    } catch(e) {}
+    return { current: 0, best: 0, lastPlayed: '', perfectCurrent: 0, perfectBest: 0, lastPerfect: '' };
+  }
+
+  function checkBadges() {
+    var profile = _loadProfile();
+    var badges = _loadBadges();
+    var gamesCount = profile.gamesPlayed ? profile.gamesPlayed.length : 0;
+
+    // Explorer: 10 games
+    if (gamesCount >= 10) _awardBadge('explorer');
+    // Collector: 25 games
+    if (gamesCount >= 25) _awardBadge('collector');
+    // Completionist: 72 games
+    if (gamesCount >= 72) _awardBadge('completionist');
+
+    // Speed demon: top 10% in any game
+    var percs = profile.topPercentiles || {};
+    var hasTop10 = false;
+    var hasTop1 = false;
+    for (var g in percs) {
+      if (percs.hasOwnProperty(g)) {
+        if (percs[g] <= 10) hasTop10 = true;
+        if (percs[g] <= 1) hasTop1 = true;
+      }
+    }
+    if (hasTop10) _awardBadge('speed_demon');
+    if (hasTop1) _awardBadge('world_class');
+
+    // Challenge badges
+    if (profile.challengeWins >= 1 || profile.challengeLosses >= 1) {
+      // They've responded to at least one challenge
+    }
+    if (profile.challengeWins >= 5) _awardBadge('rival');
+
+    // Streak badges (from hub streak or any game streak)
+    var hubStreak = _loadHubStreak();
+    var bestStreak = hubStreak.best || 0;
+    // Also check current game streak if daily
+    if (cfg.daily) {
+      var gameStreak = _loadStreak();
+      if (gameStreak.best > bestStreak) bestStreak = gameStreak.best;
+      if (gameStreak.current > bestStreak) bestStreak = gameStreak.current;
+      // First daily
+      if (gameStreak.current >= 1 || gameStreak.best >= 1) _awardBadge('first_daily');
+    }
+    if (bestStreak >= 7) _awardBadge('streak7');
+    if (bestStreak >= 30) _awardBadge('streak30');
+    if (bestStreak >= 100) _awardBadge('streak100');
+
+    // Perfect day / perfect week (from hub streak data)
+    if (hubStreak.perfectCurrent >= 1 || hubStreak.perfectBest >= 1) _awardBadge('perfect_day');
+    if (hubStreak.perfectBest >= 7 || hubStreak.perfectCurrent >= 7) _awardBadge('perfect_week');
+
+    // Show toasts for any unseen badges
+    _showUnseenBadgeToasts();
+  }
+
+  function _showUnseenBadgeToasts() {
+    var badges = _loadBadges();
+    var unseen = [];
+    for (var i = 0; i < BADGE_DEFS.length; i++) {
+      var def = BADGE_DEFS[i];
+      if (badges[def.id] && !badges[def.id].seen) {
+        unseen.push(def);
+        badges[def.id].seen = true;
+      }
+    }
+    if (unseen.length === 0) return;
+    _saveBadges(badges);
+
+    // Show toasts sequentially (3.5s apart)
+    unseen.forEach(function(def, idx) {
+      setTimeout(function() {
+        _showBadgeToast(def);
+      }, idx * 3500);
+    });
+  }
+
+  function _showBadgeToast(def) {
+    var toast = document.createElement('div');
+    toast.className = 'ns-badge-toast';
+    var inner = document.createElement('div');
+    inner.className = 'ns-bt-inner';
+    inner.textContent = def.emoji + ' ' + def.name + ' UNLOCKED!';
+    toast.appendChild(inner);
+    document.body.appendChild(toast);
+    setTimeout(function() {
+      toast.classList.add('ns-bt-out');
+      setTimeout(function() { toast.remove(); }, 400);
+    }, 3000);
+  }
+
   // ========== INJECT STYLES ==========
   function injectStyles() {
     if (document.getElementById('neon-styles')) return;
@@ -1121,7 +1265,11 @@ window.Neon = (function() {
       '.ns-streak-badge{font-family:"Orbitron",monospace;font-weight:700;font-size:14px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4);display:inline-block}' +
       // Rank hint & percentile
       '.ns-rank-hint{font-family:"Rajdhani",sans-serif;font-weight:500;font-size:12px;letter-spacing:1px;color:#b44dff;text-align:center;margin-top:6px}' +
-      '.ns-percentile{font-family:"Orbitron",monospace;font-weight:700;font-size:13px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4);text-align:center;margin-top:8px}';
+      '.ns-percentile{font-family:"Orbitron",monospace;font-weight:700;font-size:13px;letter-spacing:2px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.4);text-align:center;margin-top:8px}' +
+      // Badge toast
+      '.ns-badge-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10001;animation:nsCcIn .3s ease}' +
+      '.ns-bt-inner{font-family:"Orbitron",monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 24px;background:#0e0e1a;border:1px solid #ffd700;color:#ffd700;border-radius:4px;box-shadow:0 0 20px rgba(255,215,0,0.3);white-space:nowrap}' +
+      '.ns-badge-toast.ns-bt-out{animation:nsCcOut .4s ease forwards}';
     document.head.appendChild(el);
   }
 
@@ -1148,6 +1296,8 @@ window.Neon = (function() {
     getPlaysTotal: function() { return _playsTotal || 0; },
     getPercentile: function() { return _lastPercentile; },
     getProfile: getProfile,
+    checkBadges: checkBadges,
+    getBadges: getBadges,
   };
 
   return {
@@ -1178,5 +1328,7 @@ window.Neon = (function() {
     getPlaysTotal: function() { return _playsTotal || 0; },
     getPercentile: function() { return _lastPercentile; },
     getProfile: getProfile,
+    checkBadges: checkBadges,
+    getBadges: getBadges,
   };
 })();
