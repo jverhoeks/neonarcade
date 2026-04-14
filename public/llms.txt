@@ -73,6 +73,7 @@ NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven ca
 - [ColorName](https://neonarcade.net/neongrind/colorname.html) — Name the color, not the word
 - [GridMatch](https://neonarcade.net/neongrind/gridmatch.html) — Spot the difference in growing grids
 - [MathBlitz](https://neonarcade.net/neongrind/mathblitz.html) — Mental math speed challenge
+- [N-Back](https://neonarcade.net/neongrind/nback.html) — Working memory training with N-back matching
 - [NeuroSort](https://neonarcade.net/neongrind/neurosort.html) — Sort numbers under pressure
 - [NumberSense](https://neonarcade.net/neongrind/numbersense.html) — Estimate quantities quickly
 - [Reflex Chain](https://neonarcade.net/neongrind/reflex-chain.html) — Sequential reaction time test

@@ -51,6 +51,7 @@ const KNOWN_GAMES = {
   'numbersense':         { mode: 'high', maxScore: 2000 },
   'gridmatch':           { mode: 'high', maxScore: 1000 },
   'sequencer':           { mode: 'high', maxScore: 100000 },
+  'nback':               { mode: 'high', maxScore: 900 },
 
   // NEON MIND (mode: low — time-based puzzles)
   'sudoku':              { mode: 'low', maxScore: 86400 },
