@@ -601,6 +601,48 @@ export default {
         return json(result);
       }
 
+      // ─── Daily Hub Endpoints ───────────────────────────────────────
+
+      // POST /api/daily/complete — record daily completion (all 5 puzzles)
+      if (request.method === 'POST' && segments[0] === 'daily' && segments[1] === 'complete') {
+        let body;
+        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+
+        const name = sanitizeName(body.name);
+        if (!name) return json({ error: 'name required' }, 400);
+
+        const today = new Date().toISOString().slice(0, 10);
+        const namesKey = `daily_complete_names:${today}`;
+        const countKey = `daily_complete:${today}`;
+
+        // Deduplicate by name
+        const namesRaw = await env.GAME_DATA.get(namesKey);
+        let names = [];
+        try { names = namesRaw ? JSON.parse(namesRaw) : []; } catch { names = []; }
+        if (!Array.isArray(names)) names = [];
+
+        if (names.indexOf(name) >= 0) {
+          const count = parseInt(await env.GAME_DATA.get(countKey) || '0', 10);
+          return json({ count, date: today });
+        }
+
+        if (names.length < 500) names.push(name);
+        const count = await increment(env.GAME_DATA, countKey);
+        await Promise.all([
+          env.GAME_DATA.put(namesKey, JSON.stringify(names), { expirationTtl: 172800 }),
+          env.GAME_DATA.put(countKey, String(count), { expirationTtl: 172800 }),
+        ]);
+
+        return json({ count, date: today });
+      }
+
+      // GET /api/daily/stats — get today's completion count
+      if (request.method === 'GET' && segments[0] === 'daily' && segments[1] === 'stats') {
+        const today = new Date().toISOString().slice(0, 10);
+        const count = parseInt(await env.GAME_DATA.get(`daily_complete:${today}`) || '0', 10);
+        return json({ completions: count, date: today });
+      }
+
       // ─── Multiplayer Room Endpoints ────────────────────────────────
 
       // POST /api/room/create — create a new multiplayer room
