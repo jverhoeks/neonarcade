@@ -99,6 +99,7 @@ const KNOWN_GAMES = {
   'pinball':             { mode: 'high', maxScore: 10000000 },
   'sopwith':             { mode: 'high', maxScore: 1000000 },
   'outrun':              { mode: 'high', maxScore: 1000000 },
+  'gorillas':            { mode: 'high', maxScore: 100 },
 
   // NEON CASINO (mode: high — bankroll-based)
   'blackjack':           { mode: 'high', maxScore: 1000000 },
