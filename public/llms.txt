@@ -111,6 +111,8 @@ Casino card and table games with persistent chip bankroll. Gold neon aesthetic.
 ## Infrastructure Pages
 
 - [Leaderboard Browser](https://neonarcade.net/leaderboards/) — Browse global leaderboards for all games, filterable by category, with percentile rankings and daily play counts
+- [Daily Hub](https://neonarcade.net/daily/) — Daily challenge hub featuring rotating daily games, streaks, and curated picks refreshed every day
+- [Profile](https://neonarcade.net/profile/) — Player profile page showing personal stats, score history, achievements, and streak tracking across all games
 - Challenge Links (`/c/{code}`) — Shareable "beat my score" links generated after each game. Recipients see the challenger's score and compete head-to-head. Links are noindexed.
 
 ## Features
