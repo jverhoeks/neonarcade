@@ -103,6 +103,8 @@ const KNOWN_GAMES = {
 
 function isAllowedOrigin(request) {
   const origin = request.headers.get('Origin') || '';
+  // Same-origin requests (e.g. fetch from neonarcade.net) may not send Origin header
+  if (!origin) return true;
   return ALLOWED_ORIGINS.includes(origin);
 }
 
