@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Player Profile — NEON ARCADE</title>
+<meta name="description" content="Your NEON ARCADE player profile — badges, streaks, stats, and best scores.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/profile/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/profile/">
+<meta property="og:title" content="Player Profile — NEON ARCADE">
+<meta property="og:description" content="Your NEON ARCADE player profile — badges, streaks, stats, and best scores.">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:url" content="https://neonarcade.net/profile/">
+<meta name="twitter:title" content="Player Profile — NEON ARCADE">
+<meta name="twitter:description" content="Your NEON ARCADE player profile — badges, streaks, stats, and best scores.">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100%; background: #0a0a12; font-family: 'Rajdhani', sans-serif; color: #fff; }
+body { padding-bottom: 60px; }
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(180,77,255,0.03) 0%, transparent 70%);
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Nav */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.nav-link {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #00f0ff;
+  text-decoration: none;
+  border: 1px solid rgba(0,240,255,0.2);
+  padding: 8px 16px;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+.nav-link:hover {
+  background: rgba(0,240,255,0.1);
+  box-shadow: 0 0 12px rgba(0,240,255,0.2);
+}
+
+/* Header */
+.profile-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,240,255,0.4);
+  background: rgba(0,240,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 0 20px rgba(0,240,255,0.15);
+}
+.profile-avatar-text {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6);
+}
+.profile-name {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.2);
+  margin-bottom: 6px;
+}
+.profile-since {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+}
+
+/* Cards */
+.card {
+  background: #12121f;
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+.card-title-cyan { color: #00f0ff; text-shadow: 0 0 10px rgba(0,240,255,0.4); }
+.card-title-gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+.card-title-pink { color: #ff2d7b; text-shadow: 0 0 10px rgba(255,45,123,0.4); }
+.card-title-purple { color: #b44dff; text-shadow: 0 0 10px rgba(180,77,255,0.4); }
+.card-title-green { color: #39ff14; text-shadow: 0 0 10px rgba(57,255,20,0.4); }
+
+/* Streaks */
+.streak-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.streak-item {
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+  padding: 16px 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.streak-emoji {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+.streak-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 32px;
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255,215,0,0.4);
+  line-height: 1.1;
+}
+.streak-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.streak-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  color: #9999bb;
+  margin-top: 2px;
+}
+
+/* Badges */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: all 0.2s;
+}
+.badge-item.earned {
+  border-color: rgba(255,215,0,0.15);
+  background: rgba(255,215,0,0.03);
+}
+.badge-item.locked {
+  opacity: 0.3;
+  filter: grayscale(0.8);
+}
+.badge-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.badge-info {
+  min-width: 0;
+}
+.badge-name {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,215,0,0.3);
+}
+.badge-item.locked .badge-name {
+  color: #7a7a9a;
+  text-shadow: none;
+}
+.badge-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  color: #7a7a9a;
+  line-height: 1.3;
+}
+.badge-date {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  color: #39ff14;
+  margin-top: 2px;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+.stat-item {
+  text-align: center;
+  padding: 16px 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 28px;
+  color: #00f0ff;
+  text-shadow: 0 0 12px rgba(0,240,255,0.4);
+  line-height: 1.1;
+}
+.stat-value-gold {
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255,215,0,0.4);
+}
+.stat-value-green {
+  color: #39ff14;
+  text-shadow: 0 0 12px rgba(57,255,20,0.4);
+}
+.stat-value-pink {
+  color: #ff2d7b;
+  text-shadow: 0 0 12px rgba(255,45,123,0.4);
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Scores table */
+.scores-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.scores-table th {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #7a7a9a;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  text-transform: uppercase;
+}
+.scores-table th:last-child {
+  text-align: right;
+}
+.scores-table td {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: #9999bb;
+}
+.scores-table td:last-child {
+  text-align: right;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #00f0ff;
+  text-shadow: 0 0 6px rgba(0,240,255,0.3);
+}
+.scores-table tr:hover {
+  background: rgba(0,240,255,0.03);
+}
+.game-link {
+  color: #9999bb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+.game-link:hover {
+  color: #00f0ff;
+}
+.cat-tag {
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.cat-arcade { color: #00f0ff; background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.15); }
+.cat-mind { color: #b44dff; background: rgba(180,77,255,0.08); border: 1px solid rgba(180,77,255,0.15); }
+.cat-grind { color: #39ff14; background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.15); }
+.cat-classic { color: #ffd700; background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.15); }
+.cat-casino { color: #ff8c00; background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.15); }
+.cat-quest { color: #ff2d7b; background: rgba(255,45,123,0.08); border: 1px solid rgba(255,45,123,0.15); }
+.cat-world { color: #00f0ff; background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.15); }
+
+.no-scores {
+  text-align: center;
+  padding: 24px;
+  color: #7a7a9a;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* Share button */
+.share-btn {
+  display: block;
+  width: 100%;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 16px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.share-btn:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+  transform: scale(1.02);
+}
+.share-btn.shared {
+  border-color: #39ff14;
+  color: #39ff14;
+  background: rgba(57,255,20,0.06);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-emoji {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.empty-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0,240,255,0.4);
+  margin-bottom: 8px;
+}
+.empty-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #7a7a9a;
+  margin-bottom: 24px;
+}
+.empty-cta {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid #00f0ff;
+  background: rgba(0,240,255,0.06);
+  color: #00f0ff;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.empty-cta:hover {
+  background: rgba(0,240,255,0.15);
+  box-shadow: 0 0 20px rgba(0,240,255,0.2);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .container { padding: 16px 12px; }
+  .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .streak-row { gap: 8px; }
+  .streak-item { min-width: 0; padding: 12px 8px; }
+  .streak-value { font-size: 24px; }
+  .stat-value { font-size: 22px; }
+  .profile-name { font-size: 22px; letter-spacing: 4px; }
+  .scores-table td, .scores-table th { padding: 6px 8px; }
+  .cat-tag { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Nav -->
+  <nav class="nav-bar">
+    <a href="/" class="nav-link">HOME</a>
+    <a href="/daily/" class="nav-link">DAILY</a>
+  </nav>
+
+  <!-- Header -->
+  <div class="profile-header" id="profileHeader">
+    <div class="profile-avatar">
+      <span class="profile-avatar-text" id="avatarText">???</span>
+    </div>
+    <div class="profile-name" id="profileName">PLAYER</div>
+    <div class="profile-since" id="profileSince"></div>
+  </div>
+
+  <!-- Streaks -->
+  <div class="card" id="streaksCard" style="display:none">
+    <div class="card-title card-title-gold">STREAKS</div>
+    <div class="streak-row" id="streaksRow"></div>
+  </div>
+
+  <!-- Badges -->
+  <div class="card" id="badgesCard">
+    <div class="card-title card-title-purple">BADGES <span id="badgeCount" style="font-weight:400;font-size:11px;color:#9999bb"></span></div>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card" id="statsCard">
+    <div class="card-title card-title-cyan">STATS</div>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+
+  <!-- Best Scores -->
+  <div class="card" id="scoresCard">
+    <div class="card-title card-title-green">BEST SCORES</div>
+    <div id="scoresBody"></div>
+  </div>
+
+  <!-- Share -->
+  <button class="share-btn" id="shareBtn">SHARE MY STATS</button>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ========== GAME REGISTRY ==========
+  var GAMES = [
+    // NEON ARCADE (31 games)
+    {s:'neon-snake',n:'Neon Snake',c:'neonarcade',m:'high'},
+    {s:'impostor-pixel',n:'Impostor Pixel',c:'neonarcade',m:'high'},
+    {s:'catalyst',n:'Catalyst',c:'neonarcade',m:'high'},
+    {s:'pong-both-sides',n:'Pong: Both Sides',c:'neonarcade',m:'high'},
+    {s:'afterglow',n:'Afterglow',c:'neonarcade',m:'high'},
+    {s:'flappy-rewind',n:'Flappy Rewind',c:'neonarcade',m:'high'},
+    {s:'palette',n:'Palette',c:'neonarcade',m:'high'},
+    {s:'pacman-amnesia',n:'Pac-Man Amnesia',c:'neonarcade',m:'high'},
+    {s:'territory',n:'Territory',c:'neonarcade',m:'high'},
+    {s:'signal',n:'Signal',c:'neonarcade',m:'high'},
+    {s:'burndown',n:'Burndown',c:'neonarcade',m:'high'},
+    {s:'mine-finder',n:'Mine Finder',c:'neonarcade',m:'high'},
+    {s:'priorself',n:'Priorself',c:'neonarcade',m:'high'},
+    {s:'tetris-betrayal',n:'Tetris Betrayal',c:'neonarcade',m:'high'},
+    {s:'faultline',n:'Faultline',c:'neonarcade',m:'high'},
+    {s:'wordchain',n:'Wordchain',c:'neonarcade',m:'high'},
+    {s:'wordchain-duel',n:'Wordchain Duel',c:'neonarcade',m:'high'},
+    {s:'split-second',n:'Split Second',c:'neonarcade',m:'high'},
+    {s:'chromaself',n:'Chromaself',c:'neonarcade',m:'high'},
+    {s:'curfew',n:'Curfew',c:'neonarcade',m:'high'},
+    {s:'truecolor',n:'Truecolor',c:'neonarcade',m:'high'},
+    {s:'gridlock',n:'Gridlock',c:'neonarcade',m:'high'},
+    {s:'doodle-drop',n:'Doodle Drop',c:'neonarcade',m:'high'},
+    {s:'breakout-architect',n:'Breakout Architect',c:'neonarcade',m:'high'},
+    {s:'chimp',n:'Chimp Test',c:'neonarcade',m:'high'},
+    {s:'pour',n:'Pour',c:'neonarcade',m:'high'},
+    {s:'bloomfield',n:'Bloomfield',c:'neonarcade',m:'high'},
+    {s:'typeblitz',n:'Typeblitz',c:'neonarcade',m:'high'},
+    {s:'battleship',n:'Battleship',c:'neonarcade',m:'high'},
+    {s:'veto',n:'Veto',c:'neonarcade',m:'high'},
+    {s:'mimic',n:'Mimic',c:'neonarcade',m:'high'},
+
+    // NEON MIND (15 games)
+    {s:'minisudoku',n:'MiniSudoku',c:'neonmind',m:'low'},
+    {s:'sudoku',n:'Sudoku',c:'neonmind',m:'low'},
+    {s:'queens',n:'Queens',c:'neonmind',m:'low'},
+    {s:'minesweeper',n:'Minesweeper',c:'neonmind',m:'low'},
+    {s:'nonogram',n:'Nonogram',c:'neonmind',m:'low'},
+    {s:'kakuro',n:'Kakuro',c:'neonmind',m:'low'},
+    {s:'bridges',n:'Bridges',c:'neonmind',m:'low'},
+    {s:'nurikabe',n:'Nurikabe',c:'neonmind',m:'low'},
+    {s:'tango',n:'Tango',c:'neonmind',m:'low'},
+    {s:'lightup',n:'LightUp',c:'neonmind',m:'low'},
+    {s:'tents',n:'Tents',c:'neonmind',m:'low'},
+    {s:'skyscrapers',n:'Skyscrapers',c:'neonmind',m:'low'},
+    {s:'connections',n:'Connections',c:'neonmind',m:'low'},
+    {s:'hitori',n:'Hitori',c:'neonmind',m:'low'},
+    {s:'kenken',n:'KenKen',c:'neonmind',m:'low'},
+
+    // NEON GRIND (8 games)
+    {s:'mathblitz',n:'MathBlitz',c:'neongrind',m:'high'},
+    {s:'reflex-chain',n:'Reflex Chain',c:'neongrind',m:'high'},
+    {s:'neurosort',n:'NeuroSort',c:'neongrind',m:'high'},
+    {s:'clickspeed',n:'ClickSpeed',c:'neongrind',m:'high'},
+    {s:'colorname',n:'ColorName',c:'neongrind',m:'high'},
+    {s:'numbersense',n:'NumberSense',c:'neongrind',m:'high'},
+    {s:'gridmatch',n:'GridMatch',c:'neongrind',m:'high'},
+    {s:'sequencer',n:'Sequencer',c:'neongrind',m:'high'},
+
+    // NEON CLASSIC (8 games)
+    {s:'invaders',n:'Invaders',c:'neonclassic',m:'high'},
+    {s:'breakout',n:'Breakout',c:'neonclassic',m:'high'},
+    {s:'tetris',n:'Tetris',c:'neonclassic',m:'high'},
+    {s:'2048',n:'2048',c:'neonclassic',m:'high'},
+    {s:'pairs',n:'Pairs',c:'neonclassic',m:'low'},
+    {s:'asteroids',n:'Asteroids',c:'neonclassic',m:'high'},
+    {s:'frogger',n:'Frogger',c:'neonclassic',m:'high'},
+    {s:'tictactoe',n:'Tic Tac Toe',c:'neonclassic',m:'high'},
+
+    // NEON CASINO (5 games)
+    {s:'blackjack',n:'Blackjack',c:'neoncasino',m:'high'},
+    {s:'poker',n:'Poker',c:'neoncasino',m:'high'},
+    {s:'roulette',n:'Roulette',c:'neoncasino',m:'high'},
+    {s:'slots',n:'Slots',c:'neoncasino',m:'high'},
+    {s:'video-poker',n:'Video Poker',c:'neoncasino',m:'high'},
+
+    // NEON QUEST (5 games)
+    {s:'fusion',n:'Fusion',c:'neonquest',m:'high'},
+    {s:'jackpot',n:'Jackpot',c:'neonquest',m:'high'},
+    {s:'firewall',n:'Firewall',c:'neonquest',m:'high'},
+    {s:'swarm',n:'Swarm',c:'neonquest',m:'high'},
+    {s:'synthesis',n:'Synthesis',c:'neonquest',m:'high'},
+
+    // NEON WORLD (2 games)
+    {s:'decade',n:'Decade',c:'neonworld',m:'high'},
+    {s:'style',n:'Style',c:'neonworld',m:'high'}
+  ];
+
+  var TOTAL_GAMES = GAMES.length;
+
+  // ========== BADGE DEFINITIONS ==========
+  var BADGE_DEFS = [
+    {id:'first_daily',name:'FIRST LIGHT',emoji:'\uD83C\uDF05',desc:'Complete your first daily game'},
+    {id:'streak7',name:'WEEK WARRIOR',emoji:'\uD83D\uDD25',desc:'7-day streak on any daily game'},
+    {id:'streak30',name:'MONTHLY MASTER',emoji:'\u26A1',desc:'30-day streak on any daily game'},
+    {id:'streak100',name:'CENTURION',emoji:'\uD83D\uDC8E',desc:'100-day streak on any daily game'},
+    {id:'perfect_day',name:'PERFECT DAY',emoji:'\u2B50',desc:'Complete all daily games in one day'},
+    {id:'perfect_week',name:'PERFECT WEEK',emoji:'\uD83C\uDFC6',desc:'Perfect day 7 days in a row'},
+    {id:'explorer',name:'EXPLORER',emoji:'\uD83D\uDDFA\uFE0F',desc:'Play 10 different games'},
+    {id:'collector',name:'COLLECTOR',emoji:'\uD83C\uDFAE',desc:'Play 25 different games'},
+    {id:'completionist',name:'COMPLETIONIST',emoji:'\uD83D\uDC51',desc:'Play all games'},
+    {id:'speed_demon',name:'SPEED DEMON',emoji:'\uD83D\uDE80',desc:'Reach top 10% globally in any game'},
+    {id:'world_class',name:'WORLD CLASS',emoji:'\uD83C\uDF0D',desc:'Reach top 1% globally in any game'},
+    {id:'challenger',name:'CHALLENGER',emoji:'\u2694\uFE0F',desc:'Send your first challenge'},
+    {id:'rival',name:'RIVAL',emoji:'\uD83E\uDD4A',desc:'Win 5 challenges'}
+  ];
+
+  // ========== HELPERS ==========
+  function $(id) { return document.getElementById(id); }
+
+  function safeJSON(key) {
+    try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; }
+  }
+
+  function fmtTime(s) {
+    var sec = Math.floor(s);
+    var m = Math.floor(sec / 60);
+    sec = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function fmtNumber(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 10000) return (n / 1000).toFixed(1) + 'K';
+    return String(n);
+  }
+
+  function catLabel(c) {
+    var map = {
+      neonarcade: 'ARCADE', neonmind: 'MIND', neongrind: 'GRIND',
+      neonclassic: 'CLASSIC', neoncasino: 'CASINO', neonquest: 'QUEST', neonworld: 'WORLD'
+    };
+    return map[c] || c.toUpperCase();
+  }
+
+  function catClass(c) {
+    var map = {
+      neonarcade: 'cat-arcade', neonmind: 'cat-mind', neongrind: 'cat-grind',
+      neonclassic: 'cat-classic', neoncasino: 'cat-casino', neonquest: 'cat-quest', neonworld: 'cat-world'
+    };
+    return map[c] || 'cat-arcade';
+  }
+
+  function gameUrl(game) {
+    return '/' + game.c + '/' + game.s + '.html';
+  }
+
+  // ========== PROFILE HEADER ==========
+  var playerName = localStorage.getItem('neonarcade_player_name') || '';
+  var profile = safeJSON('neonarcade_profile') || {};
+
+  if (playerName) {
+    $('avatarText').textContent = playerName;
+    $('profileName').textContent = playerName;
+  } else {
+    $('avatarText').textContent = '???';
+    $('profileName').textContent = 'PLAYER';
+  }
+
+  if (profile.firstVisit) {
+    var parts = profile.firstVisit.split('-');
+    var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var monthIdx = parseInt(parts[1], 10) - 1;
+    $('profileSince').textContent = 'PLAYING SINCE ' + months[monthIdx] + ' ' + parts[0];
+  }
+
+  // ========== STREAKS ==========
+  var streak = safeJSON('neonarcade_daily_hub_streak');
+  if (streak && (streak.current > 0 || streak.best > 0 || streak.perfectCurrent > 0 || streak.perfectBest > 0)) {
+    $('streaksCard').style.display = '';
+    var row = $('streaksRow');
+
+    var items = [
+      { emoji: '\uD83D\uDD25', value: streak.current || 0, label: 'CURRENT', sub: 'day streak' },
+      { emoji: '\uD83C\uDFC6', value: streak.best || 0, label: 'BEST', sub: 'day streak' },
+      { emoji: '\u2B50', value: streak.perfectCurrent || 0, label: 'PERFECT', sub: 'current' },
+      { emoji: '\u2B50', value: streak.perfectBest || 0, label: 'PERFECT', sub: 'best' }
+    ];
+
+    items.forEach(function(item) {
+      var div = document.createElement('div');
+      div.className = 'streak-item';
+
+      var emoji = document.createElement('div');
+      emoji.className = 'streak-emoji';
+      emoji.textContent = item.emoji;
+      div.appendChild(emoji);
+
+      var val = document.createElement('div');
+      val.className = 'streak-value';
+      val.textContent = String(item.value);
+      div.appendChild(val);
+
+      var label = document.createElement('div');
+      label.className = 'streak-label';
+      label.textContent = item.label;
+      div.appendChild(label);
+
+      var sub = document.createElement('div');
+      sub.className = 'streak-sub';
+      sub.textContent = item.sub;
+      div.appendChild(sub);
+
+      row.appendChild(div);
+    });
+  }
+
+  // ========== BADGES ==========
+  var badges = safeJSON('neonarcade_badges') || {};
+  var earnedCount = 0;
+
+  BADGE_DEFS.forEach(function(def) {
+    if (badges[def.id]) earnedCount++;
+  });
+
+  $('badgeCount').textContent = earnedCount + ' / ' + BADGE_DEFS.length;
+
+  var grid = $('badgesGrid');
+  BADGE_DEFS.forEach(function(def) {
+    var earned = badges[def.id];
+    var div = document.createElement('div');
+    div.className = 'badge-item ' + (earned ? 'earned' : 'locked');
+
+    var emojiEl = document.createElement('div');
+    emojiEl.className = 'badge-emoji';
+    emojiEl.textContent = def.emoji;
+    div.appendChild(emojiEl);
+
+    var info = document.createElement('div');
+    info.className = 'badge-info';
+
+    var nameEl = document.createElement('div');
+    nameEl.className = 'badge-name';
+    nameEl.textContent = def.name;
+    info.appendChild(nameEl);
+
+    var descEl = document.createElement('div');
+    descEl.className = 'badge-desc';
+    descEl.textContent = def.desc;
+    info.appendChild(descEl);
+
+    if (earned && earned.earned) {
+      var dateEl = document.createElement('div');
+      dateEl.className = 'badge-date';
+      dateEl.textContent = 'Earned ' + earned.earned;
+      info.appendChild(dateEl);
+    }
+
+    div.appendChild(info);
+    grid.appendChild(div);
+  });
+
+  // ========== STATS ==========
+  var gamesPlayed = Array.isArray(profile.gamesPlayed) ? profile.gamesPlayed : [];
+  var challengeWins = profile.challengeWins || 0;
+  var challengeLosses = profile.challengeLosses || 0;
+  var topPercentiles = profile.topPercentiles || {};
+  var topPctCount = 0;
+  for (var g in topPercentiles) {
+    if (topPercentiles.hasOwnProperty(g) && topPercentiles[g] <= 10) {
+      topPctCount++;
+    }
+  }
+
+  var statsGrid = $('statsGrid');
+  var stats = [
+    { value: gamesPlayed.length + ' / ' + TOTAL_GAMES, label: 'GAMES PLAYED', cls: '' },
+    { value: String(earnedCount), label: 'BADGES EARNED', cls: 'stat-value-gold' },
+    { value: String(challengeWins), label: 'CHALLENGE WINS', cls: 'stat-value-green' },
+    { value: String(challengeLosses), label: 'CHALLENGE LOSSES', cls: 'stat-value-pink' },
+    { value: String(topPctCount), label: 'TOP 10% GAMES', cls: 'stat-value-gold' }
+  ];
+
+  stats.forEach(function(st) {
+    var div = document.createElement('div');
+    div.className = 'stat-item';
+
+    var val = document.createElement('div');
+    val.className = 'stat-value' + (st.cls ? ' ' + st.cls : '');
+    val.textContent = st.value;
+    div.appendChild(val);
+
+    var label = document.createElement('div');
+    label.className = 'stat-label';
+    label.textContent = st.label;
+    div.appendChild(label);
+
+    statsGrid.appendChild(div);
+  });
+
+  // ========== BEST SCORES ==========
+  // Build a lookup from slug to game info
+  var gameMap = {};
+  GAMES.forEach(function(g) { gameMap[g.s] = g; });
+
+  // Scan localStorage for score keys
+  var scoreEntries = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    if (!key || key.indexOf('neonarcade_') !== 0) continue;
+    if (key.indexOf('scores') === -1 && key.indexOf('score') === -1) continue;
+    // Skip non-score keys
+    if (key === 'neonarcade_player_name' || key === 'neonarcade_profile' ||
+        key === 'neonarcade_badges' || key === 'neonarcade_daily_hub_streak') continue;
+
+    var data;
+    try { data = JSON.parse(localStorage.getItem(key)); } catch(e) { continue; }
+    if (!Array.isArray(data) || data.length === 0) continue;
+
+    // Try to match to a game slug
+    var matched = null;
+    for (var j = 0; j < GAMES.length; j++) {
+      var g = GAMES[j];
+      var slugUnderscore = g.s.replace(/-/g, '_');
+      // Match patterns like neonarcade_scores_neon_snake, neonarcade_neonmind_sudoku_scores, etc.
+      if (key.indexOf(slugUnderscore) !== -1 || key.indexOf(g.s) !== -1) {
+        matched = g;
+        break;
+      }
+    }
+
+    // Extract best score
+    var best = data[0];
+    for (var k = 1; k < data.length; k++) {
+      if (matched && matched.m === 'low') {
+        if (data[k].score < best.score) best = data[k];
+      } else {
+        if (data[k].score > best.score) best = data[k];
+      }
+    }
+
+    // Deduplicate by game slug (keep best)
+    var entrySlug = matched ? matched.s : key;
+    var existing = null;
+    for (var e = 0; e < scoreEntries.length; e++) {
+      if (scoreEntries[e].slug === entrySlug) { existing = e; break; }
+    }
+
+    if (existing !== null) {
+      var prev = scoreEntries[existing];
+      if (matched && matched.m === 'low') {
+        if (best.score < prev.score) {
+          scoreEntries[existing] = { slug: entrySlug, game: matched, score: best.score, ts: best.ts };
+        }
+      } else {
+        if (best.score > prev.score) {
+          scoreEntries[existing] = { slug: entrySlug, game: matched, score: best.score, ts: best.ts };
+        }
+      }
+    } else {
+      scoreEntries.push({ slug: entrySlug, game: matched, score: best.score, ts: best.ts });
+    }
+  }
+
+  // Sort: most recent first
+  scoreEntries.sort(function(a, b) { return (b.ts || 0) - (a.ts || 0); });
+
+  var scoresBody = $('scoresBody');
+  if (scoreEntries.length === 0) {
+    var noScores = document.createElement('div');
+    noScores.className = 'no-scores';
+    noScores.textContent = 'No scores yet. Play some games to see your best scores here!';
+    scoresBody.appendChild(noScores);
+  } else {
+    var table = document.createElement('table');
+    table.className = 'scores-table';
+
+    var thead = document.createElement('thead');
+    var headRow = document.createElement('tr');
+    var th1 = document.createElement('th'); th1.textContent = 'GAME'; headRow.appendChild(th1);
+    var th2 = document.createElement('th'); th2.textContent = 'BEST'; headRow.appendChild(th2);
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    scoreEntries.forEach(function(entry) {
+      var tr = document.createElement('tr');
+
+      var td1 = document.createElement('td');
+      if (entry.game) {
+        var link = document.createElement('a');
+        link.className = 'game-link';
+        link.href = gameUrl(entry.game);
+        link.textContent = entry.game.n;
+        td1.appendChild(link);
+
+        var tag = document.createElement('span');
+        tag.className = 'cat-tag ' + catClass(entry.game.c);
+        tag.textContent = catLabel(entry.game.c);
+        td1.appendChild(tag);
+      } else {
+        td1.textContent = entry.slug;
+      }
+      tr.appendChild(td1);
+
+      var td2 = document.createElement('td');
+      if (entry.game && entry.game.m === 'low') {
+        td2.textContent = fmtTime(entry.score);
+      } else {
+        td2.textContent = fmtNumber(entry.score);
+      }
+      tr.appendChild(td2);
+
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    scoresBody.appendChild(table);
+  }
+
+  // ========== SHARE ==========
+  $('shareBtn').addEventListener('click', function() {
+    var name = playerName || 'PLAYER';
+    var streakVal = streak ? (streak.current || 0) : 0;
+    var text = '\uD83C\uDFAE NEON ARCADE \u2014 ' + name + '\n' +
+      '\uD83D\uDD25 ' + streakVal + ' day streak | \uD83C\uDFC5 ' + earnedCount + ' badges\n' +
+      gamesPlayed.length + '/' + TOTAL_GAMES + ' games played\n' +
+      'neonarcade.net';
+
+    var btn = $('shareBtn');
+
+    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+      navigator.share({ title: 'NEON ARCADE Profile', text: text }).catch(function() {});
+    } else {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'COPIED!';
+        btn.classList.add('shared');
+        setTimeout(function() {
+          btn.textContent = 'SHARE MY STATS';
+          btn.classList.remove('shared');
+        }, 2000);
+      }).catch(function() {});
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
