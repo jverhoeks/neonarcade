@@ -959,14 +959,18 @@ body::before {
               syncBtn.disabled = false;
             }, 2000);
           } else {
-            syncBtn.textContent = 'SYNC FAILED';
+            r.text().then(function(errText) {
+              console.error('Sync failed:', r.status, errText);
+              syncBtn.textContent = 'FAILED: ' + r.status;
+              alert('Sync error: ' + errText);
+            });
             setTimeout(function() {
               syncBtn.textContent = 'SYNC NOW';
               syncBtn.disabled = false;
-            }, 2000);
+            }, 3000);
           }
         })
-        .catch(function() {
+        .catch(function(fetchErr) {
           syncBtn.textContent = 'SYNC FAILED';
           setTimeout(function() {
             syncBtn.textContent = 'SYNC NOW';
