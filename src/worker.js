@@ -844,12 +844,20 @@ export default {
           await env.GAME_DATA.put(throttleKey, '1', { expirationTtl: 10 });
 
           let body;
-          try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
-          if (JSON.stringify(body).length > 524288) return json({ error: 'payload too large' }, 413);
+          try { body = await request.json(); } catch (parseErr) { return json({ error: 'invalid JSON body: ' + parseErr.message }, 400); }
+          if (!body || typeof body !== 'object') return json({ error: 'body must be an object' }, 400);
 
           const userKey = `user:${session.userId}`;
           const existing = safeParseObject(await env.GAME_DATA.get(userKey));
-          const merged = mergeSyncData(body, existing ? existing.data : null);
+
+          let merged;
+          try {
+            merged = mergeSyncData(body, existing ? existing.data : null);
+          } catch (mergeErr) {
+            console.error('Merge error:', mergeErr);
+            // If merge fails, just store the client data directly
+            merged = body;
+          }
 
           const userData = {
             email: session.email,
@@ -858,7 +866,10 @@ export default {
             data: merged,
             lastSync: new Date().toISOString(),
           };
-          await env.GAME_DATA.put(userKey, JSON.stringify(userData));
+
+          const serialized = JSON.stringify(userData);
+          if (serialized.length > 524288) return json({ error: 'merged data too large' }, 413);
+          await env.GAME_DATA.put(userKey, serialized);
           return json({ ok: true, lastSync: userData.lastSync });
         } catch (syncErr) {
           console.error('Sync error:', syncErr);
