@@ -223,6 +223,22 @@
 }
 </script>
 
+<!-- Structured Data: Article 13 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "The Virality Engine — Making Every Game Shareable",
+  "description": "How we built challenge links, percentile rankings, daily puzzles, and streak tracking into one shared library — upgrading 72 games with zero per-game changes.",
+  "url": "https://neonarcade.net/blog.html#virality-engine",
+  "datePublished": "2026-04-14",
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "publisher": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net", "logo": { "@type": "ImageObject", "url": "https://neonarcade.net/og-image.png" } },
+  "image": "https://neonarcade.net/og-image.png",
+  "mainEntityOfPage": "https://neonarcade.net/blog.html#virality-engine"
+}
+</script>
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1877,6 +1893,107 @@ neonarcade.net/neonmind/minesweeper.html<span class="str">#c=839274516-3</span><
   <div class="highlight-box">
     <span class="hl-label">The Takeaway</span>
     <p>Casino games are a different beast from quick arcade hits. They need shared state, session persistence, and enough integrity checking to keep leaderboards fair. But the same single-HTML-file architecture scales to handle it. FNV-1a hashes in localStorage, a 6-seat room system on Cloudflare KV, and canvas-rendered wheels and reels &mdash; all running without a framework, without a build step, without a database. Open the file, play some cards.</p>
+  </div>
+</article>
+
+<article class="article" id="virality-engine">
+  <p class="article-num">Article 13 &mdash; April 14, 2026</p>
+  <h2 class="article-title">The Virality Engine &mdash; Making Every Game Shareable</h2>
+
+  <p>72 games, zero viral loops. That was the problem. Players would finish a round, see their score, and&hellip; close the tab. No reason to share. No reason to come back tomorrow. No hook to pull a friend in. The games were good. The distribution was not.</p>
+
+  <p>So we built a virality engine directly into <code>neon.js</code> &mdash; the shared client library loaded by every game on the site. One file change, 72 games upgraded. No per-game work required.</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val cyan">72</div>
+      <div class="stat-label">Games Upgraded</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val pink">0</div>
+      <div class="stat-label">Per-Game Changes</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val gold">4</div>
+      <div class="stat-label">Viral Layers</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val green">5</div>
+      <div class="stat-label">Daily Puzzles</div>
+    </div>
+  </div>
+
+  <h3>Challenge Links: Every Share Is a Playable Invitation</h3>
+
+  <p>The highest-leverage feature. When you finish a game, a pulsing <span style="color:#ff2d7b">&ldquo;CHALLENGE A FRIEND&rdquo;</span> button appears. Click it, and neon.js creates a challenge via <code>POST /api/challenge</code>, stores your score in Cloudflare KV with a 30-day TTL, and generates a short URL: <code>neonarcade.net/c/Xk9mQ2</code>.</p>
+
+  <p>The magic is in the link preview. When someone shares that URL on Discord, iMessage, or Twitter, they see a rich card:</p>
+
+  <div class="code-block" data-lang="html">
+<code><span class="str">"TST scored 2,450 in Neon Snake &mdash; Can you beat it?"</span></code>
+  </div>
+
+  <p>This works because the Cloudflare Worker intercepts <code>/c/{code}</code> requests and injects Open Graph meta tags server-side before serving the HTML. The challenger&rsquo;s name, score, and game screenshot are baked into the link preview. The friend clicks through, sees the score they need to beat, and lands directly in the game with a <code>?challenge=</code> parameter. After playing, neon.js compares scores and shows a fullscreen result: <strong>&ldquo;YOU WIN! +230 points&rdquo;</strong> or <strong>&ldquo;SO CLOSE! -45 points.&rdquo;</strong></p>
+
+  <p>Every share is no longer just text. It is a playable dare.</p>
+
+  <h3>Percentile Rankings: &ldquo;Top 7% Globally&rdquo;</h3>
+
+  <p>Leaderboards show the top 20. But what about the other 99% of players? Telling someone they are &ldquo;rank 4,521&rdquo; means nothing. Telling them they are <span style="color:#ffd700">&ldquo;Top 7%&rdquo;</span> makes them want to share it.</p>
+
+  <p>The worker maintains 10 score distribution buckets per game, updated on every score submission via <code>POST /api/score/{game}</code>. This tracks the full distribution, not just the top 20. After saving a score, neon.js fetches the percentile and displays it in gold below the leaderboard. It also goes into the share text automatically.</p>
+
+  <p>We also enhanced the leaderboard rendering. If you are not on the global top 20, neon.js shows where you would rank (&ldquo;Your score would be #8&rdquo;) or what you need to get there (&ldquo;Score 1,240+ to join&rdquo;). Every player, at every skill level, now has a visible goal.</p>
+
+  <h3>Daily Mode and Streaks</h3>
+
+  <p>Wordle proved the model: one puzzle per day, same for everyone, streak tracking, emoji sharing. We built this into neon.js as an opt-in feature. Games pass <code>daily: true</code> to <code>Neon.init()</code> and get:</p>
+
+  <ul style="list-style:none;padding:0;margin:16px 0;">
+    <li style="padding:4px 0;color:#9999bb;">&bull; Date-suffixed storage keys (one score per day)</li>
+    <li style="padding:4px 0;color:#9999bb;">&bull; Streak tracking: current streak, best streak, last played date</li>
+    <li style="padding:4px 0;color:#9999bb;">&bull; <span style="color:#ffd700;">&ldquo;&#x1F525;7&rdquo;</span> streak badges on start and game-over screens</li>
+    <li style="padding:4px 0;color:#9999bb;">&bull; Streak count in share text</li>
+  </ul>
+
+  <p>The daily seed is a deterministic integer from an FNV-1a hash of the UTC date. Every player who plays on the same day gets the same puzzle. Five NEON MIND games are live with daily mode now &mdash; Sudoku, Mini Sudoku, Queens, Minesweeper, and Nonogram. These already had seeded RNG in their puzzle generators. We just flipped the switch.</p>
+
+  <p>The other 10 NEON MIND puzzles (Kakuro, Bridges, Tango, Skyscrapers&hellip;) still use <code>Math.random()</code> in their generators. Each needs a seeded PRNG refactor before daily mode works. That is Wave 2.</p>
+
+  <h3>Enhanced Sharing</h3>
+
+  <p>The old share button copied plain text: &ldquo;I scored 450 in Neon Snake.&rdquo; Nobody clicks on that. The new system builds structured share text with three layers:</p>
+
+  <div class="code-block" data-lang="text">
+<code>&#x1F40D; NEON SNAKE
+Score: 2,450 | Top 3% | &#x1F525;7
+&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2591;&#x2591;&#x2591;&#x2591; 67%
+Can you beat me? &rarr; neonarcade.net/c/Xk9mQ2</code>
+  </div>
+
+  <p>On mobile, <code>navigator.share()</code> opens the native share sheet. On desktop, it copies to clipboard with a confirmation toast. Games can also generate a 1200&times;630 score card image &mdash; a canvas-rendered PNG with neon styling, score, rank, and branding &mdash; suitable for Twitter or Instagram.</p>
+
+  <h3>The Architecture: One Library, All Games</h3>
+
+  <p>Everything lives in <code>neon.js</code> (now ~1,100 lines) and <code>worker.js</code> (now ~900 lines). The new neon.js methods:</p>
+
+  <div class="code-block" data-lang="javascript">
+<code>Neon.challenge(text)       <span class="cmt">// create + share challenge link</span>
+Neon.getDailySeed()        <span class="cmt">// deterministic daily seed</span>
+Neon.getStreak()           <span class="cmt">// { current, best, lastPlayed }</span>
+Neon.share(opts)           <span class="cmt">// native share / clipboard</span>
+Neon.formatShare(opts)     <span class="cmt">// emoji share text builder</span>
+Neon.generateScoreCard()   <span class="cmt">// 1200&times;630 canvas image</span>
+Neon.getPercentile()       <span class="cmt">// last score's global rank</span></code>
+  </div>
+
+  <p>The worker gained four new endpoint groups: challenge CRUD (<code>/api/challenge</code>), score distribution (<code>/api/score/{game}</code>), daily play counters (<code>plays_daily:{game}:{date}</code>), and challenge page routing with OG injection (<code>/c/{code}</code>). Two new pages: a <a href="/c/GU4W3M" style="color:var(--neon-pink);text-decoration:underline;text-underline-offset:3px;">challenge landing page</a> and a <a href="/leaderboards/" style="color:var(--neon-cyan);text-decoration:underline;text-underline-offset:3px;">public leaderboard browser</a>.</p>
+
+  <p>The best part: games do not need to change. Call <code>Neon.save(score)</code> like before, and the challenge button, percentile, and enhanced sharing appear automatically. Daily mode is one flag away. The viral loops wrap around the existing game logic without touching it.</p>
+
+  <div class="highlight-box">
+    <span class="hl-label">The Takeaway</span>
+    <p>Virality is not a feature you bolt on at the end. It is infrastructure. The challenge link system touches the worker (KV storage, OG injection), the client library (URL handling, UI injection), and a new landing page &mdash; three layers that must work together for one seamless flow. Building it into the shared library means every game on the site &mdash; past, present, and future &mdash; gets viral mechanics for free. The next game we build will be shareable from the first commit.</p>
   </div>
 </article>
 
