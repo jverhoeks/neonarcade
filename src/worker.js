@@ -834,31 +834,36 @@ export default {
 
       // POST /api/sync — upload localStorage data to server
       if (request.method === 'POST' && segments[0] === 'sync' && segments.length === 1) {
-        const session = await getSession(request, env.GAME_DATA);
-        if (!session) return json({ error: 'not authenticated' }, 401);
+        try {
+          const session = await getSession(request, env.GAME_DATA);
+          if (!session) return json({ error: 'not authenticated' }, 401);
 
-        const throttleKey = `sync_throttle:${session.userId}`;
-        const lastSync = await env.GAME_DATA.get(throttleKey);
-        if (lastSync) return json({ error: 'sync too frequent' }, 429);
-        await env.GAME_DATA.put(throttleKey, '1', { expirationTtl: 10 });
+          const throttleKey = `sync_throttle:${session.userId}`;
+          const lastSync = await env.GAME_DATA.get(throttleKey);
+          if (lastSync) return json({ error: 'sync too frequent' }, 429);
+          await env.GAME_DATA.put(throttleKey, '1', { expirationTtl: 10 });
 
-        let body;
-        try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
-        if (JSON.stringify(body).length > 524288) return json({ error: 'payload too large' }, 413);
+          let body;
+          try { body = await request.json(); } catch { return json({ error: 'invalid JSON body' }, 400); }
+          if (JSON.stringify(body).length > 524288) return json({ error: 'payload too large' }, 413);
 
-        const userKey = `user:${session.userId}`;
-        const existing = safeParseObject(await env.GAME_DATA.get(userKey));
-        const merged = mergeSyncData(body, existing ? existing.data : null);
+          const userKey = `user:${session.userId}`;
+          const existing = safeParseObject(await env.GAME_DATA.get(userKey));
+          const merged = mergeSyncData(body, existing ? existing.data : null);
 
-        const userData = {
-          email: session.email,
-          name: session.name,
-          provider: session.provider,
-          data: merged,
-          lastSync: new Date().toISOString(),
-        };
-        await env.GAME_DATA.put(userKey, JSON.stringify(userData));
-        return json({ ok: true, lastSync: userData.lastSync });
+          const userData = {
+            email: session.email,
+            name: session.name,
+            provider: session.provider,
+            data: merged,
+            lastSync: new Date().toISOString(),
+          };
+          await env.GAME_DATA.put(userKey, JSON.stringify(userData));
+          return json({ ok: true, lastSync: userData.lastSync });
+        } catch (syncErr) {
+          console.error('Sync error:', syncErr);
+          return json({ error: 'sync failed: ' + syncErr.message }, 500);
+        }
       }
 
       // GET /api/sync — download server data to device
