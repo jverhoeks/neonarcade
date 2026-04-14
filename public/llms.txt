@@ -108,6 +108,11 @@ Casino card and table games with persistent chip bankroll. Gold neon aesthetic.
 - [Slots](https://neonarcade.net/neoncasino/slots.html) — 5x3 reels, 20 paylines, wilds, free spins bonus
 - [Video Poker](https://neonarcade.net/neoncasino/video-poker.html) — Jacks or Better with double-or-nothing
 
+## Infrastructure Pages
+
+- [Leaderboard Browser](https://neonarcade.net/leaderboards/) — Browse global leaderboards for all games, filterable by category, with percentile rankings and daily play counts
+- Challenge Links (`/c/{code}`) — Shareable "beat my score" links generated after each game. Recipients see the challenger's score and compete head-to-head. Links are noindexed.
+
 ## Features
 
 - All games are free, no account required
