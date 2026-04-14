@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Echofield — Free Online Sonar Exploration Game | NEON ARCADE</title>
+<meta name="description" content="Play Echofield free online — navigate pitch-black space using sonar pulses. Collect glowing nodes while avoiding creatures that hunt your sound. No download, no login.">
+<meta name="keywords" content="echofield, sonar game, exploration game, stealth game, free browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonarcade/echofield.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonarcade/echofield.html">
+<meta property="og:title" content="Echofield — Free Online Sonar Exploration Game | NEON ARCADE">
+<meta property="og:description" content="Play Echofield free online — navigate pitch-black space using sonar pulses. Collect glowing nodes while avoiding creatures that hunt your sound.">
+<meta property="og:image" content="https://neonarcade.net/neonarcade/screenshots/echofield.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonarcade/echofield.html">
+<meta name="twitter:title" content="Echofield — Free Online Sonar Exploration Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Echofield free online — navigate pitch-black space using sonar pulses. Collect glowing nodes while avoiding creatures that hunt your sound.">
+<meta name="twitter:image" content="https://neonarcade.net/neonarcade/screenshots/echofield.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Echofield",
+  "url": "https://neonarcade.net/neonarcade/echofield.html",
+  "description": "Play Echofield free online — navigate pitch-black space using sonar pulses. Collect glowing nodes while avoiding creatures that hunt your sound.",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "NEON ARCADE",
+    "url": "https://neonarcade.net"
+  },
+  "image": "https://neonarcade.net/neonarcade/screenshots/echofield.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://neonarcade.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "NEON ARCADE",
+      "item": "https://neonarcade.net/neonarcade/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Echofield",
+      "item": "https://neonarcade.net/neonarcade/echofield.html"
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%; overflow: hidden; background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif; color: #fff;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+body::after {
+  content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9999;
+}
+canvas { display: block; position: absolute; top: 0; left: 0; }
+
+/* HUD */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 12px 16px; display: none; pointer-events: none;
+  justify-content: space-between; align-items: flex-start;
+}
+.hud-item {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 16px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2);
+}
+.hud-item span { color: var(--neon-gold); }
+#hud-pulses span { color: var(--neon-cyan); }
+#hud-time span { color: var(--neon-orange); }
+#hud-level {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300; font-size: 12px;
+  color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase;
+  text-align: center; margin-top: 4px;
+}
+
+/* Screens */
+.screen-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200;
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, rgba(0,240,255,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(255,45,123,0.04) 0%, transparent 50%),
+              var(--bg-deep);
+}
+.screen-overlay.active { display: flex; }
+
+/* Start Screen */
+#start-screen h1 {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(36px, 10vw, 72px); letter-spacing: 8px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.3), 0 0 120px rgba(0,240,255,0.15);
+  margin-bottom: 12px;
+  animation: titlePulse 4s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.3), 0 0 120px rgba(0,240,255,0.15); }
+  50% { text-shadow: 0 0 30px rgba(0,240,255,0.8), 0 0 80px rgba(0,240,255,0.5), 0 0 150px rgba(0,240,255,0.25); }
+}
+.subtitle {
+  font-family: 'Rajdhani', sans-serif; font-weight: 300;
+  font-size: clamp(13px, 3vw, 20px); color: var(--text-mid);
+  letter-spacing: 4px; text-transform: uppercase; margin-bottom: 48px;
+}
+.play-btn {
+  font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px;
+  letter-spacing: 3px; padding: 14px 40px;
+  border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan); cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+.play-btn:active { transform: scale(0.97); }
+.controls-hint {
+  margin-top: 24px; font-size: clamp(10px, 2vw, 13px);
+  color: var(--text-dim); letter-spacing: 2px; text-align: center; line-height: 1.8;
+}
+.highscore-display {
+  margin-top: 16px; font-family: 'Orbitron', monospace;
+  font-size: 13px; color: rgba(0,240,255,0.5); letter-spacing: 2px;
+}
+#startLB { margin-top: 16px; max-width: 340px; width: 100%; }
+
+/* Game Over Screen */
+#gameover-screen h2 {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(28px, 7vw, 52px); letter-spacing: 8px;
+  color: var(--neon-pink);
+  text-shadow: 0 0 30px rgba(255,45,123,0.5); margin-bottom: 8px;
+}
+.death-text {
+  font-size: clamp(12px, 2.5vw, 17px);
+  color: rgba(255,45,123,0.6); letter-spacing: 3px; margin-bottom: 32px;
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px; margin-bottom: 24px; text-align: center;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: clamp(20px, 5vw, 32px);
+  color: var(--neon-gold); text-shadow: 0 0 15px rgba(255,215,0,0.4);
+}
+.stat-label {
+  font-size: clamp(9px, 2vw, 12px); color: var(--text-dim);
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;
+}
+.new-best {
+  font-family: 'Orbitron', monospace; font-size: 14px;
+  color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,215,0,0.6);
+  letter-spacing: 3px; margin-bottom: 16px; display: none;
+  animation: bestPulse 1s ease-in-out infinite;
+}
+@keyframes bestPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+#score-table { margin: 8px auto 20px; max-width: 340px; width: 100%; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn-secondary {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: clamp(11px, 2.5vw, 14px); letter-spacing: 3px;
+  color: var(--neon-cyan); background: transparent;
+  border: 1px solid rgba(0,240,255,0.4); padding: 12px 28px;
+  cursor: pointer; text-transform: uppercase; transition: all 0.2s; border-radius: 3px;
+}
+.btn-secondary:hover { border-color: rgba(0,240,255,0.8); box-shadow: 0 0 20px rgba(0,240,255,0.3); }
+
+/* Level Complete */
+#level-screen {
+  background: radial-gradient(ellipse at 50% 30%, rgba(57,255,20,0.08) 0%, transparent 60%),
+              var(--bg-deep);
+}
+#level-screen h2 {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(24px, 6vw, 44px); letter-spacing: 6px;
+  color: var(--neon-green);
+  text-shadow: 0 0 20px rgba(57,255,20,0.5); margin-bottom: 8px;
+}
+.level-info {
+  font-size: clamp(12px, 2.5vw, 16px);
+  color: var(--text-mid); letter-spacing: 3px; margin-bottom: 24px;
+}
+.level-stats {
+  display: flex; gap: 24px; margin-bottom: 32px; text-align: center;
+}
+
+/* Virtual Joystick */
+#joystick-zone {
+  position: fixed; bottom: 0; left: 0; width: 50%; height: 40%;
+  z-index: 150; display: none;
+}
+#pulse-zone {
+  position: fixed; bottom: 0; right: 0; width: 50%; height: 40%;
+  z-index: 150; display: none;
+  justify-content: center; align-items: center;
+}
+#pulse-btn {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 2px solid rgba(0,240,255,0.4); background: rgba(0,240,255,0.08);
+  color: var(--neon-cyan); font-family: 'Orbitron', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0,240,255,0.15);
+  transition: all 0.15s;
+}
+#pulse-btn:active { background: rgba(0,240,255,0.2); box-shadow: 0 0 30px rgba(0,240,255,0.3); transform: scale(0.95); }
+
+/* Screen shake */
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-3px)}
+  30%{transform:translateX(3px)}
+  45%{transform:translateX(-2px)}
+  60%{transform:translateX(2px)}
+  75%{transform:translateX(-1px)}
+  90%{transform:translateX(1px)}
+}
+.shake { animation: shake 0.25s ease; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+  <div class="hud-item" id="hud-nodes">NODES <span id="nodes-val">0</span>/<span id="nodes-total">0</span></div>
+  <div style="text-align:center">
+    <div class="hud-item" id="hud-pulses">PULSES <span id="pulses-val">0</span></div>
+    <div id="hud-level">LEVEL 1</div>
+  </div>
+  <div class="hud-item" id="hud-time">TIME <span id="time-val">0:00</span></div>
+</div>
+
+<div id="start-screen" class="screen-overlay active">
+  <h1>ECHOFIELD</h1>
+  <div class="subtitle">See with sound. Survive the dark.</div>
+  <button class="play-btn" id="btn-start">START</button>
+  <div class="controls-hint">
+    ARROWS / WASD to move &bull; SPACE / TAP to pulse<br>
+    Each pulse reveals the dark &mdash; but attracts hunters
+  </div>
+  <div class="highscore-display" id="hs-start"></div>
+  <div id="startLB"></div>
+</div>
+
+<div id="level-screen" class="screen-overlay">
+  <h2 id="level-title">LEVEL CLEAR</h2>
+  <div class="level-info" id="level-info"></div>
+  <div class="level-stats">
+    <div class="stat-item">
+      <div class="stat-value" id="lvl-nodes">0</div>
+      <div class="stat-label">Nodes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="lvl-pulses">0</div>
+      <div class="stat-label">Pulses</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="lvl-mult">1.0x</div>
+      <div class="stat-label">Multiplier</div>
+    </div>
+  </div>
+  <button class="play-btn" id="btn-next">NEXT LEVEL</button>
+</div>
+
+<div id="gameover-screen" class="screen-overlay">
+  <h2>DETECTED</h2>
+  <div class="death-text">The creatures found you in the dark</div>
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-value" id="final-score">0</div>
+      <div class="stat-label">Score</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="final-nodes">0</div>
+      <div class="stat-label">Nodes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="final-level">1</div>
+      <div class="stat-label">Level</div>
+    </div>
+  </div>
+  <div class="new-best" id="new-best">NEW HIGH SCORE</div>
+  <div id="score-table"></div>
+  <div class="btn-row">
+    <button class="play-btn" id="btn-replay">PLAY AGAIN</button>
+    <button class="btn-secondary" id="btn-share">SHARE</button>
+  </div>
+</div>
+
+<div id="joystick-zone"></div>
+<div id="pulse-zone"><div id="pulse-btn">PING</div></div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+'use strict';
+
+// ============================================================
+//  ECHOFIELD — Sonar Exploration Arcade Game
+// ============================================================
+
+var canvas = document.getElementById('game');
+var ctx = canvas.getContext('2d');
+var dpr = window.devicePixelRatio || 1;
+
+// ---- CONFIG ----
+var TILE = 32;
+var PLAYER_RADIUS = 6;
+var NODE_RADIUS = 5;
+var CREATURE_RADIUS = 7;
+var PULSE_SPEED = 280;         // px/s expansion
+var PULSE_MAX_RADIUS = 320;
+var PULSE_FADE_TIME = 2500;    // ms for echo to fade
+var WALL_REVEAL_TIME = 3000;   // ms walls stay visible after pulse
+var CREATURE_SPEED_BASE = 40;  // px/s
+var CREATURE_SPEED_ALERT = 90; // when attracted to pulse
+var CREATURE_ALERT_DURATION = 4000; // ms they chase toward pulse origin
+var PLAYER_SPEED = 120;        // px/s
+var NODE_GLOW_RADIUS = 18;     // permanent soft glow on nodes
+var LEVEL_TIME_BONUS = 30;     // seconds for full time bonus
+var MAX_PULSE_MULTIPLIER = 3.0;
+
+// ---- DOM REFS ----
+var startScreen = document.getElementById('start-screen');
+var gameoverScreen = document.getElementById('gameover-screen');
+var levelScreen = document.getElementById('level-screen');
+var hud = document.getElementById('hud');
+var nodesVal = document.getElementById('nodes-val');
+var nodesTotal = document.getElementById('nodes-total');
+var pulsesVal = document.getElementById('pulses-val');
+var timeVal = document.getElementById('time-val');
+var hudLevel = document.getElementById('hud-level');
+var btnStart = document.getElementById('btn-start');
+var btnReplay = document.getElementById('btn-replay');
+var btnShare = document.getElementById('btn-share');
+var btnNext = document.getElementById('btn-next');
+var joystickZone = document.getElementById('joystick-zone');
+var pulseZone = document.getElementById('pulse-zone');
+var pulseBtn = document.getElementById('pulse-btn');
+
+// ---- STATE ----
+var state = 'start'; // start, playing, levelcomplete, gameover
+var W = 0, H = 0;    // canvas logical size
+var mapW = 0, mapH = 0;  // map pixel size
+var gridW = 0, gridH = 0; // grid tile count
+var walls = [];       // 2D boolean grid
+var nodes = [];       // { x, y, collected }
+var creatures = [];   // { x, y, vx, vy, alertTime, alertX, alertY }
+var pulses = [];      // { x, y, radius, maxRadius, time, origin }
+var echoes = [];      // { x, y, radius, alpha, time } - fading echo rings
+var revealedWalls = [];  // { col, row, alpha, time }
+var player = { x: 0, y: 0 };
+var camera = { x: 0, y: 0 };
+var particles = [];
+
+var level = 1;
+var totalScore = 0;
+var levelNodes = 0;
+var levelPulses = 0;
+var totalPulses = 0;
+var totalNodes = 0;
+var levelStartTime = 0;
+var gameStartTime = 0;
+var gameTime = 0;
+var alive = true;
+
+// Input
+var keys = {};
+var moveDir = { x: 0, y: 0 };
+var joystickActive = false;
+var joystickId = null;
+var joystickStart = { x: 0, y: 0 };
+var joystickCurrent = { x: 0, y: 0 };
+var isMobile = false;
+
+// Animation
+var lastTime = 0;
+var animId = null;
+
+// ---- AUDIO ----
+var audioCtx = null;
+var masterGain = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.3;
+  masterGain.connect(audioCtx.destination);
+}
+
+function playSonarPing() {
+  if (!audioCtx) return;
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.6);
+  gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+  osc.connect(gain);
+  gain.connect(masterGain);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.6);
+}
+
+function playNodeCollect() {
+  if (!audioCtx) return;
+  var t = audioCtx.currentTime;
+  [800, 1000, 1200].forEach(function(f, i) {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = f;
+    gain.gain.setValueAtTime(0, t + i * 0.06);
+    gain.gain.linearRampToValueAtTime(0.15, t + i * 0.06 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.2);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start(t + i * 0.06);
+    osc.stop(t + i * 0.06 + 0.2);
+  });
+}
+
+function playCreatureWarning() {
+  if (!audioCtx) return;
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+  osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.3);
+  gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+  osc.connect(gain);
+  gain.connect(masterGain);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.3);
+}
+
+function playDeathSound() {
+  if (!audioCtx) return;
+  var t = audioCtx.currentTime;
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(300, t);
+  osc.frequency.exponentialRampToValueAtTime(50, t + 0.8);
+  gain.gain.setValueAtTime(0.2, t);
+  gain.gain.linearRampToValueAtTime(0, t + 0.8);
+  osc.connect(gain);
+  gain.connect(masterGain);
+  osc.start(t);
+  osc.stop(t + 0.8);
+  // Static noise burst
+  var buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.3, audioCtx.sampleRate);
+  var data = buf.getChannelData(0);
+  for (var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / data.length);
+  var noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+  var ng = audioCtx.createGain();
+  ng.gain.value = 0.1;
+  noise.connect(ng);
+  ng.connect(masterGain);
+  noise.start(t);
+}
+
+function playLevelComplete() {
+  if (!audioCtx) return;
+  var t = audioCtx.currentTime;
+  [523, 659, 784, 1047].forEach(function(f, i) {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = f;
+    gain.gain.setValueAtTime(0, t + i * 0.1);
+    gain.gain.linearRampToValueAtTime(0.15, t + i * 0.1 + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.4);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start(t + i * 0.1);
+    osc.stop(t + i * 0.1 + 0.4);
+  });
+}
+
+// ---- NEON.JS ----
+Neon.init({ game: 'echofield', mode: 'high', emoji: '\uD83D\uDC41\uFE0F', title: 'ECHOFIELD' });
+var highScore = Neon.getHighScore();
+
+// ---- SIZING ----
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ---- DETECT MOBILE ----
+function checkMobile() {
+  isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  if (isMobile) {
+    joystickZone.style.display = 'block';
+    pulseZone.style.display = 'flex';
+  } else {
+    joystickZone.style.display = 'none';
+    pulseZone.style.display = 'none';
+  }
+}
+checkMobile();
+
+// ---- MAP GENERATION ----
+function generateMap(lvl) {
+  // Grid size grows with level
+  gridW = Math.min(24 + lvl * 2, 40);
+  gridH = Math.min(18 + lvl * 2, 30);
+  mapW = gridW * TILE;
+  mapH = gridH * TILE;
+
+  // Init walls: all solid
+  walls = [];
+  for (var r = 0; r < gridH; r++) {
+    walls[r] = [];
+    for (var c = 0; c < gridW; c++) {
+      walls[r][c] = true;
+    }
+  }
+
+  // Carve maze using recursive backtracker
+  // Work on odd cells (1,3,5...) as rooms
+  var startR = 1, startC = 1;
+  walls[startR][startC] = false;
+  var stack = [[startR, startC]];
+  var dirs = [[0,2],[0,-2],[2,0],[-2,0]];
+
+  while (stack.length > 0) {
+    var cur = stack[stack.length - 1];
+    var cr = cur[0], cc = cur[1];
+    // Shuffle dirs
+    var shuffled = dirs.slice();
+    for (var i = shuffled.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = tmp;
+    }
+    var found = false;
+    for (var d = 0; d < shuffled.length; d++) {
+      var nr = cr + shuffled[d][0];
+      var nc = cc + shuffled[d][1];
+      if (nr > 0 && nr < gridH - 1 && nc > 0 && nc < gridW - 1 && walls[nr][nc]) {
+        // Carve passage
+        walls[nr][nc] = false;
+        walls[cr + shuffled[d][0] / 2][cc + shuffled[d][1] / 2] = false;
+        stack.push([nr, nc]);
+        found = true;
+        break;
+      }
+    }
+    if (!found) stack.pop();
+  }
+
+  // Open up some extra passages for exploration variety
+  var extraPasses = Math.floor(gridW * gridH * 0.04);
+  for (var e = 0; e < extraPasses; e++) {
+    var er = 1 + Math.floor(Math.random() * (gridH - 2));
+    var ec = 1 + Math.floor(Math.random() * (gridW - 2));
+    if (walls[er][ec]) {
+      // Check if adjacent to at least 2 open cells
+      var adj = 0;
+      if (er > 0 && !walls[er-1][ec]) adj++;
+      if (er < gridH-1 && !walls[er+1][ec]) adj++;
+      if (ec > 0 && !walls[er][ec-1]) adj++;
+      if (ec < gridW-1 && !walls[er][ec+1]) adj++;
+      if (adj >= 2) walls[er][ec] = false;
+    }
+  }
+
+  // Collect open cells
+  var openCells = [];
+  for (var r2 = 1; r2 < gridH - 1; r2++) {
+    for (var c2 = 1; c2 < gridW - 1; c2++) {
+      if (!walls[r2][c2]) openCells.push([r2, c2]);
+    }
+  }
+
+  // Place player at start
+  player.x = 1.5 * TILE;
+  player.y = 1.5 * TILE;
+
+  // Place nodes (far from player, spread out)
+  nodes = [];
+  var nodeCount = Math.min(5 + lvl * 2, 20);
+  var usedCells = new Set();
+  usedCells.add('1,1');
+  // Sort open cells by distance from player (farthest first)
+  var sortedCells = openCells.slice().sort(function(a, b) {
+    var da = Math.abs(a[0] - 1) + Math.abs(a[1] - 1);
+    var db = Math.abs(b[0] - 1) + Math.abs(b[1] - 1);
+    return db - da;
+  });
+
+  for (var n = 0; n < sortedCells.length && nodes.length < nodeCount; n++) {
+    var cell = sortedCells[n];
+    var key = cell[0] + ',' + cell[1];
+    if (usedCells.has(key)) continue;
+    // Must be at least 4 tiles from player start
+    if (Math.abs(cell[0] - 1) + Math.abs(cell[1] - 1) < 4) continue;
+    // Must be far enough from other nodes
+    var tooClose = false;
+    for (var nn = 0; nn < nodes.length; nn++) {
+      var dx = nodes[nn].x - (cell[1] + 0.5) * TILE;
+      var dy = nodes[nn].y - (cell[0] + 0.5) * TILE;
+      if (Math.sqrt(dx * dx + dy * dy) < TILE * 3) { tooClose = true; break; }
+    }
+    if (tooClose) continue;
+    nodes.push({ x: (cell[1] + 0.5) * TILE, y: (cell[0] + 0.5) * TILE, collected: false });
+    usedCells.add(key);
+  }
+
+  // Place creatures
+  creatures = [];
+  var creatureCount = Math.min(1 + Math.floor(lvl * 0.8), 8);
+  var creatureCells = sortedCells.filter(function(c) {
+    return Math.abs(c[0] - 1) + Math.abs(c[1] - 1) > 6;
+  });
+  for (var ci = 0; ci < creatureCells.length && creatures.length < creatureCount; ci++) {
+    var cc2 = creatureCells[ci];
+    var ck = cc2[0] + ',' + cc2[1];
+    if (usedCells.has(ck)) continue;
+    creatures.push({
+      x: (cc2[1] + 0.5) * TILE,
+      y: (cc2[0] + 0.5) * TILE,
+      vx: 0, vy: 0,
+      alertTime: 0,
+      alertX: 0, alertY: 0,
+      wanderAngle: Math.random() * Math.PI * 2,
+      wanderTimer: 0
+    });
+    usedCells.add(ck);
+  }
+}
+
+// ---- CAMERA ----
+function updateCamera() {
+  camera.x = player.x - W / 2;
+  camera.y = player.y - H / 2;
+  // Clamp
+  camera.x = Math.max(0, Math.min(mapW - W, camera.x));
+  camera.y = Math.max(0, Math.min(mapH - H, camera.y));
+  if (mapW < W) camera.x = (mapW - W) / 2;
+  if (mapH < H) camera.y = (mapH - H) / 2;
+}
+
+// ---- COLLISION ----
+function isWall(px, py, radius) {
+  var r = radius || PLAYER_RADIUS;
+  var checks = [
+    [px - r, py - r], [px + r, py - r],
+    [px - r, py + r], [px + r, py + r],
+    [px, py - r], [px, py + r],
+    [px - r, py], [px + r, py]
+  ];
+  for (var i = 0; i < checks.length; i++) {
+    var col = Math.floor(checks[i][0] / TILE);
+    var row = Math.floor(checks[i][1] / TILE);
+    if (col < 0 || col >= gridW || row < 0 || row >= gridH) return true;
+    if (walls[row][col]) return true;
+  }
+  return false;
+}
+
+// ---- PULSE ----
+function emitPulse() {
+  pulses.push({
+    x: player.x, y: player.y,
+    radius: 0,
+    maxRadius: PULSE_MAX_RADIUS,
+    time: 0
+  });
+  levelPulses++;
+  totalPulses++;
+  playSonarPing();
+
+  // Alert all creatures toward this pulse position
+  for (var i = 0; i < creatures.length; i++) {
+    var c = creatures[i];
+    var dx = player.x - c.x;
+    var dy = player.y - c.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    // Only alert if within hearing range (scales with level)
+    if (dist < PULSE_MAX_RADIUS * 1.5) {
+      c.alertTime = CREATURE_ALERT_DURATION;
+      c.alertX = player.x;
+      c.alertY = player.y;
+      playCreatureWarning();
+    }
+  }
+}
+
+// ---- PARTICLES ----
+function spawnParticles(x, y, color, count) {
+  for (var i = 0; i < count; i++) {
+    var angle = Math.random() * Math.PI * 2;
+    var speed = 30 + Math.random() * 80;
+    particles.push({
+      x: x, y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0.5 + Math.random() * 0.5,
+      maxLife: 0.5 + Math.random() * 0.5,
+      color: color,
+      size: 1.5 + Math.random() * 2.5
+    });
+  }
+}
+
+// ---- UPDATE ----
+function update(dt) {
+  if (state !== 'playing') return;
+  if (!alive) return;
+
+  var now = performance.now();
+  gameTime = (now - gameStartTime) / 1000;
+
+  // Player movement
+  var mx = 0, my = 0;
+  if (keys['ArrowLeft'] || keys['KeyA']) mx -= 1;
+  if (keys['ArrowRight'] || keys['KeyD']) mx += 1;
+  if (keys['ArrowUp'] || keys['KeyW']) my -= 1;
+  if (keys['ArrowDown'] || keys['KeyS']) my += 1;
+
+  // Apply joystick input
+  if (joystickActive) {
+    mx = moveDir.x;
+    my = moveDir.y;
+  }
+
+  // Normalize
+  var ml = Math.sqrt(mx * mx + my * my);
+  if (ml > 0) {
+    mx /= ml;
+    my /= ml;
+  }
+
+  var speed = PLAYER_SPEED * dt;
+  var nx = player.x + mx * speed;
+  var ny = player.y + my * speed;
+
+  // Axis-aligned collision
+  if (!isWall(nx, player.y, PLAYER_RADIUS)) {
+    player.x = nx;
+  }
+  if (!isWall(player.x, ny, PLAYER_RADIUS)) {
+    player.y = ny;
+  }
+
+  updateCamera();
+
+  // Update pulses
+  for (var pi = pulses.length - 1; pi >= 0; pi--) {
+    var p = pulses[pi];
+    p.time += dt * 1000;
+    p.radius += PULSE_SPEED * dt;
+
+    // Reveal walls as pulse passes through
+    var ringMin = p.radius - 8;
+    var ringMax = p.radius + 8;
+    var colMin = Math.max(0, Math.floor((p.x - ringMax) / TILE));
+    var colMax = Math.min(gridW - 1, Math.floor((p.x + ringMax) / TILE));
+    var rowMin = Math.max(0, Math.floor((p.y - ringMax) / TILE));
+    var rowMax = Math.min(gridH - 1, Math.floor((p.y + ringMax) / TILE));
+
+    for (var wr = rowMin; wr <= rowMax; wr++) {
+      for (var wc = colMin; wc <= colMax; wc++) {
+        if (walls[wr][wc]) {
+          var wcx = (wc + 0.5) * TILE;
+          var wcy = (wr + 0.5) * TILE;
+          var wd = Math.sqrt((wcx - p.x) * (wcx - p.x) + (wcy - p.y) * (wcy - p.y));
+          if (wd >= ringMin && wd <= ringMax) {
+            // Add or refresh wall reveal
+            var found = false;
+            for (var rv = 0; rv < revealedWalls.length; rv++) {
+              if (revealedWalls[rv].col === wc && revealedWalls[rv].row === wr) {
+                revealedWalls[rv].time = WALL_REVEAL_TIME;
+                revealedWalls[rv].alpha = 1;
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              revealedWalls.push({ col: wc, row: wr, alpha: 1, time: WALL_REVEAL_TIME });
+            }
+          }
+        }
+      }
+    }
+
+    if (p.radius > p.maxRadius) {
+      // Convert to echo
+      echoes.push({
+        x: p.x, y: p.y, radius: p.maxRadius,
+        alpha: 0.4, time: PULSE_FADE_TIME
+      });
+      pulses.splice(pi, 1);
+    }
+  }
+
+  // Fade echoes
+  for (var ei = echoes.length - 1; ei >= 0; ei--) {
+    var e = echoes[ei];
+    e.time -= dt * 1000;
+    e.alpha = Math.max(0, 0.4 * (e.time / PULSE_FADE_TIME));
+    if (e.time <= 0) echoes.splice(ei, 1);
+  }
+
+  // Fade revealed walls
+  for (var rvi = revealedWalls.length - 1; rvi >= 0; rvi--) {
+    var rv2 = revealedWalls[rvi];
+    rv2.time -= dt * 1000;
+    rv2.alpha = Math.max(0, rv2.time / WALL_REVEAL_TIME);
+    if (rv2.time <= 0) revealedWalls.splice(rvi, 1);
+  }
+
+  // Node collection
+  for (var ni = 0; ni < nodes.length; ni++) {
+    var nd = nodes[ni];
+    if (nd.collected) continue;
+    var ndx = player.x - nd.x;
+    var ndy = player.y - nd.y;
+    if (Math.sqrt(ndx * ndx + ndy * ndy) < PLAYER_RADIUS + NODE_RADIUS + 4) {
+      nd.collected = true;
+      levelNodes++;
+      totalNodes++;
+      playNodeCollect();
+      spawnParticles(nd.x, nd.y, '#ffd700', 12);
+
+      // Check if all collected
+      var allCollected = true;
+      for (var nj = 0; nj < nodes.length; nj++) {
+        if (!nodes[nj].collected) { allCollected = false; break; }
+      }
+      if (allCollected) {
+        levelComplete();
+        return;
+      }
+    }
+  }
+
+  // Update creatures
+  var creatureSpeed = CREATURE_SPEED_BASE + level * 5;
+  for (var ci = 0; ci < creatures.length; ci++) {
+    var cr = creatures[ci];
+
+    if (cr.alertTime > 0) {
+      // Chase toward pulse origin
+      cr.alertTime -= dt * 1000;
+      var adx = cr.alertX - cr.x;
+      var ady = cr.alertY - cr.y;
+      var adist = Math.sqrt(adx * adx + ady * ady);
+      if (adist > 2) {
+        cr.vx = (adx / adist) * CREATURE_SPEED_ALERT;
+        cr.vy = (ady / adist) * CREATURE_SPEED_ALERT;
+      } else {
+        cr.alertTime = 0;
+      }
+    } else {
+      // Wander
+      cr.wanderTimer -= dt;
+      if (cr.wanderTimer <= 0) {
+        cr.wanderAngle += (Math.random() - 0.5) * Math.PI;
+        cr.wanderTimer = 1 + Math.random() * 2;
+      }
+      cr.vx = Math.cos(cr.wanderAngle) * creatureSpeed * 0.4;
+      cr.vy = Math.sin(cr.wanderAngle) * creatureSpeed * 0.4;
+    }
+
+    var cnx = cr.x + cr.vx * dt;
+    var cny = cr.y + cr.vy * dt;
+    if (!isWall(cnx, cr.y, CREATURE_RADIUS)) {
+      cr.x = cnx;
+    } else {
+      cr.vx = -cr.vx;
+      cr.wanderAngle += Math.PI;
+    }
+    if (!isWall(cr.x, cny, CREATURE_RADIUS)) {
+      cr.y = cny;
+    } else {
+      cr.vy = -cr.vy;
+      cr.wanderAngle += Math.PI * 0.5;
+    }
+
+    // Check collision with player
+    var cdx = player.x - cr.x;
+    var cdy = player.y - cr.y;
+    if (Math.sqrt(cdx * cdx + cdy * cdy) < PLAYER_RADIUS + CREATURE_RADIUS) {
+      die();
+      return;
+    }
+  }
+
+  // Update particles
+  for (var pti = particles.length - 1; pti >= 0; pti--) {
+    var pt = particles[pti];
+    pt.life -= dt;
+    pt.x += pt.vx * dt;
+    pt.y += pt.vy * dt;
+    pt.vx *= 0.97;
+    pt.vy *= 0.97;
+    if (pt.life <= 0) particles.splice(pti, 1);
+  }
+
+  // Update HUD
+  var collected = 0;
+  for (var h = 0; h < nodes.length; h++) if (nodes[h].collected) collected++;
+  nodesVal.textContent = collected;
+  nodesTotal.textContent = nodes.length;
+  pulsesVal.textContent = totalPulses;
+  var mins = Math.floor(gameTime / 60);
+  var secs = Math.floor(gameTime % 60);
+  timeVal.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+}
+
+// ---- DRAW ----
+function draw() {
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.translate(-camera.x, -camera.y);
+
+  // Draw revealed walls (fading)
+  for (var rv = 0; rv < revealedWalls.length; rv++) {
+    var w = revealedWalls[rv];
+    var alpha = w.alpha * 0.7;
+    ctx.fillStyle = 'rgba(0,240,255,' + alpha * 0.15 + ')';
+    ctx.fillRect(w.col * TILE, w.row * TILE, TILE, TILE);
+    // Wall edge glow
+    ctx.strokeStyle = 'rgba(0,240,255,' + alpha * 0.5 + ')';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(w.col * TILE + 0.5, w.row * TILE + 0.5, TILE - 1, TILE - 1);
+  }
+
+  // Draw echo rings (fading)
+  for (var ei = 0; ei < echoes.length; ei++) {
+    var e = echoes[ei];
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,240,255,' + e.alpha * 0.3 + ')';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw active pulses (expanding rings)
+  for (var pi = 0; pi < pulses.length; pi++) {
+    var p = pulses[pi];
+    var pulseAlpha = Math.max(0, 1 - p.radius / p.maxRadius);
+
+    // Main ring
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,240,255,' + pulseAlpha * 0.8 + ')';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Inner glow ring
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,240,255,' + pulseAlpha * 0.3 + ')';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // Outer faint ring
+    if (p.radius > 20) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius - 15, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,240,255,' + pulseAlpha * 0.1 + ')';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  // Draw nodes (always faintly glowing gold)
+  for (var ni = 0; ni < nodes.length; ni++) {
+    var nd = nodes[ni];
+    if (nd.collected) continue;
+
+    // Soft permanent glow
+    var grd = ctx.createRadialGradient(nd.x, nd.y, 0, nd.x, nd.y, NODE_GLOW_RADIUS);
+    grd.addColorStop(0, 'rgba(255,215,0,0.25)');
+    grd.addColorStop(0.5, 'rgba(255,215,0,0.08)');
+    grd.addColorStop(1, 'rgba(255,215,0,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(nd.x - NODE_GLOW_RADIUS, nd.y - NODE_GLOW_RADIUS, NODE_GLOW_RADIUS * 2, NODE_GLOW_RADIUS * 2);
+
+    // Node dot
+    ctx.beginPath();
+    ctx.arc(nd.x, nd.y, NODE_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Pulse animation on node
+    var nodePulse = (Math.sin(performance.now() * 0.003 + ni) * 0.5 + 0.5) * 6 + NODE_RADIUS;
+    ctx.beginPath();
+    ctx.arc(nd.x, nd.y, nodePulse, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,215,0,0.2)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw creatures (red blips, only visible near pulses or always faintly)
+  for (var ci = 0; ci < creatures.length; ci++) {
+    var cr = creatures[ci];
+    var creatureVisible = 0;
+
+    // Check if any pulse ring is near the creature
+    for (var cpi = 0; cpi < pulses.length; cpi++) {
+      var cp = pulses[cpi];
+      var cdist = Math.sqrt((cr.x - cp.x) * (cr.x - cp.x) + (cr.y - cp.y) * (cr.y - cp.y));
+      var ringDist = Math.abs(cdist - cp.radius);
+      if (ringDist < 30) {
+        creatureVisible = Math.max(creatureVisible, 1 - ringDist / 30);
+      }
+    }
+
+    // Also visible from echoes
+    for (var cei = 0; cei < echoes.length; cei++) {
+      var ce = echoes[cei];
+      var cedist = Math.sqrt((cr.x - ce.x) * (cr.x - ce.x) + (cr.y - ce.y) * (cr.y - ce.y));
+      var ceRingDist = Math.abs(cedist - ce.radius);
+      if (ceRingDist < 20) {
+        creatureVisible = Math.max(creatureVisible, ce.alpha * (1 - ceRingDist / 20));
+      }
+    }
+
+    // Very faint red glow when alert (they're making noise)
+    if (cr.alertTime > 0) {
+      creatureVisible = Math.max(creatureVisible, 0.3);
+    }
+
+    // Very faint proximity warning
+    var pdist = Math.sqrt((player.x - cr.x) * (player.x - cr.x) + (player.y - cr.y) * (player.y - cr.y));
+    if (pdist < TILE * 3) {
+      creatureVisible = Math.max(creatureVisible, (1 - pdist / (TILE * 3)) * 0.4);
+    }
+
+    if (creatureVisible > 0.05) {
+      var cAlpha = creatureVisible;
+      // Red glow
+      var cGrd = ctx.createRadialGradient(cr.x, cr.y, 0, cr.x, cr.y, 16);
+      cGrd.addColorStop(0, 'rgba(255,45,123,' + cAlpha * 0.4 + ')');
+      cGrd.addColorStop(1, 'rgba(255,45,123,0)');
+      ctx.fillStyle = cGrd;
+      ctx.fillRect(cr.x - 16, cr.y - 16, 32, 32);
+
+      // Creature blip
+      ctx.beginPath();
+      ctx.arc(cr.x, cr.y, CREATURE_RADIUS * cAlpha, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,45,123,' + cAlpha + ')';
+      ctx.fill();
+    }
+  }
+
+  // Draw player
+  if (alive) {
+    // Player glow
+    var pGrd = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 20);
+    pGrd.addColorStop(0, 'rgba(0,240,255,0.3)');
+    pGrd.addColorStop(0.5, 'rgba(0,240,255,0.08)');
+    pGrd.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = pGrd;
+    ctx.fillRect(player.x - 20, player.y - 20, 40, 40);
+
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, PLAYER_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Breathing ring
+    var breathe = (Math.sin(performance.now() * 0.004) * 0.5 + 0.5) * 4 + PLAYER_RADIUS + 2;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, breathe, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,240,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw particles
+  for (var pti = 0; pti < particles.length; pti++) {
+    var pt = particles[pti];
+    var ptAlpha = pt.life / pt.maxLife;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.size * ptAlpha, 0, Math.PI * 2);
+    ctx.fillStyle = pt.color;
+    ctx.globalAlpha = ptAlpha;
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+
+  // Draw joystick visual if active
+  if (joystickActive && isMobile) {
+    ctx.beginPath();
+    ctx.arc(joystickStart.x, joystickStart.y, 40, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,240,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(joystickCurrent.x, joystickCurrent.y, 16, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,240,255,0.3)';
+    ctx.fill();
+  }
+}
+
+// ---- GAME LOOP ----
+function loop(ts) {
+  animId = requestAnimationFrame(loop);
+  if (!lastTime) { lastTime = ts; return; }
+  var dt = Math.min((ts - lastTime) / 1000, 0.05);
+  lastTime = ts;
+
+  update(dt);
+  draw();
+}
+
+// ---- LEVEL COMPLETE ----
+function levelComplete() {
+  state = 'levelcomplete';
+  playLevelComplete();
+
+  var mult = calcMultiplier();
+  var levelScore = Math.round(levelNodes * 100 * mult);
+  // Time bonus
+  var levelTime = (performance.now() - levelStartTime) / 1000;
+  var timeBonus = Math.max(0, Math.round((LEVEL_TIME_BONUS - levelTime) * 10));
+  levelScore += timeBonus;
+  totalScore += levelScore;
+
+  document.getElementById('lvl-nodes').textContent = levelNodes;
+  document.getElementById('lvl-pulses').textContent = levelPulses;
+  document.getElementById('lvl-mult').textContent = mult.toFixed(1) + 'x';
+  document.getElementById('level-info').textContent = 'Level ' + level + ' complete \u2014 Score: +' + levelScore + (timeBonus > 0 ? ' (time bonus: +' + timeBonus + ')' : '');
+
+  hud.style.display = 'none';
+  levelScreen.classList.add('active');
+}
+
+function calcMultiplier() {
+  if (levelPulses === 0) return MAX_PULSE_MULTIPLIER;
+  var ratio = levelNodes / levelPulses;
+  return Math.min(MAX_PULSE_MULTIPLIER, Math.max(1, ratio));
+}
+
+// ---- DEATH ----
+function die() {
+  if (!alive) return;
+  alive = false;
+  playDeathSound();
+  spawnParticles(player.x, player.y, '#ff2d7b', 20);
+  document.body.classList.add('shake');
+  setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+
+  // Calculate final score including current level progress
+  var mult = calcMultiplier();
+  var partialScore = Math.round(levelNodes * 100 * mult);
+  totalScore += partialScore;
+
+  setTimeout(showGameOver, 600);
+}
+
+function showGameOver() {
+  state = 'gameover';
+  hud.style.display = 'none';
+  if (isMobile) {
+    joystickZone.style.display = 'none';
+    pulseZone.style.display = 'none';
+  }
+
+  document.getElementById('final-score').textContent = totalScore;
+  document.getElementById('final-nodes').textContent = totalNodes;
+  document.getElementById('final-level').textContent = level;
+
+  // Neon.js save
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function() {
+    return Neon.save(totalScore);
+  }).then(function(result) {
+    if (result && result.isNewBest) {
+      document.getElementById('new-best').style.display = 'block';
+    }
+    Neon.render(document.getElementById('score-table'));
+    if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+      Neon.showGlobalSplash(result.globalRank);
+    }
+    highScore = Neon.getHighScore();
+  });
+
+  gameoverScreen.classList.add('active');
+}
+
+// ---- SHARE ----
+function shareResult() {
+  var mult = calcMultiplier();
+  var text = '\uD83D\uDC41\uFE0F ECHOFIELD\n';
+  text += 'Score: ' + totalScore + ' | Nodes: ' + totalNodes + ' | Pulses: ' + totalPulses + '\n';
+  text += 'Level ' + level + ' | ' + mult.toFixed(1) + 'x multiplier\n';
+  // Visual: sonar rings
+  var rings = '';
+  for (var i = 0; i < Math.min(level, 8); i++) rings += '\u25CE';
+  text += rings + '\n';
+  text += 'neonarcade.net/neonarcade/echofield.html';
+
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function() {
+      copyToClipboard(text);
+    });
+  } else {
+    copyToClipboard(text);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    btnShare.textContent = 'COPIED!';
+    setTimeout(function() { btnShare.textContent = 'SHARE'; }, 2000);
+  }).catch(function() {
+    btnShare.textContent = 'FAILED';
+    setTimeout(function() { btnShare.textContent = 'SHARE'; }, 2000);
+  });
+}
+
+// ---- START / RESTART ----
+function startGame() {
+  initAudio();
+  state = 'playing';
+  alive = true;
+  level = 1;
+  totalScore = 0;
+  totalPulses = 0;
+  totalNodes = 0;
+  gameStartTime = performance.now();
+  lastTime = 0;
+
+  startScreen.classList.remove('active');
+  gameoverScreen.classList.remove('active');
+  levelScreen.classList.remove('active');
+  document.getElementById('new-best').style.display = 'none';
+
+  startLevel();
+}
+
+function startLevel() {
+  levelNodes = 0;
+  levelPulses = 0;
+  pulses = [];
+  echoes = [];
+  revealedWalls = [];
+  particles = [];
+  levelStartTime = performance.now();
+
+  generateMap(level);
+  updateCamera();
+
+  hudLevel.textContent = 'LEVEL ' + level;
+  hud.style.display = 'flex';
+  if (isMobile) {
+    joystickZone.style.display = 'block';
+    pulseZone.style.display = 'flex';
+  }
+
+  // Initial pulse to see surroundings
+  setTimeout(function() {
+    if (state === 'playing') emitPulse();
+  }, 300);
+}
+
+function nextLevel() {
+  level++;
+  levelScreen.classList.remove('active');
+  startLevel();
+}
+
+function goToMenu() {
+  state = 'start';
+  hud.style.display = 'none';
+  gameoverScreen.classList.remove('active');
+  levelScreen.classList.remove('active');
+  if (isMobile) {
+    joystickZone.style.display = 'none';
+    pulseZone.style.display = 'none';
+  }
+
+  highScore = Neon.getHighScore();
+  if (highScore > 0) {
+    document.getElementById('hs-start').textContent = 'BEST: ' + highScore;
+  }
+  Neon.render(document.getElementById('startLB'));
+  startScreen.classList.add('active');
+}
+
+// ---- INPUT: KEYBOARD ----
+document.addEventListener('keydown', function(e) {
+  keys[e.code] = true;
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (state === 'playing' && alive) {
+      emitPulse();
+    } else if (state === 'start') {
+      startGame();
+    }
+  }
+
+  if (e.code === 'Escape') {
+    if (state === 'playing') {
+      goToMenu();
+    }
+  }
+
+  if (e.code === 'Enter') {
+    if (state === 'levelcomplete') {
+      nextLevel();
+    }
+  }
+});
+
+document.addEventListener('keyup', function(e) {
+  keys[e.code] = false;
+});
+
+// ---- INPUT: TOUCH (JOYSTICK) ----
+joystickZone.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  var t = e.changedTouches[0];
+  joystickActive = true;
+  joystickId = t.identifier;
+  joystickStart.x = t.clientX;
+  joystickStart.y = t.clientY;
+  joystickCurrent.x = t.clientX;
+  joystickCurrent.y = t.clientY;
+  moveDir.x = 0;
+  moveDir.y = 0;
+}, { passive: false });
+
+joystickZone.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  for (var i = 0; i < e.changedTouches.length; i++) {
+    var t = e.changedTouches[i];
+    if (t.identifier === joystickId) {
+      joystickCurrent.x = t.clientX;
+      joystickCurrent.y = t.clientY;
+      var dx = t.clientX - joystickStart.x;
+      var dy = t.clientY - joystickStart.y;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      var deadzone = 10;
+      if (dist > deadzone) {
+        moveDir.x = dx / dist;
+        moveDir.y = dy / dist;
+      } else {
+        moveDir.x = 0;
+        moveDir.y = 0;
+      }
+    }
+  }
+}, { passive: false });
+
+joystickZone.addEventListener('touchend', function(e) {
+  for (var i = 0; i < e.changedTouches.length; i++) {
+    if (e.changedTouches[i].identifier === joystickId) {
+      joystickActive = false;
+      joystickId = null;
+      moveDir.x = 0;
+      moveDir.y = 0;
+    }
+  }
+}, { passive: false });
+
+joystickZone.addEventListener('touchcancel', function() {
+  joystickActive = false;
+  joystickId = null;
+  moveDir.x = 0;
+  moveDir.y = 0;
+});
+
+// Pulse button (mobile)
+pulseBtn.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  if (state === 'playing' && alive) {
+    emitPulse();
+  }
+}, { passive: false });
+
+// Prevent scrolling
+document.addEventListener('touchmove', function(e) {
+  if (state === 'playing') e.preventDefault();
+}, { passive: false });
+
+// ---- BUTTON EVENTS ----
+btnStart.addEventListener('click', function() { startGame(); });
+btnReplay.addEventListener('click', function() { startGame(); });
+btnShare.addEventListener('click', function() { shareResult(); });
+btnNext.addEventListener('click', function() { nextLevel(); });
+
+// ---- INIT ----
+highScore = Neon.getHighScore();
+if (highScore > 0) {
+  document.getElementById('hs-start').textContent = 'BEST: ' + highScore;
+}
+Neon.render(document.getElementById('startLB'));
+
+// Start loop
+animId = requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
