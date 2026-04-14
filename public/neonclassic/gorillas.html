@@ -700,8 +700,8 @@ canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
   function generateBuildings() {
     buildings = [];
     var x = 0;
-    var minH = H * 0.15;
-    var maxH = H * 0.55;
+    var minH = H * 0.10;
+    var maxH = H * 0.35;
     var idx = 0;
     while (x < W) {
       var bw = 40 + Math.random() * 50;
@@ -1552,8 +1552,8 @@ canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
 
       var basePower = Math.min(95, Math.max(20, dist / W * 100 + 10));
 
-      var angleFuzz = (Math.random() - 0.5) * 25;
-      var powerFuzz = (Math.random() - 0.5) * 20;
+      var angleFuzz = (Math.random() - 0.5) * 40;
+      var powerFuzz = (Math.random() - 0.5) * 35;
 
       var aiAngle = Math.max(10, Math.min(170, Math.round(baseAngle + angleFuzz)));
       var aiPower = Math.max(15, Math.min(95, Math.round(basePower + powerFuzz)));

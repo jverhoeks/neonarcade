@@ -352,7 +352,7 @@ canvas {
   var plungerCharge = 0;
   var plungerHeld = false;
   var PLUNGER_MAX = 1.0;
-  var PLUNGER_RATE = 2.0; // per second to full charge
+  var PLUNGER_RATE = 3.0; // per second to full charge (faster charge = easier to get strong launch)
 
   // Flippers
   var FLIPPER_LEN = 55;
@@ -879,7 +879,7 @@ canvas {
     if (state !== 'plunger') return;
     var power = Math.max(plungerCharge, 0.2);
     ball.active = true;
-    ball.vy = -450 * power - 300;
+    ball.vy = -700 * power - 400;
     ball.vx = -20;
     state = 'playing';
     sndLaunch();
