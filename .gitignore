@@ -1,3 +1,9 @@
 .playwright-mcp
 .wrangler/
-hub-screenshot.png
+node_modules/
+package.json
+package-lock.json
+.claude/worktrees/
+
+# Root-level dev screenshots (not deployed)
+/*.png
