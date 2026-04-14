@@ -94,6 +94,8 @@ NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven ca
 - [Pinball](https://neonarcade.net/neonclassic/pinball.html) — Neon pinball machine with bumpers, flippers, and ramps
 - [Sopwith](https://neonarcade.net/neonclassic/sopwith.html) — Classic 1984 DOS biplane combat reimagined with neon aesthetics
 - [OutRun](https://neonarcade.net/neonclassic/outrun.html) — Pseudo-3D arcade racer with neon highway, traffic, and checkpoints
+- [Gorillas](https://neonarcade.net/neonclassic/gorillas.html) — Classic QBasic banana artillery with destructible buildings and wind physics
+- [Solitaire](https://neonarcade.net/neonclassic/solitaire.html) — Classic Klondike solitaire with neon cards, drag-and-drop, undo, and iconic victory cascade
 
 ### NEON QUEST
 - [Fusion](https://neonarcade.net/neonquest/fusion.html) — Atomic merge physics — drop elements, fuse them up the periodic table

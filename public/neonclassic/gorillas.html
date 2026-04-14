@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Gorillas — Free Online Artillery Game | NEON ARCADE</title>
+<meta name="description" content="Play Gorillas free online — the classic QBasic banana artillery game reimagined with neon visuals. 2-Player or VS AI. Destructible buildings, wind physics. No download, no login.">
+<meta name="keywords" content="gorillas, free artillery game online, qbasic gorillas, banana throw game, browser game, neon arcade">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonclassic/gorillas.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonclassic/gorillas.html">
+<meta property="og:title" content="Gorillas — Free Online Artillery Game | NEON ARCADE">
+<meta property="og:description" content="Play Gorillas free online — the classic QBasic banana artillery game reimagined with neon visuals. 2-Player or VS AI.">
+<meta property="og:image" content="https://neonarcade.net/neonclassic/screenshots/gorillas.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonclassic/gorillas.html">
+<meta name="twitter:title" content="Gorillas — Free Online Artillery Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Gorillas free online — the classic QBasic banana artillery game reimagined with neon visuals. 2-Player or VS AI.">
+<meta name="twitter:image" content="https://neonarcade.net/neonclassic/screenshots/gorillas.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Gorillas",
+  "url": "https://neonarcade.net/neonclassic/gorillas.html",
+  "description": "Play Gorillas free online — the classic QBasic banana artillery game reimagined with neon visuals. Destructible buildings, wind physics. No download, no login.",
+  "genre": "Artillery",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonclassic/screenshots/gorillas.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CLASSIC", "item": "https://neonarcade.net/neonclassic/" },
+    { "@type": "ListItem", "position": 3, "name": "Gorillas", "item": "https://neonarcade.net/neonclassic/gorillas.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #0a0a12;
+  --bg-surface: #12121f;
+  --neon-cyan: #00f0ff;
+  --neon-green: #39ff14;
+  --neon-gold: #ffd700;
+  --neon-pink: #ff2d7b;
+  --neon-purple: #b44dff;
+  --neon-orange: #ff8c00;
+  --text-dim: #7a7a9a;
+  --text-mid: #9999bb;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  font-family: 'Rajdhani', sans-serif;
+  color: #fff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 30% 10%, rgba(0,240,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,123,0.04) 0%, transparent 60%);
+}
+
+canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
+
+/* --- OVERLAY SCREENS --- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: rgba(10,10,18,0.96);
+}
+.overlay.hidden { display: none; }
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(32px, 7vw, 60px);
+  letter-spacing: 6px;
+  color: var(--neon-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.2);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 2.5vw, 20px);
+  letter-spacing: 3px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.mode-select {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.mode-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 12px 24px;
+  border: 1px solid var(--text-dim);
+  background: rgba(122,122,154,0.06);
+  color: var(--text-mid);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.mode-btn:hover { background: rgba(0,240,255,0.08); border-color: var(--neon-cyan); color: var(--neon-cyan); }
+.mode-btn.active { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,240,255,0.12); box-shadow: 0 0 15px rgba(0,240,255,0.15); }
+
+.play-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin: 8px;
+}
+.play-btn:hover { background: rgba(0,240,255,0.15); box-shadow: 0 0 20px rgba(0,240,255,0.2); transform: scale(1.04); }
+
+.share-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  border: 1px solid var(--neon-green);
+  background: rgba(57,255,20,0.06);
+  color: var(--neon-green);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.share-btn:hover { background: rgba(57,255,20,0.15); box-shadow: 0 0 15px rgba(57,255,20,0.2); }
+
+.controls-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.8;
+  max-width: 440px;
+  margin-bottom: 16px;
+}
+.controls-hint kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--text-dim);
+  border-radius: 3px;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: var(--text-mid);
+  margin: 0 2px;
+}
+
+#startLB { margin-top: 16px; max-width: 380px; width: 90%; }
+
+/* Game Over */
+.go-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(22px, 5vw, 40px);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+.go-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.stat-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 3vw, 24px);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+}
+.stat-value.gold { color: var(--neon-gold); text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.go-btns { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+#goLB { max-width: 380px; width: 90%; margin-top: 8px; }
+
+/* HUD */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  pointer-events: none;
+}
+#hud.active { display: flex; }
+.hud-player {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+.hud-score {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+.hud-wind {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--neon-cyan);
+  text-align: center;
+}
+
+/* Controls Panel */
+#controlsPanel {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: none;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: rgba(10,10,18,0.88);
+  border: 1px solid rgba(0,240,255,0.2);
+  border-radius: 6px;
+  box-shadow: 0 0 30px rgba(0,240,255,0.06);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#controlsPanel.active { display: flex; }
+
+.ctrl-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ctrl-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.ctrl-input {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  width: 60px;
+  text-align: center;
+  padding: 6px 4px;
+  border: 1px solid rgba(0,240,255,0.3);
+  background: rgba(0,240,255,0.06);
+  color: var(--neon-cyan);
+  border-radius: 3px;
+  outline: none;
+}
+.ctrl-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.2); }
+.ctrl-slider {
+  width: 100px;
+  accent-color: var(--neon-cyan);
+}
+.throw-btn {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border: 1px solid var(--neon-gold);
+  background: rgba(255,215,0,0.08);
+  color: var(--neon-gold);
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.throw-btn:hover { background: rgba(255,215,0,0.18); box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+
+/* Round Banner */
+#roundBanner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 80;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: clamp(24px, 5vw, 48px);
+  letter-spacing: 6px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 15px rgba(0,240,255,0.7), 0 0 50px rgba(0,240,255,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  text-align: center;
+}
+#roundBanner.show { opacity: 1; }
+
+/* Turn indicator */
+#turnIndicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 70;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: clamp(16px, 3vw, 28px);
+  letter-spacing: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+  text-align: center;
+}
+#turnIndicator.show { opacity: 1; }
+
+@keyframes shake { 0%,100%{transform:translate(0)} 10%{transform:translate(-3px,2px)} 20%{transform:translate(3px,-2px)} 30%{transform:translate(-2px,-3px)} 40%{transform:translate(2px,3px)} 50%{transform:translate(-3px,-1px)} 60%{transform:translate(3px,1px)} 70%{transform:translate(-1px,3px)} 80%{transform:translate(1px,-3px)} 90%{transform:translate(-2px,2px)} }
+.shake { animation: shake 0.25s ease; }
+
+@media (max-width: 600px) {
+  .ctrl-slider { width: 70px; }
+  .ctrl-input { width: 48px; font-size: 12px; }
+  #controlsPanel { gap: 8px; padding: 8px 12px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div>
+    <div class="hud-player" style="color:var(--neon-cyan);" id="hudP1Name">PLAYER 1</div>
+    <div class="hud-score" style="color:var(--neon-cyan);" id="hudP1Score">0</div>
+  </div>
+  <div class="hud-wind" id="hudWind">WIND: 0</div>
+  <div style="text-align:right;">
+    <div class="hud-player" style="color:var(--neon-pink);" id="hudP2Name">PLAYER 2</div>
+    <div class="hud-score" style="color:var(--neon-pink);" id="hudP2Score">0</div>
+  </div>
+</div>
+
+<!-- Controls Panel -->
+<div id="controlsPanel">
+  <div class="ctrl-group">
+    <span class="ctrl-label">ANGLE</span>
+    <input type="range" class="ctrl-slider" id="angleSlider" min="0" max="180" value="60">
+    <input type="number" class="ctrl-input" id="angleInput" min="0" max="180" value="60">
+    <span class="ctrl-label">&deg;</span>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">POWER</span>
+    <input type="range" class="ctrl-slider" id="powerSlider" min="1" max="100" value="50">
+    <input type="number" class="ctrl-input" id="powerInput" min="1" max="100" value="50">
+    <span class="ctrl-label">%</span>
+  </div>
+  <button class="throw-btn" id="throwBtn">THROW</button>
+</div>
+
+<!-- Round Banner -->
+<div id="roundBanner"></div>
+<div id="turnIndicator"></div>
+
+<!-- START SCREEN -->
+<div class="overlay" id="startScreen">
+  <div class="title">GORILLAS</div>
+  <div class="subtitle">The Classic Banana Battle</div>
+  <div class="mode-select">
+    <button class="mode-btn active" data-mode="ai" id="modeAI">VS AI</button>
+    <button class="mode-btn" data-mode="2p" id="mode2P">2 PLAYER</button>
+  </div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">
+    Adjust <kbd>ANGLE</kbd> and <kbd>POWER</kbd> to throw bananas<br>
+    <kbd>ENTER</kbd> Throw &nbsp; <kbd>ESC</kbd> Quit to menu &nbsp; First to 3 wins!
+  </div>
+  <div id="startLB"></div>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div class="overlay hidden" id="gameOverScreen">
+  <div class="go-title" id="goTitle">PLAYER 1 WINS!</div>
+  <div class="go-subtitle" id="goSubtitle"></div>
+  <div class="stats-grid" id="goStats"></div>
+  <div class="go-btns">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="retryBtn">PLAY AGAIN</button>
+  </div>
+  <div id="goLB"></div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  // CONFIG
+  // ============================================================
+  var WINS_TO_WIN = 3;
+  var GRAVITY = 400;
+  var MAX_VELOCITY = 700;
+  var EXPLOSION_RADIUS = 35;
+  var GORILLA_W = 28;
+  var GORILLA_H = 32;
+  var BANANA_SIZE = 8;
+  var STAR_COUNT = 80;
+  var BUILDING_COLORS = ['#00f0ff', '#b44dff', '#ff2d7b', '#39ff14', '#ff8c00', '#ffd700'];
+  var WINDOW_COLORS = ['rgba(0,240,255,0.3)', 'rgba(180,77,255,0.25)', 'rgba(255,45,123,0.2)', 'rgba(57,255,20,0.2)'];
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  var startScreen = document.getElementById('startScreen');
+  var gameOverScreen = document.getElementById('gameOverScreen');
+  var hud = document.getElementById('hud');
+  var controlsPanel = document.getElementById('controlsPanel');
+  var roundBanner = document.getElementById('roundBanner');
+  var turnIndicator = document.getElementById('turnIndicator');
+
+  var angleSlider = document.getElementById('angleSlider');
+  var angleInput = document.getElementById('angleInput');
+  var powerSlider = document.getElementById('powerSlider');
+  var powerInput = document.getElementById('powerInput');
+  var throwBtn = document.getElementById('throwBtn');
+
+  var startBtn = document.getElementById('startBtn');
+  var retryBtn = document.getElementById('retryBtn');
+  var shareBtn = document.getElementById('shareBtn');
+  var modeAI = document.getElementById('modeAI');
+  var mode2P = document.getElementById('mode2P');
+
+  // ============================================================
+  // SIZING (HiDPI)
+  // ============================================================
+  var dpr = window.devicePixelRatio || 1;
+  var W, H;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ============================================================
+  // GAME STATE
+  // ============================================================
+  var gameMode = 'ai';
+  var state = 'menu';
+  var currentPlayer = 0;
+  var scores = [0, 0];
+  var bestThrow = { angle: 0, power: 0 };
+  var throwCount = 0;
+
+  var buildings = [];
+  var buildingMask = null;
+  var gorillas = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+  var gorillaAnim = [{ frame: 0, dancing: false, throwAnim: 0 }, { frame: 0, dancing: false, throwAnim: 0 }];
+  var banana = null;
+  var bananaTrail = [];
+  var wind = 0;
+  var stars = [];
+  var particles = [];
+  var explosionEffects = [];
+
+  var sunState = 'normal';
+  var sunTimer = 0;
+
+  var aiThinking = false;
+
+  // ============================================================
+  // NEON.JS INIT
+  // ============================================================
+  Neon.init({
+    game: 'gorillas',
+    mode: 'high',
+    key: 'neonarcade_neonclassic_gorillas_scores',
+    formatScore: function(s) { return s + ' wins'; }
+  });
+  Neon.render(document.getElementById('startLB'));
+
+  // ============================================================
+  // SOUND (Web Audio API)
+  // ============================================================
+  var audioCtx = null;
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playThrow() {
+    var a = getAudio();
+    var osc = a.createOscillator();
+    var gain = a.createGain();
+    osc.connect(gain);
+    gain.connect(a.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(200, a.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(600, a.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.12, a.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.2);
+    osc.start(a.currentTime);
+    osc.stop(a.currentTime + 0.2);
+  }
+
+  function playWhistle() {
+    var a = getAudio();
+    var osc = a.createOscillator();
+    var gain = a.createGain();
+    osc.connect(gain);
+    gain.connect(a.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, a.currentTime);
+    osc.frequency.linearRampToValueAtTime(400, a.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.04, a.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.3);
+    osc.start(a.currentTime);
+    osc.stop(a.currentTime + 0.3);
+  }
+
+  function playExplosion() {
+    var a = getAudio();
+    var bufSize = a.sampleRate * 0.4;
+    var buf = a.createBuffer(1, bufSize, a.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 2);
+    }
+    var src = a.createBufferSource();
+    src.buffer = buf;
+    var gain = a.createGain();
+    src.connect(gain);
+    gain.connect(a.destination);
+    gain.gain.setValueAtTime(0.25, a.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.4);
+    src.start(a.currentTime);
+  }
+
+  function playCrumble() {
+    var a = getAudio();
+    var bufSize = a.sampleRate * 0.3;
+    var buf = a.createBuffer(1, bufSize, a.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 3) * 0.5;
+    }
+    var src = a.createBufferSource();
+    src.buffer = buf;
+    var filt = a.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.setValueAtTime(600, a.currentTime);
+    var gain = a.createGain();
+    src.connect(filt);
+    filt.connect(gain);
+    gain.connect(a.destination);
+    gain.gain.setValueAtTime(0.15, a.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.3);
+    src.start(a.currentTime);
+  }
+
+  function playVictory() {
+    var a = getAudio();
+    var notes = [523, 659, 784, 1047];
+    for (var i = 0; i < notes.length; i++) {
+      (function(freq, delay) {
+        var osc = a.createOscillator();
+        var gain = a.createGain();
+        osc.connect(gain);
+        gain.connect(a.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, a.currentTime + delay);
+        gain.gain.setValueAtTime(0, a.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.08, a.currentTime + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, a.currentTime + delay + 0.25);
+        osc.start(a.currentTime + delay);
+        osc.stop(a.currentTime + delay + 0.25);
+      })(notes[i], i * 0.15);
+    }
+  }
+
+  // ============================================================
+  // GENERATION
+  // ============================================================
+  function generateStars() {
+    stars = [];
+    for (var i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.5,
+        r: Math.random() * 1.5 + 0.5,
+        bright: Math.random(),
+        twinkle: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function generateBuildings() {
+    buildings = [];
+    var x = 0;
+    var minH = H * 0.15;
+    var maxH = H * 0.55;
+    var idx = 0;
+    while (x < W) {
+      var bw = 40 + Math.random() * 50;
+      if (x + bw > W) bw = W - x;
+      var bh = minH + Math.random() * (maxH - minH);
+      buildings.push({
+        x: x,
+        w: bw,
+        h: bh,
+        y: H - bh,
+        color: BUILDING_COLORS[idx % BUILDING_COLORS.length],
+        windows: generateWindows(x, H - bh, bw, bh)
+      });
+      x += bw;
+      idx++;
+    }
+
+    buildingMask = document.createElement('canvas');
+    buildingMask.width = W * dpr;
+    buildingMask.height = H * dpr;
+    var mctx = buildingMask.getContext('2d');
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mctx.fillStyle = '#fff';
+    for (var i = 0; i < buildings.length; i++) {
+      var b = buildings[i];
+      mctx.fillRect(b.x, b.y, b.w, b.h);
+    }
+  }
+
+  function generateWindows(bx, by, bw, bh) {
+    var wins = [];
+    var winW = 5, winH = 6;
+    var gapX = winW + 6;
+    var gapY = winH + 8;
+    for (var row = by + 8; row < by + bh - 8; row += gapY) {
+      for (var col = bx + 6; col < bx + bw - 6; col += gapX) {
+        if (Math.random() > 0.3) {
+          wins.push({
+            x: col, y: row, w: winW, h: winH,
+            lit: Math.random() > 0.4,
+            color: WINDOW_COLORS[Math.floor(Math.random() * WINDOW_COLORS.length)]
+          });
+        }
+      }
+    }
+    return wins;
+  }
+
+  function placeGorillas() {
+    var leftBuildings = buildings.filter(function(b) { return b.x + b.w / 2 < W * 0.35; });
+    var rightBuildings = buildings.filter(function(b) { return b.x + b.w / 2 > W * 0.65; });
+
+    if (leftBuildings.length === 0) leftBuildings = [buildings[1] || buildings[0]];
+    if (rightBuildings.length === 0) rightBuildings = [buildings[buildings.length - 2] || buildings[buildings.length - 1]];
+
+    var lb = leftBuildings[Math.floor(Math.random() * leftBuildings.length)];
+    var rb = rightBuildings[Math.floor(Math.random() * rightBuildings.length)];
+
+    gorillas[0] = { x: lb.x + lb.w / 2, y: lb.y };
+    gorillas[1] = { x: rb.x + rb.w / 2, y: rb.y };
+    gorillaAnim[0] = { frame: 0, dancing: false, throwAnim: 0 };
+    gorillaAnim[1] = { frame: 0, dancing: false, throwAnim: 0 };
+  }
+
+  function generateWind() {
+    wind = (Math.random() * 200 - 100);
+  }
+
+  // ============================================================
+  // DESTRUCTION
+  // ============================================================
+  function destroyCircle(cx, cy, r) {
+    if (!buildingMask) return;
+    var mctx = buildingMask.getContext('2d');
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mctx.globalCompositeOperation = 'destination-out';
+    mctx.beginPath();
+    mctx.arc(cx, cy, r, 0, Math.PI * 2);
+    mctx.fill();
+    mctx.globalCompositeOperation = 'source-over';
+  }
+
+  function isBuildingAt(x, y) {
+    if (!buildingMask) return false;
+    if (x < 0 || x >= W || y < 0 || y >= H) return false;
+    var mctx = buildingMask.getContext('2d');
+    var px = Math.floor(x * dpr);
+    var py = Math.floor(y * dpr);
+    if (px < 0 || px >= buildingMask.width || py < 0 || py >= buildingMask.height) return false;
+    var data = mctx.getImageData(px, py, 1, 1).data;
+    return data[3] > 128;
+  }
+
+  // ============================================================
+  // COLLISION
+  // ============================================================
+  function hitGorilla(bx, by, playerIdx) {
+    var g = gorillas[playerIdx];
+    var gx = g.x - GORILLA_W / 2;
+    var gy = g.y - GORILLA_H;
+    return bx >= gx && bx <= gx + GORILLA_W && by >= gy && by <= gy + GORILLA_H;
+  }
+
+  // ============================================================
+  // PARTICLES
+  // ============================================================
+  function spawnParticles(x, y, count, color, speed) {
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var sp = (Math.random() * 0.6 + 0.4) * (speed || 200);
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * sp,
+        vy: Math.sin(angle) * sp - 80,
+        life: 1,
+        decay: 1.5 + Math.random() * 1.5,
+        r: 2 + Math.random() * 3,
+        color: color || '#ffd700'
+      });
+    }
+  }
+
+  function spawnExplosion(x, y) {
+    var colors = ['#ffd700', '#ff8c00', '#ff2d7b', '#fff'];
+    spawnParticles(x, y, 25, null, 250);
+    for (var i = 0; i < colors.length; i++) {
+      spawnParticles(x, y, 6, colors[i], 180);
+    }
+    explosionEffects.push({ x: x, y: y, r: 0, maxR: EXPLOSION_RADIUS * 1.5, life: 1 });
+  }
+
+  function updateParticles(dt) {
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 200 * dt;
+      p.life -= p.decay * dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+    for (var j = explosionEffects.length - 1; j >= 0; j--) {
+      var e = explosionEffects[j];
+      e.r += (e.maxR - e.r) * 5 * dt;
+      e.life -= 3 * dt;
+      if (e.life <= 0) explosionEffects.splice(j, 1);
+    }
+  }
+
+  // ============================================================
+  // DRAWING
+  // ============================================================
+  function drawStars() {
+    var time = Date.now() / 1000;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var alpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(time * 2 + s.twinkle));
+      ctx.globalAlpha = alpha * s.bright;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSun() {
+    var sx = W / 2;
+    var sy = 50;
+    var sr = 25;
+
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = 'rgba(255,215,0,0.5)';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Rays
+    ctx.strokeStyle = 'rgba(255,215,0,0.2)';
+    ctx.lineWidth = 1.5;
+    for (var i = 0; i < 8; i++) {
+      var a = (i / 8) * Math.PI * 2 + Date.now() / 3000;
+      ctx.beginPath();
+      ctx.moveTo(sx + Math.cos(a) * (sr + 4), sy + Math.sin(a) * (sr + 4));
+      ctx.lineTo(sx + Math.cos(a) * (sr + 14), sy + Math.sin(a) * (sr + 14));
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#0a0a12';
+    if (sunState === 'flinch') {
+      ctx.beginPath();
+      ctx.arc(sx - 8, sy - 5, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(sx + 8, sy - 5, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(sx, sy + 8, 6, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(sx - 8, sy - 4, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(sx + 8, sy - 4, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(sx, sy + 4, 7, 0, Math.PI, false);
+      ctx.fill();
+    }
+  }
+
+  function drawBuildingsWithMask() {
+    if (!buildingMask) return;
+
+    var tc = document.createElement('canvas');
+    tc.width = canvas.width;
+    tc.height = canvas.height;
+    var tctx = tc.getContext('2d');
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    for (var i = 0; i < buildings.length; i++) {
+      var b = buildings[i];
+      tctx.fillStyle = '#12121f';
+      tctx.fillRect(b.x, b.y, b.w, b.h);
+    }
+
+    for (var i2 = 0; i2 < buildings.length; i2++) {
+      var b2 = buildings[i2];
+      tctx.strokeStyle = b2.color;
+      tctx.lineWidth = 1.5;
+      tctx.shadowColor = b2.color;
+      tctx.shadowBlur = 8;
+      tctx.strokeRect(b2.x + 0.5, b2.y + 0.5, b2.w - 1, b2.h - 1);
+      tctx.shadowBlur = 0;
+    }
+
+    for (var i3 = 0; i3 < buildings.length; i3++) {
+      var b3 = buildings[i3];
+      for (var j = 0; j < b3.windows.length; j++) {
+        var w = b3.windows[j];
+        if (w.lit) {
+          tctx.fillStyle = w.color;
+          tctx.shadowColor = w.color;
+          tctx.shadowBlur = 4;
+          tctx.fillRect(w.x, w.y, w.w, w.h);
+        }
+      }
+    }
+    tctx.shadowBlur = 0;
+
+    tctx.globalCompositeOperation = 'destination-in';
+    tctx.drawImage(buildingMask, 0, 0, tc.width, tc.height);
+    tctx.globalCompositeOperation = 'source-over';
+
+    ctx.drawImage(tc, 0, 0, tc.width, tc.height, 0, 0, W, H);
+  }
+
+  function drawGorilla(idx) {
+    var g = gorillas[idx];
+    var anim = gorillaAnim[idx];
+    var color = idx === 0 ? '#00f0ff' : '#ff2d7b';
+    var glowColor = idx === 0 ? 'rgba(0,240,255,0.5)' : 'rgba(255,45,123,0.5)';
+
+    ctx.save();
+    ctx.translate(g.x, g.y);
+
+    var bounceY = 0;
+    if (anim.dancing) {
+      bounceY = Math.sin(Date.now() / 150) * 4;
+    }
+
+    var armRaise = 0;
+    if (anim.throwAnim > 0) {
+      armRaise = Math.sin(anim.throwAnim * Math.PI) * 12;
+    }
+
+    ctx.translate(0, bounceY);
+
+    ctx.fillStyle = color;
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 10;
+
+    // Torso
+    ctx.fillRect(-8, -24, 16, 16);
+    // Head
+    ctx.fillRect(-6, -32, 12, 10);
+    // Eyes
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(-4, -29, 3, 3);
+    ctx.fillRect(1, -29, 3, 3);
+
+    ctx.fillStyle = color;
+    if (anim.dancing || armRaise > 0) {
+      ctx.fillRect(-14, -28 - armRaise, 6, 4);
+      ctx.fillRect(8, -28 - armRaise, 6, 4);
+    } else {
+      ctx.fillRect(-14, -20, 6, 10);
+      ctx.fillRect(8, -20, 6, 10);
+    }
+
+    // Legs
+    ctx.fillRect(-7, -8, 5, 8);
+    ctx.fillRect(2, -8, 5, 8);
+
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
+  function drawBanana() {
+    if (!banana) return;
+
+    // Trail
+    for (var i = 0; i < bananaTrail.length; i++) {
+      var t = bananaTrail[i];
+      var alpha = (i / bananaTrail.length) * 0.4;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 2 + (i / bananaTrail.length) * 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Banana body
+    ctx.save();
+    ctx.translate(banana.x, banana.y);
+    ctx.rotate(banana.spin);
+
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = 'rgba(255,215,0,0.6)';
+    ctx.shadowBlur = 12;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, BANANA_SIZE, 0.2, Math.PI - 0.2);
+    ctx.arc(0, -3, BANANA_SIZE * 0.7, Math.PI - 0.2, 0.2, true);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
+  function drawWindArrow() {
+    var cx = W / 2;
+    var cy = 85;
+    var arrowLen = Math.abs(wind) * 0.6;
+    if (arrowLen < 5) arrowLen = 5;
+    var dir = wind > 0 ? 1 : -1;
+    if (Math.abs(wind) < 3) dir = 0;
+
+    ctx.strokeStyle = 'rgba(0,240,255,0.6)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(0,240,255,0.4)';
+    ctx.shadowBlur = 6;
+
+    if (dir !== 0) {
+      ctx.beginPath();
+      ctx.moveTo(cx - dir * arrowLen / 2, cy);
+      ctx.lineTo(cx + dir * arrowLen / 2, cy);
+      ctx.lineTo(cx + dir * arrowLen / 2 - dir * 8, cy - 5);
+      ctx.moveTo(cx + dir * arrowLen / 2, cy);
+      ctx.lineTo(cx + dir * arrowLen / 2 - dir * 8, cy + 5);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+
+    ctx.font = "500 12px 'Rajdhani', sans-serif";
+    ctx.fillStyle = 'rgba(0,240,255,0.7)';
+    ctx.textAlign = 'center';
+    ctx.fillText('WIND: ' + (wind > 0 ? '+' : '') + Math.round(wind), cx, cy + 18);
+  }
+
+  function drawAimGuide() {
+    if (state !== 'playing') return;
+    var g = gorillas[currentPlayer];
+    var angle = parseFloat(angleInput.value);
+    var power = parseFloat(powerInput.value);
+
+    var radAngle;
+    if (currentPlayer === 0) {
+      radAngle = angle * Math.PI / 180;
+    } else {
+      radAngle = (180 - angle) * Math.PI / 180;
+    }
+
+    var startX = g.x;
+    var startY = g.y - GORILLA_H;
+
+    var dirX = Math.cos(radAngle);
+    var dirY = -Math.sin(radAngle);
+
+    var lineLen = 30 + power * 0.5;
+    ctx.strokeStyle = 'rgba(255,215,0,0.3)';
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(startX + dirX * lineLen, startY + dirY * lineLen);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawParticles() {
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    for (var j = 0; j < explosionEffects.length; j++) {
+      var e = explosionEffects[j];
+      ctx.globalAlpha = e.life * 0.4;
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = 'rgba(255,215,0,0.5)';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, W, H);
+
+    var grd = ctx.createRadialGradient(W * 0.3, 0, 0, W * 0.3, 0, W * 0.5);
+    grd.addColorStop(0, 'rgba(0,240,255,0.04)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    var grd2 = ctx.createRadialGradient(W * 0.8, H, 0, W * 0.8, H, W * 0.4);
+    grd2.addColorStop(0, 'rgba(255,45,123,0.03)');
+    grd2.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd2;
+    ctx.fillRect(0, 0, W, H);
+
+    drawStars();
+    drawSun();
+    drawWindArrow();
+    drawBuildingsWithMask();
+    drawGorilla(0);
+    drawGorilla(1);
+    drawBanana();
+    drawAimGuide();
+    drawParticles();
+  }
+
+  // ============================================================
+  // GAME LOGIC
+  // ============================================================
+  function startMatch() {
+    scores = [0, 0];
+    throwCount = 0;
+    bestThrow = { angle: 0, power: 0 };
+    startRound();
+  }
+
+  function startRound() {
+    state = 'roundStart';
+    banana = null;
+    bananaTrail = [];
+    particles = [];
+    explosionEffects = [];
+    sunState = 'normal';
+
+    generateStars();
+    generateBuildings();
+    placeGorillas();
+    generateWind();
+    currentPlayer = Math.random() < 0.5 ? 0 : 1;
+
+    updateHUD();
+
+    var round = scores[0] + scores[1] + 1;
+    roundBanner.textContent = 'ROUND ' + round;
+    roundBanner.style.color = 'var(--neon-cyan)';
+    roundBanner.classList.add('show');
+
+    setTimeout(function() {
+      roundBanner.classList.remove('show');
+      setTimeout(function() {
+        state = 'playing';
+        showControls();
+        showTurnIndicator();
+        if (gameMode === 'ai' && currentPlayer === 1) {
+          startAITurn();
+        }
+      }, 300);
+    }, 1200);
+  }
+
+  function showControls() {
+    controlsPanel.classList.add('active');
+    hud.classList.add('active');
+    angleSlider.value = 60;
+    angleInput.value = 60;
+    powerSlider.value = 50;
+    powerInput.value = 50;
+  }
+
+  function hideControls() {
+    controlsPanel.classList.remove('active');
+  }
+
+  function showTurnIndicator() {
+    var name = currentPlayer === 0 ? 'PLAYER 1' : (gameMode === 'ai' ? 'AI' : 'PLAYER 2');
+    var color = currentPlayer === 0 ? 'var(--neon-cyan)' : 'var(--neon-pink)';
+    turnIndicator.textContent = name + "'S TURN";
+    turnIndicator.style.color = color;
+    turnIndicator.style.textShadow = currentPlayer === 0
+      ? '0 0 15px rgba(0,240,255,0.7)'
+      : '0 0 15px rgba(255,45,123,0.7)';
+    turnIndicator.classList.add('show');
+    setTimeout(function() { turnIndicator.classList.remove('show'); }, 1000);
+  }
+
+  function updateHUD() {
+    document.getElementById('hudP1Name').textContent = 'PLAYER 1';
+    document.getElementById('hudP2Name').textContent = gameMode === 'ai' ? 'AI' : 'PLAYER 2';
+    document.getElementById('hudP1Score').textContent = scores[0];
+    document.getElementById('hudP2Score').textContent = scores[1];
+    document.getElementById('hudWind').textContent = 'WIND: ' + (wind > 0 ? '+' : '') + Math.round(wind);
+  }
+
+  function throwBanana() {
+    if (state !== 'playing') return;
+    state = 'throwing';
+    hideControls();
+
+    var angle = parseFloat(angleInput.value);
+    var power = parseFloat(powerInput.value);
+
+    angle = Math.max(0, Math.min(180, angle));
+    power = Math.max(1, Math.min(100, power));
+
+    throwCount++;
+    if (power > (bestThrow.power || 0)) {
+      bestThrow = { angle: Math.round(angle), power: Math.round(power) };
+    }
+
+    var g = gorillas[currentPlayer];
+    var vel = (power / 100) * MAX_VELOCITY;
+
+    var radAngle;
+    if (currentPlayer === 0) {
+      radAngle = angle * Math.PI / 180;
+    } else {
+      radAngle = (180 - angle) * Math.PI / 180;
+    }
+
+    banana = {
+      x: g.x,
+      y: g.y - GORILLA_H - 4,
+      vx: Math.cos(radAngle) * vel,
+      vy: -Math.sin(radAngle) * vel,
+      spin: 0,
+      active: true
+    };
+
+    bananaTrail = [];
+    gorillaAnim[currentPlayer].throwAnim = 1;
+    playThrow();
+  }
+
+  function updateBanana(dt) {
+    if (!banana || !banana.active) return;
+
+    banana.vx += wind * dt;
+    banana.vy += GRAVITY * dt;
+    banana.x += banana.vx * dt;
+    banana.y += banana.vy * dt;
+    banana.spin += 8 * dt;
+
+    bananaTrail.push({ x: banana.x, y: banana.y });
+    if (bananaTrail.length > 30) bananaTrail.shift();
+
+    if (Math.random() < dt * 3) playWhistle();
+
+    // Sun flinch check
+    var sunX = W / 2, sunY = 50;
+    var dsx = banana.x - sunX;
+    var dsy = banana.y - sunY;
+    if (Math.sqrt(dsx * dsx + dsy * dsy) < 60) {
+      sunState = 'flinch';
+      sunTimer = 0.5;
+    }
+
+    // Off-screen
+    if (banana.x < -50 || banana.x > W + 50 || banana.y > H + 50) {
+      banana.active = false;
+      onMiss();
+      return;
+    }
+
+    // Hit target gorilla
+    var targetIdx = 1 - currentPlayer;
+    if (hitGorilla(banana.x, banana.y, targetIdx)) {
+      onHit(targetIdx);
+      return;
+    }
+
+    // Self-hit
+    if (banana.vy > 0 && hitGorilla(banana.x, banana.y, currentPlayer)) {
+      onHit(currentPlayer);
+      return;
+    }
+
+    // Building collision
+    if (banana.y > 0 && isBuildingAt(banana.x, banana.y)) {
+      onBuildingHit(banana.x, banana.y);
+      return;
+    }
+
+    // Ground
+    if (banana.y >= H) {
+      banana.y = H;
+      onBuildingHit(banana.x, banana.y);
+      return;
+    }
+  }
+
+  function onHit(hitPlayerIdx) {
+    var bx = banana.x;
+    var by = banana.y;
+    banana.active = false;
+    banana = null;
+
+    state = 'exploding';
+    playExplosion();
+    spawnExplosion(bx, by);
+    destroyCircle(bx, by, EXPLOSION_RADIUS);
+    document.body.classList.add('shake');
+    setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+
+    var winner = 1 - hitPlayerIdx;
+
+    setTimeout(function() {
+      scores[winner]++;
+      updateHUD();
+
+      gorillaAnim[winner].dancing = true;
+      playVictory();
+
+      var winnerName = winner === 0 ? 'PLAYER 1' : (gameMode === 'ai' ? 'AI' : 'PLAYER 2');
+      if (scores[winner] >= WINS_TO_WIN) {
+        roundBanner.textContent = winnerName + ' WINS THE MATCH!';
+      } else {
+        roundBanner.textContent = winnerName + ' SCORES!';
+      }
+      roundBanner.style.color = winner === 0 ? 'var(--neon-cyan)' : 'var(--neon-pink)';
+      roundBanner.classList.add('show');
+
+      setTimeout(function() {
+        roundBanner.classList.remove('show');
+        gorillaAnim[winner].dancing = false;
+
+        if (scores[winner] >= WINS_TO_WIN) {
+          endMatch(winner);
+        } else {
+          setTimeout(function() { startRound(); }, 400);
+        }
+      }, 2000);
+    }, 500);
+  }
+
+  function onBuildingHit(bx, by) {
+    banana.active = false;
+    banana = null;
+    state = 'exploding';
+
+    playCrumble();
+    playExplosion();
+    spawnExplosion(bx, by);
+    destroyCircle(bx, by, EXPLOSION_RADIUS);
+    document.body.classList.add('shake');
+    setTimeout(function() { document.body.classList.remove('shake'); }, 250);
+
+    setTimeout(function() {
+      onMiss();
+    }, 600);
+  }
+
+  function onMiss() {
+    banana = null;
+    bananaTrail = [];
+    state = 'playing';
+
+    currentPlayer = 1 - currentPlayer;
+    generateWind();
+    updateHUD();
+    showControls();
+    showTurnIndicator();
+
+    if (gameMode === 'ai' && currentPlayer === 1) {
+      startAITurn();
+    }
+  }
+
+  function buildStatsDOM(statsContainer) {
+    statsContainer.textContent = '';
+
+    var items = [
+      { label: 'PLAYER 1', value: String(scores[0]), cls: '', style: 'color:var(--neon-cyan);text-shadow:0 0 8px rgba(0,240,255,0.4)' },
+      { label: gameMode === 'ai' ? 'AI' : 'PLAYER 2', value: String(scores[1]), cls: '', style: 'color:var(--neon-pink);text-shadow:0 0 8px rgba(255,45,123,0.4)' },
+      { label: 'THROWS', value: String(throwCount), cls: '', style: '' },
+      { label: 'BEST POWER', value: bestThrow.power + '%', cls: 'gold', style: '' }
+    ];
+
+    for (var i = 0; i < items.length; i++) {
+      var labelDiv = document.createElement('div');
+      labelDiv.className = 'stat-label';
+      labelDiv.textContent = items[i].label;
+
+      // Labels go in pairs: two labels then two values
+      // But the grid is 2 columns, so we alternate label/label/value/value
+      statsContainer.appendChild(labelDiv);
+    }
+
+    // Actually the grid pattern is label, label, value, value, label, label, value, value
+    // Let me redo this properly:
+    statsContainer.textContent = '';
+
+    // Row 1: labels
+    var l1 = document.createElement('div');
+    l1.className = 'stat-label';
+    l1.textContent = 'PLAYER 1';
+    statsContainer.appendChild(l1);
+
+    var l2 = document.createElement('div');
+    l2.className = 'stat-label';
+    l2.textContent = gameMode === 'ai' ? 'AI' : 'PLAYER 2';
+    statsContainer.appendChild(l2);
+
+    // Row 2: values
+    var v1 = document.createElement('div');
+    v1.className = 'stat-value';
+    v1.style.cssText = 'color:var(--neon-cyan);text-shadow:0 0 8px rgba(0,240,255,0.4)';
+    v1.textContent = scores[0];
+    statsContainer.appendChild(v1);
+
+    var v2 = document.createElement('div');
+    v2.className = 'stat-value';
+    v2.style.cssText = 'color:var(--neon-pink);text-shadow:0 0 8px rgba(255,45,123,0.4)';
+    v2.textContent = scores[1];
+    statsContainer.appendChild(v2);
+
+    // Row 3: labels
+    var l3 = document.createElement('div');
+    l3.className = 'stat-label';
+    l3.textContent = 'THROWS';
+    statsContainer.appendChild(l3);
+
+    var l4 = document.createElement('div');
+    l4.className = 'stat-label';
+    l4.textContent = 'BEST POWER';
+    statsContainer.appendChild(l4);
+
+    // Row 4: values
+    var v3 = document.createElement('div');
+    v3.className = 'stat-value';
+    v3.textContent = throwCount;
+    statsContainer.appendChild(v3);
+
+    var v4 = document.createElement('div');
+    v4.className = 'stat-value gold';
+    v4.textContent = bestThrow.power + '%';
+    statsContainer.appendChild(v4);
+  }
+
+  function endMatch(winner) {
+    state = 'matchEnd';
+    hud.classList.remove('active');
+    hideControls();
+
+    var winnerName = winner === 0 ? 'PLAYER 1' : (gameMode === 'ai' ? 'AI' : 'PLAYER 2');
+
+    var totalWins = scores[0];
+    var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+    nameReady.then(function() {
+      return Neon.save(totalWins);
+    }).then(function(result) {
+      Neon.render(document.getElementById('goLB'));
+      if (result && result.globalRank >= 1 && result.globalRank <= 5) {
+        Neon.showGlobalSplash(result.globalRank);
+      }
+    });
+
+    var goTitle = document.getElementById('goTitle');
+    goTitle.textContent = winnerName + ' WINS!';
+    goTitle.style.color = winner === 0 ? 'var(--neon-cyan)' : 'var(--neon-pink)';
+    goTitle.style.textShadow = winner === 0
+      ? '0 0 10px rgba(0,240,255,0.6), 0 0 40px rgba(0,240,255,0.2)'
+      : '0 0 10px rgba(255,45,123,0.6), 0 0 40px rgba(255,45,123,0.2)';
+
+    document.getElementById('goSubtitle').textContent = 'MATCH COMPLETE';
+
+    buildStatsDOM(document.getElementById('goStats'));
+
+    startScreen.classList.add('hidden');
+    gameOverScreen.classList.remove('hidden');
+  }
+
+  // ============================================================
+  // AI
+  // ============================================================
+  function startAITurn() {
+    aiThinking = true;
+    hideControls();
+
+    turnIndicator.textContent = 'AI THINKING...';
+    turnIndicator.style.color = 'var(--neon-pink)';
+    turnIndicator.style.textShadow = '0 0 15px rgba(255,45,123,0.7)';
+    turnIndicator.classList.add('show');
+
+    setTimeout(function() {
+      turnIndicator.classList.remove('show');
+      aiThinking = false;
+
+      var target = gorillas[0];
+      var self = gorillas[1];
+      var dx = target.x - self.x;
+      var dy = target.y - self.y;
+
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      var baseAngle = Math.atan2(-dy, -dx) * 180 / Math.PI;
+      baseAngle = 180 - baseAngle;
+
+      var windAdj = -wind * 0.05;
+      baseAngle += windAdj;
+
+      var basePower = Math.min(95, Math.max(20, dist / W * 100 + 10));
+
+      var angleFuzz = (Math.random() - 0.5) * 25;
+      var powerFuzz = (Math.random() - 0.5) * 20;
+
+      var aiAngle = Math.max(10, Math.min(170, Math.round(baseAngle + angleFuzz)));
+      var aiPower = Math.max(15, Math.min(95, Math.round(basePower + powerFuzz)));
+
+      angleInput.value = aiAngle;
+      angleSlider.value = aiAngle;
+      powerInput.value = aiPower;
+      powerSlider.value = aiPower;
+
+      throwBanana();
+    }, 800 + Math.random() * 600);
+  }
+
+  // ============================================================
+  // SHARE
+  // ============================================================
+  function getShareText() {
+    var winner = scores[0] >= WINS_TO_WIN ? 'Player 1' : (gameMode === 'ai' ? 'AI' : 'Player 2');
+    var text = '\uD83C\uDF4C GORILLAS\n';
+    text += winner + ' wins ' + Math.max(scores[0], scores[1]) + '-' + Math.min(scores[0], scores[1]);
+    text += ' | Throws: ' + throwCount;
+    if (bestThrow.power > 0) {
+      text += ' | Best: ' + bestThrow.angle + '\u00B0 ' + bestThrow.power + '%';
+    }
+    text += '\nneonarcade.net/neonclassic/gorillas.html';
+    return text;
+  }
+
+  // ============================================================
+  // GAME LOOP
+  // ============================================================
+  var lastTime = 0;
+
+  function loop(ts) {
+    requestAnimationFrame(loop);
+    var dt = Math.min((ts - lastTime) / 1000, 0.05);
+    lastTime = ts;
+
+    if (state === 'menu' || state === 'matchEnd') {
+      draw();
+      return;
+    }
+
+    for (var i = 0; i < 2; i++) {
+      if (gorillaAnim[i].throwAnim > 0) {
+        gorillaAnim[i].throwAnim -= dt * 3;
+        if (gorillaAnim[i].throwAnim < 0) gorillaAnim[i].throwAnim = 0;
+      }
+    }
+
+    if (sunTimer > 0) {
+      sunTimer -= dt;
+      if (sunTimer <= 0) sunState = 'normal';
+    }
+
+    updateBanana(dt);
+    updateParticles(dt);
+    draw();
+  }
+
+  // ============================================================
+  // INPUT
+  // ============================================================
+  angleSlider.addEventListener('input', function() { angleInput.value = angleSlider.value; });
+  angleInput.addEventListener('input', function() {
+    var v = parseInt(angleInput.value);
+    if (!isNaN(v)) angleSlider.value = Math.max(0, Math.min(180, v));
+  });
+  powerSlider.addEventListener('input', function() { powerInput.value = powerSlider.value; });
+  powerInput.addEventListener('input', function() {
+    var v = parseInt(powerInput.value);
+    if (!isNaN(v)) powerSlider.value = Math.max(1, Math.min(100, v));
+  });
+
+  throwBtn.addEventListener('click', function() {
+    if (state === 'playing' && !(gameMode === 'ai' && currentPlayer === 1)) {
+      throwBanana();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (state !== 'menu' && state !== 'matchEnd') {
+        state = 'menu';
+        hud.classList.remove('active');
+        hideControls();
+        roundBanner.classList.remove('show');
+        turnIndicator.classList.remove('show');
+        startScreen.classList.remove('hidden');
+        gameOverScreen.classList.add('hidden');
+      }
+    }
+    if (e.key === 'Enter' && state === 'playing' && !(gameMode === 'ai' && currentPlayer === 1)) {
+      throwBanana();
+    }
+  });
+
+  modeAI.addEventListener('click', function() {
+    gameMode = 'ai';
+    modeAI.classList.add('active');
+    mode2P.classList.remove('active');
+  });
+  mode2P.addEventListener('click', function() {
+    gameMode = '2p';
+    mode2P.classList.add('active');
+    modeAI.classList.remove('active');
+  });
+
+  startBtn.addEventListener('click', function() {
+    startScreen.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+    startMatch();
+  });
+
+  retryBtn.addEventListener('click', function() {
+    gameOverScreen.classList.add('hidden');
+    startMatch();
+  });
+
+  shareBtn.addEventListener('click', function() {
+    var text = getShareText();
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function() {});
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        shareBtn.textContent = 'COPIED!';
+        setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 1500);
+      });
+    }
+  });
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  generateStars();
+  generateBuildings();
+  placeGorillas();
+  generateWind();
+
+  state = 'menu';
+  requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
