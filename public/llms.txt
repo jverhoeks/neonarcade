@@ -1,15 +1,15 @@
 # NEON ARCADE
 
-> Play 76 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro, deep quest, casino, and world knowledge games with global leaderboards.
+> Play 83 free online browser games instantly — no download, no login required. Arcade, puzzle, skill, retro, deep quest, casino, and world knowledge games with global leaderboards.
 
-NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven categories:
+NEON ARCADE is a collection of 83 free HTML5 browser games organized in seven categories:
 
 ## Categories
 
 - [NEON ARCADE](https://neonarcade.net/neonarcade/) — 31 quick viral action games (30-60 seconds)
 - [NEON MIND](https://neonarcade.net/neonmind/) — 17 classic brain puzzles (Sudoku, Minesweeper, Queens, etc.)
 - [NEON GRIND](https://neonarcade.net/neongrind/) — 8 progressive skill challenges
-- [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 11 retro arcade classics reimagined
+- [NEON CLASSIC](https://neonarcade.net/neonclassic/) — 14 retro arcade classics reimagined
 - [NEON QUEST](https://neonarcade.net/neonquest/) — 5 deep games for longer sessions (roguelikes, tower defense, crafting)
 - [NEON CASINO](https://neonarcade.net/neoncasino/) — 5 casino card and table games with virtual chips
 - [NEON WORLD](https://neonarcade.net/neonworld/) — 2 world knowledge games (history, art, geography)
@@ -96,6 +96,7 @@ NEON ARCADE is a collection of 76 free HTML5 browser games organized in seven ca
 - [OutRun](https://neonarcade.net/neonclassic/outrun.html) — Pseudo-3D arcade racer with neon highway, traffic, and checkpoints
 - [Gorillas](https://neonarcade.net/neonclassic/gorillas.html) — Classic QBasic banana artillery with destructible buildings and wind physics
 - [Solitaire](https://neonarcade.net/neonclassic/solitaire.html) — Classic Klondike solitaire with neon cards, drag-and-drop, undo, and iconic victory cascade
+- [Blockout](https://neonarcade.net/neonclassic/blockout.html) — Classic 1989 3D Tetris reimagined with isometric neon rendering, 3-axis rotation, and three pit sizes
 
 ### NEON QUEST
 - [Fusion](https://neonarcade.net/neonquest/fusion.html) — Atomic merge physics — drop elements, fuse them up the periodic table

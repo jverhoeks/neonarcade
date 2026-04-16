@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Blockout — Free Online 3D Tetris Game | NEON ARCADE</title>
+<meta name="description" content="Play Blockout free online — the classic 1989 3D Tetris reimagined with neon aesthetics. Drop polycube pieces into a 3D pit, clear layers, climb levels. No download, no login.">
+<meta name="keywords" content="blockout, 3d tetris, free puzzle game online, browser game, neon arcade, block dropping game">
+<meta name="author" content="NEON ARCADE">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://neonarcade.net/neonclassic/blockout.html">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neonarcade.net/neonclassic/blockout.html">
+<meta property="og:title" content="Blockout — Free Online 3D Tetris Game | NEON ARCADE">
+<meta property="og:description" content="Play Blockout free online — the classic 1989 3D Tetris reimagined with neon aesthetics. Drop polycube pieces into a 3D pit, clear layers, climb levels.">
+<meta property="og:image" content="https://neonarcade.net/neonclassic/screenshots/blockout.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:site_name" content="NEON ARCADE">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neonarcade.net/neonclassic/blockout.html">
+<meta name="twitter:title" content="Blockout — Free Online 3D Tetris Game | NEON ARCADE">
+<meta name="twitter:description" content="Play Blockout free online — the classic 1989 3D Tetris reimagined with neon aesthetics. Drop polycube pieces into a 3D pit, clear layers, climb levels.">
+<meta name="twitter:image" content="https://neonarcade.net/neonclassic/screenshots/blockout.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Blockout",
+  "url": "https://neonarcade.net/neonclassic/blockout.html",
+  "description": "Play Blockout free online — the classic 1989 3D Tetris reimagined with neon aesthetics. Drop polycube pieces into a 3D pit, clear layers, climb levels.",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "NEON ARCADE", "url": "https://neonarcade.net" },
+  "image": "https://neonarcade.net/neonclassic/screenshots/blockout.png",
+  "inLanguage": "en",
+  "isFamilyFriendly": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://neonarcade.net/" },
+    { "@type": "ListItem", "position": 2, "name": "NEON CLASSIC", "item": "https://neonarcade.net/neonclassic/" },
+    { "@type": "ListItem", "position": 3, "name": "Blockout", "item": "https://neonarcade.net/neonclassic/blockout.html" }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0a12;font-family:'Rajdhani',sans-serif;color:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,0,0,0.07)2px,rgba(0,0,0,0.07)4px)}
+body{background-image:radial-gradient(ellipse at 30% 10%,rgba(0,240,255,0.06)0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(255,45,123,0.05)0%,transparent 50%)}
+canvas{display:block;margin:0 auto}
+
+#startScreen,#gameOverScreen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:rgba(10,10,18,0.97)}
+#startScreen.hidden,#gameOverScreen.hidden{display:none}
+
+.title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(28px,6vw,56px);letter-spacing:6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.6),0 0 40px rgba(0,240,255,0.2);text-transform:uppercase;margin-bottom:6px}
+.subtitle{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:clamp(14px,2.5vw,20px);letter-spacing:3px;color:#9999bb;text-transform:uppercase;margin-bottom:28px;text-align:center;max-width:500px;padding:0 20px}
+
+.diff-select{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
+.diff-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 24px;border:1px solid #7a7a9a;background:rgba(122,122,154,0.06);color:#9999bb;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all .2s}
+.diff-btn:hover{background:rgba(0,240,255,0.08);border-color:#00f0ff;color:#00f0ff}
+.diff-btn.active{border-color:#00f0ff;color:#00f0ff;background:rgba(0,240,255,0.12);box-shadow:0 0 12px rgba(0,240,255,0.15)}
+
+.play-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:3px;padding:14px 40px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;cursor:pointer;border-radius:3px;text-transform:uppercase;margin-bottom:20px;transition:all .2s}
+.play-btn:hover{background:rgba(0,240,255,0.15);box-shadow:0 0 20px rgba(0,240,255,0.2);transform:scale(1.04)}
+
+.controls-hint{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:13px;letter-spacing:2px;color:#7a7a9a;text-transform:uppercase;text-align:center;line-height:1.8;max-width:420px;padding:0 20px}
+
+.go-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,5vw,42px);letter-spacing:4px;color:#ff2d7b;text-shadow:0 0 10px rgba(255,45,123,0.6),0 0 40px rgba(255,45,123,0.2);margin-bottom:20px}
+.go-stats{font-family:'Rajdhani',sans-serif;font-weight:500;font-size:18px;color:#9999bb;letter-spacing:2px;margin-bottom:6px}
+.go-stats span{color:#00f0ff}
+
+.share-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:2px;padding:12px 32px;border:1px solid #39ff14;background:rgba(57,255,20,0.06);color:#39ff14;cursor:pointer;border-radius:3px;text-transform:uppercase;margin:16px 6px 6px;transition:all .2s}
+.share-btn:hover{background:rgba(57,255,20,0.15);box-shadow:0 0 20px rgba(57,255,20,0.2)}
+
+#startLB,#endLB{margin-top:16px;max-width:400px;width:90%}
+
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,3px)}80%{transform:translate(2px,-3px)}}
+.shake{animation:shake .25s}
+
+/* Touch controls */
+#touchControls{display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;padding:8px;background:rgba(10,10,18,0.85)}
+.touch-row{display:flex;justify-content:center;gap:6px;margin-bottom:6px}
+.touch-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:1px;padding:10px 14px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:3px;cursor:pointer;min-width:44px;text-align:center;-webkit-tap-highlight-color:transparent}
+.touch-btn:active{background:rgba(0,240,255,0.2)}
+.touch-btn.drop{border-color:rgba(255,45,123,0.3);background:rgba(255,45,123,0.06);color:#ff2d7b}
+.touch-btn.drop:active{background:rgba(255,45,123,0.2)}
+</style>
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<!-- Start Screen -->
+<div id="startScreen">
+  <div class="title">BLOCKOUT</div>
+  <div class="subtitle">3D Tetris — drop polycubes into a pit, fill layers to clear them</div>
+  <div class="diff-select">
+    <button class="diff-btn active" data-diff="0">EASY<br><span style="font-size:10px;color:#7a7a9a">3&times;3&times;6</span></button>
+    <button class="diff-btn" data-diff="1">NORMAL<br><span style="font-size:10px;color:#7a7a9a">5&times;5&times;12</span></button>
+    <button class="diff-btn" data-diff="2">HARD<br><span style="font-size:10px;color:#7a7a9a">7&times;7&times;14</span></button>
+  </div>
+  <button class="play-btn" id="startBtn">START</button>
+  <div class="controls-hint">
+    Arrows: move &middot; Q/E: yaw &middot; W/S: pitch &middot; Z/X: roll<br>
+    Space: soft drop &middot; Enter: hard drop &middot; ESC: quit
+  </div>
+  <div id="startLB"></div>
+</div>
+
+<!-- Game Over Screen -->
+<div id="gameOverScreen" class="hidden">
+  <div class="go-title">GAME OVER</div>
+  <div class="go-stats">SCORE: <span id="goScore">0</span></div>
+  <div class="go-stats">LAYERS: <span id="goLayers">0</span></div>
+  <div class="go-stats">LEVEL: <span id="goLevel">0</span></div>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center">
+    <button class="share-btn" id="shareBtn">SHARE</button>
+    <button class="play-btn" id="retryBtn" style="margin-top:16px">PLAY AGAIN</button>
+  </div>
+  <div id="endLB"></div>
+</div>
+
+<!-- Touch Controls (shown on mobile) -->
+<div id="touchControls">
+  <div class="touch-row">
+    <button class="touch-btn" data-action="rotX">PITCH</button>
+    <button class="touch-btn" data-action="up">&uarr;</button>
+    <button class="touch-btn" data-action="rotZ">YAW</button>
+  </div>
+  <div class="touch-row">
+    <button class="touch-btn" data-action="left">&larr;</button>
+    <button class="touch-btn" data-action="down">&darr;</button>
+    <button class="touch-btn" data-action="right">&rarr;</button>
+  </div>
+  <div class="touch-row">
+    <button class="touch-btn" data-action="rotY">ROLL</button>
+    <button class="touch-btn drop" data-action="soft">DROP</button>
+    <button class="touch-btn drop" data-action="hard">SLAM</button>
+  </div>
+</div>
+
+<script src="/neon.js"></script>
+<script>
+(function() {
+'use strict';
+
+// ============ CONFIG ============
+var DIFFICULTIES = [
+  { name: 'EASY',   w: 3, d: 3, h: 6,  key: 'neonarcade_neonclassic_blockout_scores_easy' },
+  { name: 'NORMAL', w: 5, d: 5, h: 12, key: 'neonarcade_neonclassic_blockout_scores_normal' },
+  { name: 'HARD',   w: 7, d: 7, h: 14, key: 'neonarcade_neonclassic_blockout_scores_hard' }
+];
+
+var COLORS = {
+  cyan:   { r: 0,   g: 240, b: 255 },
+  pink:   { r: 255, g: 45,  b: 123 },
+  gold:   { r: 255, g: 215, b: 0   },
+  green:  { r: 57,  g: 255, b: 20  },
+  purple: { r: 180, g: 77,  b: 255 },
+  orange: { r: 255, g: 140, b: 0   }
+};
+var COLOR_KEYS = Object.keys(COLORS);
+
+// Piece definitions: arrays of [x,y,z] offsets
+// Flat pieces (z=0 only)
+var FLAT_PIECES = [
+  { name: 'I2', cubes: [[0,0,0],[1,0,0]] },
+  { name: 'I3', cubes: [[0,0,0],[1,0,0],[2,0,0]] },
+  { name: 'L3', cubes: [[0,0,0],[1,0,0],[1,1,0]] },
+  { name: 'T',  cubes: [[0,0,0],[1,0,0],[2,0,0],[1,1,0]] },
+  { name: 'S',  cubes: [[0,0,0],[1,0,0],[1,1,0],[2,1,0]] },
+  { name: 'Z',  cubes: [[0,1,0],[1,1,0],[1,0,0],[2,0,0]] },
+  { name: 'O',  cubes: [[0,0,0],[1,0,0],[0,1,0],[1,1,0]] },
+  { name: 'L4', cubes: [[0,0,0],[1,0,0],[2,0,0],[2,1,0]] },
+  { name: 'I4', cubes: [[0,0,0],[1,0,0],[2,0,0],[3,0,0]] }
+];
+// 3D pieces (extend in z)
+var THREE_D_PIECES = [
+  { name: 'L3d',   cubes: [[0,0,0],[1,0,0],[0,0,1]] },
+  { name: 'T3d',   cubes: [[0,0,0],[1,0,0],[0,1,0],[0,0,1]] },
+  { name: 'Corner', cubes: [[0,0,0],[1,0,0],[0,1,0],[0,0,1]] },
+  { name: 'S3d',   cubes: [[0,0,0],[1,0,0],[1,0,1]] },
+  { name: 'Tower',  cubes: [[0,0,0],[0,0,1],[0,0,2]] },
+  { name: 'Bridge', cubes: [[0,0,0],[1,0,0],[0,0,1],[1,0,1]] },
+  { name: 'Screw',  cubes: [[0,0,0],[1,0,0],[1,1,0],[1,1,1]] }
+];
+
+// ============ DOM ============
+var canvas = document.getElementById('game');
+var ctx = canvas.getContext('2d');
+var startScreen = document.getElementById('startScreen');
+var gameOverScreen = document.getElementById('gameOverScreen');
+var startBtn = document.getElementById('startBtn');
+var retryBtn = document.getElementById('retryBtn');
+var shareBtn = document.getElementById('shareBtn');
+var touchControls = document.getElementById('touchControls');
+var diffBtns = document.querySelectorAll('.diff-btn');
+
+// ============ STATE ============
+var diffIdx = 0;
+var pitW, pitD, pitH;
+var pit; // 3D array [x][y][z] = colorIndex or 0
+var currentPiece, nextPiece;
+var pieceX, pieceY, pieceZ;
+var score, layers, level;
+var dropInterval, dropTimer;
+var gameActive = false;
+var gameOver = false;
+var particles = [];
+var clearFlash = []; // layers currently flashing
+var clearFlashTimer = 0;
+var isMobile = false;
+
+// Isometric projection config
+var cubeSize, centerX, centerY;
+var dpr = window.devicePixelRatio || 1;
+
+// ============ AUDIO ============
+var audioCtx;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function playSound(type) {
+  ensureAudio();
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  var t = audioCtx.currentTime;
+  switch(type) {
+    case 'rotate':
+      osc.type = 'sine'; osc.frequency.setValueAtTime(600, t); osc.frequency.exponentialRampToValueAtTime(800, t+0.06);
+      gain.gain.setValueAtTime(0.08, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.08);
+      osc.start(t); osc.stop(t+0.08); break;
+    case 'land':
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(60, t+0.15);
+      gain.gain.setValueAtTime(0.12, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.18);
+      osc.start(t); osc.stop(t+0.18); break;
+    case 'clear':
+      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, t); osc.frequency.exponentialRampToValueAtTime(900, t+0.3);
+      gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.35);
+      osc.start(t); osc.stop(t+0.35); break;
+    case 'gameover':
+      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(400, t); osc.frequency.exponentialRampToValueAtTime(80, t+0.6);
+      gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.7);
+      osc.start(t); osc.stop(t+0.7); break;
+    case 'move':
+      osc.type = 'sine'; osc.frequency.setValueAtTime(400, t);
+      gain.gain.setValueAtTime(0.04, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.04);
+      osc.start(t); osc.stop(t+0.04); break;
+  }
+}
+
+// ============ NEON.JS INIT ============
+var diff = DIFFICULTIES[diffIdx];
+Neon.init({ game: 'blockout', mode: 'high', key: diff.key });
+Neon.render(document.getElementById('startLB'));
+
+// ============ DIFFICULTY ============
+diffBtns.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    diffBtns.forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    diffIdx = parseInt(btn.getAttribute('data-diff'));
+    var d = DIFFICULTIES[diffIdx];
+    Neon.init({ game: 'blockout', mode: 'high', key: d.key });
+    Neon.render(document.getElementById('startLB'));
+  });
+});
+
+// ============ SIZING ============
+function resize() {
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  isMobile = ('ontouchstart' in window) && w < 900;
+  touchControls.style.display = (isMobile && gameActive) ? 'block' : 'none';
+
+  // Calculate cube size and center based on pit dims
+  var d = DIFFICULTIES[diffIdx];
+  var pw = d.w, pd = d.d, ph = d.h;
+  // Isometric: width spans (pw + pd) * cos30, height spans (pw+pd)*sin30 + ph
+  var isoW = (pw + pd) * 0.866;
+  var isoH = (pw + pd) * 0.5 + ph;
+  var availW = w * 0.55;
+  var availH = h * (isMobile ? 0.55 : 0.75);
+  cubeSize = Math.min(availW / isoW, availH / isoH);
+  cubeSize = Math.max(12, Math.min(cubeSize, 40));
+
+  centerX = w * 0.5;
+  centerY = h * 0.35 + (pw + pd) * 0.5 * cubeSize * 0.3;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ============ 3D → 2D PROJECTION ============
+function project(x, y, z) {
+  var sx = centerX + (x - y) * cubeSize * 0.866;
+  var sy = centerY + (x + y) * cubeSize * 0.5 - z * cubeSize;
+  return { x: sx, y: sy };
+}
+
+// ============ DRAWING ============
+function colorStr(c, a) {
+  a = a === undefined ? 1 : a;
+  return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
+}
+function darken(c, f) {
+  return { r: Math.floor(c.r*f), g: Math.floor(c.g*f), b: Math.floor(c.b*f) };
+}
+
+function drawCubeFace(pts, fill, stroke, lw) {
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = lw || 1;
+    ctx.stroke();
+  }
+}
+
+function drawCube(x, y, z, color, alpha) {
+  alpha = alpha === undefined ? 1 : alpha;
+  var s = cubeSize;
+  // 8 corners of the unit cube
+  var p000 = project(x, y, z);
+  var p100 = project(x+1, y, z);
+  var p010 = project(x, y+1, z);
+  var p110 = project(x+1, y+1, z);
+  var p001 = project(x, y, z+1);
+  var p101 = project(x+1, y, z+1);
+  var p011 = project(x, y+1, z+1);
+  var p111 = project(x+1, y+1, z+1);
+
+  var c = color;
+  // Top face (bright)
+  drawCubeFace([p001, p101, p111, p011], colorStr(c, alpha * 0.7), colorStr(c, alpha * 0.9), 1.2);
+  // Left face (medium)
+  drawCubeFace([p000, p010, p011, p001], colorStr(darken(c, 0.5), alpha * 0.7), colorStr(c, alpha * 0.6), 0.8);
+  // Right face (dark)
+  drawCubeFace([p100, p110, p111, p101], colorStr(darken(c, 0.35), alpha * 0.7), colorStr(c, alpha * 0.6), 0.8);
+}
+
+function drawPitWireframe() {
+  var w = pitW, d = pitD, h = pitH;
+  ctx.strokeStyle = 'rgba(0,240,255,0.12)';
+  ctx.lineWidth = 1;
+
+  // Draw bottom grid
+  for (var x = 0; x <= w; x++) {
+    var a = project(x, 0, 0);
+    var b = project(x, d, 0);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  for (var y = 0; y <= d; y++) {
+    var a = project(0, y, 0);
+    var b = project(w, y, 0);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+
+  // Draw vertical edges
+  ctx.strokeStyle = 'rgba(0,240,255,0.08)';
+  var corners = [[0,0],[w,0],[w,d],[0,d]];
+  for (var i = 0; i < corners.length; i++) {
+    var cx = corners[i][0], cy = corners[i][1];
+    var a = project(cx, cy, 0);
+    var b = project(cx, cy, h);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+
+  // Draw top rim
+  ctx.strokeStyle = 'rgba(0,240,255,0.15)';
+  ctx.lineWidth = 1.5;
+  var t0 = project(0,0,h), t1 = project(w,0,h), t2 = project(w,d,h), t3 = project(0,d,h);
+  ctx.beginPath();
+  ctx.moveTo(t0.x, t0.y); ctx.lineTo(t1.x, t1.y); ctx.lineTo(t2.x, t2.y); ctx.lineTo(t3.x, t3.y); ctx.closePath();
+  ctx.stroke();
+
+  // Draw back walls (faint grid lines on walls)
+  ctx.strokeStyle = 'rgba(180,77,255,0.05)';
+  ctx.lineWidth = 0.5;
+  // Back-left wall (y=d)
+  for (var z = 1; z < h; z++) {
+    var a = project(0, d, z);
+    var b = project(w, d, z);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  // Back-right wall (x=w)
+  for (var z = 1; z < h; z++) {
+    var a = project(w, 0, z);
+    var b = project(w, d, z);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+}
+
+// ============ PIT MANAGEMENT ============
+function createPit() {
+  pit = [];
+  for (var x = 0; x < pitW; x++) {
+    pit[x] = [];
+    for (var y = 0; y < pitD; y++) {
+      pit[x][y] = [];
+      for (var z = 0; z < pitH; z++) {
+        pit[x][y][z] = 0;
+      }
+    }
+  }
+}
+
+function pitGet(x, y, z) {
+  if (x < 0 || x >= pitW || y < 0 || y >= pitD || z < 0) return -1; // wall/floor
+  if (z >= pitH) return 0; // above pit is empty
+  return pit[x][y][z];
+}
+
+function checkCollision(cubes, px, py, pz) {
+  for (var i = 0; i < cubes.length; i++) {
+    var c = cubes[i];
+    var nx = px + c[0], ny = py + c[1], nz = pz + c[2];
+    if (nx < 0 || nx >= pitW || ny < 0 || ny >= pitD || nz < 0) return true;
+    if (nz < pitH && pit[nx][ny][nz] !== 0) return true;
+  }
+  return false;
+}
+
+function placePiece() {
+  var ci = currentPiece.colorIdx;
+  for (var i = 0; i < currentPiece.cubes.length; i++) {
+    var c = currentPiece.cubes[i];
+    var x = pieceX + c[0], y = pieceY + c[1], z = pieceZ + c[2];
+    if (z >= 0 && z < pitH && x >= 0 && x < pitW && y >= 0 && y < pitD) {
+      pit[x][y][z] = ci;
+    }
+  }
+}
+
+function checkAndClearLayers() {
+  var cleared = 0;
+  for (var z = pitH - 1; z >= 0; z--) {
+    var full = true;
+    for (var x = 0; x < pitW && full; x++) {
+      for (var y = 0; y < pitD && full; y++) {
+        if (pit[x][y][z] === 0) full = false;
+      }
+    }
+    if (full) {
+      clearFlash.push(z);
+      cleared++;
+    }
+  }
+  if (cleared > 0) {
+    clearFlashTimer = 20; // frames of flash
+    playSound('clear');
+  }
+  return cleared;
+}
+
+function removeClearedLayers() {
+  // Sort flash layers from top to bottom for safe removal
+  clearFlash.sort(function(a, b) { return b - a; });
+  for (var i = 0; i < clearFlash.length; i++) {
+    var cz = clearFlash[i];
+    // Shift everything above down
+    for (var z = cz; z < pitH - 1; z++) {
+      for (var x = 0; x < pitW; x++) {
+        for (var y = 0; y < pitD; y++) {
+          pit[x][y][z] = pit[x][y][z + 1];
+        }
+      }
+    }
+    // Clear top layer
+    for (var x = 0; x < pitW; x++) {
+      for (var y = 0; y < pitD; y++) {
+        pit[x][y][pitH - 1] = 0;
+      }
+    }
+    // Adjust remaining flash indices
+    for (var j = i + 1; j < clearFlash.length; j++) {
+      if (clearFlash[j] > cz) clearFlash[j]--;
+    }
+  }
+}
+
+function spawnParticles(z, count) {
+  for (var i = 0; i < count; i++) {
+    var px = Math.random() * pitW;
+    var py = Math.random() * pitD;
+    var p = project(px, py, z + 0.5);
+    particles.push({
+      x: p.x, y: p.y,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4 - 2,
+      life: 30 + Math.random() * 20,
+      maxLife: 50,
+      color: COLOR_KEYS[Math.floor(Math.random() * COLOR_KEYS.length)]
+    });
+  }
+}
+
+// ============ PIECE GENERATION ============
+function getPiecePool() {
+  // Easy: mostly flat pieces; Normal: mix; Hard: more 3D
+  if (diffIdx === 0) return FLAT_PIECES;
+  if (diffIdx === 1) return FLAT_PIECES.concat(THREE_D_PIECES.slice(0, 3));
+  return FLAT_PIECES.concat(THREE_D_PIECES);
+}
+
+function randomPiece() {
+  var pool = getPiecePool();
+  var template = pool[Math.floor(Math.random() * pool.length)];
+  var cubes = template.cubes.map(function(c) { return [c[0], c[1], c[2]]; });
+  var ci = Math.floor(Math.random() * COLOR_KEYS.length) + 1; // 1-based color
+  return { cubes: cubes, colorIdx: ci, name: template.name };
+}
+
+function centerPiece(piece) {
+  // Find bounding box
+  var minX = 99, maxX = -99, minY = 99, maxY = -99, maxZ = -99;
+  for (var i = 0; i < piece.cubes.length; i++) {
+    var c = piece.cubes[i];
+    if (c[0] < minX) minX = c[0];
+    if (c[0] > maxX) maxX = c[0];
+    if (c[1] < minY) minY = c[1];
+    if (c[1] > maxY) maxY = c[1];
+    if (c[2] > maxZ) maxZ = c[2];
+  }
+  var pw = maxX - minX + 1;
+  var pd = maxY - minY + 1;
+  pieceX = Math.floor((pitW - pw) / 2);
+  pieceY = Math.floor((pitD - pd) / 2);
+  pieceZ = pitH - 1 - maxZ;
+  // Normalize cubes to start at 0,0,0
+  for (var i = 0; i < piece.cubes.length; i++) {
+    piece.cubes[i][0] -= minX;
+    piece.cubes[i][1] -= minY;
+  }
+}
+
+// ============ ROTATION ============
+function rotateCubes(cubes, axis) {
+  // Rotate 90 degrees around axis
+  return cubes.map(function(c) {
+    var x = c[0], y = c[1], z = c[2];
+    switch(axis) {
+      case 'z': return [-y, x, z]; // yaw
+      case 'x': return [x, -z, y]; // pitch
+      case 'y': return [z, y, -x]; // roll
+    }
+    return [x, y, z];
+  });
+}
+
+function normalizeCubes(cubes) {
+  var minX = 99, minY = 99, minZ = 99;
+  for (var i = 0; i < cubes.length; i++) {
+    if (cubes[i][0] < minX) minX = cubes[i][0];
+    if (cubes[i][1] < minY) minY = cubes[i][1];
+    if (cubes[i][2] < minZ) minZ = cubes[i][2];
+  }
+  return cubes.map(function(c) { return [c[0]-minX, c[1]-minY, c[2]-minZ]; });
+}
+
+function tryRotate(axis) {
+  var rotated = normalizeCubes(rotateCubes(currentPiece.cubes, axis));
+  if (!checkCollision(rotated, pieceX, pieceY, pieceZ)) {
+    currentPiece.cubes = rotated;
+    playSound('rotate');
+    return true;
+  }
+  // Wall kick: try shifting 1 in each direction
+  var kicks = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  for (var i = 0; i < kicks.length; i++) {
+    var kx = pieceX + kicks[i][0], ky = pieceY + kicks[i][1], kz = pieceZ + kicks[i][2];
+    if (!checkCollision(rotated, kx, ky, kz)) {
+      currentPiece.cubes = rotated;
+      pieceX = kx; pieceY = ky; pieceZ = kz;
+      playSound('rotate');
+      return true;
+    }
+  }
+  return false;
+}
+
+// ============ GHOST PIECE ============
+function getGhostZ() {
+  var gz = pieceZ;
+  while (!checkCollision(currentPiece.cubes, pieceX, pieceY, gz - 1)) {
+    gz--;
+  }
+  return gz;
+}
+
+// ============ GAME LOGIC ============
+function spawnNext() {
+  currentPiece = nextPiece || randomPiece();
+  nextPiece = randomPiece();
+  centerPiece(currentPiece);
+
+  // Check if spawn position collides = game over
+  if (checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ)) {
+    endGame();
+  }
+}
+
+function dropPiece() {
+  if (!checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ - 1)) {
+    pieceZ--;
+    return true;
+  }
+  // Land
+  placePiece();
+  playSound('land');
+  score += 5 + currentPiece.cubes.length;
+
+  var cleared = checkAndClearLayers();
+  if (cleared > 0) {
+    // Score: exponential bonus
+    var layerScore = [0, 100, 300, 600, 1000, 1500, 2100];
+    score += (layerScore[Math.min(cleared, 6)] || cleared * 400) * (level + 1);
+    layers += cleared;
+    level = Math.floor(layers / 10);
+    dropInterval = Math.max(100, 800 - level * 60);
+    // Spawn particles per cleared layer
+    for (var i = 0; i < clearFlash.length; i++) {
+      spawnParticles(clearFlash[i], 15);
+    }
+  }
+
+  if (clearFlashTimer <= 0) {
+    spawnNext();
+  }
+  return false;
+}
+
+function hardDrop() {
+  var dropped = 0;
+  while (!checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ - 1)) {
+    pieceZ--;
+    dropped++;
+  }
+  score += dropped * 2;
+  dropPiece(); // land immediately
+}
+
+function movePiece(dx, dy) {
+  if (!checkCollision(currentPiece.cubes, pieceX + dx, pieceY + dy, pieceZ)) {
+    pieceX += dx;
+    pieceY += dy;
+    playSound('move');
+    return true;
+  }
+  return false;
+}
+
+function endGame() {
+  gameActive = false;
+  gameOver = true;
+  playSound('gameover');
+  canvas.classList.add('shake');
+  setTimeout(function() { canvas.classList.remove('shake'); }, 250);
+  touchControls.style.display = 'none';
+
+  document.getElementById('goScore').textContent = score.toLocaleString();
+  document.getElementById('goLayers').textContent = layers;
+  document.getElementById('goLevel').textContent = level + 1;
+
+  var nameReady = Neon.getName() ? Promise.resolve() : Neon.promptName();
+  nameReady.then(function() {
+    return Neon.save(score);
+  }).then(function(result) {
+    Neon.render(document.getElementById('endLB'));
+    if (result.globalRank >= 1 && result.globalRank <= 5) {
+      Neon.showGlobalSplash(result.globalRank);
+    }
+    gameOverScreen.classList.remove('hidden');
+  });
+}
+
+function startGame() {
+  var d = DIFFICULTIES[diffIdx];
+  pitW = d.w; pitD = d.d; pitH = d.h;
+  Neon.init({ game: 'blockout', mode: 'high', key: d.key });
+
+  createPit();
+  score = 0; layers = 0; level = 0;
+  dropInterval = 800; dropTimer = 0;
+  particles = []; clearFlash = []; clearFlashTimer = 0;
+  gameActive = true; gameOver = false;
+  nextPiece = randomPiece();
+  spawnNext();
+
+  startScreen.classList.add('hidden');
+  gameOverScreen.classList.add('hidden');
+  resize();
+}
+
+// ============ RENDER ============
+function drawNextPiece() {
+  if (!nextPiece) return;
+  var label = 'NEXT';
+  var nx = window.innerWidth - 90;
+  var ny = 30;
+
+  ctx.font = '700 11px Orbitron, monospace';
+  ctx.fillStyle = '#7a7a9a';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, nx, ny);
+
+  // Draw small preview cubes
+  var previewSize = Math.min(cubeSize * 0.5, 14);
+  var c = COLORS[COLOR_KEYS[(nextPiece.colorIdx - 1) % COLOR_KEYS.length]];
+  for (var i = 0; i < nextPiece.cubes.length; i++) {
+    var cb = nextPiece.cubes[i];
+    var px = nx + (cb[0] - cb[1]) * previewSize * 0.866 - 10;
+    var py = ny + 20 + (cb[0] + cb[1]) * previewSize * 0.5 - cb[2] * previewSize;
+    // Simple cube representation
+    ctx.fillStyle = colorStr(c, 0.7);
+    ctx.fillRect(px - previewSize*0.4, py - previewSize*0.4, previewSize*0.8, previewSize*0.8);
+    ctx.strokeStyle = colorStr(c, 0.9);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px - previewSize*0.4, py - previewSize*0.4, previewSize*0.8, previewSize*0.8);
+  }
+}
+
+function drawHUD() {
+  ctx.font = '700 13px Orbitron, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#7a7a9a';
+  ctx.fillText('SCORE', 16, 30);
+  ctx.fillStyle = '#00f0ff';
+  ctx.shadowColor = 'rgba(0,240,255,0.4)';
+  ctx.shadowBlur = 8;
+  ctx.fillText(score.toLocaleString(), 16, 50);
+  ctx.shadowBlur = 0;
+
+  ctx.fillStyle = '#7a7a9a';
+  ctx.fillText('LAYERS', 16, 78);
+  ctx.fillStyle = '#39ff14';
+  ctx.fillText('' + layers, 16, 98);
+
+  ctx.fillStyle = '#7a7a9a';
+  ctx.fillText('LEVEL', 16, 126);
+  ctx.fillStyle = '#ffd700';
+  ctx.fillText('' + (level + 1), 16, 146);
+
+  ctx.fillStyle = '#7a7a9a';
+  ctx.font = '300 11px Rajdhani, sans-serif';
+  ctx.fillText(DIFFICULTIES[diffIdx].name, 16, 168);
+}
+
+function drawParticles() {
+  for (var i = particles.length - 1; i >= 0; i--) {
+    var p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.08;
+    p.life--;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    var alpha = p.life / p.maxLife;
+    var c = COLORS[p.color];
+    ctx.fillStyle = colorStr(c, alpha * 0.8);
+    ctx.shadowColor = colorStr(c, alpha * 0.4);
+    ctx.shadowBlur = 6;
+    var sz = 2 + alpha * 3;
+    ctx.fillRect(p.x - sz/2, p.y - sz/2, sz, sz);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function render() {
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  ctx.clearRect(0, 0, w, h);
+
+  if (!gameActive && !gameOver) return;
+
+  drawPitWireframe();
+
+  // Collect all cubes to draw, sort by depth (back to front)
+  var cubes = [];
+
+  // Pit cubes
+  for (var x = 0; x < pitW; x++) {
+    for (var y = 0; y < pitD; y++) {
+      for (var z = 0; z < pitH; z++) {
+        if (pit[x][y][z] !== 0) {
+          var isFlashing = clearFlashTimer > 0 && clearFlash.indexOf(z) >= 0;
+          cubes.push({
+            x: x, y: y, z: z,
+            color: isFlashing ? {r:255,g:255,b:255} : COLORS[COLOR_KEYS[(pit[x][y][z] - 1) % COLOR_KEYS.length]],
+            alpha: isFlashing ? 0.9 : 0.55,
+            depth: x + y - z
+          });
+        }
+      }
+    }
+  }
+
+  // Ghost piece
+  if (currentPiece && gameActive) {
+    var gz = getGhostZ();
+    if (gz !== pieceZ) {
+      var gc = COLORS[COLOR_KEYS[(currentPiece.colorIdx - 1) % COLOR_KEYS.length]];
+      for (var i = 0; i < currentPiece.cubes.length; i++) {
+        var cb = currentPiece.cubes[i];
+        cubes.push({
+          x: pieceX + cb[0], y: pieceY + cb[1], z: gz + cb[2],
+          color: gc, alpha: 0.12,
+          depth: (pieceX + cb[0]) + (pieceY + cb[1]) - (gz + cb[2])
+        });
+      }
+    }
+
+    // Active piece
+    var ac = COLORS[COLOR_KEYS[(currentPiece.colorIdx - 1) % COLOR_KEYS.length]];
+    for (var i = 0; i < currentPiece.cubes.length; i++) {
+      var cb = currentPiece.cubes[i];
+      cubes.push({
+        x: pieceX + cb[0], y: pieceY + cb[1], z: pieceZ + cb[2],
+        color: ac, alpha: 0.95,
+        depth: (pieceX + cb[0]) + (pieceY + cb[1]) - (pieceZ + cb[2])
+      });
+    }
+  }
+
+  // Sort: higher depth = further back = draw first
+  cubes.sort(function(a, b) { return b.depth - a.depth; });
+
+  for (var i = 0; i < cubes.length; i++) {
+    drawCube(cubes[i].x, cubes[i].y, cubes[i].z, cubes[i].color, cubes[i].alpha);
+  }
+
+  drawNextPiece();
+  drawHUD();
+  drawParticles();
+}
+
+// ============ GAME LOOP ============
+var lastTime = 0;
+function tick(now) {
+  requestAnimationFrame(tick);
+
+  if (!gameActive) {
+    render();
+    return;
+  }
+
+  var dt = now - lastTime;
+  lastTime = now;
+  if (dt > 200) dt = 16; // cap
+
+  // Handle clear flash animation
+  if (clearFlashTimer > 0) {
+    clearFlashTimer--;
+    if (clearFlashTimer <= 0) {
+      removeClearedLayers();
+      clearFlash = [];
+      spawnNext();
+    }
+    render();
+    return;
+  }
+
+  dropTimer += dt;
+  if (dropTimer >= dropInterval) {
+    dropTimer = 0;
+    dropPiece();
+  }
+
+  render();
+}
+requestAnimationFrame(tick);
+
+// ============ INPUT ============
+document.addEventListener('keydown', function(e) {
+  if (!gameActive) {
+    if (e.key === 'Enter' && !startScreen.classList.contains('hidden')) {
+      startGame();
+      e.preventDefault();
+    }
+    return;
+  }
+  if (clearFlashTimer > 0) return;
+
+  switch(e.key) {
+    case 'ArrowLeft':  movePiece(-1, 0); e.preventDefault(); break;
+    case 'ArrowRight': movePiece(1, 0);  e.preventDefault(); break;
+    case 'ArrowUp':    movePiece(0, -1); e.preventDefault(); break;
+    case 'ArrowDown':  movePiece(0, 1);  e.preventDefault(); break;
+    case 'q': case 'Q': tryRotate('z'); break;
+    case 'e': case 'E': tryRotate('z'); break; // same axis, could be opposite
+    case 'w': case 'W': tryRotate('x'); break;
+    case 's': case 'S': tryRotate('x'); break;
+    case 'z': case 'Z': tryRotate('y'); break;
+    case 'x': case 'X': tryRotate('y'); break;
+    case ' ':
+      dropTimer = 0;
+      dropPiece();
+      e.preventDefault();
+      break;
+    case 'Enter':
+      hardDrop();
+      e.preventDefault();
+      break;
+    case 'Escape':
+      gameActive = false;
+      gameOver = false;
+      touchControls.style.display = 'none';
+      startScreen.classList.remove('hidden');
+      gameOverScreen.classList.add('hidden');
+      Neon.render(document.getElementById('startLB'));
+      e.preventDefault();
+      break;
+  }
+});
+
+// ============ TOUCH CONTROLS ============
+document.querySelectorAll('.touch-btn').forEach(function(btn) {
+  btn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (!gameActive || clearFlashTimer > 0) return;
+    var action = btn.getAttribute('data-action');
+    switch(action) {
+      case 'left':  movePiece(-1, 0); break;
+      case 'right': movePiece(1, 0); break;
+      case 'up':    movePiece(0, -1); break;
+      case 'down':  movePiece(0, 1); break;
+      case 'rotZ':  tryRotate('z'); break;
+      case 'rotX':  tryRotate('x'); break;
+      case 'rotY':  tryRotate('y'); break;
+      case 'soft':  dropTimer = 0; dropPiece(); break;
+      case 'hard':  hardDrop(); break;
+    }
+  });
+});
+
+// ============ SHARE ============
+shareBtn.addEventListener('click', function() {
+  var d = DIFFICULTIES[diffIdx];
+  var text = '\uD83E\uDDCA BLOCKOUT [' + d.name + ']\n' +
+    'Score: ' + score.toLocaleString() + ' | Layers: ' + layers + ' | Level: ' + (level+1) + '\n' +
+    'neonarcade.net/neonclassic/blockout.html';
+
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      shareBtn.textContent = 'COPIED!';
+      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+    });
+  }
+});
+
+// ============ BUTTONS ============
+startBtn.addEventListener('click', startGame);
+retryBtn.addEventListener('click', startGame);
+
+})();
+</script>
+</body>
+</html>
