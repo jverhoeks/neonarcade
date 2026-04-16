@@ -150,6 +150,10 @@ body{background:#0a0a12;background-image:radial-gradient(ellipse at 30% 10%,rgba
 .auto-banner{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:150;font-family:'Orbitron',monospace;font-weight:700;font-size:12px;letter-spacing:3px;padding:8px 24px;border:1px solid rgba(57,255,20,0.3);background:rgba(57,255,20,0.08);color:#39ff14;border-radius:3px;text-transform:uppercase;opacity:0;transition:opacity 0.3s}
 .auto-banner.show{opacity:1}
 
+/* --- VALID TARGET PULSE --- */
+@keyframes targetPulse{0%,100%{box-shadow:0 0 10px rgba(57,255,20,0.3),inset 0 0 6px rgba(57,255,20,0.05)}50%{box-shadow:0 0 20px rgba(57,255,20,0.6),inset 0 0 12px rgba(57,255,20,0.12)}}
+.valid-target{animation:targetPulse 0.8s ease-in-out infinite;border-color:#39ff14 !important}
+
 @media(max-width:600px){
   .hud{padding:6px 8px}
   .hud-stat{font-size:10px}
@@ -299,23 +303,52 @@ function playSound(type) {
         }
         break;
       case 'victory':
-        [0,100,200,300,400,500].forEach(function(delay, i) {
+        // Rich multi-note fanfare with harmonics
+        var fanfare = [
+          // [delay, freq, type, vol, dur]
+          // Opening chord (C major)
+          [0, 523, 'sine', 0.10, 0.6],
+          [0, 659, 'sine', 0.07, 0.6],
+          [0, 784, 'sine', 0.06, 0.6],
+          // Rising arpeggio
+          [150, 659, 'triangle', 0.09, 0.3],
+          [250, 784, 'triangle', 0.09, 0.3],
+          [350, 1047, 'sine', 0.10, 0.4],
+          [450, 1319, 'sine', 0.09, 0.3],
+          // Triumphant high notes
+          [550, 1568, 'sine', 0.11, 0.5],
+          [550, 784, 'sine', 0.06, 0.5],
+          // Second phrase
+          [750, 1319, 'triangle', 0.08, 0.2],
+          [850, 1568, 'sine', 0.10, 0.4],
+          [950, 1760, 'sine', 0.08, 0.3],
+          // Final chord (C major high)
+          [1100, 2093, 'sine', 0.10, 0.8],
+          [1100, 1568, 'sine', 0.07, 0.8],
+          [1100, 1319, 'sine', 0.05, 0.8],
+          [1100, 1047, 'sine', 0.04, 0.8],
+          // Shimmer tail
+          [1400, 2093, 'sine', 0.04, 1.0],
+          [1500, 2637, 'sine', 0.03, 0.8],
+          [1600, 3136, 'sine', 0.02, 0.6]
+        ];
+        fanfare.forEach(function(note) {
           setTimeout(function() {
             try {
               var c = getAudio();
               var gg = c.createGain();
               gg.connect(c.destination);
               var oo = c.createOscillator();
-              oo.type = 'sine';
-              var freqs = [523,659,784,1047,1319,1568];
-              oo.frequency.setValueAtTime(freqs[i], c.currentTime);
-              gg.gain.setValueAtTime(0.1, c.currentTime);
-              gg.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.4);
+              oo.type = note[2];
+              oo.frequency.setValueAtTime(note[1], c.currentTime);
+              gg.gain.setValueAtTime(note[3], c.currentTime);
+              gg.gain.setValueAtTime(note[3], c.currentTime + note[4] * 0.6);
+              gg.gain.exponentialRampToValueAtTime(0.001, c.currentTime + note[4]);
               oo.connect(gg);
               oo.start(c.currentTime);
-              oo.stop(c.currentTime + 0.4);
+              oo.stop(c.currentTime + note[4]);
             } catch(e2) {}
-          }, delay);
+          }, note[0]);
         });
         break;
     }
@@ -404,12 +437,34 @@ function calcLayout() {
     CH = Math.round(CW * 1.45);
   }
 
-  GAP = Math.max(6, Math.floor((availW - 7 * CW) / 8));
-  MARGIN_LEFT = Math.floor((W - (7 * CW + 6 * GAP)) / 2);
+  // Enforce minimum 60px card width on mobile; allow horizontal scroll if needed
+  if (CW < 60) CW = 60;
+  CH = Math.round(CW * 1.45);
+
+  GAP = Math.max(4, Math.floor((availW - 7 * CW) / 8));
+  if (GAP < 4) GAP = 4;
+  MARGIN_LEFT = Math.max(2, Math.floor((W - (7 * CW + 6 * GAP)) / 2));
   MARGIN_TOP = hudH + 8;
   TABLEAU_TOP = MARGIN_TOP + CH + Math.max(12, Math.floor(H * 0.015));
-  CARD_OVERLAP_DOWN = Math.max(16, Math.floor(CH * 0.16));
-  CARD_OVERLAP_UP = Math.max(22, Math.floor(CH * 0.22));
+
+  // Reduce overlap on small screens to fit more cards vertically
+  var maxTableauH = H - TABLEAU_TOP - 20;
+  var longestPile = 0;
+  for (var c = 0; c < 7; c++) {
+    if (tableau[c] && tableau[c].length > longestPile) longestPile = tableau[c].length;
+  }
+  if (longestPile === 0) longestPile = 13;
+  var idealOverlapUp = Math.floor(CH * 0.22);
+  var idealOverlapDown = Math.floor(CH * 0.16);
+  // Check if it fits
+  var neededH = (longestPile - 1) * idealOverlapUp + CH;
+  if (neededH > maxTableauH && longestPile > 1) {
+    var scaleFactor = Math.max(0.5, maxTableauH / neededH);
+    idealOverlapUp = Math.floor(idealOverlapUp * scaleFactor);
+    idealOverlapDown = Math.floor(idealOverlapDown * scaleFactor);
+  }
+  CARD_OVERLAP_DOWN = Math.max(14, idealOverlapDown);
+  CARD_OVERLAP_UP = Math.max(18, idealOverlapUp);
 
   document.documentElement.style.setProperty('--cw', CW + 'px');
   document.documentElement.style.setProperty('--ch', CH + 'px');
@@ -619,6 +674,7 @@ function renderAll() {
 function updateSelection() {
   document.querySelectorAll('.card.selected').forEach(function(el) { el.classList.remove('selected'); });
   document.querySelectorAll('.drop-highlight').forEach(function(el) { el.classList.remove('drop-highlight'); });
+  document.querySelectorAll('.valid-target').forEach(function(el) { el.classList.remove('valid-target'); });
 
   if (selectedCard) {
     if (selectedPile === 'waste') {
@@ -628,6 +684,42 @@ function updateSelection() {
       var idx = selectedCard._tabIdx;
       for (var i = idx; i < tableau[col].length; i++) {
         if (tableau[col][i].el) tableau[col][i].el.classList.add('selected');
+      }
+    }
+
+    // Highlight valid drop targets for tap-to-place mode
+    var topCard = selectedCard;
+
+    // Check foundations (only single cards)
+    var isSingle = selectedPile === 'waste' ||
+      (selectedPile === 'tableau' && selectedCard._tabIdx === tableau[selectedCard._tabCol].length - 1);
+    if (isSingle) {
+      for (var fi = 0; fi < 4; fi++) {
+        if (canPlaceOnFoundation(topCard, fi)) {
+          if (foundations[fi].length > 0) {
+            var fTop = foundations[fi][foundations[fi].length - 1];
+            if (fTop.el) fTop.el.classList.add('valid-target');
+          } else {
+            var markers = document.querySelectorAll('.pile-marker.foundation');
+            if (markers[fi]) markers[fi].classList.add('valid-target');
+          }
+        }
+      }
+    }
+
+    // Check tableau columns
+    for (var tc = 0; tc < 7; tc++) {
+      if (selectedPile === 'tableau' && tc === selectedCard._tabCol) continue;
+      if (canPlaceOnTableau(topCard, tc)) {
+        if (tableau[tc].length === 0) {
+          var allMarkers = gameArea.querySelectorAll('.pile-marker:not(.foundation)');
+          allMarkers.forEach(function(m) {
+            if (m._tabCol === tc) m.classList.add('valid-target');
+          });
+        } else {
+          var tTop = tableau[tc][tableau[tc].length - 1];
+          if (tTop.el) tTop.el.classList.add('valid-target');
+        }
       }
     }
   }
@@ -893,6 +985,25 @@ function handleCardTap(card, pileType, idx, col) {
       }
       clearSelection();
       return;
+    }
+  }
+
+  // Try to place on foundation if tapping the top card of a foundation pile
+  for (var fi = 0; fi < 4; fi++) {
+    if (foundations[fi].length > 0 && foundations[fi][foundations[fi].length - 1] === card) {
+      if (canPlaceOnFoundation(selectedCard, fi)) {
+        var isSingle = selectedPile === 'waste' ||
+          (selectedPile === 'tableau' && selectedCard._tabIdx === tableau[selectedCard._tabCol].length - 1);
+        if (isSingle) {
+          if (selectedPile === 'waste') {
+            executeMove('waste-to-foundation', -1, fi);
+          } else if (selectedPile === 'tableau') {
+            executeMove('tableau-to-foundation', selectedCard._tabCol, fi);
+          }
+          clearSelection();
+          return;
+        }
+      }
     }
   }
 
@@ -1279,10 +1390,10 @@ function startVictoryCascade() {
   canvas.style.height = H + 'px';
   ctx.scale(dpr, dpr);
 
-  var cardW = Math.min(70, CW * 0.8);
+  var cardW = Math.min(80, CW * 0.85);
   var cardH = cardW * 1.45;
 
-  // Collect all cards from foundations
+  // Collect cards from foundations — launch from each pile in order (K down to A)
   var allCards = [];
   for (var fi = 0; fi < 4; fi++) {
     for (var ci = foundations[fi].length - 1; ci >= 0; ci--) {
@@ -1293,71 +1404,162 @@ function startVictoryCascade() {
         rank: card.rank,
         x: pos.x + CW / 2,
         y: pos.y + CH / 2,
-        color: SUIT_COLORS[card.suit] === 'red' ? '#ff2d7b' : '#00f0ff'
+        color: SUIT_COLORS[card.suit] === 'red' ? '#ff2d7b' : '#00f0ff',
+        glowColor: SUIT_COLORS[card.suit] === 'red' ? 'rgba(255,45,123,' : 'rgba(0,240,255,',
+        fi: fi
       });
     }
   }
 
-  // Shuffle launch order
-  for (var i = allCards.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = allCards[i]; allCards[i] = allCards[j]; allCards[j] = tmp;
+  // Interleave cards from different piles for visual variety
+  var piles = [[], [], [], []];
+  allCards.forEach(function(c) { piles[c.fi].push(c); });
+  var interleaved = [];
+  var maxLen = 0;
+  piles.forEach(function(p) { if (p.length > maxLen) maxLen = p.length; });
+  for (var ri = 0; ri < maxLen; ri++) {
+    for (var pi = 0; pi < 4; pi++) {
+      if (ri < piles[pi].length) interleaved.push(piles[pi][ri]);
+    }
   }
+  allCards = interleaved;
 
   var flyingCards = [];
   var trails = [];
+  var particles = [];
   var launchIdx = 0;
-  var launchTimer = 0;
-  var gravity = 0.4;
-  var bounceCoeff = 0.75;
+  var frameCount = 0;
+  var gravity = 0.55;
+  var bounceCoeff = 0.72;
   var running = true;
+  var LAUNCH_INTERVAL = 5; // frames between launches — slower for drama
 
   function launch() {
     if (launchIdx >= allCards.length) return;
     var c = allCards[launchIdx++];
+    // Random direction — either left or right with significant velocity
+    var dir = Math.random() < 0.5 ? -1 : 1;
     flyingCards.push({
       x: c.x,
       y: c.y,
-      vx: (Math.random() - 0.5) * 12,
-      vy: -(4 + Math.random() * 6),
+      vx: dir * (3 + Math.random() * 7),
+      vy: -(6 + Math.random() * 8),
+      rotation: 0,
+      rotSpeed: (Math.random() - 0.5) * 0.15,
       color: c.color,
+      glowColor: c.glowColor,
       suit: c.suit,
       rank: c.rank,
-      active: true
+      active: true,
+      bounces: 0,
+      life: 0
     });
+  }
+
+  function spawnBounceParticles(x, y, color, glowColor) {
+    for (var pp = 0; pp < 8; pp++) {
+      particles.push({
+        x: x + (Math.random() - 0.5) * cardW,
+        y: y,
+        vx: (Math.random() - 0.5) * 6,
+        vy: -(1 + Math.random() * 4),
+        life: 1.0,
+        decay: 0.015 + Math.random() * 0.015,
+        size: 2 + Math.random() * 4,
+        color: color,
+        glowColor: glowColor
+      });
+    }
   }
 
   function tick() {
     if (!running) return;
 
-    launchTimer++;
-    if (launchTimer % 3 === 0) launch();
+    frameCount++;
+    if (frameCount % LAUNCH_INTERVAL === 0) launch();
+
+    // Update particles
+    for (var pi2 = particles.length - 1; pi2 >= 0; pi2--) {
+      var pp = particles[pi2];
+      pp.x += pp.vx;
+      pp.y += pp.vy;
+      pp.vy += 0.1;
+      pp.life -= pp.decay;
+      if (pp.life <= 0) particles.splice(pi2, 1);
+    }
 
     var anyActive = false;
     for (var i = 0; i < flyingCards.length; i++) {
       var fc = flyingCards[i];
       if (!fc.active) continue;
       anyActive = true;
+      fc.life++;
 
       fc.vy += gravity;
       fc.x += fc.vx;
       fc.y += fc.vy;
+      fc.rotation += fc.rotSpeed;
 
-      // Bounce off bottom
-      if (fc.y + cardH / 2 >= H) {
-        fc.y = H - cardH / 2;
-        fc.vy = -Math.abs(fc.vy) * bounceCoeff;
+      // Leave motion trail every few frames
+      if (fc.life % 2 === 0) {
         trails.push({
           x: fc.x - cardW / 2,
           y: fc.y - cardH / 2,
           w: cardW,
           h: cardH,
-          color: fc.color
+          color: fc.color,
+          glowColor: fc.glowColor,
+          alpha: 0.5,
+          isMotion: true
         });
       }
 
-      // Off screen
+      // Bounce off bottom
+      if (fc.y + cardH / 2 >= H) {
+        fc.y = H - cardH / 2;
+        fc.vy = -Math.abs(fc.vy) * bounceCoeff;
+        fc.bounces++;
+
+        // Strong colored trail stamp at bounce point
+        trails.push({
+          x: fc.x - cardW / 2,
+          y: fc.y - cardH / 2,
+          w: cardW,
+          h: cardH,
+          color: fc.color,
+          glowColor: fc.glowColor,
+          alpha: 0.7,
+          isBounce: true,
+          rank: fc.rank,
+          suit: fc.suit
+        });
+
+        // Spawn particles at bounce
+        spawnBounceParticles(fc.x, H, fc.color, fc.glowColor);
+
+        // Play a subtle bounce tick sound
+        if (fc.bounces <= 3) {
+          try {
+            var actx = getAudio();
+            var bg = actx.createGain();
+            bg.connect(actx.destination);
+            var bo = actx.createOscillator();
+            bo.type = 'sine';
+            bo.frequency.setValueAtTime(200 + Math.random() * 300, actx.currentTime);
+            bg.gain.setValueAtTime(0.03, actx.currentTime);
+            bg.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.06);
+            bo.connect(bg);
+            bo.start(actx.currentTime);
+            bo.stop(actx.currentTime + 0.06);
+          } catch(e3) {}
+        }
+      }
+
+      // Off screen sides or too many bounces with low velocity
       if (fc.x < -cardW * 2 || fc.x > W + cardW * 2 || fc.y > H + cardH * 2) {
+        fc.active = false;
+      }
+      if (fc.bounces > 6 && Math.abs(fc.vy) < 1) {
         fc.active = false;
       }
     }
@@ -1365,17 +1567,65 @@ function startVictoryCascade() {
     // Draw
     ctx.clearRect(0, 0, W, H);
 
-    // Draw trails
+    // Draw trails — bounce stamps are persistent and vivid, motion trails fade
     for (var t = 0; t < trails.length; t++) {
       var tr = trails[t];
-      ctx.globalAlpha = 0.35;
-      ctx.fillStyle = tr.color;
-      ctx.fillRect(tr.x, tr.y, tr.w, tr.h);
-      ctx.globalAlpha = 0.6;
-      ctx.strokeStyle = tr.color;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(tr.x, tr.y, tr.w, tr.h);
+      if (tr.isMotion) {
+        // Motion trails fade quickly
+        tr.alpha -= 0.025;
+        if (tr.alpha <= 0) { trails.splice(t, 1); t--; continue; }
+        ctx.globalAlpha = tr.alpha * 0.3;
+        ctx.fillStyle = tr.color;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(tr.x, tr.y, tr.w, tr.h, 3);
+        else ctx.rect(tr.x, tr.y, tr.w, tr.h);
+        ctx.fill();
+      } else {
+        // Bounce stamps — full colored card silhouette that persists
+        ctx.globalAlpha = tr.alpha;
+        ctx.fillStyle = tr.color;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(tr.x, tr.y, tr.w, tr.h, 4);
+        else ctx.rect(tr.x, tr.y, tr.w, tr.h);
+        ctx.fill();
+
+        // Draw rank + suit on bounce stamps
+        if (tr.rank) {
+          ctx.globalAlpha = tr.alpha * 0.8;
+          ctx.fillStyle = '#0a0a12';
+          ctx.font = 'bold ' + Math.floor(cardW * 0.28) + 'px Orbitron, monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(tr.rank, tr.x + cardW / 2, tr.y + cardH * 0.38);
+          ctx.font = Math.floor(cardW * 0.3) + 'px sans-serif';
+          ctx.fillText(SUIT_SYMBOLS[tr.suit], tr.x + cardW / 2, tr.y + cardH * 0.62);
+        }
+
+        // Glow effect around bounce stamps
+        ctx.globalAlpha = tr.alpha * 0.15;
+        ctx.shadowColor = tr.color;
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(tr.x - 2, tr.y - 2, tr.w + 4, tr.h + 4, 5);
+        else ctx.rect(tr.x - 2, tr.y - 2, tr.w + 4, tr.h + 4);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
     }
+    ctx.globalAlpha = 1;
+
+    // Draw particles
+    for (var pi3 = 0; pi3 < particles.length; pi3++) {
+      var pt = particles[pi3];
+      ctx.globalAlpha = pt.life;
+      ctx.fillStyle = pt.color;
+      ctx.shadowColor = pt.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
 
     // Draw flying cards
@@ -1386,25 +1636,36 @@ function startVictoryCascade() {
       var cx = fc2.x - cardW / 2;
       var cy = fc2.y - cardH / 2;
 
+      ctx.save();
+      ctx.translate(fc2.x, fc2.y);
+      ctx.rotate(fc2.rotation);
+
+      // Card shadow/glow
+      ctx.shadowColor = fc2.color;
+      ctx.shadowBlur = 12;
+
       ctx.fillStyle = '#12121f';
       ctx.strokeStyle = fc2.color;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 2;
       ctx.beginPath();
       if (ctx.roundRect) {
-        ctx.roundRect(cx, cy, cardW, cardH, 4);
+        ctx.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 4);
       } else {
-        ctx.rect(cx, cy, cardW, cardH);
+        ctx.rect(-cardW / 2, -cardH / 2, cardW, cardH);
       }
       ctx.fill();
       ctx.stroke();
+      ctx.shadowBlur = 0;
 
       ctx.fillStyle = fc2.color;
       ctx.font = 'bold ' + Math.floor(cardW * 0.3) + 'px Orbitron, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(fc2.rank, fc2.x, fc2.y - cardH * 0.12);
+      ctx.fillText(fc2.rank, 0, -cardH * 0.12);
       ctx.font = Math.floor(cardW * 0.35) + 'px sans-serif';
-      ctx.fillText(SUIT_SYMBOLS[fc2.suit], fc2.x, fc2.y + cardH * 0.15);
+      ctx.fillText(SUIT_SYMBOLS[fc2.suit], 0, cardH * 0.15);
+
+      ctx.restore();
     }
 
     if (anyActive || launchIdx < allCards.length) {
@@ -1414,7 +1675,7 @@ function startVictoryCascade() {
 
   requestAnimationFrame(tick);
 
-  setTimeout(function() { running = false; }, 15000);
+  setTimeout(function() { running = false; }, 18000);
 }
 
 // ==================== TIMER ====================
@@ -1438,8 +1699,8 @@ function recordFirstMove() {
 // ==================== SHARE ====================
 function shareResult() {
   var timeStr = formatTime(timerElapsed);
-  var drawStr = drawCount === 1 ? 'Draw 1' : 'Draw 3';
-  var text = '\uD83C\uDCCF SOLITAIRE\n' + drawStr + ' | Won in ' + timeStr + ' | ' + moves + ' moves\nneonarcade.net/neonclassic/solitaire.html';
+  var drawStr = 'Draw ' + drawCount;
+  var text = '\uD83C\uDCCF SOLITAIRE\nWon in ' + timeStr + ' | ' + moves + ' moves | ' + drawStr + ' mode\nThe classic, neon-ified.\nneonarcade.net/neonclassic/solitaire.html';
 
   if (navigator.share) {
     navigator.share({ text: text }).catch(function() {
