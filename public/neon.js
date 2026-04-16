@@ -1212,6 +1212,8 @@ window.Neon = (function() {
   // ========== AUTH & SYNC ==========
   var _lastSyncTime = 0;
   var _authNudgeEl = null;
+  var _installNudgeEl = null;
+  var _installPrompt = null;
 
   function isLoggedIn() {
     return document.cookie.indexOf('neon_user=') !== -1;
@@ -1413,6 +1415,68 @@ window.Neon = (function() {
     _authNudgeEl = bar;
   }
 
+  // ========== PWA INSTALL NUDGE ==========
+  function _showInstallNudge() {
+    if (_installNudgeEl) return;
+    if (!_installPrompt) return;
+    try {
+      if (sessionStorage.getItem('neonarcade_install_dismissed')) return;
+    } catch(e) {}
+
+    var bar = document.createElement('div');
+    bar.className = 'ns-install-nudge';
+
+    var icon = document.createElement('span');
+    icon.textContent = '\u2B07\uFE0F';
+    icon.style.fontSize = '18px';
+    bar.appendChild(icon);
+
+    var msg = document.createElement('span');
+    msg.className = 'ns-in-msg';
+    msg.textContent = 'Install NEON ARCADE for instant access';
+    bar.appendChild(msg);
+
+    var btn = document.createElement('button');
+    btn.className = 'ns-in-btn';
+    btn.textContent = 'INSTALL';
+    btn.addEventListener('click', function() {
+      if (_installPrompt) {
+        _installPrompt.prompt();
+        _installPrompt.userChoice.then(function() {
+          _installPrompt = null;
+          bar.remove();
+          _installNudgeEl = null;
+        });
+      }
+    });
+    bar.appendChild(btn);
+
+    var dismiss = document.createElement('button');
+    dismiss.className = 'ns-in-dismiss';
+    dismiss.textContent = '\u00D7';
+    dismiss.addEventListener('click', function() {
+      bar.remove();
+      _installNudgeEl = null;
+      try {
+        sessionStorage.setItem('neonarcade_install_dismissed', '1');
+      } catch(e) {}
+    });
+    bar.appendChild(dismiss);
+
+    document.body.appendChild(bar);
+    _installNudgeEl = bar;
+  }
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _installPrompt = e;
+    // Show install nudge after 2+ games played
+    var profile = _loadProfile();
+    if (profile && profile.gamesPlayed && profile.gamesPlayed.length >= 2) {
+      _showInstallNudge();
+    }
+  });
+
   // ========== INJECT STYLES ==========
   function injectStyles() {
     if (document.getElementById('neon-styles')) return;
@@ -1497,7 +1561,13 @@ window.Neon = (function() {
       '.ns-an-msg{color:#9999bb;font-size:14px;letter-spacing:1px}' +
       '.ns-an-btn{font-family:"Orbitron",monospace;font-weight:700;font-size:11px;letter-spacing:2px;padding:8px 20px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:3px;text-decoration:none;text-transform:uppercase;white-space:nowrap}' +
       '.ns-an-btn:hover{background:rgba(0,240,255,0.15)}' +
-      '.ns-an-dismiss{background:none;border:none;color:#7a7a9a;font-size:18px;cursor:pointer;padding:4px 8px}';
+      '.ns-an-dismiss{background:none;border:none;color:#7a7a9a;font-size:18px;cursor:pointer;padding:4px 8px}' +
+      // Install nudge
+      '.ns-install-nudge{position:fixed;bottom:0;left:0;right:0;z-index:899;display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 20px;background:#0e0e1a;border-top:1px solid rgba(0,240,255,0.2);font-family:"Rajdhani",sans-serif;animation:nsSlideUp .3s ease}' +
+      '.ns-in-msg{color:#9999bb;font-size:14px;letter-spacing:1px}' +
+      '.ns-in-btn{font-family:"Orbitron",monospace;font-weight:700;font-size:11px;letter-spacing:2px;padding:8px 20px;border:1px solid #00f0ff;background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:3px;cursor:pointer;text-transform:uppercase;white-space:nowrap}' +
+      '.ns-in-btn:hover{background:rgba(0,240,255,0.15)}' +
+      '.ns-in-dismiss{background:none;border:none;color:#7a7a9a;font-size:18px;cursor:pointer;padding:4px 8px}';
     document.head.appendChild(el);
   }
 
@@ -1568,3 +1638,8 @@ window.Neon = (function() {
     logout: logout,
   };
 })();
+
+// Register service worker for PWA support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function() {});
+}
