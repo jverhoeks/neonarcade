@@ -162,6 +162,16 @@ canvas{display:block;image-rendering:pixelated}
 .na-more-link:hover{color:#00f0ff;border-color:rgba(0,240,255,0.25);background:rgba(0,240,255,0.08)}
 .na-more-hub{color:#b44dff;border-color:rgba(180,77,255,0.15)}
 .na-more-hub:hover{color:#b44dff;border-color:rgba(180,77,255,0.3);background:rgba(180,77,255,0.08)}
+
+/* Touch Controls */
+.touch-controls{position:fixed;bottom:10px;left:0;right:0;display:none;justify-content:center;gap:10px;z-index:50;padding:0 12px}
+.touch-btn{width:56px;height:56px;border:1px solid rgba(0,240,255,.3);background:rgba(0,240,255,.06);color:#00f0ff;font-size:22px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;font-family:'Rajdhani',sans-serif;font-weight:700;transition:background .1s}
+.touch-btn:active{background:rgba(0,240,255,.2)}
+.touch-btn.drop-btn{border-color:rgba(255,45,123,.3);background:rgba(255,45,123,.06);color:#ff2d7b;font-size:14px;font-family:'Orbitron',monospace;letter-spacing:1px}
+.touch-btn.drop-btn:active{background:rgba(255,45,123,.2)}
+.touch-btn.rotate-btn{border-color:rgba(180,77,255,.3);background:rgba(180,77,255,.06);color:#b44dff}
+.touch-btn.rotate-btn:active{background:rgba(180,77,255,.2)}
+@media(hover:none)and(pointer:coarse){.touch-controls.game-active{display:flex}}
 </style>
 </head>
 <body>
@@ -177,8 +187,9 @@ canvas{display:block;image-rendering:pixelated}
     Lines the TWIN clears <strong style="color:var(--neon-green)">REWARD you</strong> (+50 pts).<br>
     Build MESSY on yours. Build CLEAN on theirs.</p>
   </div>
-  <div class="controls-hint">ARROWS: move/rotate | SPACE: hard drop | TOUCH: swipe &amp; tap</div>
+  <div class="controls-hint">ARROWS: move/rotate | SPACE: hard drop | TOUCH: buttons below</div>
   <button class="play-btn" id="btnStart">START</button>
+  <div class="score-table" id="startLB"></div>
 </div>
 
 <!-- GAME OVER SCREEN -->
@@ -208,10 +219,20 @@ canvas{display:block;image-rendering:pixelated}
 
 <canvas id="c"></canvas>
 
+<!-- Touch Controls (visible on touch devices during gameplay) -->
+<div class="touch-controls" id="touchControls">
+  <button class="touch-btn" id="tcLeft" aria-label="Move left">&#9664;</button>
+  <button class="touch-btn" id="tcDown" aria-label="Soft drop">&#9660;</button>
+  <button class="touch-btn rotate-btn" id="tcRotate" aria-label="Rotate">&#8635;</button>
+  <button class="touch-btn" id="tcRight" aria-label="Move right">&#9654;</button>
+  <button class="touch-btn drop-btn" id="tcDrop" aria-label="Hard drop">DROP</button>
+</div>
+
 <script src="/neon.js"></script>
 <script>
 (()=>{
-Neon.init({ game: 'tetris-betrayal', mode: 'high' });
+Neon.init({ game: 'tetris-betrayal', mode: 'high', key: 'neonarcade_neonarcade_tetris-betrayal_scores' });
+Neon.render(document.getElementById('startLB'));
 
 // ============ CONFIG ============
 const COLS=10,ROWS=20,PREVIEW_SIZE=4;
@@ -256,6 +277,9 @@ function sndGoodClear(){playTone(523,.1,'sine',.15);setTimeout(()=>playTone(659,
 function sndBadClear(){playTone(180,.2,'sawtooth',.15);setTimeout(()=>playTone(120,.3,'sawtooth',.12),100)}
 function sndLevelUp(){playTone(440,.08,'square',.12);setTimeout(()=>playTone(554,.08,'square',.1),80);setTimeout(()=>playTone(659,.08,'square',.1),160);setTimeout(()=>playTone(880,.15,'square',.12),240)}
 function sndGameOver(){playTone(300,.15,'sawtooth',.15);setTimeout(()=>playTone(250,.15,'sawtooth',.12),120);setTimeout(()=>playTone(180,.3,'sawtooth',.15),240)}
+function sndMove(){playTone(440,.03,'square',.06)}
+function sndRotate(){playTone(660,.05,'sine',.08);setTimeout(()=>playTone(880,.03,'sine',.06),30)}
+function sndSoftLand(){playTone(110,.1,'triangle',.1)}
 
 // ============ SIZING ============
 const dpr=window.devicePixelRatio||1;
@@ -265,7 +289,9 @@ let boardLeftX,boardRightX,boardY,previewLeftX,previewRightX,previewY;
 function resize(){
   const W=window.innerWidth, H=window.innerHeight;
   const hudH=48;
-  const availH=H-hudH-20;
+  const hasTouchUI=('ontouchstart' in window||navigator.maxTouchPoints>0);
+  const touchPad=hasTouchUI?76:0; // 56px button + 10px bottom + 10px gap
+  const availH=H-hudH-20-touchPad;
   const availW=W-20;
   // cell size: fit two boards + gap
   const csFromH=Math.floor(availH/ROWS);
@@ -416,6 +442,7 @@ function triggerGameOver(){
   gameOver=true;gameRunning=false;
   sndGameOver();
   shakeScreen();
+  if(typeof hideTouchControls==='function')hideTouchControls();
   var nameReady=Neon.getName()?Promise.resolve():Neon.promptName();
   nameReady.then(function(){return Neon.save(score);}).then(function(result){
     setTimeout(()=>{
@@ -445,18 +472,18 @@ function spawnNext(){
 function moveLeft(){
   if(!currentPiece||!gameRunning)return;
   const g=getGrid();
-  if(!collides(currentPiece,g,-1,0))currentPiece.x--;
+  if(!collides(currentPiece,g,-1,0)){currentPiece.x--;sndMove()}
 }
 function moveRight(){
   if(!currentPiece||!gameRunning)return;
   const g=getGrid();
-  if(!collides(currentPiece,g,1,0))currentPiece.x++;
+  if(!collides(currentPiece,g,1,0)){currentPiece.x++;sndMove()}
 }
 function moveDown(){
   if(!currentPiece||!gameRunning)return;
   const g=getGrid();
   if(!collides(currentPiece,g,0,1)){currentPiece.y++;dropTimer=0;return true}
-  else{lockPiece();return false}
+  else{sndSoftLand();lockPiece();return false}
 }
 function rotate(){
   if(!currentPiece||!gameRunning)return;
@@ -466,7 +493,7 @@ function rotate(){
   const kicks=[0,-1,1,-2,2];
   for(const kx of kicks){
     if(!collides(currentPiece,g,kx,0,newRot)){
-      currentPiece.rot=newRot;currentPiece.x+=kx;return;
+      currentPiece.rot=newRot;currentPiece.x+=kx;sndRotate();return;
     }
   }
 }
@@ -702,6 +729,7 @@ document.addEventListener('keydown',e=>{
     if(gameRunning){
       gameRunning=false;
       hud.style.display='none';
+      if(typeof hideTouchControls==='function')hideTouchControls();
       gameOverScreen.classList.add('hidden');
       startScreen.classList.remove('hidden');
       return;
@@ -768,13 +796,14 @@ function startGame(){
   startScreen.classList.add('hidden');
   gameOverScreen.classList.add('hidden');
   hud.style.display='flex';
+  if(typeof showTouchControls==='function')showTouchControls();
   spawnNext();
 }
 
 btnStart.addEventListener('click',startGame);
 btnRestart.addEventListener('click',startGame);
 btnShare.addEventListener('click',()=>{
-  const text=`\u{1F9F1} TETRIS BETRAYAL\nScore: ${score} | Twin cleared: ${twinClears} lines\nMy clears: ${myClears} (oops)\nPlaying Tetris badly is HARD\nhttps://neonarcade.fun`;
+  const text=`\u{1F504} TETRIS BETRAYAL\nScore: ${score} | Lines: ${twinClears+myClears} | Level: ${level}\nPlay Tetris badly on purpose!\nneonarcade.net/neonarcade/tetris-betrayal.html`;
   if(navigator.share){
     navigator.share({text}).catch(()=>{});
   }else{
@@ -784,6 +813,36 @@ btnShare.addEventListener('click',()=>{
     });
   }
 });
+
+// ============ TOUCH CONTROLS ============
+const touchControls=document.getElementById('touchControls');
+const isTouchDevice='ontouchstart' in window||navigator.maxTouchPoints>0;
+
+function showTouchControls(){if(isTouchDevice)touchControls.classList.add('game-active')}
+function hideTouchControls(){touchControls.classList.remove('game-active')}
+
+// Wire touch buttons — left/right/down support hold-to-repeat
+let repeatInterval=null;
+function startRepeat(fn){
+  clearInterval(repeatInterval);
+  repeatInterval=setInterval(fn,100);
+}
+function stopRepeat(){clearInterval(repeatInterval);repeatInterval=null}
+['tcLeft','tcRight','tcDown'].forEach(id=>{
+  const fn=id==='tcLeft'?moveLeft:id==='tcRight'?moveRight:moveDown;
+  const el=document.getElementById(id);
+  let timer=null;
+  el.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    fn();
+    timer=setTimeout(()=>startRepeat(fn),200);
+  },{passive:false});
+  el.addEventListener('touchend',e=>{e.preventDefault();clearTimeout(timer);stopRepeat()},{passive:false});
+  el.addEventListener('touchcancel',e=>{clearTimeout(timer);stopRepeat()});
+});
+// Rotate + drop = single tap only
+document.getElementById('tcRotate').addEventListener('touchstart',e=>{e.preventDefault();rotate()},{passive:false});
+document.getElementById('tcDrop').addEventListener('touchstart',e=>{e.preventDefault();hardDrop()},{passive:false});
 
 // start render loop
 requestAnimationFrame(loop);
