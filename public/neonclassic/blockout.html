@@ -121,15 +121,20 @@ canvas{display:block;position:absolute;top:0;left:0}
 .pause-text{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,5vw,48px);letter-spacing:6px;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6),0 0 40px rgba(255,215,0,0.2)}
 
 /* Touch controls */
-#touchControls{display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;padding:6px;background:rgba(10,10,18,0.85)}
-.touch-row{display:flex;justify-content:center;gap:5px;margin-bottom:5px}
-.touch-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:9px;letter-spacing:1px;padding:9px 11px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:3px;cursor:pointer;min-width:40px;text-align:center;-webkit-tap-highlight-color:transparent}
-.touch-btn:active{background:rgba(0,240,255,0.2)}
+#touchControls{display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;padding:8px 6px;background:rgba(10,10,18,0.92)}
+.touch-layout{display:flex;justify-content:space-between;align-items:flex-start;max-width:480px;margin:0 auto}
+.touch-group{display:flex;flex-direction:column;gap:4px;align-items:center}
+.touch-group-row{display:flex;gap:4px;justify-content:center}
+.touch-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:14px;letter-spacing:1px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.06);color:#00f0ff;border-radius:4px;cursor:pointer;width:64px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .1s}
+.touch-btn:active{background:rgba(0,240,255,0.25)}
 .touch-btn.rot{border-color:rgba(180,77,255,0.3);color:#b44dff;background:rgba(180,77,255,0.06)}
-.touch-btn.rot:active{background:rgba(180,77,255,0.2)}
-.touch-btn.drop{border-color:rgba(255,45,123,0.3);background:rgba(255,45,123,0.06);color:#ff2d7b}
-.touch-btn.drop:active{background:rgba(255,45,123,0.2)}
-.touch-label{font-size:7px;color:#7a7a9a;display:block;margin-top:1px}
+.touch-btn.rot:active{background:rgba(180,77,255,0.25)}
+.touch-btn.drop{border-color:rgba(255,45,123,0.4);background:rgba(255,45,123,0.08);color:#ff2d7b;width:100%;max-width:200px;height:52px;font-size:16px;letter-spacing:3px;margin-top:4px}
+.touch-btn.drop:active{background:rgba(255,45,123,0.25)}
+.touch-btn.pause-btn{border-color:rgba(255,215,0,0.3);color:#ffd700;background:rgba(255,215,0,0.06);width:52px;height:52px;font-size:12px}
+.touch-btn.pause-btn:active{background:rgba(255,215,0,0.2)}
+.touch-label{font-size:9px;color:#7a7a9a;display:block;margin-top:2px;letter-spacing:1px}
+.touch-drop-row{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:4px;max-width:480px;margin-left:auto;margin-right:auto}
 
 @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,3px)}80%{transform:translate(2px,-3px)}}
 .shake{animation:shake .25s}
@@ -229,23 +234,31 @@ canvas{display:block;position:absolute;top:0;left:0}
 
 <!-- Touch Controls (mobile) -->
 <div id="touchControls">
-  <div class="touch-row">
-    <button class="touch-btn rot" data-action="flipCCW">Q<span class="touch-label">FLIP</span></button>
-    <button class="touch-btn rot" data-action="turnCCW">W<span class="touch-label">TURN</span></button>
-    <button class="touch-btn rot" data-action="spinCCW">E<span class="touch-label">SPIN</span></button>
-    <button class="touch-btn" data-action="up">&uarr;</button>
+  <div class="touch-layout">
+    <!-- Left: D-pad -->
+    <div class="touch-group">
+      <div class="touch-group-row">
+        <button class="touch-btn" data-action="left">&larr;<span class="touch-label">LEFT</span></button>
+        <button class="touch-btn" data-action="right">&rarr;<span class="touch-label">RIGHT</span></button>
+      </div>
+      <div class="touch-group-row">
+        <button class="touch-btn" data-action="up">&uarr;<span class="touch-label">UP</span></button>
+        <button class="touch-btn" data-action="down">&darr;<span class="touch-label">DOWN</span></button>
+      </div>
+    </div>
+    <!-- Right: Rotations -->
+    <div class="touch-group">
+      <div class="touch-group-row">
+        <button class="touch-btn rot" data-action="flipCCW">&#x21BA;<span class="touch-label">FLIP</span></button>
+        <button class="touch-btn rot" data-action="turnCCW">&#x21BA;<span class="touch-label">TURN</span></button>
+        <button class="touch-btn rot" data-action="spinCCW">&#x21BA;<span class="touch-label">SPIN</span></button>
+      </div>
+    </div>
   </div>
-  <div class="touch-row">
-    <button class="touch-btn rot" data-action="flipCW">A<span class="touch-label">FLIP</span></button>
-    <button class="touch-btn rot" data-action="turnCW">S<span class="touch-label">TURN</span></button>
-    <button class="touch-btn rot" data-action="spinCW">D<span class="touch-label">SPIN</span></button>
-    <button class="touch-btn" data-action="down">&darr;</button>
-  </div>
-  <div class="touch-row">
-    <button class="touch-btn" data-action="left">&larr;</button>
-    <button class="touch-btn" data-action="right">&rarr;</button>
+  <!-- Bottom: Drop + Pause -->
+  <div class="touch-drop-row">
     <button class="touch-btn drop" data-action="drop">DROP</button>
-    <button class="touch-btn" data-action="pause" style="border-color:rgba(255,215,0,0.3);color:#ffd700">P</button>
+    <button class="touch-btn pause-btn" data-action="pause">&#9646;&#9646;</button>
   </div>
 </div>
 
@@ -376,40 +389,57 @@ function ensureAudio() {
 }
 function playSound(type) {
   ensureAudio();
-  var osc = audioCtx.createOscillator();
-  var gain = audioCtx.createGain();
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
   var t = audioCtx.currentTime;
+
+  // Helper to create a simple tone
+  function tone(oscType, freq, freqEnd, vol, dur, startAt) {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    var s = startAt || t;
+    osc.type = oscType;
+    osc.frequency.setValueAtTime(freq, s);
+    if (freqEnd) osc.frequency.exponentialRampToValueAtTime(freqEnd, s + dur * 0.8);
+    gain.gain.setValueAtTime(vol, s);
+    gain.gain.exponentialRampToValueAtTime(0.001, s + dur);
+    osc.start(s);
+    osc.stop(s + dur);
+  }
+
   switch (type) {
     case 'rotate':
-      osc.type = 'sine'; osc.frequency.setValueAtTime(600, t); osc.frequency.exponentialRampToValueAtTime(800, t + 0.06);
-      gain.gain.setValueAtTime(0.08, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-      osc.start(t); osc.stop(t + 0.08); break;
+      tone('sine', 600, 800, 0.08, 0.08); break;
     case 'move':
-      osc.type = 'sine'; osc.frequency.setValueAtTime(400, t);
-      gain.gain.setValueAtTime(0.04, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-      osc.start(t); osc.stop(t + 0.04); break;
+      tone('sine', 400, null, 0.04, 0.04); break;
     case 'land':
-      osc.type = 'triangle'; osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(60, t + 0.15);
-      gain.gain.setValueAtTime(0.12, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-      osc.start(t); osc.stop(t + 0.18); break;
+      tone('triangle', 150, 60, 0.12, 0.18); break;
     case 'clear':
-      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, t); osc.frequency.exponentialRampToValueAtTime(900, t + 0.3);
-      gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-      osc.start(t); osc.stop(t + 0.35); break;
+      // Sweep: rising sawtooth
+      tone('sawtooth', 200, 1200, 0.08, 0.35);
+      // Chime: bright sine notes
+      tone('sine', 880, null, 0.1, 0.15, t + 0.05);
+      tone('sine', 1320, null, 0.08, 0.12, t + 0.15);
+      tone('sine', 1760, null, 0.06, 0.2, t + 0.25);
+      break;
     case 'drop':
-      osc.type = 'square'; osc.frequency.setValueAtTime(100, t); osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
-      gain.gain.setValueAtTime(0.15, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-      osc.start(t); osc.stop(t + 0.15); break;
+      tone('square', 100, 40, 0.15, 0.15); break;
     case 'gameover':
-      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(400, t); osc.frequency.exponentialRampToValueAtTime(80, t + 0.6);
-      gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-      osc.start(t); osc.stop(t + 0.7); break;
+      tone('sawtooth', 400, 80, 0.1, 0.7); break;
     case 'levelup':
-      osc.type = 'square'; osc.frequency.setValueAtTime(500, t); osc.frequency.exponentialRampToValueAtTime(1000, t + 0.15);
-      gain.gain.setValueAtTime(0.08, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-      osc.start(t); osc.stop(t + 0.2); break;
+      // Ascending 3-note fanfare
+      tone('square', 523, null, 0.07, 0.12, t);
+      tone('square', 659, null, 0.07, 0.12, t + 0.12);
+      tone('square', 784, null, 0.07, 0.12, t + 0.24);
+      tone('sine', 1047, null, 0.09, 0.3, t + 0.36);
+      break;
+    case 'start':
+      // Short fanfare: 3 quick ascending tones
+      tone('square', 440, null, 0.06, 0.1, t);
+      tone('square', 554, null, 0.06, 0.1, t + 0.1);
+      tone('square', 659, null, 0.06, 0.1, t + 0.2);
+      tone('sine', 880, null, 0.08, 0.25, t + 0.3);
+      break;
   }
 }
 
@@ -435,7 +465,7 @@ function resize() {
   isMobile = ('ontouchstart' in window) && w < 900;
   touchControls.style.display = (isMobile && gameActive && !gamePaused) ? 'block' : 'none';
 
-  var touchH = isMobile ? 130 : 0;
+  var touchH = isMobile ? 200 : 0;
   var hudPct = isMobile ? 0 : 0.28;
 
   gameAreaW = Math.floor(w * (1 - hudPct));
@@ -898,7 +928,14 @@ function placePiece() {
     score += layerScore;
     layersCleared += cleared.length;
     clearFlashLayers = cleared;
-    clearFlashTimer = 400; // ms
+    clearFlashTimer = 500; // ms
+    // Spawn particles outward from each cleared layer
+    for (var ci = 0; ci < cleared.length; ci++) {
+      spawnClearParticles(cleared[ci]);
+    }
+    // Screen shake
+    document.body.classList.add('shake');
+    setTimeout(function() { document.body.classList.remove('shake'); }, 250);
     playSound('clear');
   }
 
@@ -949,13 +986,41 @@ function spawnParticles(px, py, pz, colorIdx) {
   }
 }
 
+function spawnClearParticles(layerZ) {
+  // Burst particles outward from every cell in the cleared layer
+  for (var x = 0; x < pitW; x++) {
+    for (var y = 0; y < pitH; y++) {
+      if (pit[x][y][layerZ] !== 0) {
+        var ci = (pit[x][y][layerZ] - 1) % 6;
+        var c = NEON_COLORS[ci];
+        var center = project(x + 0.5, y + 0.5, layerZ);
+        var count = 3;
+        for (var i = 0; i < count; i++) {
+          var angle = Math.random() * Math.PI * 2;
+          var speed = 2 + Math.random() * 4;
+          particles.push({
+            x: center.x, y: center.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 1,
+            life: 1,
+            decay: 0.015 + Math.random() * 0.015,
+            color: c,
+            size: 2 + Math.random() * 4
+          });
+        }
+      }
+    }
+  }
+}
+
 function updateParticles(dt) {
+  var dtS = dt / 16.67; // normalize to ~60fps baseline
   for (var i = particles.length - 1; i >= 0; i--) {
     var p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.05;
-    p.life -= p.decay;
+    p.x += p.vx * dtS;
+    p.y += p.vy * dtS;
+    p.vy += 0.05 * dtS;
+    p.life -= p.decay * dtS;
     if (p.life <= 0) particles.splice(i, 1);
   }
 }
@@ -1149,6 +1214,18 @@ function draw() {
   // Draw placed cubes (bottom-up / far first for correct overlapping)
   for (var z = pitD - 1; z >= 0; z--) {
     var isFlashing = clearFlashLayers && clearFlashLayers.indexOf(z) >= 0;
+    if (isFlashing) {
+      // White flash overlay for the entire layer
+      var flashPhase = clearFlashTimer / 500; // 1.0 -> 0.0
+      var flashAlpha = flashPhase > 0.7 ? (flashPhase - 0.7) / 0.3 : 0; // bright flash at start, then fade
+      var p0 = project(0, 0, z);
+      var p1 = project(pitW, 0, z);
+      var p2 = project(pitW, pitH, z);
+      var p3 = project(0, pitH, z);
+      if (flashAlpha > 0.05) {
+        drawPoly([p0, p1, p2, p3], 'rgba(255,255,255,' + (flashAlpha * 0.6) + ')', null);
+      }
+    }
     for (var x = 0; x < pitW; x++) {
       for (var y = 0; y < pitH; y++) {
         if (pit[x][y][z] !== 0) {
@@ -1204,12 +1281,16 @@ function draw() {
 // ===========================
 var lastTime = 0;
 var dropAccum = 0;
+var firstFrame = true;
 
 function gameLoop(timestamp) {
   if (!timestamp) timestamp = performance.now();
+  // On first frame, sync lastTime to rAF timestamp to avoid initial dt spike
+  if (firstFrame) { lastTime = timestamp; firstFrame = false; }
   var dt = timestamp - lastTime;
   lastTime = timestamp;
-  if (dt > 200) dt = 16; // cap delta
+  // Cap dt to prevent large jumps (tab switch, lag spikes)
+  if (dt > 200) dt = 16.67;
 
   if (gameActive && !gamePaused && !gameOverFlag) {
     // Clear flash timer
@@ -1267,6 +1348,7 @@ function startGame(w, h, d, set, lvl) {
   gameOverFlag = false;
   dropInterval = calcDropInterval();
   dropAccum = 0;
+  firstFrame = true;
   nextPiece = null;
 
   // Neon.js: create key based on settings
@@ -1276,6 +1358,7 @@ function startGame(w, h, d, set, lvl) {
   createPit();
   resize();
   spawnPiece();
+  playSound('start');
 
   startScreen.classList.add('hidden');
   gameOverScreen.classList.add('hidden');
@@ -1520,7 +1603,7 @@ document.getElementById('shareBtn').addEventListener('click', function() {
 // ===========================
 // KICK OFF
 // ===========================
-lastTime = performance.now();
+firstFrame = true;
 requestAnimationFrame(gameLoop);
 
 })();
