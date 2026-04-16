@@ -239,12 +239,13 @@ body::after {
 
 #grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: clamp(3px, 0.6vw, 6px);
-  width: min(90vw, 380px);
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  grid-template-rows: repeat(8, minmax(44px, 1fr));
+  gap: clamp(3px, 0.8vw, 6px);
+  width: min(92vw, 400px);
   height: min(80vh, 620px);
   max-height: calc(100vh - 120px);
+  max-width: calc(100vw - 16px);
 }
 
 .cell {
@@ -260,9 +261,11 @@ body::after {
   color: transparent;
   background: transparent;
   border: 1px solid transparent;
-  transition: background 0.15s, border-color 0.15s;
-  min-height: 0;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  min-width: 44px;
+  min-height: 44px;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cell.active {
@@ -285,10 +288,11 @@ body::after {
   box-shadow: inset 0 0 12px rgba(0,240,255,0.04);
   cursor: pointer;
 }
-.cell.hidden-tile:hover {
-  border-color: rgba(0,240,255,0.35);
+.cell.hidden-tile:hover,
+.cell.hidden-tile.touch-active {
+  border-color: rgba(0,240,255,0.45);
   background: rgba(18,18,31,0.9);
-  box-shadow: 0 0 12px rgba(0,240,255,0.1);
+  box-shadow: 0 0 16px rgba(0,240,255,0.15);
 }
 
 .cell.correct {
@@ -296,7 +300,14 @@ body::after {
   background: rgba(57,255,20,0.12);
   border-color: rgba(57,255,20,0.5);
   text-shadow: 0 0 10px rgba(57,255,20,0.6);
+  box-shadow: 0 0 12px rgba(57,255,20,0.3), inset 0 0 8px rgba(57,255,20,0.1);
   cursor: default;
+  animation: correctPulse 0.5s ease-out;
+}
+@keyframes correctPulse {
+  0% { transform: scale(1.15); box-shadow: 0 0 24px rgba(57,255,20,0.6), inset 0 0 12px rgba(57,255,20,0.2); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); box-shadow: 0 0 12px rgba(57,255,20,0.3), inset 0 0 8px rgba(57,255,20,0.1); }
 }
 
 .cell.wrong {
@@ -326,20 +337,42 @@ body::after {
   justify-content: center;
   background: rgba(10,10,18,0.85);
   pointer-events: none;
-  animation: flashIn 0.6s ease-out forwards;
+  animation: flashIn 0.85s ease-out forwards;
 }
 .level-flash-text {
   font-family: 'Orbitron', monospace;
   font-weight: 900;
-  font-size: clamp(32px, 8vw, 56px);
-  letter-spacing: 6px;
+  font-size: clamp(36px, 10vw, 72px);
+  letter-spacing: 8px;
   color: var(--neon-cyan);
-  text-shadow: 0 0 20px rgba(0,240,255,0.7), 0 0 60px rgba(0,240,255,0.3);
+  text-shadow: 0 0 20px rgba(0,240,255,0.8), 0 0 60px rgba(0,240,255,0.4), 0 0 120px rgba(0,240,255,0.15);
+  animation: levelTextPop 0.85s ease-out forwards;
 }
 @keyframes flashIn {
   0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
+  15% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes levelTextPop {
+  0% { transform: scale(0.3); opacity: 0; filter: blur(8px); }
+  25% { transform: scale(1.25); opacity: 1; filter: blur(0); }
+  45% { transform: scale(0.95); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* Wrong-tap screen flash */
+.wrong-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 350;
+  background: rgba(255,45,123,0.18);
+  pointer-events: none;
+  animation: wrongFlashAnim 0.35s ease-out forwards;
+}
+@keyframes wrongFlashAnim {
+  0% { opacity: 1; }
   100% { opacity: 0; }
 }
 
@@ -452,6 +485,10 @@ body::after {
   border-radius: 50%;
   pointer-events: none;
   z-index: 800;
+}
+.particle.big {
+  width: 6px;
+  height: 6px;
 }
 
 /* More Games Navigation */
@@ -571,61 +608,92 @@ body::after {
   function playCorrectSound(num, total) {
     try {
       var ctx = getAudio();
-      var baseFreq = 800 + (num / total) * 400;
+      var baseFreq = 600 + (num / total) * 600;
+      // Main tone — bright ascending
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(baseFreq * 1.2, ctx.currentTime + 0.06);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.frequency.linearRampToValueAtTime(baseFreq * 1.4, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
       osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.12);
+      osc.stop(ctx.currentTime + 0.15);
+      // Harmonic shimmer
+      var osc2 = ctx.createOscillator();
+      var gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(baseFreq * 2, ctx.currentTime);
+      osc2.frequency.linearRampToValueAtTime(baseFreq * 2.5, ctx.currentTime + 0.06);
+      gain2.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc2.start(ctx.currentTime);
+      osc2.stop(ctx.currentTime + 0.1);
     } catch(e) {}
   }
 
   function playWrongSound() {
     try {
       var ctx = getAudio();
+      // Harsh buzz — detuned sawtooth+square
       var osc = ctx.createOscillator();
       var osc2 = ctx.createOscillator();
+      var osc3 = ctx.createOscillator();
       var gain = ctx.createGain();
       osc.connect(gain);
       osc2.connect(gain);
+      osc3.connect(gain);
       gain.connect(ctx.destination);
       osc.type = 'sawtooth';
       osc2.type = 'square';
-      osc.frequency.setValueAtTime(180, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.35);
-      osc2.frequency.setValueAtTime(190, ctx.currentTime);
-      osc2.frequency.linearRampToValueAtTime(70, ctx.currentTime + 0.35);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc3.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(60, ctx.currentTime + 0.4);
+      osc2.frequency.setValueAtTime(207, ctx.currentTime);
+      osc2.frequency.linearRampToValueAtTime(55, ctx.currentTime + 0.4);
+      osc3.frequency.setValueAtTime(103, ctx.currentTime);
+      osc3.frequency.linearRampToValueAtTime(40, ctx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.16, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
       osc.start(ctx.currentTime);
       osc2.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.4);
-      osc2.stop(ctx.currentTime + 0.4);
+      osc3.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.45);
+      osc2.stop(ctx.currentTime + 0.45);
+      osc3.stop(ctx.currentTime + 0.45);
     } catch(e) {}
   }
 
   function playLevelComplete() {
     try {
       var ctx = getAudio();
-      var notes = [523, 659, 784, 1047];
+      // Fanfare arpeggio — C5 E5 G5 C6 with harmonics
+      var notes = [523, 659, 784, 1047, 1319];
       notes.forEach(function(freq, i) {
         var osc = ctx.createOscillator();
+        var osc2 = ctx.createOscillator();
         var gain = ctx.createGain();
         osc.connect(gain);
+        osc2.connect(gain);
         gain.connect(ctx.destination);
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.08);
-        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.08);
-        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + i * 0.08 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.2);
-        osc.start(ctx.currentTime + i * 0.08);
-        osc.stop(ctx.currentTime + i * 0.08 + 0.2);
+        osc2.type = 'triangle';
+        var t = ctx.currentTime + i * 0.07;
+        osc.frequency.setValueAtTime(freq, t);
+        osc2.frequency.setValueAtTime(freq * 2, t);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.1, t + 0.015);
+        gain.gain.linearRampToValueAtTime(0.08, t + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+        osc.start(t);
+        osc2.start(t);
+        osc.stop(t + 0.3);
+        osc2.stop(t + 0.3);
       });
     } catch(e) {}
   }
@@ -633,42 +701,87 @@ body::after {
   function playNewBestSound() {
     try {
       var ctx = getAudio();
-      var notes = [523, 659, 784, 1047, 1319];
+      // Celebratory double arpeggio with shimmer
+      var notes = [523, 659, 784, 1047, 1319, 1568];
       notes.forEach(function(freq, i) {
+        var osc = ctx.createOscillator();
+        var osc2 = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc2.type = 'sine';
+        var t = ctx.currentTime + i * 0.09;
+        osc.frequency.setValueAtTime(freq, t);
+        osc2.frequency.setValueAtTime(freq * 1.5, t);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.13, t + 0.02);
+        gain.gain.linearRampToValueAtTime(0.1, t + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc.start(t);
+        osc2.start(t);
+        osc.stop(t + 0.4);
+        osc2.stop(t + 0.4);
+      });
+      // Final sustained chord
+      var chordNotes = [1047, 1319, 1568];
+      chordNotes.forEach(function(freq) {
         var osc = ctx.createOscillator();
         var gain = ctx.createGain();
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
-        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.1);
-        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + i * 0.1 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.3);
-        osc.start(ctx.currentTime + i * 0.1);
-        osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+        osc.type = 'sine';
+        var t = ctx.currentTime + 0.55;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.06, t + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+        osc.start(t);
+        osc.stop(t + 0.6);
       });
     } catch(e) {}
   }
 
+  function playTimerTick() {
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, ctx.currentTime);
+      gain.gain.setValueAtTime(0.03, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
+    } catch(e) {}
+  }
+
   // ============ PARTICLES ============
-  function spawnParticles(x, y, color, count) {
+  function spawnParticles(x, y, color, count, opts) {
     count = count || 12;
+    opts = opts || {};
+    var big = opts.big || false;
+    var speedMult = opts.speedMult || 1;
+    var durMult = opts.durMult || 1;
     for (var i = 0; i < count; i++) {
       var p = document.createElement('div');
-      p.className = 'particle';
+      p.className = 'particle' + (big ? ' big' : '');
       p.style.left = x + 'px';
       p.style.top = y + 'px';
       p.style.background = color;
-      p.style.boxShadow = '0 0 6px ' + color;
+      p.style.boxShadow = '0 0 ' + (big ? '10' : '6') + 'px ' + color;
       document.body.appendChild(p);
       var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
-      var speed = 60 + Math.random() * 80;
+      var speed = (60 + Math.random() * 80) * speedMult;
       var dx = Math.cos(angle) * speed;
       var dy = Math.sin(angle) * speed;
       (function(el, pdx, pdy) {
         var startX = x, startY = y;
         var startTime = performance.now();
-        var duration = 500 + Math.random() * 300;
+        var duration = (500 + Math.random() * 300) * durMult;
         function animate(now) {
           var t = (now - startTime) / duration;
           if (t >= 1) { el.remove(); return; }
@@ -681,6 +794,26 @@ body::after {
         requestAnimationFrame(animate);
       })(p, dx, dy);
     }
+  }
+
+  function spawnLevelBurst() {
+    var cx = window.innerWidth / 2;
+    var cy = window.innerHeight / 2;
+    var colors = ['#00f0ff', '#39ff14', '#ffd700', '#b44dff', '#ff8c00'];
+    for (var c = 0; c < colors.length; c++) {
+      spawnParticles(
+        cx + (Math.random() - 0.5) * 80,
+        cy + (Math.random() - 0.5) * 80,
+        colors[c], 8, { big: true, speedMult: 1.8, durMult: 1.4 }
+      );
+    }
+  }
+
+  function spawnWrongFlash() {
+    var el = document.createElement('div');
+    el.className = 'wrong-flash';
+    document.body.appendChild(el);
+    setTimeout(function() { el.remove(); }, 400);
   }
 
   // ============ DOM REFS ============
@@ -711,6 +844,7 @@ body::after {
   var numberMap = {};
   var phase = 'idle'; // idle | showing | playing | gameover
   var displayTimeout = null;
+  var tickInterval = null;
   var bestLevel = 0;
 
   // ============ INIT ============
@@ -725,7 +859,9 @@ body::after {
       cell.className = 'cell';
       cell.dataset.index = String(i);
       cell.addEventListener('click', onCellClick);
+      cell.addEventListener('touchstart', onCellTouchStart, { passive: true });
       cell.addEventListener('touchend', onCellTouch);
+      cell.addEventListener('touchcancel', onCellTouchCancel, { passive: true });
       grid.appendChild(cell);
       cells.push(cell);
     }
@@ -806,6 +942,12 @@ body::after {
     timerBar.style.transition = 'transform ' + displayTime + 'ms linear';
     timerBar.style.transform = 'scaleX(0)';
 
+    // Timer tick during display
+    if (tickInterval) clearInterval(tickInterval);
+    tickInterval = setInterval(function() {
+      playTimerTick();
+    }, Math.max(200, displayTime / 5));
+
     // Hide numbers after display time
     if (displayTimeout) clearTimeout(displayTimeout);
     displayTimeout = setTimeout(function() {
@@ -820,6 +962,7 @@ body::after {
 
   function hideNumbers() {
     timerBarWrap.classList.remove('visible');
+    if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
     phase = 'playing';
 
     for (var i = 0; i < cells.length; i++) {
@@ -834,8 +977,19 @@ body::after {
     }
   }
 
+  function onCellTouchStart(e) {
+    if (this.classList.contains('hidden-tile') || this.classList.contains('showing')) {
+      this.classList.add('touch-active');
+    }
+  }
+
+  function onCellTouchCancel(e) {
+    this.classList.remove('touch-active');
+  }
+
   function onCellTouch(e) {
     e.preventDefault();
+    this.classList.remove('touch-active');
     handleTap(this);
   }
 
@@ -848,6 +1002,7 @@ body::after {
     if (phase === 'showing') {
       // Player taps during showing phase: hide immediately and process
       if (displayTimeout) { clearTimeout(displayTimeout); displayTimeout = null; }
+      if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
       hideNumbers();
       processTap(cell);
       return;
@@ -881,14 +1036,16 @@ body::after {
         // Level complete!
         phase = 'idle';
         playLevelComplete();
+        spawnLevelBurst();
         level++;
         showLevelFlash(level);
         setTimeout(function() {
           startRound();
-        }, 700);
+        }, 850);
       }
     } else {
-      // WRONG
+      // WRONG — flash + shake + game over
+      spawnWrongFlash();
       gameOver(cell, idx);
     }
   }
@@ -901,7 +1058,7 @@ body::after {
     span.textContent = lvl > CHIMP_LEVEL ? 'LEVEL ' + lvl + ' \uD83D\uDC12' : 'LEVEL ' + lvl;
     flash.appendChild(span);
     document.body.appendChild(flash);
-    setTimeout(function() { flash.remove(); }, 650);
+    setTimeout(function() { flash.remove(); }, 850);
   }
 
   function gameOver(wrongCell, wrongIdx) {
@@ -976,19 +1133,27 @@ body::after {
   }
 
   // ============ SHARE ============
-  function buildShareText(levelReached) {
-    var beatChimp = levelReached > CHIMP_LEVEL;
-    var squares = '';
-    var levelsCleared = levelReached - START_LEVEL;
-    for (var i = 0; i < levelsCleared; i++) {
-      squares += '\uD83D\uDFE9';
-    }
-    squares += '\uD83D\uDFE5';
+  function getChimpPercentile(levelReached) {
+    // Approximate percentile — chimps average level 9
+    // Most humans: 5-8, good: 9-12, exceptional: 13+
+    if (levelReached <= 4) return 15;
+    if (levelReached <= 5) return 30;
+    if (levelReached <= 6) return 45;
+    if (levelReached <= 7) return 60;
+    if (levelReached <= 8) return 70;
+    if (levelReached <= 9) return 80;
+    if (levelReached <= 10) return 88;
+    if (levelReached <= 12) return 94;
+    if (levelReached <= 14) return 98;
+    return 99;
+  }
 
+  function buildShareText(levelReached) {
+    var pct = getChimpPercentile(levelReached);
     var lines = [
-      '\uD83E\uDDE0 CHIMP TEST',
-      'Level ' + levelReached + ' | ' + (beatChimp ? 'Beat the chimp! \uD83D\uDC12' : 'Chimp wins \uD83D\uDC12'),
-      squares,
+      '\uD83D\uDC35 CHIMP TEST',
+      'Level: ' + levelReached + ' | Better than ' + pct + '% of chimps',
+      'Are you smarter than a chimpanzee?',
       'neonarcade.net/neonarcade/chimp.html'
     ];
     return lines.join('\n');
@@ -1054,6 +1219,7 @@ body::after {
     if (e.key === 'Escape') {
       if (phase === 'showing' || phase === 'playing') {
         if (displayTimeout) { clearTimeout(displayTimeout); displayTimeout = null; }
+        if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
         phase = 'idle';
         gridContainer.style.display = 'none';
         hud.style.display = 'none';
