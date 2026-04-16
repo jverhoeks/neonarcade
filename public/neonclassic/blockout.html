@@ -115,11 +115,11 @@ canvas{display:block;margin:0 auto}
 <!-- Start Screen -->
 <div id="startScreen">
   <div class="title">BLOCKOUT</div>
-  <div class="subtitle">3D Tetris — drop polycubes into a pit, fill layers to clear them</div>
+  <div class="subtitle">Look down into the pit — drop 3D blocks, fill complete layers to clear them</div>
   <div class="diff-select">
     <button class="diff-btn active" data-diff="0">EASY<br><span style="font-size:10px;color:#7a7a9a">3&times;3&times;6</span></button>
-    <button class="diff-btn" data-diff="1">NORMAL<br><span style="font-size:10px;color:#7a7a9a">5&times;5&times;12</span></button>
-    <button class="diff-btn" data-diff="2">HARD<br><span style="font-size:10px;color:#7a7a9a">7&times;7&times;14</span></button>
+    <button class="diff-btn" data-diff="1">NORMAL<br><span style="font-size:10px;color:#7a7a9a">5&times;5&times;10</span></button>
+    <button class="diff-btn" data-diff="2">HARD<br><span style="font-size:10px;color:#7a7a9a">5&times;5&times;14</span></button>
   </div>
   <button class="play-btn" id="startBtn">START</button>
   <div class="controls-hint">
@@ -169,8 +169,8 @@ canvas{display:block;margin:0 auto}
 // ============ CONFIG ============
 var DIFFICULTIES = [
   { name: 'EASY',   w: 3, d: 3, h: 6,  key: 'neonarcade_neonclassic_blockout_scores_easy' },
-  { name: 'NORMAL', w: 5, d: 5, h: 12, key: 'neonarcade_neonclassic_blockout_scores_normal' },
-  { name: 'HARD',   w: 7, d: 7, h: 14, key: 'neonarcade_neonclassic_blockout_scores_hard' }
+  { name: 'NORMAL', w: 5, d: 5, h: 10, key: 'neonarcade_neonclassic_blockout_scores_normal' },
+  { name: 'HARD',   w: 5, d: 5, h: 14, key: 'neonarcade_neonclassic_blockout_scores_hard' }
 ];
 
 var COLORS = {
@@ -183,8 +183,7 @@ var COLORS = {
 };
 var COLOR_KEYS = Object.keys(COLORS);
 
-// Piece definitions: arrays of [x,y,z] offsets
-// Flat pieces (z=0 only)
+// Flat piece definitions (z=0 only) — classic Blockout flat set
 var FLAT_PIECES = [
   { name: 'I2', cubes: [[0,0,0],[1,0,0]] },
   { name: 'I3', cubes: [[0,0,0],[1,0,0],[2,0,0]] },
@@ -194,12 +193,12 @@ var FLAT_PIECES = [
   { name: 'Z',  cubes: [[0,1,0],[1,1,0],[1,0,0],[2,0,0]] },
   { name: 'O',  cubes: [[0,0,0],[1,0,0],[0,1,0],[1,1,0]] },
   { name: 'L4', cubes: [[0,0,0],[1,0,0],[2,0,0],[2,1,0]] },
-  { name: 'I4', cubes: [[0,0,0],[1,0,0],[2,0,0],[3,0,0]] }
+  { name: 'I4', cubes: [[0,0,0],[1,0,0],[2,0,0],[3,0,0]] },
+  { name: 'O1', cubes: [[0,0,0]] }
 ];
-// 3D pieces (extend in z)
+// 3D pieces (extend into z)
 var THREE_D_PIECES = [
   { name: 'L3d',   cubes: [[0,0,0],[1,0,0],[0,0,1]] },
-  { name: 'T3d',   cubes: [[0,0,0],[1,0,0],[0,1,0],[0,0,1]] },
   { name: 'Corner', cubes: [[0,0,0],[1,0,0],[0,1,0],[0,0,1]] },
   { name: 'S3d',   cubes: [[0,0,0],[1,0,0],[1,0,1]] },
   { name: 'Tower',  cubes: [[0,0,0],[0,0,1],[0,0,2]] },
@@ -223,19 +222,20 @@ var diffIdx = 0;
 var pitW, pitD, pitH;
 var pit; // 3D array [x][y][z] = colorIndex or 0
 var currentPiece, nextPiece;
-var pieceX, pieceY, pieceZ;
-var score, layers, level;
+var pieceX, pieceY, pieceZ; // piece position in pit coords (z=0 is top/near, z=pitH-1 is floor/far)
+var score, layers, level, cubesPlayed;
 var dropInterval, dropTimer;
 var gameActive = false;
 var gameOver = false;
 var particles = [];
-var clearFlash = []; // layers currently flashing
+var clearFlash = []; // z-layers currently flashing
 var clearFlashTimer = 0;
 var isMobile = false;
-
-// Isometric projection config
-var cubeSize, centerX, centerY;
 var dpr = window.devicePixelRatio || 1;
+
+// Perspective projection parameters (calculated in resize)
+var pitLeft, pitTop, pitRight, pitBottom; // screen coords of pit opening
+var floorShrink = 0.7; // how much the floor shrinks (0=same as opening, 1=point)
 
 // ============ AUDIO ============
 var audioCtx;
@@ -291,6 +291,9 @@ diffBtns.forEach(function(btn) {
 });
 
 // ============ SIZING ============
+// HUD panel width
+var HUD_W = 160;
+
 function resize() {
   var w = window.innerWidth;
   var h = window.innerHeight;
@@ -303,124 +306,266 @@ function resize() {
   isMobile = ('ontouchstart' in window) && w < 900;
   touchControls.style.display = (isMobile && gameActive) ? 'block' : 'none';
 
-  // Calculate cube size and center based on pit dims
-  var d = DIFFICULTIES[diffIdx];
-  var pw = d.w, pd = d.d, ph = d.h;
-  // Isometric: width spans (pw + pd) * cos30, height spans (pw+pd)*sin30 + ph
-  var isoW = (pw + pd) * 0.866;
-  var isoH = (pw + pd) * 0.5 + ph;
-  var availW = w * 0.55;
-  var availH = h * (isMobile ? 0.55 : 0.75);
-  cubeSize = Math.min(availW / isoW, availH / isoH);
-  cubeSize = Math.max(12, Math.min(cubeSize, 40));
+  // Calculate pit opening rectangle on screen
+  // The pit takes up the left portion, HUD on the right
+  var gameW = w - (isMobile ? 0 : HUD_W);
+  var gameH = h - (isMobile ? 140 : 0); // leave room for touch controls
 
-  centerX = w * 0.5;
-  centerY = h * 0.35 + (pw + pd) * 0.5 * cubeSize * 0.3;
+  var margin = Math.min(gameW, gameH) * 0.06;
+  var d = DIFFICULTIES[diffIdx];
+  // Aspect ratio of pit opening
+  var pitAspect = d.w / d.d;
+  var availW = gameW - margin * 2;
+  var availH = gameH - margin * 2;
+
+  if (availW / availH > pitAspect) {
+    // Height-limited
+    pitTop = margin;
+    pitBottom = gameH - margin;
+    var pitScreenH = pitBottom - pitTop;
+    var pitScreenW = pitScreenH * pitAspect;
+    pitLeft = (gameW - pitScreenW) / 2;
+    pitRight = pitLeft + pitScreenW;
+  } else {
+    // Width-limited
+    pitLeft = margin;
+    pitRight = gameW - margin;
+    var pitScreenW = pitRight - pitLeft;
+    var pitScreenH = pitScreenW / pitAspect;
+    pitTop = (gameH - pitScreenH) / 2;
+    pitBottom = pitTop + pitScreenH;
+  }
 }
 resize();
 window.addEventListener('resize', resize);
 
-// ============ 3D → 2D PROJECTION ============
-function project(x, y, z) {
-  var sx = centerX + (x - y) * cubeSize * 0.866;
-  var sy = centerY + (x + y) * cubeSize * 0.5 - z * cubeSize;
+// ============ PERSPECTIVE PROJECTION ============
+// Map a 3D pit cell position to 2D screen coordinates
+// gx: 0..pitW, gy: 0..pitD (cell position in horizontal plane)
+// z: 0=top of pit (near, large), pitH=floor (far, small)
+function project(gx, gy, z) {
+  var depthFrac = z / pitH; // 0=near(top), 1=far(floor)
+  var scale = 1 - depthFrac * floorShrink;
+
+  // Normalized position in pit (0 to 1)
+  var nx = gx / pitW;
+  var ny = gy / pitD;
+
+  // Center of pit opening on screen
+  var cx = (pitLeft + pitRight) / 2;
+  var cy = (pitTop + pitBottom) / 2;
+
+  // Half-extents of pit opening
+  var hw = (pitRight - pitLeft) / 2;
+  var hh = (pitBottom - pitTop) / 2;
+
+  // Screen position: lerp between full opening edge and center
+  var sx = cx + (nx - 0.5) * 2 * hw * scale;
+  var sy = cy + (ny - 0.5) * 2 * hh * scale;
+
   return { x: sx, y: sy };
 }
 
-// ============ DRAWING ============
+// ============ DRAWING HELPERS ============
 function colorStr(c, a) {
   a = a === undefined ? 1 : a;
   return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
 }
 function darken(c, f) {
-  return { r: Math.floor(c.r*f), g: Math.floor(c.g*f), b: Math.floor(c.b*f) };
+  return { r: Math.floor(c.r * f), g: Math.floor(c.g * f), b: Math.floor(c.b * f) };
+}
+function brighten(c, f) {
+  return { r: Math.min(255, Math.floor(c.r * f)), g: Math.min(255, Math.floor(c.g * f)), b: Math.min(255, Math.floor(c.b * f)) };
 }
 
-function drawCubeFace(pts, fill, stroke, lw) {
+function drawPoly(pts, fill, stroke, lw) {
+  if (pts.length < 2) return;
   ctx.beginPath();
   ctx.moveTo(pts[0].x, pts[0].y);
   for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
   ctx.closePath();
-  ctx.fillStyle = fill;
-  ctx.fill();
-  if (stroke) {
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = lw || 1;
-    ctx.stroke();
-  }
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1; ctx.stroke(); }
 }
 
-function drawCube(x, y, z, color, alpha) {
-  alpha = alpha === undefined ? 1 : alpha;
-  var s = cubeSize;
-  // 8 corners of the unit cube
-  var p000 = project(x, y, z);
-  var p100 = project(x+1, y, z);
-  var p010 = project(x, y+1, z);
-  var p110 = project(x+1, y+1, z);
-  var p001 = project(x, y, z+1);
-  var p101 = project(x+1, y, z+1);
-  var p011 = project(x, y+1, z+1);
-  var p111 = project(x+1, y+1, z+1);
+// ============ PIT WIREFRAME (TOP-DOWN PERSPECTIVE) ============
+function drawPitWireframe() {
+  var gridColor = 'rgba(0,240,255,0.18)';
+  var gridColorDim = 'rgba(0,240,255,0.08)';
+  var wallFill = 'rgba(0,240,255,0.015)';
+
+  // Draw 4 walls as converging trapezoids with grid lines
+  // Left wall: gx=0
+  for (var z = 0; z <= pitH; z++) {
+    var p1 = project(0, 0, z);
+    var p2 = project(0, pitD, z);
+    ctx.strokeStyle = z === 0 || z === pitH ? gridColor : gridColorDim;
+    ctx.lineWidth = z === 0 ? 1.5 : 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  for (var gy = 0; gy <= pitD; gy++) {
+    var p1 = project(0, gy, 0);
+    var p2 = project(0, gy, pitH);
+    ctx.strokeStyle = gridColorDim;
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  // Fill left wall
+  drawPoly([project(0,0,0), project(0,pitD,0), project(0,pitD,pitH), project(0,0,pitH)], wallFill, null);
+
+  // Right wall: gx=pitW
+  for (var z = 0; z <= pitH; z++) {
+    var p1 = project(pitW, 0, z);
+    var p2 = project(pitW, pitD, z);
+    ctx.strokeStyle = z === 0 || z === pitH ? gridColor : gridColorDim;
+    ctx.lineWidth = z === 0 ? 1.5 : 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  for (var gy = 0; gy <= pitD; gy++) {
+    var p1 = project(pitW, gy, 0);
+    var p2 = project(pitW, gy, pitH);
+    ctx.strokeStyle = gridColorDim;
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  drawPoly([project(pitW,0,0), project(pitW,pitD,0), project(pitW,pitD,pitH), project(pitW,0,pitH)], wallFill, null);
+
+  // Top wall: gy=0
+  for (var z = 0; z <= pitH; z++) {
+    var p1 = project(0, 0, z);
+    var p2 = project(pitW, 0, z);
+    ctx.strokeStyle = z === 0 || z === pitH ? gridColor : gridColorDim;
+    ctx.lineWidth = z === 0 ? 1.5 : 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  for (var gx = 0; gx <= pitW; gx++) {
+    var p1 = project(gx, 0, 0);
+    var p2 = project(gx, 0, pitH);
+    ctx.strokeStyle = gridColorDim;
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  drawPoly([project(0,0,0), project(pitW,0,0), project(pitW,0,pitH), project(0,0,pitH)], wallFill, null);
+
+  // Bottom wall: gy=pitD
+  for (var z = 0; z <= pitH; z++) {
+    var p1 = project(0, pitD, z);
+    var p2 = project(pitW, pitD, z);
+    ctx.strokeStyle = z === 0 || z === pitH ? gridColor : gridColorDim;
+    ctx.lineWidth = z === 0 ? 1.5 : 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  for (var gx = 0; gx <= pitW; gx++) {
+    var p1 = project(gx, pitD, 0);
+    var p2 = project(gx, pitD, pitH);
+    ctx.strokeStyle = gridColorDim;
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  drawPoly([project(0,pitD,0), project(pitW,pitD,0), project(pitW,pitD,pitH), project(0,pitD,pitH)], wallFill, null);
+
+  // Draw floor grid (at z=pitH)
+  ctx.strokeStyle = 'rgba(0,240,255,0.25)';
+  ctx.lineWidth = 0.8;
+  for (var gx = 0; gx <= pitW; gx++) {
+    var p1 = project(gx, 0, pitH);
+    var p2 = project(gx, pitD, pitH);
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  for (var gy = 0; gy <= pitD; gy++) {
+    var p1 = project(0, gy, pitH);
+    var p2 = project(pitW, gy, pitH);
+    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  }
+  // Floor fill
+  drawPoly([project(0,0,pitH), project(pitW,0,pitH), project(pitW,pitD,pitH), project(0,pitD,pitH)],
+    'rgba(0,240,255,0.03)', null);
+
+  // Opening rim (z=0) — bright outline
+  ctx.strokeStyle = 'rgba(0,240,255,0.5)';
+  ctx.lineWidth = 2;
+  var r0 = project(0,0,0), r1 = project(pitW,0,0), r2 = project(pitW,pitD,0), r3 = project(0,pitD,0);
+  ctx.beginPath();
+  ctx.moveTo(r0.x, r0.y); ctx.lineTo(r1.x, r1.y); ctx.lineTo(r2.x, r2.y); ctx.lineTo(r3.x, r3.y);
+  ctx.closePath(); ctx.stroke();
+}
+
+// ============ DRAW CUBE (TOP-DOWN PERSPECTIVE) ============
+// Each cube is at pit position (gx, gy, z).
+// z=0 is the TOP of the pit (near viewer), z=pitH-1 is the floor layer.
+// We draw the top face and visible side faces.
+function drawCube(gx, gy, z, color, alpha, wireOnly) {
+  // The 8 corners of the cube
+  var p = [
+    project(gx,     gy,     z),     // 0: top-near-left
+    project(gx + 1, gy,     z),     // 1: top-near-right
+    project(gx + 1, gy + 1, z),     // 2: top-far-right
+    project(gx,     gy + 1, z),     // 3: top-far-left
+    project(gx,     gy,     z + 1), // 4: bottom-near-left
+    project(gx + 1, gy,     z + 1), // 5: bottom-near-right
+    project(gx + 1, gy + 1, z + 1), // 6: bottom-far-right
+    project(gx,     gy + 1, z + 1)  // 7: bottom-far-left
+  ];
+
+  if (wireOnly) {
+    // Ghost piece: just draw wireframe outline
+    var wc = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1.2;
+    // Top face
+    drawPoly([p[0], p[1], p[2], p[3]], null, wc, 1.2);
+    // Bottom face
+    drawPoly([p[4], p[5], p[6], p[7]], null, 'rgba(255,255,255,0.15)', 0.8);
+    // Side edges
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 0.8;
+    for (var i = 0; i < 4; i++) {
+      ctx.beginPath(); ctx.moveTo(p[i].x, p[i].y); ctx.lineTo(p[i+4].x, p[i+4].y); ctx.stroke();
+    }
+    return;
+  }
 
   var c = color;
-  // Top face (bright)
-  drawCubeFace([p001, p101, p111, p011], colorStr(c, alpha * 0.7), colorStr(c, alpha * 0.9), 1.2);
-  // Left face (medium)
-  drawCubeFace([p000, p010, p011, p001], colorStr(darken(c, 0.5), alpha * 0.7), colorStr(c, alpha * 0.6), 0.8);
-  // Right face (dark)
-  drawCubeFace([p100, p110, p111, p101], colorStr(darken(c, 0.35), alpha * 0.7), colorStr(c, alpha * 0.6), 0.8);
-}
+  var strokeC = colorStr(c, alpha * 0.9);
+  var centerGx = pitW / 2;
+  var centerGy = pitD / 2;
 
-function drawPitWireframe() {
-  var w = pitW, d = pitD, h = pitH;
-  ctx.strokeStyle = 'rgba(0,240,255,0.12)';
-  ctx.lineWidth = 1;
+  // Top face (always visible — we look down)
+  var topFill = colorStr(c, alpha * 0.6);
+  drawPoly([p[0], p[1], p[2], p[3]], topFill, strokeC, 1);
 
-  // Draw bottom grid
-  for (var x = 0; x <= w; x++) {
-    var a = project(x, 0, 0);
-    var b = project(x, d, 0);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  // Neon glow on top face
+  ctx.shadowColor = colorStr(c, 0.3);
+  ctx.shadowBlur = 4;
+  drawPoly([p[0], p[1], p[2], p[3]], null, strokeC, 1.2);
+  ctx.shadowBlur = 0;
+
+  // Side faces: visible based on position relative to center (perspective)
+  var sideAlpha = alpha * 0.35;
+  var sideFill, sideStroke;
+
+  // Left face (gx side): visible if gx < centerGx (cube is left of center)
+  if (gx < centerGx) {
+    sideFill = colorStr(darken(c, 0.5), sideAlpha);
+    sideStroke = colorStr(c, alpha * 0.4);
+    drawPoly([p[0], p[3], p[7], p[4]], sideFill, sideStroke, 0.7);
   }
-  for (var y = 0; y <= d; y++) {
-    var a = project(0, y, 0);
-    var b = project(w, y, 0);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  // Right face (gx+1 side): visible if gx+1 > centerGx
+  if (gx + 1 > centerGx) {
+    sideFill = colorStr(darken(c, 0.45), sideAlpha);
+    sideStroke = colorStr(c, alpha * 0.4);
+    drawPoly([p[1], p[2], p[6], p[5]], sideFill, sideStroke, 0.7);
   }
-
-  // Draw vertical edges
-  ctx.strokeStyle = 'rgba(0,240,255,0.08)';
-  var corners = [[0,0],[w,0],[w,d],[0,d]];
-  for (var i = 0; i < corners.length; i++) {
-    var cx = corners[i][0], cy = corners[i][1];
-    var a = project(cx, cy, 0);
-    var b = project(cx, cy, h);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  // Front face (gy side): visible if gy < centerGy
+  if (gy < centerGy) {
+    sideFill = colorStr(darken(c, 0.55), sideAlpha);
+    sideStroke = colorStr(c, alpha * 0.4);
+    drawPoly([p[0], p[1], p[5], p[4]], sideFill, sideStroke, 0.7);
   }
-
-  // Draw top rim
-  ctx.strokeStyle = 'rgba(0,240,255,0.15)';
-  ctx.lineWidth = 1.5;
-  var t0 = project(0,0,h), t1 = project(w,0,h), t2 = project(w,d,h), t3 = project(0,d,h);
-  ctx.beginPath();
-  ctx.moveTo(t0.x, t0.y); ctx.lineTo(t1.x, t1.y); ctx.lineTo(t2.x, t2.y); ctx.lineTo(t3.x, t3.y); ctx.closePath();
-  ctx.stroke();
-
-  // Draw back walls (faint grid lines on walls)
-  ctx.strokeStyle = 'rgba(180,77,255,0.05)';
-  ctx.lineWidth = 0.5;
-  // Back-left wall (y=d)
-  for (var z = 1; z < h; z++) {
-    var a = project(0, d, z);
-    var b = project(w, d, z);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-  }
-  // Back-right wall (x=w)
-  for (var z = 1; z < h; z++) {
-    var a = project(w, 0, z);
-    var b = project(w, d, z);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  // Back face (gy+1 side): visible if gy+1 > centerGy
+  if (gy + 1 > centerGy) {
+    sideFill = colorStr(darken(c, 0.4), sideAlpha);
+    sideStroke = colorStr(c, alpha * 0.4);
+    drawPoly([p[3], p[2], p[6], p[7]], sideFill, sideStroke, 0.7);
   }
 }
 
@@ -438,18 +583,17 @@ function createPit() {
   }
 }
 
-function pitGet(x, y, z) {
-  if (x < 0 || x >= pitW || y < 0 || y >= pitD || z < 0) return -1; // wall/floor
-  if (z >= pitH) return 0; // above pit is empty
-  return pit[x][y][z];
-}
-
 function checkCollision(cubes, px, py, pz) {
   for (var i = 0; i < cubes.length; i++) {
     var c = cubes[i];
     var nx = px + c[0], ny = py + c[1], nz = pz + c[2];
-    if (nx < 0 || nx >= pitW || ny < 0 || ny >= pitD || nz < 0) return true;
-    if (nz < pitH && pit[nx][ny][nz] !== 0) return true;
+    // Walls & ceiling
+    if (nx < 0 || nx >= pitW || ny < 0 || ny >= pitD) return true;
+    // Floor: z >= pitH means beyond the floor
+    if (nz >= pitH) return true;
+    // Above pit opening is fine (z < 0)
+    if (nz < 0) continue;
+    if (pit[nx][ny][nz] !== 0) return true;
   }
   return false;
 }
@@ -466,6 +610,7 @@ function placePiece() {
 }
 
 function checkAndClearLayers() {
+  // In our coordinate system, z=pitH-1 is the floor. Layers fill from floor up.
   var cleared = 0;
   for (var z = pitH - 1; z >= 0; z--) {
     var full = true;
@@ -480,34 +625,34 @@ function checkAndClearLayers() {
     }
   }
   if (cleared > 0) {
-    clearFlashTimer = 20; // frames of flash
+    clearFlashTimer = 20;
     playSound('clear');
   }
   return cleared;
 }
 
 function removeClearedLayers() {
-  // Sort flash layers from top to bottom for safe removal
+  // Sort high-z first (floor side) for safe removal
   clearFlash.sort(function(a, b) { return b - a; });
   for (var i = 0; i < clearFlash.length; i++) {
     var cz = clearFlash[i];
-    // Shift everything above down
-    for (var z = cz; z < pitH - 1; z++) {
+    // Shift everything above (lower z values) down (higher z values)
+    for (var z = cz; z > 0; z--) {
       for (var x = 0; x < pitW; x++) {
         for (var y = 0; y < pitD; y++) {
-          pit[x][y][z] = pit[x][y][z + 1];
+          pit[x][y][z] = pit[x][y][z - 1];
         }
       }
     }
-    // Clear top layer
+    // Clear the topmost layer (z=0)
     for (var x = 0; x < pitW; x++) {
       for (var y = 0; y < pitD; y++) {
-        pit[x][y][pitH - 1] = 0;
+        pit[x][y][0] = 0;
       }
     }
-    // Adjust remaining flash indices
+    // Adjust remaining flash indices (they shift down by one)
     for (var j = i + 1; j < clearFlash.length; j++) {
-      if (clearFlash[j] > cz) clearFlash[j]--;
+      if (clearFlash[j] < cz) clearFlash[j]++;
     }
   }
 }
@@ -519,8 +664,8 @@ function spawnParticles(z, count) {
     var p = project(px, py, z + 0.5);
     particles.push({
       x: p.x, y: p.y,
-      vx: (Math.random() - 0.5) * 4,
-      vy: (Math.random() - 0.5) * 4 - 2,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
       life: 30 + Math.random() * 20,
       maxLife: 50,
       color: COLOR_KEYS[Math.floor(Math.random() * COLOR_KEYS.length)]
@@ -530,7 +675,6 @@ function spawnParticles(z, count) {
 
 // ============ PIECE GENERATION ============
 function getPiecePool() {
-  // Easy: mostly flat pieces; Normal: mix; Hard: more 3D
   if (diffIdx === 0) return FLAT_PIECES;
   if (diffIdx === 1) return FLAT_PIECES.concat(THREE_D_PIECES.slice(0, 3));
   return FLAT_PIECES.concat(THREE_D_PIECES);
@@ -540,42 +684,44 @@ function randomPiece() {
   var pool = getPiecePool();
   var template = pool[Math.floor(Math.random() * pool.length)];
   var cubes = template.cubes.map(function(c) { return [c[0], c[1], c[2]]; });
-  var ci = Math.floor(Math.random() * COLOR_KEYS.length) + 1; // 1-based color
+  var ci = Math.floor(Math.random() * COLOR_KEYS.length) + 1; // 1-based
   return { cubes: cubes, colorIdx: ci, name: template.name };
 }
 
 function centerPiece(piece) {
-  // Find bounding box
-  var minX = 99, maxX = -99, minY = 99, maxY = -99, maxZ = -99;
+  var minX = 99, maxX = -99, minY = 99, maxY = -99, minZ = 99, maxZ = -99;
   for (var i = 0; i < piece.cubes.length; i++) {
     var c = piece.cubes[i];
     if (c[0] < minX) minX = c[0];
     if (c[0] > maxX) maxX = c[0];
     if (c[1] < minY) minY = c[1];
     if (c[1] > maxY) maxY = c[1];
+    if (c[2] < minZ) minZ = c[2];
     if (c[2] > maxZ) maxZ = c[2];
   }
   var pw = maxX - minX + 1;
   var pd = maxY - minY + 1;
+  var ph = maxZ - minZ + 1;
   pieceX = Math.floor((pitW - pw) / 2);
   pieceY = Math.floor((pitD - pd) / 2);
-  pieceZ = pitH - 1 - maxZ;
+  // Piece starts at z=0 (top of pit, near viewer) — offset so the whole piece is visible
+  pieceZ = -minZ;
   // Normalize cubes to start at 0,0,0
   for (var i = 0; i < piece.cubes.length; i++) {
     piece.cubes[i][0] -= minX;
     piece.cubes[i][1] -= minY;
+    piece.cubes[i][2] -= minZ;
   }
 }
 
 // ============ ROTATION ============
 function rotateCubes(cubes, axis) {
-  // Rotate 90 degrees around axis
   return cubes.map(function(c) {
     var x = c[0], y = c[1], z = c[2];
     switch(axis) {
-      case 'z': return [-y, x, z]; // yaw
-      case 'x': return [x, -z, y]; // pitch
-      case 'y': return [z, y, -x]; // roll
+      case 'z': return [-y, x, z]; // yaw (rotate in XY plane)
+      case 'x': return [x, -z, y]; // pitch (rotate in YZ plane)
+      case 'y': return [z, y, -x]; // roll (rotate in XZ plane)
     }
     return [x, y, z];
   });
@@ -614,9 +760,10 @@ function tryRotate(axis) {
 
 // ============ GHOST PIECE ============
 function getGhostZ() {
+  // Ghost drops toward the floor (increasing z)
   var gz = pieceZ;
-  while (!checkCollision(currentPiece.cubes, pieceX, pieceY, gz - 1)) {
-    gz--;
+  while (!checkCollision(currentPiece.cubes, pieceX, pieceY, gz + 1)) {
+    gz++;
   }
   return gz;
 }
@@ -626,6 +773,7 @@ function spawnNext() {
   currentPiece = nextPiece || randomPiece();
   nextPiece = randomPiece();
   centerPiece(currentPiece);
+  cubesPlayed++;
 
   // Check if spawn position collides = game over
   if (checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ)) {
@@ -634,8 +782,9 @@ function spawnNext() {
 }
 
 function dropPiece() {
-  if (!checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ - 1)) {
-    pieceZ--;
+  // Drop = increase z (move deeper into pit toward floor)
+  if (!checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ + 1)) {
+    pieceZ++;
     return true;
   }
   // Land
@@ -645,13 +794,11 @@ function dropPiece() {
 
   var cleared = checkAndClearLayers();
   if (cleared > 0) {
-    // Score: exponential bonus
     var layerScore = [0, 100, 300, 600, 1000, 1500, 2100];
     score += (layerScore[Math.min(cleared, 6)] || cleared * 400) * (level + 1);
     layers += cleared;
     level = Math.floor(layers / 10);
     dropInterval = Math.max(100, 800 - level * 60);
-    // Spawn particles per cleared layer
     for (var i = 0; i < clearFlash.length; i++) {
       spawnParticles(clearFlash[i], 15);
     }
@@ -665,12 +812,12 @@ function dropPiece() {
 
 function hardDrop() {
   var dropped = 0;
-  while (!checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ - 1)) {
-    pieceZ--;
+  while (!checkCollision(currentPiece.cubes, pieceX, pieceY, pieceZ + 1)) {
+    pieceZ++;
     dropped++;
   }
   score += dropped * 2;
-  dropPiece(); // land immediately
+  dropPiece();
 }
 
 function movePiece(dx, dy) {
@@ -713,7 +860,7 @@ function startGame() {
   Neon.init({ game: 'blockout', mode: 'high', key: d.key });
 
   createPit();
-  score = 0; layers = 0; level = 0;
+  score = 0; layers = 0; level = 0; cubesPlayed = 0;
   dropInterval = 800; dropTimer = 0;
   particles = []; clearFlash = []; clearFlashTimer = 0;
   gameActive = true; gameOver = false;
@@ -728,55 +875,123 @@ function startGame() {
 // ============ RENDER ============
 function drawNextPiece() {
   if (!nextPiece) return;
-  var label = 'NEXT';
-  var nx = window.innerWidth - 90;
-  var ny = 30;
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  var panelX, panelY;
+
+  if (isMobile) {
+    // Draw in top-right corner
+    panelX = w - 60;
+    panelY = 20;
+  } else {
+    // HUD panel on the right
+    panelX = w - HUD_W / 2;
+    panelY = 220;
+  }
 
   ctx.font = '700 11px Orbitron, monospace';
   ctx.fillStyle = '#7a7a9a';
   ctx.textAlign = 'center';
-  ctx.fillText(label, nx, ny);
+  ctx.fillText('NEXT', panelX, panelY);
 
-  // Draw small preview cubes
-  var previewSize = Math.min(cubeSize * 0.5, 14);
+  // Draw preview cubes using small squares
+  var previewSize = 12;
   var c = COLORS[COLOR_KEYS[(nextPiece.colorIdx - 1) % COLOR_KEYS.length]];
+
+  // Find bounding box of piece for centering
+  var minX = 99, maxX = -99, minY = 99, maxY = -99;
   for (var i = 0; i < nextPiece.cubes.length; i++) {
     var cb = nextPiece.cubes[i];
-    var px = nx + (cb[0] - cb[1]) * previewSize * 0.866 - 10;
-    var py = ny + 20 + (cb[0] + cb[1]) * previewSize * 0.5 - cb[2] * previewSize;
-    // Simple cube representation
-    ctx.fillStyle = colorStr(c, 0.7);
-    ctx.fillRect(px - previewSize*0.4, py - previewSize*0.4, previewSize*0.8, previewSize*0.8);
+    if (cb[0] < minX) minX = cb[0];
+    if (cb[0] > maxX) maxX = cb[0];
+    if (cb[1] < minY) minY = cb[1];
+    if (cb[1] > maxY) maxY = cb[1];
+  }
+  var pw = maxX - minX + 1;
+  var pd = maxY - minY + 1;
+
+  for (var i = 0; i < nextPiece.cubes.length; i++) {
+    var cb = nextPiece.cubes[i];
+    // Top-down view: just show x,y position
+    var px = panelX + (cb[0] - minX - pw / 2 + 0.5) * previewSize;
+    var py = panelY + 18 + (cb[1] - minY - pd / 2 + 0.5) * previewSize;
+
+    // Show z offset with brightness
+    var zBright = 1 - cb[2] * 0.25;
+    ctx.fillStyle = colorStr(darken(c, zBright), 0.7);
+    ctx.fillRect(px - previewSize * 0.4, py - previewSize * 0.4, previewSize * 0.8, previewSize * 0.8);
     ctx.strokeStyle = colorStr(c, 0.9);
     ctx.lineWidth = 1;
-    ctx.strokeRect(px - previewSize*0.4, py - previewSize*0.4, previewSize*0.8, previewSize*0.8);
+    ctx.strokeRect(px - previewSize * 0.4, py - previewSize * 0.4, previewSize * 0.8, previewSize * 0.8);
+    // Mark if piece extends in z with a dot
+    if (cb[2] > 0) {
+      ctx.fillStyle = colorStr(c, 0.5);
+      ctx.fillRect(px - 1.5, py - 1.5, 3, 3);
+    }
   }
 }
 
 function drawHUD() {
-  ctx.font = '700 13px Orbitron, monospace';
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#7a7a9a';
-  ctx.fillText('SCORE', 16, 30);
-  ctx.fillStyle = '#00f0ff';
-  ctx.shadowColor = 'rgba(0,240,255,0.4)';
-  ctx.shadowBlur = 8;
-  ctx.fillText(score.toLocaleString(), 16, 50);
-  ctx.shadowBlur = 0;
+  var w = window.innerWidth;
+  var x, y;
 
-  ctx.fillStyle = '#7a7a9a';
-  ctx.fillText('LAYERS', 16, 78);
-  ctx.fillStyle = '#39ff14';
-  ctx.fillText('' + layers, 16, 98);
+  if (isMobile) {
+    // Compact HUD in top-left
+    x = 12; y = 20;
+    ctx.font = '700 11px Orbitron, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#7a7a9a';
+    ctx.fillText('SCORE', x, y);
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = 'rgba(0,240,255,0.4)';
+    ctx.shadowBlur = 6;
+    ctx.fillText(score.toLocaleString(), x, y + 16);
+    ctx.shadowBlur = 0;
 
-  ctx.fillStyle = '#7a7a9a';
-  ctx.fillText('LEVEL', 16, 126);
-  ctx.fillStyle = '#ffd700';
-  ctx.fillText('' + (level + 1), 16, 146);
+    ctx.fillStyle = '#7a7a9a';
+    ctx.fillText('LV', x + 100, y);
+    ctx.fillStyle = '#ffd700';
+    ctx.fillText('' + (level + 1), x + 100, y + 16);
 
-  ctx.fillStyle = '#7a7a9a';
-  ctx.font = '300 11px Rajdhani, sans-serif';
-  ctx.fillText(DIFFICULTIES[diffIdx].name, 16, 168);
+    ctx.fillStyle = '#7a7a9a';
+    ctx.fillText('LAYERS', x + 140, y);
+    ctx.fillStyle = '#39ff14';
+    ctx.fillText('' + layers, x + 140, y + 16);
+  } else {
+    // Full HUD panel on the right
+    x = w - HUD_W + 16;
+    y = 40;
+
+    ctx.font = '700 13px Orbitron, monospace';
+    ctx.textAlign = 'left';
+
+    ctx.fillStyle = '#7a7a9a';
+    ctx.fillText('SCORE', x, y);
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = 'rgba(0,240,255,0.4)';
+    ctx.shadowBlur = 8;
+    ctx.font = '700 18px Orbitron, monospace';
+    ctx.fillText(score.toLocaleString(), x, y + 24);
+    ctx.shadowBlur = 0;
+
+    ctx.font = '700 13px Orbitron, monospace';
+    y += 60;
+    ctx.fillStyle = '#7a7a9a';
+    ctx.fillText('LAYERS', x, y);
+    ctx.fillStyle = '#39ff14';
+    ctx.fillText('' + layers, x, y + 20);
+
+    y += 50;
+    ctx.fillStyle = '#7a7a9a';
+    ctx.fillText('LEVEL', x, y);
+    ctx.fillStyle = '#ffd700';
+    ctx.fillText('' + (level + 1), x, y + 20);
+
+    y += 50;
+    ctx.fillStyle = '#7a7a9a';
+    ctx.font = '300 12px Rajdhani, sans-serif';
+    ctx.fillText(DIFFICULTIES[diffIdx].name + '  ' + pitW + 'x' + pitD + 'x' + pitH, x, y);
+  }
 }
 
 function drawParticles() {
@@ -784,7 +999,6 @@ function drawParticles() {
     var p = particles[i];
     p.x += p.vx;
     p.y += p.vy;
-    p.vy += 0.08;
     p.life--;
     if (p.life <= 0) { particles.splice(i, 1); continue; }
     var alpha = p.life / p.maxLife;
@@ -793,11 +1007,12 @@ function drawParticles() {
     ctx.shadowColor = colorStr(c, alpha * 0.4);
     ctx.shadowBlur = 6;
     var sz = 2 + alpha * 3;
-    ctx.fillRect(p.x - sz/2, p.y - sz/2, sz, sz);
+    ctx.fillRect(p.x - sz / 2, p.y - sz / 2, sz, sz);
     ctx.shadowBlur = 0;
   }
 }
 
+// ============ MAIN RENDER ============
 function render() {
   var w = window.innerWidth;
   var h = window.innerHeight;
@@ -805,40 +1020,49 @@ function render() {
 
   if (!gameActive && !gameOver) return;
 
+  // Draw pit wireframe (walls + floor)
   drawPitWireframe();
 
-  // Collect all cubes to draw, sort by depth (back to front)
-  var cubes = [];
+  // Collect all cubes to draw, sort by depth (deepest/far first, then near/top last)
+  // Since we look down, cubes at high z (deep in pit) should be drawn first (behind)
+  // and cubes at low z (near top) drawn last (in front).
+  // Within same z, cubes closer to center should be drawn first (behind outer cubes).
+  var cubeList = [];
 
-  // Pit cubes
+  // Pit cubes (landed)
   for (var x = 0; x < pitW; x++) {
     for (var y = 0; y < pitD; y++) {
       for (var z = 0; z < pitH; z++) {
         if (pit[x][y][z] !== 0) {
           var isFlashing = clearFlashTimer > 0 && clearFlash.indexOf(z) >= 0;
-          cubes.push({
-            x: x, y: y, z: z,
-            color: isFlashing ? {r:255,g:255,b:255} : COLORS[COLOR_KEYS[(pit[x][y][z] - 1) % COLOR_KEYS.length]],
-            alpha: isFlashing ? 0.9 : 0.55,
-            depth: x + y - z
+          cubeList.push({
+            gx: x, gy: y, z: z,
+            color: isFlashing ? { r: 255, g: 255, b: 255 } : COLORS[COLOR_KEYS[(pit[x][y][z] - 1) % COLOR_KEYS.length]],
+            alpha: isFlashing ? 0.9 : 0.5,
+            wire: false,
+            sortZ: z
           });
         }
       }
     }
   }
 
-  // Ghost piece
+  // Ghost piece (landing preview)
   if (currentPiece && gameActive) {
     var gz = getGhostZ();
     if (gz !== pieceZ) {
-      var gc = COLORS[COLOR_KEYS[(currentPiece.colorIdx - 1) % COLOR_KEYS.length]];
       for (var i = 0; i < currentPiece.cubes.length; i++) {
         var cb = currentPiece.cubes[i];
-        cubes.push({
-          x: pieceX + cb[0], y: pieceY + cb[1], z: gz + cb[2],
-          color: gc, alpha: 0.12,
-          depth: (pieceX + cb[0]) + (pieceY + cb[1]) - (gz + cb[2])
-        });
+        var cz = gz + cb[2];
+        if (cz >= 0 && cz < pitH) {
+          cubeList.push({
+            gx: pieceX + cb[0], gy: pieceY + cb[1], z: cz,
+            color: { r: 255, g: 255, b: 255 },
+            alpha: 0.15,
+            wire: true,
+            sortZ: cz
+          });
+        }
       }
     }
 
@@ -846,19 +1070,31 @@ function render() {
     var ac = COLORS[COLOR_KEYS[(currentPiece.colorIdx - 1) % COLOR_KEYS.length]];
     for (var i = 0; i < currentPiece.cubes.length; i++) {
       var cb = currentPiece.cubes[i];
-      cubes.push({
-        x: pieceX + cb[0], y: pieceY + cb[1], z: pieceZ + cb[2],
-        color: ac, alpha: 0.95,
-        depth: (pieceX + cb[0]) + (pieceY + cb[1]) - (pieceZ + cb[2])
+      var cz = pieceZ + cb[2];
+      cubeList.push({
+        gx: pieceX + cb[0], gy: pieceY + cb[1], z: cz,
+        color: ac,
+        alpha: 0.9,
+        wire: false,
+        sortZ: cz,
+        isActive: true
       });
     }
   }
 
-  // Sort: higher depth = further back = draw first
-  cubes.sort(function(a, b) { return b.depth - a.depth; });
+  // Sort: high z first (deep in pit = behind), then by distance from center
+  cubeList.sort(function(a, b) {
+    if (a.sortZ !== b.sortZ) return b.sortZ - a.sortZ; // deeper drawn first
+    // Same depth: closer to center drawn first
+    var cx = pitW / 2, cy = pitD / 2;
+    var da = Math.abs(a.gx + 0.5 - cx) + Math.abs(a.gy + 0.5 - cy);
+    var db = Math.abs(b.gx + 0.5 - cx) + Math.abs(b.gy + 0.5 - cy);
+    return da - db;
+  });
 
-  for (var i = 0; i < cubes.length; i++) {
-    drawCube(cubes[i].x, cubes[i].y, cubes[i].z, cubes[i].color, cubes[i].alpha);
+  for (var i = 0; i < cubeList.length; i++) {
+    var cb = cubeList[i];
+    drawCube(cb.gx, cb.gy, cb.z, cb.color, cb.alpha, cb.wire);
   }
 
   drawNextPiece();
@@ -878,7 +1114,7 @@ function tick(now) {
 
   var dt = now - lastTime;
   lastTime = now;
-  if (dt > 200) dt = 16; // cap
+  if (dt > 200) dt = 16;
 
   // Handle clear flash animation
   if (clearFlashTimer > 0) {
@@ -900,56 +1136,48 @@ function tick(now) {
 
   render();
 }
-requestAnimationFrame(tick);
 
 // ============ INPUT ============
 document.addEventListener('keydown', function(e) {
-  if (!gameActive) {
-    if (e.key === 'Enter' && !startScreen.classList.contains('hidden')) {
-      startGame();
-      e.preventDefault();
-    }
-    return;
-  }
-  if (clearFlashTimer > 0) return;
-
-  switch(e.key) {
-    case 'ArrowLeft':  movePiece(-1, 0); e.preventDefault(); break;
-    case 'ArrowRight': movePiece(1, 0);  e.preventDefault(); break;
-    case 'ArrowUp':    movePiece(0, -1); e.preventDefault(); break;
-    case 'ArrowDown':  movePiece(0, 1);  e.preventDefault(); break;
+  if (!gameActive) return;
+  var k = e.key;
+  switch(k) {
+    case 'ArrowLeft':  e.preventDefault(); movePiece(-1, 0); break;
+    case 'ArrowRight': e.preventDefault(); movePiece(1, 0); break;
+    case 'ArrowUp':    e.preventDefault(); movePiece(0, -1); break;
+    case 'ArrowDown':  e.preventDefault(); movePiece(0, 1); break;
     case 'q': case 'Q': tryRotate('z'); break;
-    case 'e': case 'E': tryRotate('z'); break; // same axis, could be opposite
+    case 'e': case 'E': tryRotate('z'); break; // opposite yaw uses same axis, normalization handles it
     case 'w': case 'W': tryRotate('x'); break;
     case 's': case 'S': tryRotate('x'); break;
     case 'z': case 'Z': tryRotate('y'); break;
     case 'x': case 'X': tryRotate('y'); break;
     case ' ':
-      dropTimer = 0;
-      dropPiece();
       e.preventDefault();
+      dropPiece();
+      dropTimer = 0;
       break;
     case 'Enter':
-      hardDrop();
       e.preventDefault();
+      hardDrop();
       break;
     case 'Escape':
+      e.preventDefault();
+      // Quit to start screen
       gameActive = false;
       gameOver = false;
       touchControls.style.display = 'none';
       startScreen.classList.remove('hidden');
-      gameOverScreen.classList.add('hidden');
-      Neon.render(document.getElementById('startLB'));
-      e.preventDefault();
       break;
   }
 });
 
-// ============ TOUCH CONTROLS ============
-document.querySelectorAll('.touch-btn').forEach(function(btn) {
+// Touch controls
+var touchBtns = document.querySelectorAll('.touch-btn');
+touchBtns.forEach(function(btn) {
   btn.addEventListener('touchstart', function(e) {
     e.preventDefault();
-    if (!gameActive || clearFlashTimer > 0) return;
+    if (!gameActive) return;
     var action = btn.getAttribute('data-action');
     switch(action) {
       case 'left':  movePiece(-1, 0); break;
@@ -959,32 +1187,75 @@ document.querySelectorAll('.touch-btn').forEach(function(btn) {
       case 'rotZ':  tryRotate('z'); break;
       case 'rotX':  tryRotate('x'); break;
       case 'rotY':  tryRotate('y'); break;
-      case 'soft':  dropTimer = 0; dropPiece(); break;
+      case 'soft':  dropPiece(); dropTimer = 0; break;
       case 'hard':  hardDrop(); break;
     }
   });
 });
 
+// Swipe support for mobile
+var touchStartX = 0, touchStartY = 0, touchMoved = false;
+canvas.addEventListener('touchstart', function(e) {
+  if (!gameActive) return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchMoved = false;
+});
+canvas.addEventListener('touchmove', function(e) {
+  if (!gameActive) return;
+  var dx = e.touches[0].clientX - touchStartX;
+  var dy = e.touches[0].clientY - touchStartY;
+  var threshold = 30;
+  if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+    if (!touchMoved) {
+      touchMoved = true;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        movePiece(dx > 0 ? 1 : -1, 0);
+      } else {
+        movePiece(0, dy > 0 ? 1 : -1);
+      }
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  }
+});
+canvas.addEventListener('touchend', function(e) {
+  if (!gameActive) return;
+  if (!touchMoved) {
+    // Tap = soft drop
+    dropPiece();
+    dropTimer = 0;
+  }
+});
+
 // ============ SHARE ============
 shareBtn.addEventListener('click', function() {
   var d = DIFFICULTIES[diffIdx];
-  var text = '\uD83E\uDDCA BLOCKOUT [' + d.name + ']\n' +
-    'Score: ' + score.toLocaleString() + ' | Layers: ' + layers + ' | Level: ' + (level+1) + '\n' +
+  var fill = Math.floor((layers * pitW * pitD) / (pitW * pitD * pitH) * 10);
+  var bar = '';
+  for (var i = 0; i < 10; i++) bar += i < fill ? '\u2593' : '\u2591';
+
+  var text = '\uD83E\uDDF1 BLOCKOUT\n' +
+    'Score: ' + score.toLocaleString() + ' | Layers: ' + layers + ' | Level: ' + (level + 1) + '\n' +
+    '[' + bar + '] ' + d.name + ' (' + d.w + 'x' + d.d + 'x' + d.h + ')\n' +
     'neonarcade.net/neonclassic/blockout.html';
 
   if (navigator.share) {
-    navigator.share({ text: text }).catch(function(){});
-  } else if (navigator.clipboard) {
+    navigator.share({ text: text }).catch(function() {});
+  } else {
     navigator.clipboard.writeText(text).then(function() {
       shareBtn.textContent = 'COPIED!';
-      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 2000);
+      setTimeout(function() { shareBtn.textContent = 'SHARE'; }, 1500);
     });
   }
 });
 
-// ============ BUTTONS ============
-startBtn.addEventListener('click', startGame);
-retryBtn.addEventListener('click', startGame);
+// ============ START / RETRY ============
+startBtn.addEventListener('click', function() { ensureAudio(); startGame(); });
+retryBtn.addEventListener('click', function() { startGame(); });
+
+// ============ KICK OFF ============
+requestAnimationFrame(tick);
 
 })();
 </script>
