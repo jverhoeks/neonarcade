@@ -128,23 +128,34 @@ canvas { display: block; margin: 0 auto; }
 .go-stat-val.gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
 #startLB, #goLB { margin-top: 15px; max-width: 400px; width: 100%; }
 
-#touchControls {
+.mob-controls {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
-  display: none; padding: 10px;
+  display: none; padding: 12px 16px 20px;
+  pointer-events: none;
 }
-.touch-row { display: flex; justify-content: space-between; align-items: center; }
-.touch-btn {
+.mob-controls .mob-side {
+  position: absolute; bottom: 20px; display: flex; gap: 12px;
+  pointer-events: auto;
+}
+.mob-controls .mob-left { left: 16px; }
+.mob-controls .mob-right { right: 16px; }
+.mob-btn {
   width: 70px; height: 70px; border-radius: 50%;
   border: 2px solid rgba(0,240,255,0.4); background: rgba(0,240,255,0.08);
-  color: #00f0ff; font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700;
+  color: #00f0ff; font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent; outline: none;
+  opacity: 0.75; transition: opacity 0.1s;
 }
-.touch-btn:active { background: rgba(0,240,255,0.25); }
-.touch-btn.gas { border-color: rgba(57,255,20,0.5); color: #39ff14; background: rgba(57,255,20,0.08); }
-.touch-btn.gas:active { background: rgba(57,255,20,0.25); }
-.touch-btn.brake { border-color: rgba(255,45,123,0.5); color: #ff2d7b; background: rgba(255,45,123,0.08); }
-.touch-btn.brake:active { background: rgba(255,45,123,0.25); }
+.mob-btn:active, .mob-btn.pressed { opacity: 1; background: rgba(0,240,255,0.25); }
+.mob-btn.gas-btn {
+  border-color: rgba(57,255,20,0.5); color: #39ff14; background: rgba(57,255,20,0.08);
+}
+.mob-btn.gas-btn:active, .mob-btn.gas-btn.pressed { background: rgba(57,255,20,0.3); opacity: 1; }
+.mob-btn.brake-btn {
+  border-color: rgba(255,45,123,0.5); color: #ff2d7b; background: rgba(255,45,123,0.08);
+}
+.mob-btn.brake-btn:active, .mob-btn.brake-btn.pressed { background: rgba(255,45,123,0.3); opacity: 1; }
 
 @keyframes shake {
   0%, 100% { transform: translate(0,0); }
@@ -180,7 +191,7 @@ canvas { display: block; margin: 0 auto; }
   <button class="play-btn" id="btnStart">START</button>
   <div class="controls-hint">
     Arrow keys / WASD to steer &amp; accelerate<br>
-    Tap left/right on mobile -- ESC to quit
+    On-screen buttons on mobile -- ESC to quit
   </div>
   <div id="startLB"></div>
 </div>
@@ -197,12 +208,14 @@ canvas { display: block; margin: 0 auto; }
   <div id="goLB"></div>
 </div>
 
-<div id="touchControls">
-  <div class="touch-row">
-    <button class="touch-btn" id="tLeft">&larr;</button>
-    <button class="touch-btn gas" id="tGas">&uarr;</button>
-    <button class="touch-btn brake" id="tBrake">&darr;</button>
-    <button class="touch-btn" id="tRight">&rarr;</button>
+<div class="mob-controls" id="mobControls">
+  <div class="mob-side mob-left">
+    <button class="mob-btn steer-left" id="tLeft">&#9664;</button>
+    <button class="mob-btn steer-right" id="tRight">&#9654;</button>
+  </div>
+  <div class="mob-side mob-right">
+    <button class="mob-btn brake-btn" id="tBrake">BRK</button>
+    <button class="mob-btn gas-btn" id="tGas">GAS</button>
   </div>
 </div>
 
@@ -287,9 +300,12 @@ canvas { display: block; margin: 0 auto; }
   // Sound
   var audioCtx = null;
   var engineOsc = null, engineGain = null;
+  var engineOsc2 = null, engineGain2 = null; // second harmonic for richer tone
+  var screechOsc = null, screechGain = null;
+  var lastGear = 0;
 
   // ===== DOM =====
-  var $canvas, $hud, $startScreen, $gameOverScreen, $touchControls;
+  var $canvas, $hud, $startScreen, $gameOverScreen, $mobControls;
   var $hudSpeed, $hudTime, $hudDist;
   var $goDistance, $goTopSpeed, $goBest, $goTitle;
 
@@ -300,7 +316,7 @@ canvas { display: block; margin: 0 auto; }
     $hud = document.getElementById('hud');
     $startScreen = document.getElementById('startScreen');
     $gameOverScreen = document.getElementById('gameOverScreen');
-    $touchControls = document.getElementById('touchControls');
+    $mobControls = document.getElementById('mobControls');
     $hudSpeed = document.getElementById('hudSpeed');
     $hudTime = document.getElementById('hudTime');
     $hudDist = document.getElementById('hudDist');
@@ -828,8 +844,6 @@ canvas { display: block; margin: 0 auto; }
       maxy = segment.p2.screen.y;
     }
 
-    console.log('ROAD DRAW: y range', Math.round(maxy), 'to', H, '(' + segmentsDrawn + ' segments drawn)');
-
     // 5. Draw sprites (trees, signs, traffic) back-to-front
     for (var n = DRAW_DISTANCE - 1; n > 0; n--) {
       var segment = segments[(baseSegment.index + n) % segments.length];
@@ -996,66 +1010,186 @@ canvas { display: block; margin: 0 auto; }
   function initAudio() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Primary engine oscillator (sawtooth — raw engine)
     engineOsc = audioCtx.createOscillator();
     engineGain = audioCtx.createGain();
     engineOsc.type = 'sawtooth';
-    engineOsc.frequency.value = 60;
+    engineOsc.frequency.value = 80;
     engineGain.gain.value = 0;
     engineOsc.connect(engineGain);
     engineGain.connect(audioCtx.destination);
     engineOsc.start();
+
+    // Second harmonic (triangle — body/rumble)
+    engineOsc2 = audioCtx.createOscillator();
+    engineGain2 = audioCtx.createGain();
+    engineOsc2.type = 'triangle';
+    engineOsc2.frequency.value = 40;
+    engineGain2.gain.value = 0;
+    engineOsc2.connect(engineGain2);
+    engineGain2.connect(audioCtx.destination);
+    engineOsc2.start();
+
+    // Tire screech oscillator (noise-like, always running, gain at 0)
+    screechOsc = audioCtx.createOscillator();
+    screechGain = audioCtx.createGain();
+    screechOsc.type = 'sawtooth';
+    screechOsc.frequency.value = 900;
+    screechGain.gain.value = 0;
+    var screechFilter = audioCtx.createBiquadFilter();
+    screechFilter.type = 'bandpass';
+    screechFilter.frequency.value = 3000;
+    screechFilter.Q.value = 5;
+    screechOsc.connect(screechFilter);
+    screechFilter.connect(screechGain);
+    screechGain.connect(audioCtx.destination);
+    screechOsc.start();
+
+    lastGear = 0;
   }
 
   function updateEngineSound() {
     if (!audioCtx || !engineOsc) return;
-    var freq = 60 + (speed / MAX_SPEED) * 200;
-    engineOsc.frequency.value = freq;
-    engineGain.gain.value = gameState === 'playing' ? 0.03 + (speed / MAX_SPEED) * 0.04 : 0;
+    if (gameState !== 'playing') {
+      engineGain.gain.value = 0;
+      engineGain2.gain.value = 0;
+      screechGain.gain.value = 0;
+      return;
+    }
+
+    var speedFrac = speed / MAX_SPEED;
+
+    // Primary: 80Hz idle -> 280Hz max
+    var t = audioCtx.currentTime + 0.03;
+    engineOsc.frequency.setTargetAtTime(80 + speedFrac * 200, t, 0.05);
+    engineGain.gain.setTargetAtTime(0.03 + speedFrac * 0.05, t, 0.05);
+
+    // Second harmonic: half frequency, lower volume — adds body
+    engineOsc2.frequency.setTargetAtTime(40 + speedFrac * 100, t, 0.05);
+    engineGain2.gain.setTargetAtTime(0.02 + speedFrac * 0.03, t, 0.05);
+
+    // Gear shifts: 5 gears at 20%, 40%, 60%, 80%, 100% speed
+    var gear = speedFrac < 0.01 ? 0 : Math.min(5, Math.floor(speedFrac * 5) + 1);
+    if (gear > lastGear && gear >= 2) {
+      playSound('gearshift');
+    }
+    lastGear = gear;
+
+    // Tire screech on sharp turns at high speed
+    var turning = keyLeft || keyRight;
+    var playerSeg = findSegment(position + PLAYER_Z);
+    var curveMag = Math.abs(playerSeg.curve);
+    var screechIntensity = 0;
+    if (turning && speedFrac > 0.5) {
+      // Intensity based on speed and curve magnitude
+      screechIntensity = (speedFrac - 0.4) * 0.12 * Math.min(1, curveMag / 3);
+    }
+    screechGain.gain.setTargetAtTime(Math.min(0.08, screechIntensity), t, 0.04);
+    // Vary screech pitch slightly for realism
+    screechOsc.frequency.setTargetAtTime(800 + speedFrac * 400 + curveMag * 50, t, 0.05);
   }
 
   function playSound(type) {
     if (!audioCtx) return;
-    var osc = audioCtx.createOscillator();
-    var gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    var now = audioCtx.currentTime;
 
     if (type === 'crash') {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
       osc.type = 'square';
       osc.frequency.value = 150;
-      gain.gain.value = 0.15;
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
     } else if (type === 'checkpoint') {
-      osc.type = 'sine';
-      osc.frequency.value = 880;
-      gain.gain.value = 0.12;
-      osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.15);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.4);
+      // Satisfying ding: two-tone chime + shimmer
+      var osc1 = audioCtx.createOscillator();
+      var g1 = audioCtx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(880, now);
+      osc1.frequency.setValueAtTime(1320, now + 0.1);
+      g1.gain.setValueAtTime(0.15, now);
+      g1.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc1.connect(g1);
+      g1.connect(audioCtx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.5);
+
+      // Shimmer overtone
+      var osc2 = audioCtx.createOscillator();
+      var g2 = audioCtx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1760, now + 0.05);
+      g2.gain.setValueAtTime(0, now);
+      g2.gain.linearRampToValueAtTime(0.1, now + 0.08);
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      osc2.connect(g2);
+      g2.connect(audioCtx.destination);
+      osc2.start(now);
+      osc2.stop(now + 0.6);
+
+      // "Time added" confirmation — low bell
+      var osc3 = audioCtx.createOscillator();
+      var g3 = audioCtx.createGain();
+      osc3.type = 'triangle';
+      osc3.frequency.value = 660;
+      g3.gain.setValueAtTime(0, now + 0.15);
+      g3.gain.linearRampToValueAtTime(0.08, now + 0.2);
+      g3.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+      osc3.connect(g3);
+      g3.connect(audioCtx.destination);
+      osc3.start(now);
+      osc3.stop(now + 0.7);
     } else if (type === 'start') {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.value = 440;
-      gain.gain.value = 0.1;
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
     } else if (type === 'gameover') {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.value = 300;
-      gain.gain.value = 0.1;
-      osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === 'gearshift') {
+      // Brief dip then rise — simulates gear change
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      var baseFreq = 80 + (speed / MAX_SPEED) * 200;
+      osc.frequency.setValueAtTime(baseFreq * 0.7, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.12);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
     }
   }
 
   function stopEngineSound() {
     if (engineGain) engineGain.gain.value = 0;
+    if (engineGain2) engineGain2.gain.value = 0;
+    if (screechGain) screechGain.gain.value = 0;
+    lastGear = 0;
   }
 
   // ===== GAME LOOP =====
@@ -1082,7 +1216,7 @@ canvas { display: block; margin: 0 auto; }
     $startScreen.style.display = 'flex';
     $gameOverScreen.style.display = 'none';
     $hud.style.display = 'none';
-    $touchControls.style.display = 'none';
+    $mobControls.style.display = 'none';
     speed = 0;
     stopEngineSound();
   }
@@ -1110,7 +1244,7 @@ canvas { display: block; margin: 0 auto; }
     $hud.style.display = 'block';
 
     var isMobile = 'ontouchstart' in window && window.innerWidth < 900;
-    $touchControls.style.display = isMobile ? 'block' : 'none';
+    $mobControls.style.display = isMobile ? 'block' : 'none';
   }
 
   function gameOver() {
@@ -1125,7 +1259,7 @@ canvas { display: block; margin: 0 auto; }
     $goTopSpeed.textContent = topSpeedKmh + ' km/h';
     $goTitle.textContent = 'TIME UP';
     $hud.style.display = 'none';
-    $touchControls.style.display = 'none';
+    $mobControls.style.display = 'none';
     $gameOverScreen.style.display = 'flex';
 
     // Neon.js save
@@ -1189,12 +1323,26 @@ canvas { display: block; margin: 0 auto; }
       }
     });
 
-    // Touch controls
+    // Touch controls — wire touchstart/touchend to key state flags + visual feedback
     function touchHandler(id, keyObj) {
       var el = document.getElementById(id);
-      el.addEventListener('touchstart', function(e) { e.preventDefault(); keyObj.fn(true); });
-      el.addEventListener('touchend', function(e) { e.preventDefault(); keyObj.fn(false); });
-      el.addEventListener('touchcancel', function(e) { keyObj.fn(false); });
+      if (!el) return;
+      el.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        keyObj.fn(true);
+        el.classList.add('pressed');
+        // Init audio on first touch (mobile requires user gesture)
+        initAudio();
+      });
+      el.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        keyObj.fn(false);
+        el.classList.remove('pressed');
+      });
+      el.addEventListener('touchcancel', function(e) {
+        keyObj.fn(false);
+        el.classList.remove('pressed');
+      });
     }
     touchHandler('tLeft', { fn: function(v) { keyLeft = v; } });
     touchHandler('tRight', { fn: function(v) { keyRight = v; } });
